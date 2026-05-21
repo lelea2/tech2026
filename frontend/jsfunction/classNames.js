@@ -1,0 +1,76 @@
+// classnames is a commonly-used utility in modern front end applications to conditionally join CSS class names together. 
+// If you've written React applications, you likely have used a similar library.
+
+/**
+ * @param {...(any|Object|Array<any|Object|Array>)} args
+ * @return {string}
+ */
+export default function classNames(...args) {
+  const result = [];
+
+  function process(value) {
+    if (!value) {
+      return;
+    }
+    // string
+    if (typeof value === 'string') {
+      result.push(value);
+      return;
+    }
+
+    // integer
+    if (typeof value === 'number') {
+      if (value) {
+        result.push(value);
+        return;
+      }
+    }
+    // array
+    if (Array.isArray(value)) {
+      // recursive loop process each item type in array
+      for (const item of value) {
+        process(item);
+      }
+      return;
+    }
+    // object
+    if (typeof value === 'object') {
+      for (const key in value) {
+        if (value[key]) {
+          result.push(key);
+        }
+      }
+    }
+  }
+
+  for (const arg of args) {
+    process(arg);
+  }
+  return result.join(' ');
+}
+
+
+```
+classNames('foo', 'bar'); // 'foo bar'
+classNames('foo', { bar: true }); // 'foo bar'
+classNames({ 'foo-bar': true }); // 'foo-bar'
+classNames({ 'foo-bar': false }); // ''
+classNames({ foo: true }, { bar: true }); // 'foo bar'
+classNames({ foo: true, bar: true }); // 'foo bar'
+classNames({ foo: true, bar: false, qux: true }); // 'foo qux'
+
+
+classNames('a', ['b', { c: true, d: false }]); // 'a b c'
+
+classNames(
+  'foo',
+  {
+    bar: true,
+    duck: false,
+  },
+  'baz',
+  { quux: true },
+); // 'foo bar baz quux'
+
+classNames(null, false, 'bar', undefined, { baz: null }, ''); // 'bar'
+```

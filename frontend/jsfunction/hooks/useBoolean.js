@@ -1,0 +1,53 @@
+// Implement a useBoolean hook that manages a boolean state, with additional convenience utility methods.
+
+/**
+ * @typedef {Object} UseBooleanReturn
+ * @property {boolean} value
+ * @property {() => void} setTrue
+ * @property {() => void} setFalse
+ * @property {() => void} toggle
+ */
+
+/**
+ * @param {boolean} [initialValue=false]
+ * @returns {UseBooleanReturn}
+ */
+import {useCallback, useState} from 'react';
+
+export default function useBoolean(initialValue) {
+  const [value, setValue] = useState(initialValue ?? false);
+
+  const setTrue = useCallback(() => {
+    setValue(true);
+  }, []);
+
+  const setFalse = useCallback(() => {
+    setValue(false);
+  }, []);
+
+  const toggle = useCallback(() => {
+    setValue((prev) => !prev);
+  }, []);
+
+  return {
+    value,
+    setTrue,
+    setFalse,
+    toggle
+  };
+}
+
+
+```
+export default function Component() {
+  const { value, setTrue, setFalse } = useBoolean();
+
+  return (
+    <div>
+      <p>{value ? 'enabled' : 'disabled'}</p>
+      <button onClick={setTrue}>Enable</button>
+      <button onClick={setFalse}>Disable</button>
+    </div>
+  );
+}
+```

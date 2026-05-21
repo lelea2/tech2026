@@ -1,0 +1,23 @@
+/**
+ * @param {Array<any>} iterable
+ * @param {Function} callbackFn
+ *
+ * @return {Promise}
+ */
+export default function mapAsync(iterable, callbackFn) {
+  return Promise.all(
+    iterable.map((item, index) => callbackFn(item, index, iterable))
+  );
+}
+
+/**
+ const asyncDouble = (x: number) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(x * 2);
+    }, 10);
+  });
+
+const doubled = await mapAsync([1, 2], asyncDouble);
+console.log(doubled); // [2, 4]
+ */

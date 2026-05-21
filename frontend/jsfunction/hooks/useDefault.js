@@ -1,0 +1,39 @@
+// Implement a useDefault hook that returns the default value when state is null or undefined.
+
+
+/**
+ * @param {*} defaultValue
+ * @param {*} initialValue
+ * @returns {*}
+ */
+import {useCallback, useState} from 'react';
+
+export default function useDefault(defaultValue, initialValue) {
+  const [value, setValue] = useState(initialValue ?? defaultValue);
+  const setState = useCallback((newValue) => {
+    if (newValue == null) {
+      setValue(defaultValue);
+      return;
+    }
+    setValue(newValue);
+  }, [defaultValue]);
+
+  return [value, setState];
+}
+
+
+```
+export default function Component() {
+  const initialUser = { name: 'Marshall' };
+  const defaultUser = { name: 'Mathers' };
+  const [user, setUser] = useDefault(defaultUser, initialUser);
+
+  return (
+    <div>
+      <div>User: {user.name}</div>
+      <input onChange={(e) => setUser({ name: e.target.value })} />
+      <button onClick={() => setUser(null)}>reset</button>
+    </div>
+  );
+}
+```
