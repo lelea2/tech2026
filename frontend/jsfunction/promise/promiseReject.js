@@ -1,0 +1,10 @@
+/**
+ * @param {unknown} reason
+ * @returns {Promise<never>}
+ */
+export default function promiseReject(reason) {
+  // Always creates a new rejected Promise, even if reason is already a Promise.
+  return new Promise((_, reject) => {
+    reject(reason)
+  });
+}

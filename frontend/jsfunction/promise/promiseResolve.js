@@ -1,0 +1,54 @@
+/**
+ * @param {unknown} value
+ * @returns {Promise<unknown>}
+ */
+export default function promiseResolve(value) {
+	// If it's already a native Promise, return it unchanged.
+	if (value instanceof Promise) {
+		return value;
+	}
+
+	// Thenables are objects/functions with a callable `then` method.
+	if (
+		value !== null &&
+		(typeof value === 'object' || typeof value === 'function')
+	) {
+		const then = value.then;
+		if (typeof then === 'function') {
+			// Adopt the thenable's eventual state (fulfillment or rejection).
+			return new Promise((resolve, reject) => {
+				let called = false;
+
+				try {
+					then.call(
+						value,
+						(resolvedValue) => {
+							// Guard against thenables that try to settle multiple times.
+							if (called) {
+								return;
+							}
+							called = true;
+							resolve(resolvedValue);
+						},
+						(reason) => {
+							// Guard against thenables that try to settle multiple times.
+							if (called) {
+								return;
+							}
+							called = true;
+							reject(reason);
+						},
+					);
+				} catch (error) {
+					// If calling `then` throws before settlement, reject with that error.
+					if (!called) {
+						reject(error);
+					}
+				}
+			});
+		}
+	}
+
+	// Non-thenable values are wrapped in an already-fulfilled Promise.
+	return Promise.resolve(value);
+}

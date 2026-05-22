@@ -1,11 +1,11 @@
 // Implement a useMediaQuery hook that subscribes and responds to media query changes (e.g. screen size, resolution, orientation, etc.).
 
-import {useEffect, useState} from 'react';
-
 /**
  * @param {string} query
  * @returns {boolean}
  */
+import {useEffect, useState} from 'react';
+
 export default function useMediaQuery(query) {
   const getInitialValue = () => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
@@ -22,9 +22,13 @@ export default function useMediaQuery(query) {
     }
 
     const media = window.matchMedia(query);
+    const updateMatches = () => {
+      setMatches(window.matchMedia(query).matches);
+    };
+
     setMatches(media.matches);
 
-    const listener = (e) => setMatches(e.matches);
+    const listener = () => updateMatches();
 
     if (typeof media.addEventListener === 'function') {
       media.addEventListener('change', listener);

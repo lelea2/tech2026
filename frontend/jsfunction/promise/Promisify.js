@@ -1,0 +1,17 @@
+/**
+ * @param {Function} func - A callback-last, error-first async function
+ * @returns {Function} A version of `func` that returns a Promise
+ */
+export default function promisify(func) {
+  return function (...args) {
+    return new Promise((resolve, reject) => {
+      func.call(this, ...args, (err, value) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(value);
+        }
+      });
+    });
+  };
+}

@@ -1,0 +1,27 @@
+/**
+ * Implement a useThrottle hook that 
+ * delays value state updates to happen at most every interval-millisecond intervals.
+ */
+/**
+ * @template T
+ * @param {T} value
+ * @param {number} interval
+ */
+
+import {useEffect, useState} from 'react';
+
+export default function useThrottle(value, interval = 500) {
+  const [throttlePosition, setThrottlePosition] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setThrottlePosition(value);
+    }, interval);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [value, interval]);
+  
+  return throttlePosition;
+}
