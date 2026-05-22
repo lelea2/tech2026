@@ -1,0 +1,132 @@
+---
+title: LLM Interview Questions
+sidebar_position: 1
+---
+
+# LLM Interview Questions
+
+Structured Q&A reference for ML/LLM interview prep.
+
+## Foundational Questions
+
+### 1. What is the difference between a language model and an instruction-tuned model?
+
+A base language model is trained to predict the next token from broad internet/corpus data. It is good at continuation but not always aligned to user intent.
+
+An instruction-tuned model starts from a base model and is fine-tuned on prompt-response pairs so it follows directions better, formats outputs cleanly, and is more useful for assistant tasks.
+
+### 2. How does tokenization affect model behavior and cost?
+
+The model reads and writes tokens, not words. Cost and latency scale with total input and output tokens.
+
+Key effects:
+
+- Different tokenizers split text differently, changing effective context usage and cost.
+- Long prompts increase latency and price.
+- Poor prompt structure can waste tokens and reduce quality.
+
+### 3. What are embeddings and how are they used in retrieval systems?
+
+Embeddings map text to dense vectors where semantic similarity is represented by geometric closeness.
+
+In retrieval:
+
+- Convert docs/chunks and query into vectors.
+- Use vector search to find nearest chunks.
+- Feed retrieved chunks into generation (RAG) to improve factual grounding.
+
+## Architecture and Training
+
+### 1. Why does self-attention scale quadratically with sequence length?
+
+For sequence length n, each token attends to every token, creating an n x n attention matrix. That makes compute and memory roughly O(n^2).
+
+### 2. What are common techniques to extend context length?
+
+- RoPE scaling variants (for position interpolation/extrapolation).
+- Attention optimizations (flash attention, block/sparse attention).
+- Retrieval-based context (keep model context moderate, fetch relevant memory externally).
+- Summarization/memory compression of old turns.
+
+### 3. What is the trade-off between pre-training, SFT, and RLHF?
+
+- Pre-training: broad knowledge and general capabilities, very expensive.
+- SFT: improves instruction following and style quickly, may overfit narrow formats.
+- RLHF/RLAIF: improves preference alignment and helpfulness, but can reduce diversity and introduce reward hacking if poorly designed.
+
+## Inference and Serving
+
+### 1. How do you reduce latency and cost in production LLM systems?
+
+- Use shorter prompts and tighter output constraints.
+- Cache repeated prompts/responses and retrieved context.
+- Route simple tasks to smaller/cheaper models.
+- Batch requests where possible.
+- Stream outputs for better perceived latency.
+
+### 2. What are KV cache, batching, and speculative decoding?
+
+- KV cache: stores prior attention keys/values so generation does not recompute full history every token.
+- Batching: processes multiple requests together for better hardware utilization.
+- Speculative decoding: draft model proposes tokens, larger model verifies, increasing throughput when acceptance is high.
+
+### 3. How do you design reliable fallbacks for model failures?
+
+- Set strict timeouts and retry budgets.
+- Add model fallback tiers (large -> medium -> small/template).
+- Detect unsafe or low-confidence outputs and trigger guarded responses.
+- Keep deterministic non-LLM paths for critical workflows.
+
+## Evaluation and Safety
+
+### 1. How do you evaluate correctness beyond simple accuracy metrics?
+
+- Task-specific rubrics (factuality, completeness, reasoning trace quality).
+- Human preference and pairwise comparisons.
+- Retrieval attribution quality (citation correctness).
+- Offline benchmark sets plus online A/B and regression tests.
+
+### 2. What are hallucinations and how do you mitigate them?
+
+Hallucinations are confident but incorrect outputs.
+
+Mitigations:
+
+- Retrieval grounding with citations.
+- Ask model to abstain when evidence is missing.
+- Constrain output formats and use verification steps.
+- Use post-generation checks (rules, validators, secondary model).
+
+### 3. How do you measure and reduce prompt injection risks?
+
+- Red-team with adversarial prompts.
+- Track attack success rate and policy violation rate.
+- Separate trusted system instructions from untrusted user/document content.
+- Apply content filtering, tool-use allowlists, and permission boundaries.
+
+## System Design Scenarios
+
+### 1. Design a RAG system for internal company knowledge.
+
+Minimum blueprint:
+
+- Ingestion pipeline: connectors -> cleaning -> chunking -> embedding -> vector index.
+- Query pipeline: rewrite query -> retrieve -> rerank -> prompt assembly -> answer with citations.
+- Guardrails: access control, PII masking, source-level authorization.
+- Observability: retrieval hit rate, citation coverage, latency, cost per query.
+
+### 2. Design a chat copilot with citations and guardrails.
+
+- Session memory with short-term summary.
+- Retrieval and citation-first answer mode.
+- Policy layer for unsafe requests and tool usage.
+- Human handoff for high-risk or unresolved intents.
+
+### 3. Design an LLM pipeline for offline document summarization.
+
+- Batch ingestion and chunk-level summaries.
+- Hierarchical summarize (chunk -> section -> document).
+- Quality checks (coverage, factual consistency, banned-content checks).
+- Store summaries with versioning for reprocessing and audits.
+
+If you share the exact PDF path, I can replace this with a verbatim conversion from your source document.

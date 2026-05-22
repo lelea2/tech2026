@@ -91,6 +91,11 @@ const config = {
             label: 'FrontEnd',
           },
           {
+            to: '/docs/ml',
+            position: 'left',
+            label: 'ML',
+          },
+          {
             href: 'https://github.com/lelea2/tech2026',
             label: 'GitHub',
             position: 'right',
