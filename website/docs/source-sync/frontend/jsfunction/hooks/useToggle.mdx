@@ -1,0 +1,22 @@
+---
+title: useToggle
+---
+
+# useToggle
+
+~~~javascript
+/**
+ * @param {boolean | undefined} defaultValue
+ */
+
+import {useState, useCallback} from 'react';
+
+export default function useToggle(defaultValue) {
+  const [enabled, setEnabled] = useState(defaultValue ?? false);
+  const toggle = useCallback(() => {
+    setEnabled(!enabled);
+  }, [enabled]);
+
+  return [enabled, toggle, setEnabled];
+}
+~~~

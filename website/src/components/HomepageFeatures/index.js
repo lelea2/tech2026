@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import Heading from '@theme/Heading';
-import Link from '@docusaurus/Link';
 import styles from './styles.module.css';
 
 const FeatureList = [
@@ -13,7 +12,6 @@ const FeatureList = [
         and dynamic programming with clear trade-off analysis.
       </>
     ),
-    cta: 'Explore Algorithm',
   },
   {
     title: 'System Design',
@@ -24,7 +22,6 @@ const FeatureList = [
         capacity, and justify architectural choices during interviews.
       </>
     ),
-    cta: 'Explore System Design',
   },
   {
     title: 'Behavioral Interview',
@@ -35,11 +32,10 @@ const FeatureList = [
         leadership and collaboration questions with confidence.
       </>
     ),
-    cta: 'Explore Behavioral',
   },
 ];
 
-function Feature({Svg, title, description, cta}) {
+function Feature({Svg, title, description}) {
   return (
     <article className={clsx('col col--4', styles.featureCard)}>
       <div className={styles.featureIconWrap}>
@@ -48,9 +44,6 @@ function Feature({Svg, title, description, cta}) {
       <div className={styles.featureBody}>
         <Heading as="h3">{title}</Heading>
         <p>{description}</p>
-        <Link className="button button--primary button--sm" to="/docs/frontend">
-          {cta}
-        </Link>
       </div>
     </article>
   );

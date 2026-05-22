@@ -1,0 +1,38 @@
+---
+title: useEventListener
+---
+
+# useEventListener
+
+~~~javascript
+// Implement a useEventListener hook that subscribes to browser events by attaching event listeners to DOM elements, 
+// // the window, or media query lists.
+
+import {useEffect, useRef} from 'react';
+
+export default function useEventListener(eventName, handler, element, options) {
+  const savedHandler = useRef(handler);
+
+  useEffect(() => {
+    savedHandler.current = handler;
+  }, [handler]);
+
+  useEffect(() => {
+    const target = element?.current ?? (typeof window !== 'undefined' ? window : undefined);
+
+    if (!target || !target.addEventListener) {
+      return;
+    }
+
+    const listener = (event) => {
+      savedHandler.current(event);
+    };
+
+    target.addEventListener(eventName, listener, options);
+
+    return () => {
+      target.removeEventListener(eventName, listener, options);
+    };
+  }, [eventName, element, options]);
+}
+~~~

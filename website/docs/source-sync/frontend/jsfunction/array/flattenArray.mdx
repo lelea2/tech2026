@@ -1,0 +1,55 @@
+---
+title: flattenArray
+---
+
+# flattenArray
+
+~~~javascript
+// const nested = [1, [2, [3, [4, [5]]]]];
+
+// // Flatten one level (the default).
+// nested.flat(); // [1, 2, [3, [4, [5]]]]
+
+// // Flatten a specific number of levels.
+// nested.flat(2); // [1, 2, 3, [4, [5]]]
+
+// // Flatten all levels by passing Infinity.
+// nested.flat(Infinity); // [1, 2, 3, 4, 5]
+
+export default function flatten(arr) {
+  const flattenArr = (arr, resultArr) => {
+    const result = resultArr || [];
+    for (let i = 0; i < arr.length; i++) {
+      if (Array.isArray(arr[i])) {
+        flattenArr(arr[i], result);
+      } else {
+        result.push(arr[i]);
+      }
+    }
+    return result;
+  }
+  return flattenArr(arr, []);
+}
+
+
+// Test case
+```
+import flatten from './flatten';
+
+describe('flatten array', () => {
+  test('empty array', () => {
+    expect(flatten([])).toEqual([]);
+  });
+
+  test('nested array', () => {
+    expect(flatten([1, [2]])).toEqual([1, 2]);
+  });
+
+  test('multiple levels of nesting', () => {
+    expect(flatten([1, [2, [3]]])).toEqual([1, 2, 3]);
+  });
+});
+```
+
+
+~~~

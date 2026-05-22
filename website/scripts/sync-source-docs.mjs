@@ -136,11 +136,11 @@ function hashContent(content) {
 }
 
 function mdxForSource(relativePath, source) {
-  const fileName = path.basename(relativePath);
   const ext = path.extname(relativePath).toLowerCase();
+  const baseName = path.basename(relativePath, ext);
   const language = languageByExt[ext] || '';
 
-  return `---\ntitle: ${fileName}\n---\n\n# ${fileName}\n\nSource: ${relativePath}\n\n~~~${language}\n${source}\n~~~\n`;
+  return `---\ntitle: ${baseName}\n---\n\n# ${baseName}\n\n~~~${language}\n${source}\n~~~\n`;
 }
 
 async function pathExists(targetPath) {
@@ -272,7 +272,11 @@ async function main() {
       const source = await fs.readFile(absFile, 'utf8');
       const sourceHash = hashContent(source);
 
-      const docRelative = `${toPosix(path.join(folder.docDir, relativeFromSource))}.mdx`;
+      const sourceExt = path.extname(relativeFromSource);
+      const relativeWithoutExt = sourceExt
+        ? relativeFromSource.slice(0, -sourceExt.length)
+        : relativeFromSource;
+      const docRelative = `${toPosix(path.join(folder.docDir, relativeWithoutExt))}.mdx`;
       const outFile = path.join(docsRoot, docRelative);
       const outDir = path.dirname(outFile);
       const existing = previous.files[relativePath];

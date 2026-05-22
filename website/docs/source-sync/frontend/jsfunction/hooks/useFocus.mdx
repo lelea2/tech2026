@@ -1,0 +1,39 @@
+---
+title: useFocus
+---
+
+# useFocus
+
+~~~javascript
+// Implement a useFocus hook that enables programmatic focusing of an element.
+
+
+/**
+ * @template T
+ * @returns {[import("react").RefObject<T>, () => void]}
+ */
+
+import {useCallback, useRef} from 'react';
+export default function useFocus() {
+  const ref = useRef(null);
+
+  const focus = useCallback(() => {
+    ref.current?.focus();
+  }, []);
+
+  return [ref, focus];
+}
+
+/**
+ export default function Component() {
+  const [ref, focus] = useFocus();
+
+  return (
+    <div>
+      <input ref={ref} type="text" />
+      <button onClick={focus}>Focus input</button>
+    </div>
+  );
+}
+ */
+~~~
