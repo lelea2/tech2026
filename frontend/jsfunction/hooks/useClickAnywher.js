@@ -1,0 +1,21 @@
+// Implement a useClickAnywhere hook that handles click events anywhere in the browser window.
+
+
+/**
+ * @param {*} handler
+ * @returns {*}
+ */
+import {useCallback, useEffect} from 'react';
+
+export default function useClickAnywhere(handler) {
+  const handleClick = useCallback((event) => {
+    handler(event);
+  }, [handler]);
+
+  useEffect(() => {
+    window.addEventListener('click', handleClick);
+    return () => {
+      window.removeEventListener('click', handleClick);
+    };
+  }, [handleClick]);
+}

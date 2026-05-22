@@ -1,0 +1,14 @@
+// Implement a useEffectOnce hook that runs an effect only once.
+
+import {useRef, useEffect} from 'react';
+
+export default function useEffectOnce(effect) {
+  const hasRun = useRef(false);
+
+  useEffect(() => {
+    if (!hasRun.current) {
+      hasRun.current = true;
+      return effect();
+    }
+  }, [effect]);
+}

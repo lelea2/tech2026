@@ -1,0 +1,48 @@
+/**
+ * @template T
+ * @returns {[import("react").RefCallback<T>, boolean]}
+ */
+import {useCallback, useEffect, useState} from 'react';
+
+export default function useHover() {
+  const [isHovered, setIsHovered] = useState(false);
+  const [node, setNode] = useState(null);
+  
+  const ref = useCallback((element) => {
+    setNode(element);
+  });
+
+  useEffect(() => {
+    const element = node;
+    if (!element) return;
+    function handleMouseEnter() {
+      setIsHovered(true);
+    }
+
+    function handleMouseLeave() {
+      setIsHovered(false);
+    }
+
+    element.addEventListener('mouseenter', handleMouseEnter);
+    element.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      element.removeEventListener('mouseenter', handleMouseEnter);
+      element.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, [node]);
+
+  return [ref, isHovered];
+}
+
+/**
+ * export default function Component() {
+  const [ref, hovered] = useHover();
+
+  return (
+    <div>
+      <div ref={ref}>{hovered ? 'Hovered' : 'Not hovered'}</div>
+    </div>
+  );
+}
+ */
