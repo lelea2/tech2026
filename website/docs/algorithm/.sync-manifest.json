@@ -1,0 +1,16 @@
+{
+  "files": {
+    "algorithm/array/kRowPascalTriangle.py": {
+      "hash": "c3594094add1189a12c514811274cc91ff579752522c1753b82f155d71b54528",
+      "docRelative": "array/kRowPascalTriangle.mdx"
+    },
+    "algorithm/array/kRowPascalTriangle.js": {
+      "hash": "c3594094add1189a12c514811274cc91ff579752522c1753b82f155d71b54528",
+      "docRelative": "array/kRowPascalTriangle.mdx"
+    },
+    "algorithm/array/maxSubArray.py": {
+      "hash": "b0445cc26d7130f6709ca5b7c7a02f8286e0a534eff2d4725b0c2977638f7053",
+      "docRelative": "array/maxSubArray.mdx"
+    }
+  }
+}

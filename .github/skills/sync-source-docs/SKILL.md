@@ -1,6 +1,6 @@
 ---
 name: sync-source-docs
-description: Use when frontend, backend, or algorithm source files changed and docs need to be synced into website docs automatically. Also use when a custom folder format/path mapping is provided and document paths must be generated accordingly, including frontend/jsfunction, frontend/array, and algorithm navigation. Trigger phrases: sync docs, update documentation, refresh source docs, frontend changed, backend changed, algorithm changed, folder format mapping, jsfunction docs sync, algorithm docs sync.
+description: Use when frontend, backend, or algorithm source files changed and docs need to be synced into website docs automatically. Also use when a custom folder format/path mapping is provided and document paths must be generated accordingly, including frontend/jsfunction, frontend/array, and separate algorithm navigation. Trigger phrases: sync docs, update documentation, refresh source docs, frontend changed, backend changed, algorithm changed, folder format mapping, jsfunction docs sync, algorithm docs sync, py js compare docs.
 ---
 
 # Sync Source Docs
@@ -14,7 +14,7 @@ Keep documentation in sync when files change under frontend, backend, or algorit
 - Monitor source folders:
   - frontend
   - backend
-  - algorithm paths (for example `frontend/algorithm` or `backend/algorithm`)
+  - algorithm
 - Ignore website as a source of truth
 - Write auto-generated docs to:
   - website/docs/source-sync
@@ -44,25 +44,26 @@ With custom mapping format:
 
 Preferred pattern for ongoing maintenance (map parent folders, not only leaf folders):
 
-- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction;frontend/algorithm=algorithm"
+- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"
 
-This ensures newly added files under `frontend/jsfunction/**` and `frontend/algorithm/**` are synced automatically in the next run.
+This ensures newly added files under `frontend/jsfunction/**` are synced automatically in the next run.
 
 Canonical FrontEnd sync command (includes folders like `getElementBy`, `hooks`, `promise`, `array` automatically):
 
 - cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"
 
-Sync algorithm docs (example mapping):
+Sync algorithm docs as a separate navigation section:
 
-- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/algorithm=algorithm"
+- cd website && npm run sync:source-docs -- --docs-subdir algorithm --format "algorithm=."
 
 This creates/updates:
 
-- website/docs/frontend/algorithm
+- website/docs/algorithm
 
-Sync jsfunction + algorithm together in one run (recommended to avoid pruning non-mapped paths):
+Run FrontEnd + Algorithm sync as two commands (separate docs subdirs):
 
-- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction;frontend/jsfunction/array=array;frontend/algorithm=algorithm"
+- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"
+- cd website && npm run sync:source-docs -- --docs-subdir algorithm --format "algorithm=."
 
 Create a new FrontEnd subtab from folder name (example: `array`):
 
@@ -117,6 +118,7 @@ The sync command prints a summary in this format:
 ## Notes
 
 - Every synced source file is rendered as an MDX page with a code block.
+- If both `.py` and `.js` files share the same relative basename (for example `kRowPascalTriangle.py` + `kRowPascalTriangle.js`), they are merged into one MDX page with language tabs so readers can compare side-by-side in a single page.
 - Output filenames strip the source extension: `useBoolean.js` → `useBoolean.mdx` (never `useBoolean.js.mdx`).
 - Titles and headings also use the base name without extension (e.g. `useBoolean`, not `useBoolean.js`).
 - Removed source files are also removed from generated docs.

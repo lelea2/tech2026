@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '../..');
 const defaultDocsSubdir = 'source-sync';
-const defaultFormat = 'frontend=frontend;backend=backend';
+const defaultFormat = 'frontend=frontend;backend=backend;algorithm=algorithm';
 
 const allowedExtensions = new Set([
   '.js',
@@ -102,9 +102,9 @@ function parseFolderFormat(rawFormat) {
       }
 
       const sourceDir = normalizeRelativePath(sourcePart);
-      const docDir = normalizeRelativePath(docsPart);
+      const docDir = docsPart === '.' ? '' : normalizeRelativePath(docsPart);
 
-      if (!sourceDir || !docDir) {
+      if (!sourceDir || (docsPart !== '.' && !docDir)) {
         throw new Error(
           `Invalid --format entry "${entry}". Source and docs path must be non-empty.`,
         );
@@ -119,7 +119,7 @@ function parseFolderFormat(rawFormat) {
       return {
         sourceDir,
         docDir,
-        label: toTitleCase(path.basename(docDir)),
+        label: toTitleCase(path.basename(docDir || sourceDir)),
         position: index + 1,
       };
     });
@@ -135,12 +135,31 @@ function hashContent(content) {
   return createHash('sha256').update(content).digest('hex');
 }
 
-function mdxForSource(relativePath, source) {
-  const ext = path.extname(relativePath).toLowerCase();
-  const baseName = path.basename(relativePath, ext);
-  const language = languageByExt[ext] || '';
+function labelForExt(ext) {
+  if (ext === '.js') {
+    return 'JavaScript';
+  }
+  if (ext === '.py') {
+    return 'Python';
+  }
 
-  return `---\ntitle: ${baseName}\n---\n\n# ${baseName}\n\n~~~${language}\n${source}\n~~~\n`;
+  return (languageByExt[ext] || ext.replace('.', '') || 'Code').toUpperCase();
+}
+
+function mdxForSources(baseName, variants) {
+  if (variants.length === 1) {
+    const [only] = variants;
+    return `---\ntitle: ${baseName}\n---\n\n# ${baseName}\n\n~~~${only.language}\n${only.source}\n~~~\n`;
+  }
+
+  const tabItems = variants
+    .map((variant) => {
+      const value = variant.label.toLowerCase();
+      return `  <TabItem value="${value}" label="${variant.label}">\n\n~~~${variant.language}\n${variant.source}\n~~~\n\n  </TabItem>`;
+    })
+    .join('\n');
+
+  return `---\ntitle: ${baseName}\n---\n\n# ${baseName}\n\nimport Tabs from '@theme/Tabs';\nimport TabItem from '@theme/TabItem';\n\n<Tabs>\n${tabItems}\n</Tabs>\n`;
 }
 
 async function pathExists(targetPath) {
@@ -199,6 +218,10 @@ async function ensureCategoryFiles(docsRoot, folderMappings, docsSubdir) {
 
   const seenDocDirs = new Set();
   for (const folder of folderMappings) {
+    if (!folder.docDir) {
+      continue;
+    }
+
     if (seenDocDirs.has(folder.docDir)) {
       continue;
     }
@@ -266,44 +289,94 @@ async function main() {
 
     const files = await collectFiles(sourceRoot);
 
+    const docsByRelative = new Map();
     for (const absFile of files) {
       const relativePath = toPosix(path.relative(repoRoot, absFile));
       const relativeFromSource = toPosix(path.relative(sourceRoot, absFile));
+      const sourceExt = path.extname(relativeFromSource).toLowerCase();
+      const language = languageByExt[sourceExt] || '';
       const source = await fs.readFile(absFile, 'utf8');
       const sourceHash = hashContent(source);
 
-      const sourceExt = path.extname(relativeFromSource);
       const relativeWithoutExt = sourceExt
         ? relativeFromSource.slice(0, -sourceExt.length)
         : relativeFromSource;
       const docRelative = `${toPosix(path.join(folder.docDir, relativeWithoutExt))}.mdx`;
+
+      if (!docsByRelative.has(docRelative)) {
+        docsByRelative.set(docRelative, {
+          baseName: path.basename(relativeWithoutExt),
+          variants: [],
+        });
+      }
+
+      docsByRelative.get(docRelative).variants.push({
+        relativePath,
+        source,
+        sourceHash,
+        language,
+        label: labelForExt(sourceExt),
+      });
+    }
+
+    for (const [docRelative, doc] of docsByRelative.entries()) {
       const outFile = path.join(docsRoot, docRelative);
       const outDir = path.dirname(outFile);
-      const existing = previous.files[relativePath];
 
-      next.files[relativePath] = {
-        hash: sourceHash,
-        docRelative,
-      };
+      const variants = [...doc.variants].sort((a, b) => {
+        const priority = {'Python': 1, 'JavaScript': 2};
+        const pa = priority[a.label] || 99;
+        const pb = priority[b.label] || 99;
+        if (pa !== pb) {
+          return pa - pb;
+        }
+        return a.relativePath.localeCompare(b.relativePath);
+      });
 
-      if (existing && existing.hash === sourceHash && (await pathExists(outFile))) {
+      const docHash = hashContent(
+        variants.map((variant) => `${variant.relativePath}:${variant.sourceHash}`).join('|'),
+      );
+
+      for (const variant of variants) {
+        next.files[variant.relativePath] = {
+          hash: docHash,
+          docRelative,
+        };
+      }
+
+      const unchanged =
+        (await pathExists(outFile)) &&
+        variants.every((variant) => previous.files[variant.relativePath]?.hash === docHash);
+
+      if (unchanged) {
         unchangedCount += 1;
         continue;
       }
 
       await fs.mkdir(outDir, {recursive: true});
-      await fs.writeFile(outFile, mdxForSource(relativePath, source), 'utf8');
+      await fs.writeFile(outFile, mdxForSources(doc.baseName, variants), 'utf8');
       writtenCount += 1;
     }
   }
 
   let removedCount = 0;
-  for (const [relativePath, meta] of Object.entries(previous.files)) {
-    if (next.files[relativePath]) {
+  const previousDocRelatives = new Set(
+    Object.values(previous.files)
+      .map((meta) => meta?.docRelative)
+      .filter(Boolean),
+  );
+  const nextDocRelatives = new Set(
+    Object.values(next.files)
+      .map((meta) => meta?.docRelative)
+      .filter(Boolean),
+  );
+
+  for (const docRelative of previousDocRelatives) {
+    if (nextDocRelatives.has(docRelative)) {
       continue;
     }
 
-    const stalePath = path.join(docsRoot, meta.docRelative || `${relativePath}.mdx`);
+    const stalePath = path.join(docsRoot, docRelative);
     if (await pathExists(stalePath)) {
       await fs.unlink(stalePath);
       removedCount += 1;

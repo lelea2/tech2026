@@ -76,6 +76,11 @@ const config = {
         },
         items: [
           {
+            to: '/docs/algorithm',
+            position: 'left',
+            label: 'Algorithm',
+          },
+          {
             to: '/docs/tutorial-extras/manage-docs-versions',
             position: 'left',
             label: 'BackEnd',

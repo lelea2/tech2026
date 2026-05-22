@@ -1,243 +1,247 @@
 {
   "files": {
     "frontend/jsfunction/EventEmitter.js": {
-      "hash": "dd88caf6c018a14f74dc971863d1639316c9596920f14d345730e5075b8de4d7",
+      "hash": "661898a85863be1554b3c439765c2b3b0e10a114f5528795aeaf78ade2854088",
       "docRelative": "jsfunction/EventEmitter.mdx"
     },
     "frontend/jsfunction/array/flattenArray.js": {
-      "hash": "cddcf41928c82b4a4d682e4eac40f70bb62cef792d122e83da20303c1bc4aafa",
+      "hash": "02bbad3eb1d714a644485867a1e48c17bdc5ce54e62cdf03132e6a225cf5fa9f",
       "docRelative": "jsfunction/array/flattenArray.mdx"
     },
+    "frontend/jsfunction/array/kRowPascalTriangle.js": {
+      "hash": "1d39811dc7b9366637a5e69f93b1f62261b23f10a944a971db303fdbd915d5de",
+      "docRelative": "jsfunction/array/kRowPascalTriangle.mdx"
+    },
     "frontend/jsfunction/classNames.js": {
-      "hash": "54ad74a0d9b30ce925db829345a0ba7d25a98fd8b5b94b1784ce3cedfe9fe94a",
+      "hash": "07711fd28ee997ea5c57ed5c26b73f066fd237dc188d41ec2ba543423036cc72",
       "docRelative": "jsfunction/classNames.mdx"
     },
     "frontend/jsfunction/classNamesAdvance.js": {
-      "hash": "9e7b780cd3ebff18fd27a493bbe8cbbf33f426a711df3c7770084693e754321e",
+      "hash": "55f425d054249466b2e041273cd17b3a266085dcdf1af48ed49d45b2fafbdbff",
       "docRelative": "jsfunction/classNamesAdvance.mdx"
     },
     "frontend/jsfunction/debounce.js": {
-      "hash": "60ea3969b0021ea38ebe19e67a12417e4574c98f026e42b19b60c377cacb6d21",
+      "hash": "1f7d22364628068546c6958d490b53578ac20db64cd8c920547f9add55ecba35",
       "docRelative": "jsfunction/debounce.mdx"
     },
     "frontend/jsfunction/debounceCancelFlush.js": {
-      "hash": "51a7756891bfa443f4711cd5f8c581ab83e53c2ba38a1be6f55e40b86d601383",
+      "hash": "1c53b23aad58b922cc6a4d8aefc7051857653b8d05c20c3f1e0a497d2d64df8a",
       "docRelative": "jsfunction/debounceCancelFlush.mdx"
     },
     "frontend/jsfunction/deepClone.js": {
-      "hash": "5354fd2df3897128287a0839e0ecd77cf97af3ea53d82edcc06405813ab8e1d0",
+      "hash": "0ca756dbe6d3211434b1be88d634090459c1c0e7fd3701c6edefebb658e11901",
       "docRelative": "jsfunction/deepClone.mdx"
     },
     "frontend/jsfunction/getElementBy/getElementByClassName.js": {
-      "hash": "b67ce4c8c28aaed1e0ae5634b8b633fc13bb3fa9ff9a3a80d06c8b8102418718",
+      "hash": "24f967e6b60c4d1ec1bd0e9df427c9594d984d5caf9e2921b63693f3c1058bd4",
       "docRelative": "jsfunction/getElementBy/getElementByClassName.mdx"
     },
     "frontend/jsfunction/getElementBy/getElementByStyles.js": {
-      "hash": "fc2523b960243bc978c67d1327ff8ea13f581f0b2fc18a42805ab9df409badba",
+      "hash": "b8cedf3dd248322c9f55dfa6e688db38c2baba3c74592628b56845615a428dd6",
       "docRelative": "jsfunction/getElementBy/getElementByStyles.mdx"
     },
     "frontend/jsfunction/getElementBy/getElementByTagName.js": {
-      "hash": "bca01ed4ee3dc6495e55fee540d7fbd4921068c59664b00c616e25bfb7f29a58",
+      "hash": "9a15e3956e3131eec9c1b0826c591c6d3fc648fad0a133320aa8ec20c7a809bb",
       "docRelative": "jsfunction/getElementBy/getElementByTagName.mdx"
     },
     "frontend/jsfunction/getElementBy/getElementByTagNameHiearchy.js": {
-      "hash": "ea29a043ba611674ba081bcd653536a2255ad3266525c79c3de0e0dcfc5b34b5",
+      "hash": "e55837cf59d37c57b01cca3eff28c7b7344fc7452d2744cbd2bd429bc550e0ba",
       "docRelative": "jsfunction/getElementBy/getElementByTagNameHiearchy.mdx"
     },
     "frontend/jsfunction/hooks/useArray.js": {
-      "hash": "7637dc97498eff119ee8c1b9c2b0e44130c0545145bc9fb6fe1fa179bf2e8d49",
+      "hash": "1c0fbb7a3fb7aaaedecc357321a3d685569e0dcf22a151dfc68646966ffc26b1",
       "docRelative": "jsfunction/hooks/useArray.mdx"
     },
     "frontend/jsfunction/hooks/useBoolean.js": {
-      "hash": "6671b06e08353bfb6c78e54bc9dbbac0b81e648612d76b42975b14260b118d9d",
+      "hash": "32e2f7ec06b50f7c333162732878d3123665882e4707ba7e8b99a0862d52f5ef",
       "docRelative": "jsfunction/hooks/useBoolean.mdx"
     },
     "frontend/jsfunction/hooks/useBreakpoint.js": {
-      "hash": "a815535500021ab861425ec8b5f5a9daf8c015b727bcbc772a425904cb7b74bf",
+      "hash": "175ffe4040b296b3a0a16f0b73154b3c0463b9435e7e369474c2a56cc00f7a6b",
       "docRelative": "jsfunction/hooks/useBreakpoint.mdx"
     },
     "frontend/jsfunction/hooks/useClickAnywher.js": {
-      "hash": "49fefe69258365e67fc8e8ab19c5c6ee0edfed4bf63510019169988dada3db37",
+      "hash": "f050be7407924c0a9c913b438ca5e990618ed422fd070363d622bf0b29d20623",
       "docRelative": "jsfunction/hooks/useClickAnywher.mdx"
     },
     "frontend/jsfunction/hooks/useClickoutside.js": {
-      "hash": "7ebb78abbaff5ce6d35473b52d22b9bcd6cdd1c5adcd82eb7ea82681d2e363b7",
+      "hash": "e38064486a7cf3c955ede16b810014d07808fc43025ca066dc218679a797b712",
       "docRelative": "jsfunction/hooks/useClickoutside.mdx"
     },
     "frontend/jsfunction/hooks/useCountdown.js": {
-      "hash": "8f918af57208d92001f023b826f23bda6892bc5e7114545ab4bedd3cf7a9b59d",
+      "hash": "6114b6e030e3c7c52e9b4ff7fa0b53f6f6df272ec085e25cf5d5bcce2fd412df",
       "docRelative": "jsfunction/hooks/useCountdown.mdx"
     },
     "frontend/jsfunction/hooks/useCounter.js": {
-      "hash": "c720e7d30f21cf09973ce804c35c81182ddd75cad2d858e2d0bce955d02924eb",
+      "hash": "4d90f0ff3106148d830f014ef37fa53c0ce90586bc23b637a591c000ee4642ca",
       "docRelative": "jsfunction/hooks/useCounter.mdx"
     },
     "frontend/jsfunction/hooks/useCounterMemoize.js": {
-      "hash": "6471f875c2be26dba0b6caf09d1c67adf7b61f8750ed1c1004e6a19de0bf188a",
+      "hash": "62c6153dcb892fb10079664541211db3eb0fcc273593af71aa26ac5a9fdecfa1",
       "docRelative": "jsfunction/hooks/useCounterMemoize.mdx"
     },
     "frontend/jsfunction/hooks/useCycle.js": {
-      "hash": "0b39ce5e3610cf00628cdb28af9a0c79502dc8c3796104ba13040dca694a994b",
+      "hash": "6f4597d93191a19c74b5099683ce5c69efc6df107e6c2014df25185cbe166794",
       "docRelative": "jsfunction/hooks/useCycle.mdx"
     },
     "frontend/jsfunction/hooks/useDebounce.js": {
-      "hash": "62f8a8fff7e9226a56dd529d6437fa60ded2e1922aa65f0d19cd1bfd3a234615",
+      "hash": "640794ceb0fd3dc819ccf9ecabea555ab72ea80967e903fa0b02dd58fe48224c",
       "docRelative": "jsfunction/hooks/useDebounce.mdx"
     },
     "frontend/jsfunction/hooks/useDefault.js": {
-      "hash": "68e621aba816ac11bfe610e3235e478e340aca8e9ffcb7cecbdecfffd632bffb",
+      "hash": "4c8e8571e41bc6fec348f63daeed5f6a00170c1280f214b554e401b5cf9eeb3c",
       "docRelative": "jsfunction/hooks/useDefault.mdx"
     },
     "frontend/jsfunction/hooks/useEffectOnce.js": {
-      "hash": "58c48f42fb857119bc25c1f550df0f8969af12be19a74ba85b86437ad26c4833",
+      "hash": "40e79d0c2e6b1f964b516ce137ecfc25987e32771eb03927d1befd7ae33b8a19",
       "docRelative": "jsfunction/hooks/useEffectOnce.mdx"
     },
     "frontend/jsfunction/hooks/useEventListener.js": {
-      "hash": "836a5d3004a931b4a170a15a7cbc0adfb98782bbac9984ed523406abbd55cc30",
+      "hash": "6c30a8272d16c1e242eab2fd8dd24a7651f1e5fca0fc15b55957ec3add108f3b",
       "docRelative": "jsfunction/hooks/useEventListener.mdx"
     },
     "frontend/jsfunction/hooks/useFocus.js": {
-      "hash": "e7bcf46e3c3da4be9a6de48fff31514af445c118b9d480813d352ee045066332",
+      "hash": "1163285ccf583076c0d46343328152435107756572207c3683100741dcaddd7a",
       "docRelative": "jsfunction/hooks/useFocus.mdx"
     },
     "frontend/jsfunction/hooks/useHover.js": {
-      "hash": "9855e00c42bf76a3e76643f1ca679ca904808d73f1c7d117677dfcdfbd44f107",
+      "hash": "45b2ee68d739c4dab113a0cf95960e7630a09bbbbe37ff16274e5be978628ded",
       "docRelative": "jsfunction/hooks/useHover.mdx"
     },
     "frontend/jsfunction/hooks/useIdle.js": {
-      "hash": "898807e2deed45a2150d4294987c7305629d8d99185035f01399bf1bfb370f9d",
+      "hash": "b29107c425c5e32f073cd8aa5a506d3f35ef595853e4784119feb81ac868de70",
       "docRelative": "jsfunction/hooks/useIdle.mdx"
     },
     "frontend/jsfunction/hooks/useInputControl.js": {
-      "hash": "8860d4727d1f9ae1cfef733d45a4a4083e9e41778e5c2e7133f376d414c98cc4",
+      "hash": "b2c56a5d6f25420c307c03a7fda6117f9cd6ecd3334153a96ed8c43aff0fae50",
       "docRelative": "jsfunction/hooks/useInputControl.mdx"
     },
     "frontend/jsfunction/hooks/useInterval.js": {
-      "hash": "8407a1c15fb19fc296b7b0862306430f061d2e52d4e935f343c57d94b9a6c88d",
+      "hash": "e2c1dc6fef4f736b15ce660425e14938ec966fc171f38e801d56b08179b61d98",
       "docRelative": "jsfunction/hooks/useInterval.mdx"
     },
     "frontend/jsfunction/hooks/useMap.js": {
-      "hash": "ba47a3d7898e0b359fcd2aca6cc26c8822bd763431cfe0aa20a6280fa788fe33",
+      "hash": "4000460a72ad049c5a687b80bac1a0fd4e0ce456bccf9f34275f275a5792057b",
       "docRelative": "jsfunction/hooks/useMap.mdx"
     },
     "frontend/jsfunction/hooks/useMediaQuery.js": {
-      "hash": "e859197cbc020b58798aee179336ecf0eec629ffbdff55e0980dca410fab478a",
+      "hash": "08110bacea07c3bab5f17fb41728ec5726cd86df5669464c3db9ce485b9b0d10",
       "docRelative": "jsfunction/hooks/useMediaQuery.mdx"
     },
     "frontend/jsfunction/hooks/useMediatedState.js": {
-      "hash": "89042ffc6651c7a5a18013a42d6eb6458d820fc580e0d6e4953bf329d3971e36",
+      "hash": "65a98c34687053d5319648dcf3be43d75e9996875c67ff01526b0e17ad729342",
       "docRelative": "jsfunction/hooks/useMediatedState.mdx"
     },
     "frontend/jsfunction/hooks/useObject.js": {
-      "hash": "70466e40da2b11cb32cdf7abcb02cf93397cc81989a53928d15cb2bc41319f52",
+      "hash": "4ece5fa90f2df5c06cd9be110cc34fe223e2d80a920427bc950f01c9b9b8b9b0",
       "docRelative": "jsfunction/hooks/useObject.mdx"
     },
     "frontend/jsfunction/hooks/usePress.js": {
-      "hash": "4d20d5550d00c1241a1b6f3428dd458775fc7b737544e8b2cc9924c27df12296",
+      "hash": "de1f5fdf1341ff8dd572009b9092c60a284175b6bcbee6eb672d3d88975ce42e",
       "docRelative": "jsfunction/hooks/usePress.mdx"
     },
     "frontend/jsfunction/hooks/usePrevious.js": {
-      "hash": "9d33a9f90d73b7b1c55f1a6be1a2eef8a5e02e83ce769afed4f815a331c92524",
+      "hash": "6ef25ffd9a95670ce86af7bfa5142a0ef6e283f0d375fd15c16a361d6999199d",
       "docRelative": "jsfunction/hooks/usePrevious.mdx"
     },
     "frontend/jsfunction/hooks/useQuery.js": {
-      "hash": "a4bc980f9b15675a0364d1edae590ea57be1ba5e431d599228630892f4b0f8c8",
+      "hash": "1774b13ea008bfb18218cb5bffcba045abf69c9034409c12d3769ef8af11d4c7",
       "docRelative": "jsfunction/hooks/useQuery.mdx"
     },
     "frontend/jsfunction/hooks/useSet.js": {
-      "hash": "af69acfa3959cf91337ead5cfacd9c985e2013dcabfc2182090d85a78da40a44",
+      "hash": "099a11995646cb5f362a792aaf8aca766b6ba1918f1743445663524cdb4e87e5",
       "docRelative": "jsfunction/hooks/useSet.mdx"
     },
     "frontend/jsfunction/hooks/useStateWithReset.js": {
-      "hash": "00ba74f907ac3ef857853b90004784538946644fd110f3f2447f4f014fca321b",
+      "hash": "2da48ff64c63fe11e763909b58dc372f9282760ff08ea2e384603aada2468b42",
       "docRelative": "jsfunction/hooks/useStateWithReset.mdx"
     },
     "frontend/jsfunction/hooks/useStep.js": {
-      "hash": "d9ca4c07b6d80b8adcccad4426dd6e9cffdd4bc5789c179f0d6b8d4e67375e38",
+      "hash": "69b27f70a80ec3249e02d9abf7159fba519847bd0aa06a3bf413ed2562780417",
       "docRelative": "jsfunction/hooks/useStep.mdx"
     },
     "frontend/jsfunction/hooks/useThrottle.js": {
-      "hash": "3994b7bb167d401ef7469791727d12d11b8a189224f045b9ff342b3ef4e4bca1",
+      "hash": "cc1c4eee15743a868f2d9b4fe344ab77bdae8de7353c02fe2fb6d44efda00c5a",
       "docRelative": "jsfunction/hooks/useThrottle.mdx"
     },
     "frontend/jsfunction/hooks/useTimeout.js": {
-      "hash": "22d74981a99c8c81ff22ba400e701424b9ac5f69f09453685897477cd90a4625",
+      "hash": "b505be2164f317f2855328816617be3a60fb84ce19f4b09a2384babfa97a0065",
       "docRelative": "jsfunction/hooks/useTimeout.mdx"
     },
     "frontend/jsfunction/hooks/useToggle.js": {
-      "hash": "80a52a608889c17feb1e31c46b96709cdccc4b4750289a7f0b5897af2ce31595",
+      "hash": "e0ac6252fe8aecbbdba73f77455fb9ce050ea18056a408334a07c07b042a596c",
       "docRelative": "jsfunction/hooks/useToggle.mdx"
     },
     "frontend/jsfunction/hooks/useWindowResize.js": {
-      "hash": "e234aa6b364cfb9d1e5d8009c600c979cb9142addfe0aec1ed688739057c72c1",
+      "hash": "faa7f291edb163b5074561af1eb42023841035ad1a44bce0088f073420799718",
       "docRelative": "jsfunction/hooks/useWindowResize.mdx"
     },
     "frontend/jsfunction/htmlSerialize.js": {
-      "hash": "d421e3473b1e1ad831370c1c5a890f6c527853ede8f0203117bca41b2f4e77fd",
+      "hash": "2781462728bd6fdd0bda4cf1f4ebbe6720264c3b50d273d6b2c0e67df6714d34",
       "docRelative": "jsfunction/htmlSerialize.mdx"
     },
     "frontend/jsfunction/mapAsync.js": {
-      "hash": "d2e519a45485d0e227a45cc559660c938d74faeac3d177085c827f69d858a64b",
+      "hash": "7022bdb39d759ef644d81d4a03c092620ebd2a778d4e76eb6f010a6e030ca39d",
       "docRelative": "jsfunction/mapAsync.mdx"
     },
     "frontend/jsfunction/promise/Promise.js": {
-      "hash": "b6484db5f0f20cfdeb13002bf4cd3e93532e432f21f6ab26b192a258bdd0cdf0",
+      "hash": "6c68c82292965c8a18c3cee15c37f9787cf5b4dd57c3e2c5eb56f98557f1e133",
       "docRelative": "jsfunction/promise/Promise.mdx"
     },
     "frontend/jsfunction/promise/PromiseMerge.js": {
-      "hash": "5aa4ca691b1c4da4dc3d459e662e2013e9974dd7aa4d61ccb8b26bdaad21fd9a",
+      "hash": "83ae09ed13cdfbd76d70e4b79d7473554acd63f81cb5032f0712bfeacb365eed",
       "docRelative": "jsfunction/promise/PromiseMerge.mdx"
     },
     "frontend/jsfunction/promise/Promisify.js": {
-      "hash": "96cafac685aeef7460566a8e25ec8a966f000ec990e9b4cfd995f9dcbaf1d660",
+      "hash": "552fda2a1e37ca47031e51b1d6bb3b3e6271557a24011ae5e68d0d32d4d2c2af",
       "docRelative": "jsfunction/promise/Promisify.mdx"
     },
     "frontend/jsfunction/promise/PromisifyII.js": {
-      "hash": "6d05dcc1875d73cec980ed06bada439487c931067460c8f99386c2794f646273",
+      "hash": "61c816a97d21d53648f518d539b274017f58230f081ea90febe408d31eb9c4b5",
       "docRelative": "jsfunction/promise/PromisifyII.mdx"
     },
     "frontend/jsfunction/promise/promiseAll.js": {
-      "hash": "4e51ba3b0c22417790456bb2e1f0ffb173c47ace4ce6564251aea235f1bfdd24",
+      "hash": "f86c83d43d392cb4e24ec895425234161f056778de15ebaa5075423f53e498e1",
       "docRelative": "jsfunction/promise/promiseAll.mdx"
     },
     "frontend/jsfunction/promise/promiseAny.js": {
-      "hash": "c77e104662c9957ceb96cd59d6b6ef5db3620eb2159b118189024b59af318a5a",
+      "hash": "1f075d771fab8bd838c294e45e8f819d1aadecad07c4268773e7573b77d46cdb",
       "docRelative": "jsfunction/promise/promiseAny.mdx"
     },
     "frontend/jsfunction/promise/promiseRace.js": {
-      "hash": "d6eac97e827dc662a46344b88bccfe3eeea41982666625bd94d2657f1951f885",
+      "hash": "7d7794e21838ad1efd8816c84e93e3d2959f03627d949f76a6c68481888cd9aa",
       "docRelative": "jsfunction/promise/promiseRace.mdx"
     },
     "frontend/jsfunction/promise/promiseReduce.js": {
-      "hash": "5c35c3c67183abecf807e4dfeb914eb25a326fee46fb4a7d528ce20489954a6f",
+      "hash": "d7be770d5d8e74ef383a77e514e7572296bef7d7fa7c2c0ce150eaf40ad76bb7",
       "docRelative": "jsfunction/promise/promiseReduce.mdx"
     },
     "frontend/jsfunction/promise/promiseReject.js": {
-      "hash": "d5116b4b78e8ecc5862c6ff77f6e4096ca3727d21eaf286724c67a4127fd2dfe",
+      "hash": "d5ddb68167b4b780c03daec46ba2e4573e57ce1687fa6100152982b9b9425fab",
       "docRelative": "jsfunction/promise/promiseReject.mdx"
     },
     "frontend/jsfunction/promise/promiseResolve.js": {
-      "hash": "ddcf3f1ba4b1641dcd96074157ec908441bd180f72765354ca13c90cbb9da246",
+      "hash": "2d6aa056f4111da42b2b074f4dff7e3e8abcd118e914b2674054c8d15780b81e",
       "docRelative": "jsfunction/promise/promiseResolve.mdx"
     },
     "frontend/jsfunction/promise/promiseSerial.js": {
-      "hash": "52d20efa4329097b1a5758bbc7abb5f4ef4a5ef10bdca4fcf59b036d34b8330f",
+      "hash": "1fe053f9defd85945bcbc2a76e9ac66ae09e45bc07553e93a831a779e3a06810",
       "docRelative": "jsfunction/promise/promiseSerial.mdx"
     },
     "frontend/jsfunction/promise/promiseTimeout.js": {
-      "hash": "6aa98d120f20da9c58c07261a1eb71f2af2ce7aed6bcd8d423da19f7da401203",
+      "hash": "e2342e70e955fffad85575d9b67d2f4e710fca7499aec33ac25c530d36e0280d",
       "docRelative": "jsfunction/promise/promiseTimeout.mdx"
     },
     "frontend/jsfunction/promise/promiseWithResolvers.js": {
-      "hash": "0111bcbe9ea95416c44206278321247c1542b139d222f62a77c660b19cb846c9",
+      "hash": "e0df6becc1a9001820ed77faceba0d55fab7f05ef4d3dac47cf729ffff251d89",
       "docRelative": "jsfunction/promise/promiseWithResolvers.mdx"
     },
     "frontend/jsfunction/sanitizeHTML.js": {
-      "hash": "a6e73422a3037d6c60f2f6ce809e0d7098f8f27a025c9e08ec527e92ff4c0999",
+      "hash": "1382433d0525ebc5520121d6b822c888eca510028a3d012834716aa777aa561b",
       "docRelative": "jsfunction/sanitizeHTML.mdx"
     },
     "frontend/jsfunction/throttle.js": {
-      "hash": "c2ee6552a3583fbe38b22890a19cd4284d70712f44bebf1cf5389bc5562cd609",
+      "hash": "3ebd1c9e2e7d7821838993d15f0f906528c50cd2be5a13fb5d31aeffb82057db",
       "docRelative": "jsfunction/throttle.mdx"
     }
   }
