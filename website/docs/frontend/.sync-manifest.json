@@ -36,6 +36,14 @@
       "hash": "fc2523b960243bc978c67d1327ff8ea13f581f0b2fc18a42805ab9df409badba",
       "docRelative": "jsfunction/getElementBy/getElementByStyles.mdx"
     },
+    "frontend/jsfunction/getElementBy/getElementByTagName.js": {
+      "hash": "bca01ed4ee3dc6495e55fee540d7fbd4921068c59664b00c616e25bfb7f29a58",
+      "docRelative": "jsfunction/getElementBy/getElementByTagName.mdx"
+    },
+    "frontend/jsfunction/getElementBy/getElementByTagNameHiearchy.js": {
+      "hash": "ea29a043ba611674ba081bcd653536a2255ad3266525c79c3de0e0dcfc5b34b5",
+      "docRelative": "jsfunction/getElementBy/getElementByTagNameHiearchy.mdx"
+    },
     "frontend/jsfunction/hooks/useArray.js": {
       "hash": "7637dc97498eff119ee8c1b9c2b0e44130c0545145bc9fb6fe1fa179bf2e8d49",
       "docRelative": "jsfunction/hooks/useArray.mdx"
@@ -176,6 +184,18 @@
       "hash": "b6484db5f0f20cfdeb13002bf4cd3e93532e432f21f6ab26b192a258bdd0cdf0",
       "docRelative": "jsfunction/promise/Promise.mdx"
     },
+    "frontend/jsfunction/promise/PromiseMerge.js": {
+      "hash": "5aa4ca691b1c4da4dc3d459e662e2013e9974dd7aa4d61ccb8b26bdaad21fd9a",
+      "docRelative": "jsfunction/promise/PromiseMerge.mdx"
+    },
+    "frontend/jsfunction/promise/Promisify.js": {
+      "hash": "96cafac685aeef7460566a8e25ec8a966f000ec990e9b4cfd995f9dcbaf1d660",
+      "docRelative": "jsfunction/promise/Promisify.mdx"
+    },
+    "frontend/jsfunction/promise/PromisifyII.js": {
+      "hash": "6d05dcc1875d73cec980ed06bada439487c931067460c8f99386c2794f646273",
+      "docRelative": "jsfunction/promise/PromisifyII.mdx"
+    },
     "frontend/jsfunction/promise/promiseAll.js": {
       "hash": "4e51ba3b0c22417790456bb2e1f0ffb173c47ace4ce6564251aea235f1bfdd24",
       "docRelative": "jsfunction/promise/promiseAll.mdx"
@@ -192,9 +212,25 @@
       "hash": "5c35c3c67183abecf807e4dfeb914eb25a326fee46fb4a7d528ce20489954a6f",
       "docRelative": "jsfunction/promise/promiseReduce.mdx"
     },
+    "frontend/jsfunction/promise/promiseReject.js": {
+      "hash": "d5116b4b78e8ecc5862c6ff77f6e4096ca3727d21eaf286724c67a4127fd2dfe",
+      "docRelative": "jsfunction/promise/promiseReject.mdx"
+    },
+    "frontend/jsfunction/promise/promiseResolve.js": {
+      "hash": "ddcf3f1ba4b1641dcd96074157ec908441bd180f72765354ca13c90cbb9da246",
+      "docRelative": "jsfunction/promise/promiseResolve.mdx"
+    },
     "frontend/jsfunction/promise/promiseSerial.js": {
       "hash": "52d20efa4329097b1a5758bbc7abb5f4ef4a5ef10bdca4fcf59b036d34b8330f",
       "docRelative": "jsfunction/promise/promiseSerial.mdx"
+    },
+    "frontend/jsfunction/promise/promiseTimeout.js": {
+      "hash": "6aa98d120f20da9c58c07261a1eb71f2af2ce7aed6bcd8d423da19f7da401203",
+      "docRelative": "jsfunction/promise/promiseTimeout.mdx"
+    },
+    "frontend/jsfunction/promise/promiseWithResolvers.js": {
+      "hash": "0111bcbe9ea95416c44206278321247c1542b139d222f62a77c660b19cb846c9",
+      "docRelative": "jsfunction/promise/promiseWithResolvers.mdx"
     },
     "frontend/jsfunction/sanitizeHTML.js": {
       "hash": "a6e73422a3037d6c60f2f6ce809e0d7098f8f27a025c9e08ec527e92ff4c0999",
