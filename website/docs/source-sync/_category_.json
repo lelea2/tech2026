@@ -1,0 +1,10 @@
+{
+  "label": "Source Sync",
+  "position": 99,
+  "link": {
+    "type": "generated-index",
+    "title": "Source Sync",
+    "description": "Auto-synced documentation from frontend and backend folders.",
+    "slug": "/source-sync"
+  }
+}

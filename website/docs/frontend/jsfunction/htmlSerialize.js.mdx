@@ -1,0 +1,69 @@
+---
+title: htmlSerialize.js
+---
+
+# htmlSerialize.js
+
+Source: frontend/jsfunction/htmlSerialize.js
+
+~~~javascript
+// Given an object which resembles a DOM tree, implement a function that serializes the object into a formatted string 
+// with proper indentation (one tab (\t character) per nesting level) and one tag per line.
+
+
+/**
+ * @typedef {object} HTMLElementNode
+ * @property {string} tag
+ * @property {HTMLNode[]} children
+ */
+
+/** @typedef {string | HTMLElementNode} HTMLNode */
+
+/**
+ * @param {HTMLElementNode} root
+ * @return {string}
+ */
+export default function serializeHTML(root, depth = 0) {
+  const indent = '\t'.repeat(depth ?? 0);
+  if (typeof root === 'string') {
+    return `${indent}${root}`;
+  }
+
+  const children = root.children || [];
+  if (children.length === 0) {
+    return `${indent}<${root.tag}></${root.tag}>`;
+  }
+
+  const serializedChildren = children.map((child) => {
+    return serializeHTML(child, depth + 1);
+  }).join('\n');
+
+  console.log('serializedChildren: ', serializedChildren);
+
+  return `${indent}<${root.tag}>\n${serializedChildren}\n${indent}</${root.tag}>`;
+}
+
+/**
+const tree = {
+  tag: 'body',
+  children: [
+    { tag: 'div', children: [{ tag: 'span', children: ['foo', 'bar'] }] },
+    { tag: 'div', children: ['baz'] },
+  ],
+};
+
+serializeHTML(tree);
+// Output:
+`<body>
+  <div>
+    <span>
+      foo
+      bar
+    </span>
+  </div>
+  <div>
+    baz
+  </div>
+</body>`;
+ */
+~~~

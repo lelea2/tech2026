@@ -1,0 +1,180 @@
+{
+  "files": {
+    "frontend/jsfunction/EventEmitter.js": {
+      "hash": "dd88caf6c018a14f74dc971863d1639316c9596920f14d345730e5075b8de4d7",
+      "docRelative": "jsfunction/EventEmitter.js.mdx"
+    },
+    "frontend/jsfunction/array/flattenArray.js": {
+      "hash": "cddcf41928c82b4a4d682e4eac40f70bb62cef792d122e83da20303c1bc4aafa",
+      "docRelative": "array/flattenArray.js.mdx"
+    },
+    "frontend/jsfunction/classNames.js": {
+      "hash": "54ad74a0d9b30ce925db829345a0ba7d25a98fd8b5b94b1784ce3cedfe9fe94a",
+      "docRelative": "jsfunction/classNames.js.mdx"
+    },
+    "frontend/jsfunction/classNamesAdvance.js": {
+      "hash": "9e7b780cd3ebff18fd27a493bbe8cbbf33f426a711df3c7770084693e754321e",
+      "docRelative": "jsfunction/classNamesAdvance.js.mdx"
+    },
+    "frontend/jsfunction/debounce.js": {
+      "hash": "60ea3969b0021ea38ebe19e67a12417e4574c98f026e42b19b60c377cacb6d21",
+      "docRelative": "jsfunction/debounce.js.mdx"
+    },
+    "frontend/jsfunction/debounceCancelFlush.js": {
+      "hash": "51a7756891bfa443f4711cd5f8c581ab83e53c2ba38a1be6f55e40b86d601383",
+      "docRelative": "jsfunction/debounceCancelFlush.js.mdx"
+    },
+    "frontend/jsfunction/deepClone.js": {
+      "hash": "5354fd2df3897128287a0839e0ecd77cf97af3ea53d82edcc06405813ab8e1d0",
+      "docRelative": "jsfunction/deepClone.js.mdx"
+    },
+    "frontend/jsfunction/getElementBy/getElementByClassName.js": {
+      "hash": "b67ce4c8c28aaed1e0ae5634b8b633fc13bb3fa9ff9a3a80d06c8b8102418718",
+      "docRelative": "jsfunction/getElementBy/getElementByClassName.js.mdx"
+    },
+    "frontend/jsfunction/getElementBy/getElementByStyles.js": {
+      "hash": "fc2523b960243bc978c67d1327ff8ea13f581f0b2fc18a42805ab9df409badba",
+      "docRelative": "jsfunction/getElementBy/getElementByStyles.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useBoolean.js": {
+      "hash": "6671b06e08353bfb6c78e54bc9dbbac0b81e648612d76b42975b14260b118d9d",
+      "docRelative": "jsfunction/hooks/useBoolean.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useBreakpoint.js": {
+      "hash": "a815535500021ab861425ec8b5f5a9daf8c015b727bcbc772a425904cb7b74bf",
+      "docRelative": "jsfunction/hooks/useBreakpoint.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useClickAnywher.js": {
+      "hash": "49fefe69258365e67fc8e8ab19c5c6ee0edfed4bf63510019169988dada3db37",
+      "docRelative": "jsfunction/hooks/useClickAnywher.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useClickoutside.js": {
+      "hash": "7ebb78abbaff5ce6d35473b52d22b9bcd6cdd1c5adcd82eb7ea82681d2e363b7",
+      "docRelative": "jsfunction/hooks/useClickoutside.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useCountdown.js": {
+      "hash": "8f918af57208d92001f023b826f23bda6892bc5e7114545ab4bedd3cf7a9b59d",
+      "docRelative": "jsfunction/hooks/useCountdown.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useCounter.js": {
+      "hash": "c720e7d30f21cf09973ce804c35c81182ddd75cad2d858e2d0bce955d02924eb",
+      "docRelative": "jsfunction/hooks/useCounter.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useCounterMemoize.js": {
+      "hash": "6471f875c2be26dba0b6caf09d1c67adf7b61f8750ed1c1004e6a19de0bf188a",
+      "docRelative": "jsfunction/hooks/useCounterMemoize.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useCycle.js": {
+      "hash": "0b39ce5e3610cf00628cdb28af9a0c79502dc8c3796104ba13040dca694a994b",
+      "docRelative": "jsfunction/hooks/useCycle.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useDebounce.js": {
+      "hash": "62f8a8fff7e9226a56dd529d6437fa60ded2e1922aa65f0d19cd1bfd3a234615",
+      "docRelative": "jsfunction/hooks/useDebounce.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useDefault.js": {
+      "hash": "68e621aba816ac11bfe610e3235e478e340aca8e9ffcb7cecbdecfffd632bffb",
+      "docRelative": "jsfunction/hooks/useDefault.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useEffectOnce.js": {
+      "hash": "58c48f42fb857119bc25c1f550df0f8969af12be19a74ba85b86437ad26c4833",
+      "docRelative": "jsfunction/hooks/useEffectOnce.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useEventListener.js": {
+      "hash": "836a5d3004a931b4a170a15a7cbc0adfb98782bbac9984ed523406abbd55cc30",
+      "docRelative": "jsfunction/hooks/useEventListener.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useFocus.js": {
+      "hash": "e7bcf46e3c3da4be9a6de48fff31514af445c118b9d480813d352ee045066332",
+      "docRelative": "jsfunction/hooks/useFocus.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useHover.js": {
+      "hash": "9855e00c42bf76a3e76643f1ca679ca904808d73f1c7d117677dfcdfbd44f107",
+      "docRelative": "jsfunction/hooks/useHover.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useInterval.js": {
+      "hash": "8407a1c15fb19fc296b7b0862306430f061d2e52d4e935f343c57d94b9a6c88d",
+      "docRelative": "jsfunction/hooks/useInterval.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useMap.js": {
+      "hash": "ba47a3d7898e0b359fcd2aca6cc26c8822bd763431cfe0aa20a6280fa788fe33",
+      "docRelative": "jsfunction/hooks/useMap.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useMediaQuery.js": {
+      "hash": "41951b34a7d349159273bff58fae9ba40df10036493db2b4d303a1cad41888b5",
+      "docRelative": "jsfunction/hooks/useMediaQuery.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useObject.js": {
+      "hash": "70466e40da2b11cb32cdf7abcb02cf93397cc81989a53928d15cb2bc41319f52",
+      "docRelative": "jsfunction/hooks/useObject.js.mdx"
+    },
+    "frontend/jsfunction/hooks/usePress.js": {
+      "hash": "4d20d5550d00c1241a1b6f3428dd458775fc7b737544e8b2cc9924c27df12296",
+      "docRelative": "jsfunction/hooks/usePress.js.mdx"
+    },
+    "frontend/jsfunction/hooks/usePrevious.js": {
+      "hash": "9d33a9f90d73b7b1c55f1a6be1a2eef8a5e02e83ce769afed4f815a331c92524",
+      "docRelative": "jsfunction/hooks/usePrevious.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useQuery.js": {
+      "hash": "a4bc980f9b15675a0364d1edae590ea57be1ba5e431d599228630892f4b0f8c8",
+      "docRelative": "jsfunction/hooks/useQuery.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useStateWithReset.js": {
+      "hash": "00ba74f907ac3ef857853b90004784538946644fd110f3f2447f4f014fca321b",
+      "docRelative": "jsfunction/hooks/useStateWithReset.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useTimeout.js": {
+      "hash": "22d74981a99c8c81ff22ba400e701424b9ac5f69f09453685897477cd90a4625",
+      "docRelative": "jsfunction/hooks/useTimeout.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useToggle.js": {
+      "hash": "80a52a608889c17feb1e31c46b96709cdccc4b4750289a7f0b5897af2ce31595",
+      "docRelative": "jsfunction/hooks/useToggle.js.mdx"
+    },
+    "frontend/jsfunction/hooks/useWindowResize.js": {
+      "hash": "e234aa6b364cfb9d1e5d8009c600c979cb9142addfe0aec1ed688739057c72c1",
+      "docRelative": "jsfunction/hooks/useWindowResize.js.mdx"
+    },
+    "frontend/jsfunction/htmlSerialize.js": {
+      "hash": "d421e3473b1e1ad831370c1c5a890f6c527853ede8f0203117bca41b2f4e77fd",
+      "docRelative": "jsfunction/htmlSerialize.js.mdx"
+    },
+    "frontend/jsfunction/mapAsync.js": {
+      "hash": "d2e519a45485d0e227a45cc559660c938d74faeac3d177085c827f69d858a64b",
+      "docRelative": "jsfunction/mapAsync.js.mdx"
+    },
+    "frontend/jsfunction/promise/Promise.js": {
+      "hash": "b6484db5f0f20cfdeb13002bf4cd3e93532e432f21f6ab26b192a258bdd0cdf0",
+      "docRelative": "jsfunction/promise/Promise.js.mdx"
+    },
+    "frontend/jsfunction/promise/promiseAll.js": {
+      "hash": "4e51ba3b0c22417790456bb2e1f0ffb173c47ace4ce6564251aea235f1bfdd24",
+      "docRelative": "jsfunction/promise/promiseAll.js.mdx"
+    },
+    "frontend/jsfunction/promise/promiseAny.js": {
+      "hash": "c77e104662c9957ceb96cd59d6b6ef5db3620eb2159b118189024b59af318a5a",
+      "docRelative": "jsfunction/promise/promiseAny.js.mdx"
+    },
+    "frontend/jsfunction/promise/promiseRace.js": {
+      "hash": "d6eac97e827dc662a46344b88bccfe3eeea41982666625bd94d2657f1951f885",
+      "docRelative": "jsfunction/promise/promiseRace.js.mdx"
+    },
+    "frontend/jsfunction/promise/promiseReduce.js": {
+      "hash": "5c35c3c67183abecf807e4dfeb914eb25a326fee46fb4a7d528ce20489954a6f",
+      "docRelative": "jsfunction/promise/promiseReduce.js.mdx"
+    },
+    "frontend/jsfunction/promise/promiseSerial.js": {
+      "hash": "52d20efa4329097b1a5758bbc7abb5f4ef4a5ef10bdca4fcf59b036d34b8330f",
+      "docRelative": "jsfunction/promise/promiseSerial.js.mdx"
+    },
+    "frontend/jsfunction/sanitizeHTML.js": {
+      "hash": "a6e73422a3037d6c60f2f6ce809e0d7098f8f27a025c9e08ec527e92ff4c0999",
+      "docRelative": "jsfunction/sanitizeHTML.js.mdx"
+    },
+    "frontend/jsfunction/throttle.js": {
+      "hash": "c2ee6552a3583fbe38b22890a19cd4284d70712f44bebf1cf5389bc5562cd609",
+      "docRelative": "jsfunction/throttle.js.mdx"
+    }
+  }
+}

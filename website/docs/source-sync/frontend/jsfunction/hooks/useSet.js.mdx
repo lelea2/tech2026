@@ -1,0 +1,73 @@
+---
+title: useSet.js
+---
+
+# useSet.js
+
+Source: frontend/jsfunction/hooks/useSet.js
+
+~~~javascript
+/**
+ * Implement a useSet hook that manages a JavaScript Set of items 
+ * with additional utility methods.
+ * It is more convenient to use useSet over plain useState because in the latter case,
+ * you would always have to create a new Set, mutate it, then set state to use the new set, which can be quite cumbersome.
+ */
+
+/**
+ * @template T
+ * @param {Set<T>} initialState
+ */
+
+import {useCallback, useRef, useState} from 'react';
+
+export default function useSet(initialState = new Set()) {
+  const initialSetRef = useRef(initialState);
+  const [set, setSet] = useState(initialState);
+
+  const add = useCallback((value) => {
+    setSet((prev) => {
+      const next = new Set(prev);
+      next.add(value);
+      return next;
+    });
+  }, []);
+
+  const remove = useCallback((value) => {
+    setSet((prev) => {
+      const next = new Set(prev);
+      next.delete(value);
+      return next;
+    });
+  }, []);
+
+  const toggle = useCallback((value) => {
+    setSet((prev) => {
+      const next = new Set(prev);
+      if(next.has(value)) {
+        next.delete(value);
+      } else {
+        next.add(value);
+      }
+      return next;
+    });
+  }, []);
+
+  const reset = useCallback(() => {
+    setSet(initialSetRef.current);
+  }, [initialSetRef]);
+
+  const clear = useCallback(() => {
+    setSet(new Set());
+  }, []);
+
+  return {
+    set,
+    add,
+    remove,
+    toggle,
+    reset,
+    clear,
+  };
+}
+~~~

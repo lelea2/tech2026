@@ -1,0 +1,64 @@
+---
+title: useBreakpoint
+---
+
+# useBreakpoint
+
+~~~javascript
+// Implement a createBreakpoint function that takes an object whose keys are breakpoint names and whose values are minimum widths, 
+// then returns a useBreakpoint hook that reports the current breakpoint name based on window.innerWidth.
+
+/*
+const useBreakpoint = createBreakpoint({
+  mobile: 0,
+  tablet: 768,
+  desktop: 1024,
+});
+*/
+
+import {useEffect, useState} from 'react';
+
+export default function createBreakpoint(breakpoints) {
+  const sortedBreakpoints = Object.entries(breakpoints).sort(([, a], [, b]) => b - a);
+
+  const fallbackBreakpoint = sortedBreakpoints[sortedBreakpoints.length - 1]?.[0] ?? null;
+
+  const getBreakpointFromWidth = (width) => {
+    for (const [name, minWidth] of sortedBreakpoints) {
+      if (width >= minWidth) {
+        return name;
+      }
+    }
+    return fallbackBreakpoint;
+  };
+
+  return function useBreakpoint() {
+    const [currentBreakpoint, setCurrentBreakpoint] = useState(() => {
+      if (typeof window === 'undefined') {
+        return fallbackBreakpoint;
+      }
+      return getBreakpointFromWidth(window.innerWidth);
+    });
+
+    useEffect(() => {
+      if (typeof window === 'undefined') {
+        return undefined;
+      }
+
+      const checkBreakpoint = () => {
+        setCurrentBreakpoint(getBreakpointFromWidth(window.innerWidth));
+      };
+
+      checkBreakpoint();
+      window.addEventListener('resize', checkBreakpoint);
+
+      return () => {
+        window.removeEventListener('resize', checkBreakpoint);
+      };
+    }, []);
+
+    console.log('>>>>> currentBreakpoint', currentBreakpoint);
+    return currentBreakpoint;
+  };
+}
+~~~

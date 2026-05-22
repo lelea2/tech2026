@@ -1,0 +1,39 @@
+---
+title: useTimeout.js
+---
+
+# useTimeout.js
+
+Source: frontend/jsfunction/hooks/useTimeout.js
+
+~~~javascript
+/**
+ * @param {() => void} callback
+ * @param {number | null} delay
+ */
+
+import { useEffect, useRef } from "react";
+
+export default function useTimeout(callback, delay) {
+  // useRef is used to avoid the timeout restarting every render while still calling the latest callback.
+  const savedCallback = useRef(callback);
+
+  // Keep latest callback reference
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  useEffect(() => {
+    if (delay == null) {
+      return;
+    }
+
+    const id = setTimeout(() => {
+      savedCallback.current();
+    }, delay);
+
+    return () => clearTimeout(id);
+  }, [delay]);
+}
+
+~~~

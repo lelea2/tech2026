@@ -52,21 +52,7 @@ const config = {
           editUrl:
             'https://github.com/lelea2/tech2026/tree/main/website/',
         },
-        blog: {
-          showReadingTime: true,
-          feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
-          },
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/lelea2/tech2026/tree/main/website/',
-          // Useful options to enforce blogging best practices
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
-        },
+        blog: false,
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -90,12 +76,15 @@ const config = {
         },
         items: [
           {
-            type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
+            to: '/docs/frontend/jsfunction',
             position: 'left',
-            label: 'Tutorial',
+            label: 'FrontEnd',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
+          {
+            to: '/docs/tutorial-extras/manage-docs-versions',
+            position: 'left',
+            label: 'BackEnd',
+          },
           {
             href: 'https://github.com/lelea2/tech2026',
             label: 'GitHub',
@@ -110,8 +99,12 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Tutorial',
-                to: '/docs/intro',
+                label: 'FrontEnd',
+                to: '/docs/frontend/jsfunction',
+              },
+              {
+                label: 'BackEnd',
+                to: '/docs/tutorial-extras/manage-docs-versions',
               },
             ],
           },
@@ -135,10 +128,6 @@ const config = {
           {
             title: 'More',
             items: [
-              {
-                label: 'Blog',
-                to: '/blog',
-              },
               {
                 label: 'GitHub',
                 href: 'https://github.com/lelea2/tech2026',

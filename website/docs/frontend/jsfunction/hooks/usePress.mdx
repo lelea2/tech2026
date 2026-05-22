@@ -1,0 +1,64 @@
+---
+title: usePress
+---
+
+# usePress
+
+~~~javascript
+// Implement a useKeyPress hook that detects and performs an action for keyboard events.
+
+
+import {useEffect, useRef} from 'react';
+
+/**
+ * @callback callback
+ * @param {KeyboardEvent} e
+ */
+
+/**
+ * @typedef {Object} UseKeyPressOptions
+ * @property {'keyup' | 'keydown'} event
+ * @property {EventTarget} target
+ */
+
+/**
+ * @param {string} key
+ * @param {callback} callback
+ * @param {UseKeyPressOptions} options
+ */
+import {useCallback, useRef, useEffect} from 'react';
+
+export default function useKeyPress(
+  key,
+  callback,
+  { event = 'keydown', target = typeof window !== 'undefined' ? window : undefined } = {
+    event: 'keydown',
+    target: typeof window !== 'undefined' ? window : undefined,
+  },
+) {
+    // Keep latest callback reference
+  const savedCallback = useRef(callback);
+
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  useEffect(() => {
+    if (!target || typeof target.addEventListener !== 'function') {
+      return;
+    }
+
+    // listen for the event
+    const listener = (e) => {
+      if (e.key === key) {
+        savedCallback.current(e);
+      }
+    };
+
+    target.addEventListener(event, listener);
+
+    return () => {
+      target.removeEventListener(event, listener);
+    };
+  }, [event, key, target]);
+}~~~

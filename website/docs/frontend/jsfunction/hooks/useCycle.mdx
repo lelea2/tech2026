@@ -1,0 +1,35 @@
+---
+title: useCycle
+---
+
+# useCycle
+
+~~~javascript
+/**
+ * export default function Component() {
+  const [mode, cycle] = useCycle('low', 'medium', 'high'); => be careful with the format here, hook expected to return array instead of obbject
+
+  return (
+    <div>
+      <p>State: {mode}</p>
+      <button onClick={cycle}>Cycle</button>
+    </div>
+  );
+}
+ */
+/**
+ * @param {...*} args
+ * @returns {*}
+ */
+
+import {useState, useCallback} from 'react';
+
+export default function useCycle(...args) {
+  const [index, setIndex] = useState(0);
+
+  const cycle = useCallback(() => {
+    setIndex((prevIndex) => (prevIndex + 1) % args.length);
+  }, [args.length]);
+
+  return [args[index], cycle];
+}~~~

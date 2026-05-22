@@ -1,0 +1,49 @@
+---
+title: useMap
+---
+
+# useMap
+
+~~~javascript
+/**
+ * @template K, V
+ * @param {Map<K, V> | [K, V][]} initialState
+ */
+import {useState, useCallback} from 'react';
+
+export default function useMap(initialState) {
+  const [initialMap] = useState(() => new Map(initialState));
+  const [map, setMap] = useState(initialMap);
+
+  const _set = useCallback((key, value) => {
+    setMap((prev) => {
+      const next = new Map(prev);
+      next.set(key, value);
+      return next;
+    });
+  }, []);
+
+  const setAll = useCallback((entries) => {
+    setMap(new Map(entries));
+  }, []);
+
+  const reset = useCallback(() => {
+    setMap(new Map());
+  }, []);
+
+  const remove = useCallback((key) => {
+    setMap((prev) => {
+      const next = new Map(prev);
+      next.delete(key);
+      return next;
+    });
+  }, []);
+
+  return {
+    map,
+    set: _set,
+    setAll,
+    reset,
+    remove,
+  };
+}~~~

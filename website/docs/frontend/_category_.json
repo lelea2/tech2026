@@ -1,0 +1,10 @@
+{
+  "label": "FrontEnd",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "title": "FrontEnd",
+    "description": "FrontEnd learning paths and code practices.",
+    "slug": "/frontend"
+  }
+}

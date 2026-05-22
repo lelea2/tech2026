@@ -1,51 +1,58 @@
 import clsx from 'clsx';
 import Heading from '@theme/Heading';
+import Link from '@docusaurus/Link';
 import styles from './styles.module.css';
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
+    title: 'Algorithm',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Practice patterns such as two pointers, binary search, graph traversal,
+        and dynamic programming with clear trade-off analysis.
       </>
     ),
+    cta: 'Explore Algorithm',
   },
   {
-    title: 'Focus on What Matters',
+    title: 'System Design',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Learn to structure scalable systems, define requirements, estimate
+        capacity, and justify architectural choices during interviews.
       </>
     ),
+    cta: 'Explore System Design',
   },
   {
-    title: 'Powered by React',
+    title: 'Behavioral Interview',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Build strong STAR responses, communicate impact clearly, and prepare for
+        leadership and collaboration questions with confidence.
       </>
     ),
+    cta: 'Explore Behavioral',
   },
 ];
 
-function Feature({Svg, title, description}) {
+function Feature({Svg, title, description, cta}) {
   return (
-    <div className={clsx('col col--4')}>
-      <div className="text--center">
+    <article className={clsx('col col--4', styles.featureCard)}>
+      <div className={styles.featureIconWrap}>
         <Svg className={styles.featureSvg} role="img" />
       </div>
-      <div className="text--center padding-horiz--md">
+      <div className={styles.featureBody}>
         <Heading as="h3">{title}</Heading>
         <p>{description}</p>
+        <Link className="button button--primary button--sm" to="/docs/frontend">
+          {cta}
+        </Link>
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -53,6 +60,10 @@ export default function HomepageFeatures() {
   return (
     <section className={styles.features}>
       <div className="container">
+        <div className={styles.sectionHeader}>
+          <Heading as="h2">Preparation Tracks</Heading>
+          <p>Choose a core track and level up one interview skill at a time.</p>
+        </div>
         <div className="row">
           {FeatureList.map((props, idx) => (
             <Feature key={idx} {...props} />

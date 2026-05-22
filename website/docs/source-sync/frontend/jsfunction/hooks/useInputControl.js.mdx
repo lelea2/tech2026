@@ -1,0 +1,88 @@
+---
+title: useInputControl.js
+---
+
+# useInputControl.js
+
+Source: frontend/jsfunction/hooks/useInputControl.js
+
+~~~javascript
+/**
+ * @param {string} initialValue
+ * @returns {{
+ *   value: string,
+ *   dirty: boolean,
+ *   touched: boolean,
+ *   different: boolean,
+ *   handleChange: (event: import('react').ChangeEvent<HTMLInputElement>) => void,
+ *   handleBlur: () => void,
+ *   reset: () => void,
+ * }}
+ */
+
+import {useState, useCallback} from 'react';
+
+export default function useInputControl(initialValue) {
+  const [value, setValue] = useState(initialValue);
+  const [dirty, setDirty] = useState(false);
+  const [touched, setTouched] = useState(false);
+  const [different, setDifferent] = useState(false);
+
+  const handleChange = useCallback((event) => {
+    setValue(event.target.value);
+    setDirty(true);
+    setDifferent(event.target.value !== initialValue);
+  }, [initialValue]);
+
+  const handleBlur = useCallback(() => {
+    setTouched(true);
+  }, []);
+
+  const reset = useCallback(() => {
+    setValue(initialValue);
+    setDirty(false);
+    setTouched(false);
+    setDifferent(false);
+  }, [initialValue]);
+
+  return {
+    touched,
+    dirty,
+    different,
+    handleChange, 
+    handleBlur,
+    reset,
+    value
+  };
+}
+
+/**
+ * Test
+ * export default function Component() {
+  const nameInput = useInputControl('Oliver');
+
+  return (
+    <form>
+      <div>
+        <label htmlFor="name">Name</label>
+        <input
+          id="name"
+          value={nameInput.value}
+          onChange={nameInput.handleChange}
+          onBlur={nameInput.handleBlur}
+        />
+      </div>
+      <p>Touched: {nameInput.touched.toString()}</p>
+      <p>Dirty: {nameInput.dirty.toString()}</p>
+      <p>Different: {nameInput.different.toString()}</p>
+      <button type="submit" disabled={!nameInput.different}>
+        Submit
+      </button>
+      <button type="button" onClick={nameInput.reset}>
+        Reset
+      </button>
+    </form>
+  );
+}
+ */
+~~~
