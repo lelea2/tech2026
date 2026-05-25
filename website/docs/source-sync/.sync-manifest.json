@@ -185,7 +185,7 @@
       "docRelative": "frontend/jsfunction/htmlSerialize.mdx"
     },
     "frontend/jsfunction/localStorageWithExpiry.js": {
-      "hash": "14d4791c21a75eae324283c2cfd2ddbb2825464b8ab7ea6f5ef0a59f0e6d82b0",
+      "hash": "24dd5401a65b45722ebbeaa06fa0617eb26d088ae4ecd3a55caf65a6e8fdb051",
       "docRelative": "frontend/jsfunction/localStorageWithExpiry.mdx"
     },
     "frontend/jsfunction/mapAsync.js": {
@@ -248,6 +248,10 @@
       "hash": "e0df6becc1a9001820ed77faceba0d55fab7f05ef4d3dac47cf729ffff251d89",
       "docRelative": "frontend/jsfunction/promise/promiseWithResolvers.mdx"
     },
+    "frontend/jsfunction/rateLimiter.js": {
+      "hash": "a08d1a544757572ba7dda61bdee8bd7b19f238b010833f239cc2504ba38e1025",
+      "docRelative": "frontend/jsfunction/rateLimiter.mdx"
+    },
     "frontend/jsfunction/richText.js": {
       "hash": "ed05db5deab9f2b7f31f17837a09e251f23da8cfc799455b1a8a7eac1ed99c5f",
       "docRelative": "frontend/jsfunction/richText.mdx"
@@ -275,6 +279,22 @@
     "algorithm/array/maxSubArray.js": {
       "hash": "4b3e1240c0fa07ee647b825d05bfb8b02f71df68fc18648a99bba3400a6bdc63",
       "docRelative": "algorithm/array/maxSubArray.mdx"
+    },
+    "algorithm/two-pointers/3Sum.py": {
+      "hash": "7de9cb63fe93154c24c46cd744a75b7c07b9f6d4ac399db434300471b23668a3",
+      "docRelative": "algorithm/two-pointers/3Sum.mdx"
+    },
+    "algorithm/two-pointers/3Sum.js": {
+      "hash": "7de9cb63fe93154c24c46cd744a75b7c07b9f6d4ac399db434300471b23668a3",
+      "docRelative": "algorithm/two-pointers/3Sum.mdx"
+    },
+    "algorithm/two-pointers/isPalindrome.py": {
+      "hash": "deef9391463d62bb7822b516dac78e49b14ee20abd3483fcd01044465411114b",
+      "docRelative": "algorithm/two-pointers/isPalindrome.mdx"
+    },
+    "algorithm/two-pointers/isPalindrome.js": {
+      "hash": "deef9391463d62bb7822b516dac78e49b14ee20abd3483fcd01044465411114b",
+      "docRelative": "algorithm/two-pointers/isPalindrome.mdx"
     }
   }
 }

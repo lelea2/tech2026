@@ -56,6 +56,9 @@ export default class LocalStorageWithExpiry {
     let expiresAt = null;
 
     if (options) {
+      if (options.ttl != null && options.expiresAt != null) {
+        throw new TypeError('ttl and expiresAt cannont coexists');
+      }
       if (options.ttl != null) {
         // Relative expiry: ttl milliseconds from now.
         expiresAt = Date.now() + options.ttl;

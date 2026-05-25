@@ -1,0 +1,53 @@
+---
+title: rateLimiter
+---
+
+# rateLimiter
+
+~~~javascript
+/**
+ * Accept/reject each task based on how many previously accepted tasks
+ * still fall inside a fixed window ending at the current timestamp.
+ *
+ * Rules:
+ * - timestamps is sorted in non-decreasing order.
+ * - Only accepted tasks consume capacity.
+ * - Rejected tasks do not affect future decisions.
+ *
+ * @param {number[]} timestamps
+ * @param {number} maxAllowed
+ * @param {number} windowLen
+ * @returns {boolean[]}
+ */
+export default function rateLimit(timestamps, maxAllowed, windowLen) {
+	const accepted = new Array(timestamps.length).fill(false);
+
+	if (timestamps.length === 0 || maxAllowed <= 0) {
+		return accepted;
+	}
+
+	// Queue of accepted timestamps still relevant to the current window.
+	const acceptedWindow = [];
+	let head = 0;
+
+	for (let i = 0; i < timestamps.length; i++) {
+		const currentTs = timestamps[i];
+		const windowStart = currentTs - windowLen;
+
+		// Drop accepted tasks that are outside the window.
+		while (head < acceptedWindow.length && acceptedWindow[head] < windowStart) {
+			head++;
+		}
+
+		const activeAccepted = acceptedWindow.length - head;
+
+		if (activeAccepted < maxAllowed) {
+			accepted[i] = true;
+			acceptedWindow.push(currentTs);
+		}
+	}
+
+	return accepted;
+}
+
+~~~
