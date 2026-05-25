@@ -12,6 +12,10 @@
       "hash": "1d39811dc7b9366637a5e69f93b1f62261b23f10a944a971db303fdbd915d5de",
       "docRelative": "frontend/jsfunction/array/kRowPascalTriangle.mdx"
     },
+    "frontend/jsfunction/cancellableInterval.js": {
+      "hash": "1278a2e8236b8cac2abbe7498b5f8c93f6fd6d3638fa61d41af0de6490513f57",
+      "docRelative": "frontend/jsfunction/cancellableInterval.mdx"
+    },
     "frontend/jsfunction/classNames.js": {
       "hash": "07711fd28ee997ea5c57ed5c26b73f066fd237dc188d41ec2ba543423036cc72",
       "docRelative": "frontend/jsfunction/classNames.mdx"
@@ -180,9 +184,17 @@
       "hash": "2781462728bd6fdd0bda4cf1f4ebbe6720264c3b50d273d6b2c0e67df6714d34",
       "docRelative": "frontend/jsfunction/htmlSerialize.mdx"
     },
+    "frontend/jsfunction/localStorageWithExpiry.js": {
+      "hash": "14d4791c21a75eae324283c2cfd2ddbb2825464b8ab7ea6f5ef0a59f0e6d82b0",
+      "docRelative": "frontend/jsfunction/localStorageWithExpiry.mdx"
+    },
     "frontend/jsfunction/mapAsync.js": {
       "hash": "7022bdb39d759ef644d81d4a03c092620ebd2a778d4e76eb6f010a6e030ca39d",
       "docRelative": "frontend/jsfunction/mapAsync.mdx"
+    },
+    "frontend/jsfunction/mapAsyncWithRateLimit.js": {
+      "hash": "ba9eec807e7718759161cab4fc099dd53aac2fdd6657f5896ec2b2eff93c20f0",
+      "docRelative": "frontend/jsfunction/mapAsyncWithRateLimit.mdx"
     },
     "frontend/jsfunction/promise/Promise.js": {
       "hash": "6c68c82292965c8a18c3cee15c37f9787cf5b4dd57c3e2c5eb56f98557f1e133",
@@ -236,6 +248,10 @@
       "hash": "e0df6becc1a9001820ed77faceba0d55fab7f05ef4d3dac47cf729ffff251d89",
       "docRelative": "frontend/jsfunction/promise/promiseWithResolvers.mdx"
     },
+    "frontend/jsfunction/richText.js": {
+      "hash": "ed05db5deab9f2b7f31f17837a09e251f23da8cfc799455b1a8a7eac1ed99c5f",
+      "docRelative": "frontend/jsfunction/richText.mdx"
+    },
     "frontend/jsfunction/sanitizeHTML.js": {
       "hash": "1382433d0525ebc5520121d6b822c888eca510028a3d012834716aa777aa561b",
       "docRelative": "frontend/jsfunction/sanitizeHTML.mdx"
@@ -253,11 +269,11 @@
       "docRelative": "algorithm/array/kRowPascalTriangle.mdx"
     },
     "algorithm/array/maxSubArray.py": {
-      "hash": "376851e04267de6cd172ab1964ebd1b63912f18dd8a5e0acbc819d96a1609cd1",
+      "hash": "4b3e1240c0fa07ee647b825d05bfb8b02f71df68fc18648a99bba3400a6bdc63",
       "docRelative": "algorithm/array/maxSubArray.mdx"
     },
     "algorithm/array/maxSubArray.js": {
-      "hash": "376851e04267de6cd172ab1964ebd1b63912f18dd8a5e0acbc819d96a1609cd1",
+      "hash": "4b3e1240c0fa07ee647b825d05bfb8b02f71df68fc18648a99bba3400a6bdc63",
       "docRelative": "algorithm/array/maxSubArray.mdx"
     }
   }

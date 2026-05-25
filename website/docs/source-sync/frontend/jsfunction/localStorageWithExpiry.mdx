@@ -1,0 +1,83 @@
+---
+title: localStorageWithExpiry
+---
+
+# localStorageWithExpiry
+
+~~~javascript
+/**
+ * localStorage persists data until it is explicitly removed. Sometimes that is
+ * exactly what you want, but sometimes stored values should become invalid after
+ * a period of time.
+ *
+ * This class wraps localStorage and supports storing string values with an
+ * optional expiry time. Values can expire via:
+ * - ttl: time-to-live in milliseconds (relative to now)
+ * - expiresAt: absolute timestamp or Date object
+ *
+ * This is a small wrapper focused on core expiry logic, not a full Storage API
+ * replacement.
+ */
+export default class LocalStorageWithExpiry {
+  /**
+   * Retrieve a value from localStorage if it has not expired.
+   * Returns null if the key does not exist or has expired.
+   *
+   * @param {string} key
+   * @returns {string | null}
+   */
+  getItem(key) {
+    const stored = localStorage.getItem(key);
+    if (stored == null) {
+      return null;
+    }
+
+    try {
+      const { value, expiresAt } = JSON.parse(stored);
+
+      // Check expiry: if expiresAt is in the past, item has expired.
+      if (expiresAt != null && Date.now() > expiresAt) {
+        // Clean up expired item.
+        localStorage.removeItem(key);
+        return null;
+      }
+
+      return value;
+    } catch (e) {
+      // Fallback: return the raw string if not JSON or no expiry metadata.
+      return stored;
+    }
+  }
+
+  /**
+   * Store a value in localStorage with optional expiry.
+   *
+   * @param {string} key - Storage key
+   * @param {string} value - Value to store
+   * @param {{ ttl?: number, expiresAt?: number | Date }} [options] - Expiry options
+   *   - ttl: milliseconds from now until expiry
+   *   - expiresAt: absolute timestamp (ms) or Date object
+   * @returns {void}
+   */
+  setItem(key, value, options) {
+    let expiresAt = null;
+
+    if (options) {
+      if (options.ttl != null) {
+        // Relative expiry: ttl milliseconds from now.
+        expiresAt = Date.now() + options.ttl;
+      } else if (options.expiresAt != null) {
+        // Absolute expiry: use provided timestamp or Date.
+        expiresAt =
+          options.expiresAt instanceof Date
+            ? options.expiresAt.getTime()
+            : options.expiresAt;
+      }
+    }
+
+    // Store value + expiry metadata as JSON.
+    const payload = { value, expiresAt };
+    localStorage.setItem(key, JSON.stringify(payload));
+  }
+}
+~~~
