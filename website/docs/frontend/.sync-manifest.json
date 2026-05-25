@@ -12,6 +12,10 @@
       "hash": "1d39811dc7b9366637a5e69f93b1f62261b23f10a944a971db303fdbd915d5de",
       "docRelative": "jsfunction/array/kRowPascalTriangle.mdx"
     },
+    "frontend/jsfunction/cancellableInterval.js": {
+      "hash": "1278a2e8236b8cac2abbe7498b5f8c93f6fd6d3638fa61d41af0de6490513f57",
+      "docRelative": "jsfunction/cancellableInterval.mdx"
+    },
     "frontend/jsfunction/classNames.js": {
       "hash": "07711fd28ee997ea5c57ed5c26b73f066fd237dc188d41ec2ba543423036cc72",
       "docRelative": "jsfunction/classNames.mdx"
@@ -19,6 +23,14 @@
     "frontend/jsfunction/classNamesAdvance.js": {
       "hash": "55f425d054249466b2e041273cd17b3a266085dcdf1af48ed49d45b2fafbdbff",
       "docRelative": "jsfunction/classNamesAdvance.mdx"
+    },
+    "frontend/jsfunction/dataMerge.js": {
+      "hash": "1bf24e525b354a15f804cc58180a667213e4351d6895b9f7ad3d3c2fe20f9d02",
+      "docRelative": "jsfunction/dataMerge.mdx"
+    },
+    "frontend/jsfunction/dataSelection.js": {
+      "hash": "78bef7c11905f91841915ddf3c2ef433b9e944329c1224ed527cc8f1731ae294",
+      "docRelative": "jsfunction/dataSelection.mdx"
     },
     "frontend/jsfunction/debounce.js": {
       "hash": "1f7d22364628068546c6958d490b53578ac20db64cd8c920547f9add55ecba35",
@@ -180,9 +192,41 @@
       "hash": "2781462728bd6fdd0bda4cf1f4ebbe6720264c3b50d273d6b2c0e67df6714d34",
       "docRelative": "jsfunction/htmlSerialize.mdx"
     },
+    "frontend/jsfunction/jsonStringify/superJSON.js": {
+      "hash": "3e200badd08e753f81aab3cf3a93fa29cec8c30f08371cc1e420c713a34c8225",
+      "docRelative": "jsfunction/jsonStringify/superJSON.mdx"
+    },
+    "frontend/jsfunction/jsonStringify/superJSONAdvance.js": {
+      "hash": "f0da253c138c093cbdfa67ddf57ae49eb7e5fd49683bc10b2940f32ad76eba39",
+      "docRelative": "jsfunction/jsonStringify/superJSONAdvance.mdx"
+    },
+    "frontend/jsfunction/localStorageWithExpiry.js": {
+      "hash": "24dd5401a65b45722ebbeaa06fa0617eb26d088ae4ecd3a55caf65a6e8fdb051",
+      "docRelative": "jsfunction/localStorageWithExpiry.mdx"
+    },
     "frontend/jsfunction/mapAsync.js": {
       "hash": "7022bdb39d759ef644d81d4a03c092620ebd2a778d4e76eb6f010a6e030ca39d",
       "docRelative": "jsfunction/mapAsync.mdx"
+    },
+    "frontend/jsfunction/mapAsyncWithRateLimit.js": {
+      "hash": "ba9eec807e7718759161cab4fc099dd53aac2fdd6657f5896ec2b2eff93c20f0",
+      "docRelative": "jsfunction/mapAsyncWithRateLimit.mdx"
+    },
+    "frontend/jsfunction/mapWithHistory.js": {
+      "hash": "f2567ffdf1c8470f17922ca71f9b0b7155f5fec338ca7d4543ad40e9755e5f77",
+      "docRelative": "jsfunction/mapWithHistory.mdx"
+    },
+    "frontend/jsfunction/prismaORM/miniORM.js": {
+      "hash": "618fa65741acd95646ea158845cc07154c0f44f30606eac0612767d1cc1ba234",
+      "docRelative": "jsfunction/prismaORM/miniORM.mdx"
+    },
+    "frontend/jsfunction/prismaORM/miniORMII.js": {
+      "hash": "005176fd5b7171d5baf564bd0c78e589e79d4c6f6cb3988bfc6055dc2f8beaa4",
+      "docRelative": "jsfunction/prismaORM/miniORMII.mdx"
+    },
+    "frontend/jsfunction/prismaORM/miniORMIII.js": {
+      "hash": "1ea7dafe0b24d0066fdea4e2862680c915c63a420ca12a9d26641b17a6122342",
+      "docRelative": "jsfunction/prismaORM/miniORMIII.mdx"
     },
     "frontend/jsfunction/promise/Promise.js": {
       "hash": "6c68c82292965c8a18c3cee15c37f9787cf5b4dd57c3e2c5eb56f98557f1e133",
@@ -236,13 +280,69 @@
       "hash": "e0df6becc1a9001820ed77faceba0d55fab7f05ef4d3dac47cf729ffff251d89",
       "docRelative": "jsfunction/promise/promiseWithResolvers.mdx"
     },
+    "frontend/jsfunction/rateLimiter.js": {
+      "hash": "6753f24c3bb9939dd46fb087b1679ff051d3f03eba4634adc0cd27e24c7e849f",
+      "docRelative": "jsfunction/rateLimiter.mdx"
+    },
+    "frontend/jsfunction/richText.js": {
+      "hash": "ed05db5deab9f2b7f31f17837a09e251f23da8cfc799455b1a8a7eac1ed99c5f",
+      "docRelative": "jsfunction/richText.mdx"
+    },
     "frontend/jsfunction/sanitizeHTML.js": {
       "hash": "1382433d0525ebc5520121d6b822c888eca510028a3d012834716aa777aa561b",
       "docRelative": "jsfunction/sanitizeHTML.mdx"
     },
+    "frontend/jsfunction/spreadSheet/spreadSheet.js": {
+      "hash": "2c962fed7f48d47d8878937764666d77cc7923eecc1ac907b3c64dd7794d34b8",
+      "docRelative": "jsfunction/spreadSheet/spreadSheet.mdx"
+    },
+    "frontend/jsfunction/spreadSheet/spreadSheetII.js": {
+      "hash": "b8d225be0e3a64408c41f12c5670511a91505db2bd6c280accef83da3483a68b",
+      "docRelative": "jsfunction/spreadSheet/spreadSheetII.mdx"
+    },
+    "frontend/jsfunction/spreadSheet/spreadSheetIII.js": {
+      "hash": "1a2cd88fe88b8e41e748b5c50bb30374d95915960d0f9734c6bf89938b540b94",
+      "docRelative": "jsfunction/spreadSheet/spreadSheetIII.mdx"
+    },
+    "frontend/jsfunction/textSearch.js": {
+      "hash": "52643a188522d465278745e4f34d33e4ff2e3e8bf59204da63896341213132d6",
+      "docRelative": "jsfunction/textSearch.mdx"
+    },
     "frontend/jsfunction/throttle.js": {
       "hash": "3ebd1c9e2e7d7821838993d15f0f906528c50cd2be5a13fb5d31aeffb82057db",
       "docRelative": "jsfunction/throttle.mdx"
+    },
+    "__nav__:jsfunction": {
+      "hash": "3fb080e26f48427f2aac876ae650d438158949d3686aa1068ae4eac700324609",
+      "docRelative": "jsfunction/_index.mdx"
+    },
+    "__nav__:jsfunction/array": {
+      "hash": "380661b9e534e90c1fd0379240eca181592080777e3400a33978ff524d757245",
+      "docRelative": "jsfunction/array/_index.mdx"
+    },
+    "__nav__:jsfunction/getElementBy": {
+      "hash": "092afa458201949d4909ed9815e5562e9079a865167cac554f04c23eefab891d",
+      "docRelative": "jsfunction/getElementBy/_index.mdx"
+    },
+    "__nav__:jsfunction/hooks": {
+      "hash": "914900b9322529b7ef330f8ee3dbff0c046e2647c4b1fbf1f2ebaaea8258189f",
+      "docRelative": "jsfunction/hooks/_index.mdx"
+    },
+    "__nav__:jsfunction/jsonStringify": {
+      "hash": "1adc971acc00647c53b28b1a324e9754cb15a6f470f00275a11d8271031adf83",
+      "docRelative": "jsfunction/jsonStringify/_index.mdx"
+    },
+    "__nav__:jsfunction/prismaORM": {
+      "hash": "8a4a19273873515148b69411814a233fa484107ea647d7dfb9137035469b434f",
+      "docRelative": "jsfunction/prismaORM/_index.mdx"
+    },
+    "__nav__:jsfunction/promise": {
+      "hash": "71d750bc6fac21f39b20b800b055edd0899621f90631f83450415570347999a4",
+      "docRelative": "jsfunction/promise/_index.mdx"
+    },
+    "__nav__:jsfunction/spreadSheet": {
+      "hash": "b8b7b8eb2b0018d54918dda926e04af57d7e8567511778329741cac283f96d34",
+      "docRelative": "jsfunction/spreadSheet/_index.mdx"
     }
   }
 }

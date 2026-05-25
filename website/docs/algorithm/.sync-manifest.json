@@ -9,8 +9,36 @@
       "docRelative": "array/kRowPascalTriangle.mdx"
     },
     "algorithm/array/maxSubArray.py": {
-      "hash": "b0445cc26d7130f6709ca5b7c7a02f8286e0a534eff2d4725b0c2977638f7053",
+      "hash": "4b3e1240c0fa07ee647b825d05bfb8b02f71df68fc18648a99bba3400a6bdc63",
       "docRelative": "array/maxSubArray.mdx"
+    },
+    "algorithm/array/maxSubArray.js": {
+      "hash": "4b3e1240c0fa07ee647b825d05bfb8b02f71df68fc18648a99bba3400a6bdc63",
+      "docRelative": "array/maxSubArray.mdx"
+    },
+    "algorithm/two-pointers/3Sum.py": {
+      "hash": "7de9cb63fe93154c24c46cd744a75b7c07b9f6d4ac399db434300471b23668a3",
+      "docRelative": "two-pointers/3Sum.mdx"
+    },
+    "algorithm/two-pointers/3Sum.js": {
+      "hash": "7de9cb63fe93154c24c46cd744a75b7c07b9f6d4ac399db434300471b23668a3",
+      "docRelative": "two-pointers/3Sum.mdx"
+    },
+    "algorithm/two-pointers/isPalindrome.py": {
+      "hash": "deef9391463d62bb7822b516dac78e49b14ee20abd3483fcd01044465411114b",
+      "docRelative": "two-pointers/isPalindrome.mdx"
+    },
+    "algorithm/two-pointers/isPalindrome.js": {
+      "hash": "deef9391463d62bb7822b516dac78e49b14ee20abd3483fcd01044465411114b",
+      "docRelative": "two-pointers/isPalindrome.mdx"
+    },
+    "__nav__:array": {
+      "hash": "e070906d02a9322a98cce61cf3b78fd969f3e094c9d24d170e7269cf30b3c72b",
+      "docRelative": "array/_index.mdx"
+    },
+    "__nav__:two-pointers": {
+      "hash": "0d7ff923b0d76c28e7648a09b3763d69fea84553209c069f8499ce45c297db49",
+      "docRelative": "two-pointers/_index.mdx"
     }
   }
 }

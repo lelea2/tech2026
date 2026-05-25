@@ -1,0 +1,83 @@
+/**
+ * MapWithHistory stores string values by key across timestamps.
+ *
+ * - set(key, value, timestamp): appends a new historical value for key.
+ * - get(key, timestamp): returns value for greatest stored timestamp <= query,
+ *   or '' when none exists.
+ *
+ * Timestamps for the same key are guaranteed strictly increasing.
+ */
+export default class MapWithHistory {
+	constructor() {
+		/** @type {Map<string, Array<{timestamp: number, value: string}>>} */
+		this.store = new Map();
+	}
+
+	/**
+	 * @param {string} key
+	 * @param {string} value
+	 * @param {number} timestamp
+	 * @returns {void}
+	 */
+	set(key, value, timestamp) {
+		if (!this.store.has(key)) {
+			this.store.set(key, []);
+		}
+
+		// Strictly increasing timestamps per key means append is valid.
+		this.store.get(key).push({ timestamp, value });
+	}
+
+	/**
+	 * @param {string} key
+	 * @param {number} timestamp
+	 * @returns {string}
+	 */
+	get(key, timestamp) {
+		const history = this.store.get(key);
+
+		if (!history || history.length === 0) {
+			return '';
+		}
+
+		// Binary search for rightmost entry with entry.timestamp <= timestamp.
+		let left = 0;
+		let right = history.length - 1;
+		let bestIndex = -1;
+
+		while (left <= right) {
+			const mid = left + Math.floor((right - left) / 2);
+			const midTimestamp = history[mid].timestamp;
+
+			if (midTimestamp <= timestamp) {
+				bestIndex = mid;
+				left = mid + 1;
+			} else {
+				right = mid - 1;
+			}
+		}
+
+		return bestIndex === -1 ? '' : history[bestIndex].value;
+	}
+}
+
+/** 
+ * Test
+ ***
+const mapWithHistory = new MapWithHistory();
+
+mapWithHistory.set('language', 'JavaScript', 1);
+mapWithHistory.set('language', 'TypeScript', 4);
+
+mapWithHistory.get('language', 1);
+// 'JavaScript'
+
+mapWithHistory.get('language', 3);
+// 'JavaScript'
+
+mapWithHistory.get('language', 4);
+// 'TypeScript'
+
+mapWithHistory.get('language', 10);
+// 'TypeScript'
+ */

@@ -1,0 +1,72 @@
+/**
+ * Find all case-insensitive, non-overlapping matches of query in content
+ * and wrap matched regions in <b>...</b>. Adjacent matches are merged into
+ * one bold block.
+ *
+ * @param {string} content
+ * @param {string} query
+ * @returns {string}
+ */
+export default function textSearch(content, query) {
+	if (query.length === 0 || content.length === 0 || query.length > content.length) {
+		return content;
+	}
+
+	const contentLower = content.toLowerCase();
+	const queryLower = query.toLowerCase();
+	const qLen = query.length;
+	const rawRanges = [];
+
+	// Left-to-right greedy scan so earlier characters get priority.
+	let i = 0;
+	while (i <= content.length - qLen) {
+		if (contentLower.slice(i, i + qLen) === queryLower) {
+			rawRanges.push([i, i + qLen]);
+			i += qLen;
+		} else {
+			i++;
+		}
+	}
+
+	if (rawRanges.length === 0) {
+		return content;
+	}
+
+	// Merge touching ranges: e.g. [0,2] + [2,4] becomes [0,4].
+	const mergedRanges = [rawRanges[0]];
+	for (let j = 1; j < rawRanges.length; j++) {
+		const [start, end] = rawRanges[j];
+		const last = mergedRanges[mergedRanges.length - 1];
+
+		if (start <= last[1]) {
+			last[1] = Math.max(last[1], end);
+		} else {
+			mergedRanges.push([start, end]);
+		}
+	}
+
+	let result = '';
+	let cursor = 0;
+
+	for (const [start, end] of mergedRanges) {
+		result += content.slice(cursor, start);
+		result += `<b>${content.slice(start, end)}</b>`;
+		cursor = end;
+	}
+
+	result += content.slice(cursor);
+	return result;
+}
+
+// Examples:
+// textSearch('The Quick Brown Fox Jumps Over The Lazy Dog', 'fox')
+// => 'The Quick Brown <b>Fox</b> Jumps Over The Lazy Dog'
+//
+// textSearch('The hardworking Dog overtakes the lazy dog', 'dog')
+// => 'The hardworking <b>Dog</b> overtakes the lazy <b>dog</b>'
+//
+// textSearch('aaa', 'aa')
+// => '<b>aa</b>a'
+//
+// textSearch('aaaa', 'aa')
+// => '<b>aaaa</b>'

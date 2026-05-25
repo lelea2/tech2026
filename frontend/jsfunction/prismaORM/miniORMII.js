@@ -1,0 +1,216 @@
+/**
+ * Enhanced in-memory ORM with dynamic delegates per model name.
+ *
+ * Supports:
+ * - findMany({ where?, orderBy? }) with operator-based filtering
+ * - create({ data })
+ * - update({ where, data }) using exact top-level equality
+ * - delete({ where }) using exact top-level equality
+ */
+export default class MiniORM {
+	/**
+	 * @param {Record<string, Array<Record<string, unknown>>>} data
+	 */
+	constructor(data) {
+		/** @type {Record<string, Array<Record<string, unknown>>>} */
+		this._store = {};
+
+		for (const [modelName, records] of Object.entries(data || {})) {
+			// Clone initial rows to isolate internal state from outside mutations.
+			this._store[modelName] = records.map((record) => ({ ...record }));
+			this[modelName] = this._createDelegate(modelName);
+		}
+	}
+
+	/**
+	 * @param {string} modelName
+	 */
+	_createDelegate(modelName) {
+		return {
+			findMany: (args = {}) => {
+				const table = this._store[modelName];
+				const where = args.where;
+				const orderBy = args.orderBy;
+
+				let results = table;
+
+				if (where) {
+					results = results.filter((record) => matchesWhereEnhanced(record, where));
+				}
+
+				if (orderBy) {
+					const [field, direction] = Object.entries(orderBy)[0];
+					const sortFactor = direction === 'asc' ? 1 : -1;
+
+					// Sort after filtering. Clone first so storage order is not mutated.
+					results = [...results].sort((a, b) => {
+						if (a[field] === b[field]) {
+							return 0;
+						}
+						return a[field] < b[field] ? -1 * sortFactor : 1 * sortFactor;
+					});
+				}
+
+				return results.map((record) => ({ ...record }));
+			},
+
+			create: ({ data }) => {
+				const table = this._store[modelName];
+				const created = { ...data };
+				table.push(created);
+				return { ...created };
+			},
+
+			update: ({ where, data }) => {
+				const table = this._store[modelName];
+				const index = table.findIndex((record) => matchesWhereExact(record, where));
+				const updated = { ...table[index], ...data };
+				table[index] = updated;
+				return { ...updated };
+			},
+
+			delete: ({ where }) => {
+				const table = this._store[modelName];
+				const index = table.findIndex((record) => matchesWhereExact(record, where));
+				const [deleted] = table.splice(index, 1);
+				return { ...deleted };
+			},
+		};
+	}
+}
+
+/**
+ * Exact equality matcher used by update and delete.
+ *
+ * @param {Record<string, unknown>} record
+ * @param {Record<string, unknown>} where
+ * @returns {boolean}
+ */
+function matchesWhereExact(record, where) {
+	for (const [key, value] of Object.entries(where)) {
+		if (record[key] !== value) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/**
+ * Enhanced matcher used by findMany.
+ * Field condition can be an exact value or an operator object.
+ *
+ * Supported operators per field:
+ * - in
+ * - gt
+ * - gte
+ * - lt
+ * - lte
+ * - contains (string fields)
+ *
+ * @param {Record<string, unknown>} record
+ * @param {Record<string, unknown>} where
+ * @returns {boolean}
+ */
+function matchesWhereEnhanced(record, where) {
+	for (const [field, condition] of Object.entries(where)) {
+		const fieldValue = record[field];
+
+		if (!isOperatorObject(condition)) {
+			if (fieldValue !== condition) {
+				return false;
+			}
+			continue;
+		}
+
+		if (Object.prototype.hasOwnProperty.call(condition, 'in')) {
+			if (!condition.in.includes(fieldValue)) {
+				return false;
+			}
+		}
+
+		if (Object.prototype.hasOwnProperty.call(condition, 'gt')) {
+			if (!(fieldValue > condition.gt)) {
+				return false;
+			}
+		}
+
+		if (Object.prototype.hasOwnProperty.call(condition, 'gte')) {
+			if (!(fieldValue >= condition.gte)) {
+				return false;
+			}
+		}
+
+		if (Object.prototype.hasOwnProperty.call(condition, 'lt')) {
+			if (!(fieldValue < condition.lt)) {
+				return false;
+			}
+		}
+
+		if (Object.prototype.hasOwnProperty.call(condition, 'lte')) {
+			if (!(fieldValue <= condition.lte)) {
+				return false;
+			}
+		}
+
+		if (Object.prototype.hasOwnProperty.call(condition, 'contains')) {
+			if (typeof fieldValue !== 'string' || !fieldValue.includes(condition.contains)) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+/**
+ * @param {unknown} value
+ * @returns {value is {
+ *   in?: Array<unknown>,
+ *   gt?: unknown,
+ *   gte?: unknown,
+ *   lt?: unknown,
+ *   lte?: unknown,
+ *   contains?: string,
+ * }}
+ */
+function isOperatorObject(value) {
+	if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+		return false;
+	}
+
+	const operatorKeys = new Set(['in', 'gt', 'gte', 'lt', 'lte', 'contains']);
+	const keys = Object.keys(value);
+
+	if (keys.length === 0) {
+		return false;
+	}
+
+	return keys.some((key) => operatorKeys.has(key));
+}
+
+/**
+Example:
+
+const db = new MiniORM({
+	product: [
+		{ id: 1, name: 'Keyboard', price: 40, category: 'hardware' },
+		{ id: 2, name: 'Notebook', price: 12, category: 'stationery' },
+		{ id: 3, name: 'Monitor', price: 220, category: 'hardware' },
+		{ id: 4, name: 'Mouse Pad', price: 18, category: 'hardware' },
+	],
+});
+
+db.product.findMany({
+	where: {
+		price: { gte: 10, lt: 50 },
+		category: { in: ['hardware', 'accessories'] },
+		name: { contains: 'o' },
+	},
+	orderBy: { price: 'asc' },
+});
+// [
+//   { id: 4, name: 'Mouse Pad', price: 18, category: 'hardware' },
+//   { id: 1, name: 'Keyboard', price: 40, category: 'hardware' },
+// ]
+*/

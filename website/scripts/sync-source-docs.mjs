@@ -162,6 +162,109 @@ function mdxForSources(baseName, variants) {
   return `---\ntitle: ${baseName}\n---\n\n# ${baseName}\n\nimport Tabs from '@theme/Tabs';\nimport TabItem from '@theme/TabItem';\n\n<Tabs>\n${tabItems}\n</Tabs>\n`;
 }
 
+function toSlugPath(value) {
+  const normalized = normalizeRelativePath(value);
+  return normalized;
+}
+
+function navMdxForDirectory(dirRelative, directDocs, childDirs) {
+  const folderName = path.basename(dirRelative);
+  const title = toTitleCase(folderName);
+
+  const sections = [];
+
+  if (childDirs.length > 0) {
+    const childLinks = childDirs
+      .map((childDir) => {
+        const childName = path.basename(childDir);
+        const childTitle = toTitleCase(childName);
+        return `- [${childTitle}](./${childName}/_index)`;
+      })
+      .join('\n');
+
+    sections.push(`## Folders\n\n${childLinks}`);
+  }
+
+  if (directDocs.length > 0) {
+    const docLinks = directDocs
+      .map((docRelative) => {
+        const fileName = path.basename(docRelative, '.mdx');
+        return `- [${fileName}](./${fileName})`;
+      })
+      .join('\n');
+
+    sections.push(`## Docs\n\n${docLinks}`);
+  }
+
+  const body = sections.length > 0 ? sections.join('\n\n') : 'No synced docs yet in this folder.';
+
+  return `---\ntitle: ${title}\n---\n\n# ${title}\n\n${body}\n`;
+}
+
+async function runPostHookCreateFolderNavDocs({docsRoot, next, previous}) {
+  const generatedDocRelatives = new Set(
+    Object.values(next.files)
+      .map((meta) => meta?.docRelative)
+      .filter((value) => value && !value.endsWith('/_index.mdx') && !value.endsWith('_index.mdx')),
+  );
+
+  const directorySet = new Set();
+
+  for (const docRelative of generatedDocRelatives) {
+    let current = path.dirname(docRelative);
+
+    while (current && current !== '.' && !directorySet.has(current)) {
+      directorySet.add(current);
+      const parent = path.dirname(current);
+      if (!parent || parent === '.' || parent === current) {
+        break;
+      }
+      current = parent;
+    }
+  }
+
+  let writtenCount = 0;
+  let unchangedCount = 0;
+
+  const directories = [...directorySet].sort();
+
+  for (const dirRelative of directories) {
+    const navRelative = `${toPosix(dirRelative)}/_index.mdx`;
+
+    const directDocs = [...generatedDocRelatives]
+      .filter((docRelative) => path.dirname(docRelative) === dirRelative)
+      .sort();
+
+    const childDirs = directories
+      .filter((child) => path.dirname(child) === dirRelative)
+      .sort();
+
+    const navContent = navMdxForDirectory(dirRelative, directDocs, childDirs);
+    const navHash = hashContent(navContent);
+    const navSyntheticKey = `__nav__:${toSlugPath(dirRelative)}`;
+
+    next.files[navSyntheticKey] = {
+      hash: navHash,
+      docRelative: navRelative,
+    };
+
+    const navPath = path.join(docsRoot, navRelative);
+    const unchanged =
+      (await pathExists(navPath)) && previous.files[navSyntheticKey]?.hash === navHash;
+
+    if (unchanged) {
+      unchangedCount += 1;
+      continue;
+    }
+
+    await fs.mkdir(path.dirname(navPath), {recursive: true});
+    await fs.writeFile(navPath, navContent, 'utf8');
+    writtenCount += 1;
+  }
+
+  return {writtenCount, unchangedCount};
+}
+
 async function pathExists(targetPath) {
   try {
     await fs.access(targetPath);
@@ -358,6 +461,14 @@ async function main() {
       writtenCount += 1;
     }
   }
+
+  const postHook = await runPostHookCreateFolderNavDocs({
+    docsRoot,
+    next,
+    previous,
+  });
+  writtenCount += postHook.writtenCount;
+  unchangedCount += postHook.unchangedCount;
 
   let removedCount = 0;
   const previousDocRelatives = new Set(

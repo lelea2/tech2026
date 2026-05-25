@@ -31,6 +31,14 @@ Keep documentation in sync when files change under frontend, backend, or algorit
 5. Verify docs update summary.
 6. Run docs build to validate output.
 
+### Post-hook behavior (new)
+
+- After syncing source files, the script now runs a post-hook that auto-creates folder navigation pages:
+  - `.../<folder>/_index.mdx`
+- This happens for newly discovered nested folders too (for example `algorithm/two-pointers`, `frontend/jsfunction/spreadSheet`, `frontend/jsfunction/prismaORM`).
+- These nav pages are generated automatically and tracked in the sync manifest.
+- If a source folder disappears, the corresponding generated nav page is removed on the next sync.
+
 ## Commands
 
 From repository root:
@@ -104,8 +112,20 @@ Mapping format rules:
 - If you mapped only a leaf path, replace it with a parent mapping (example: `frontend/jsfunction=jsfunction`).
 - For `frontend/jsfunction/getElementBy/**`, do not map only `hooks`/`array`/`promise`; include `frontend/jsfunction=jsfunction` in the same command.
 - Re-run sync with all mappings for the same docs subdir in one command.
+- Confirm parent mapping is broad enough so new folders are inside scope (for example `algorithm=.` or `frontend/jsfunction=jsfunction`).
 - Check summary output: `Updated` should increase when new files are detected.
 - Run docs build after sync to verify generated pages are included.
+
+## Troubleshooting: New subfolder not visible in navigation
+
+- Use a parent mapping, not only leaf mappings:
+  - Good: `algorithm=.`
+  - Good: `frontend/jsfunction=jsfunction`
+  - Risky: mapping only selected leaves (new siblings will be missed)
+- Re-run sync; post-hook should generate `/_index.mdx` pages for new folders automatically.
+- Verify generated path exists under docs, for example:
+  - `website/docs/algorithm/two-pointers/_index.mdx`
+  - `website/docs/frontend/jsfunction/spreadSheet/_index.mdx`
 
 ## Expected Output
 

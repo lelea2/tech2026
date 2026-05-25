@@ -1,0 +1,55 @@
+---
+title: isPalindrome
+---
+
+# isPalindrome
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="python" label="Python">
+
+~~~python
+def is_palindrome(s):
+    left, right = 0, len(s) - 1
+    while left < right:
+
+        while left < right and not s[left].isalnum():
+            left += 1
+
+        while left < right and not s[right].isalnum():
+            right -= 1
+
+        if s[left].lower() != s[right].lower():
+            return False
+
+        left += 1
+        right -= 1
+
+    return True
+    
+~~~
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+~~~javascript
+// O(n) time, O(1) space
+export default function isPalindrome(string) {
+  let leftIdx = 0;
+  let rightIdx = string.length - 1;
+  while (leftIdx < rightIdx) {
+    if (string[leftIdx] !== string[rightIdx]) {
+      return false;
+    }
+    leftIdx++;
+    rightIdx--;
+  }
+  return true;
+}
+
+~~~
+
+  </TabItem>
+</Tabs>

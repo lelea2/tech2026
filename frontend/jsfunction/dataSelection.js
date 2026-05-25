@@ -1,0 +1,140 @@
+/**
+ * @param {Array<{user: number, duration: number, equipment: Array<string>}>} sessions
+ * @param {{user?: number, minDuration?: number, equipment?: Array<string>, merge?: boolean}} [options]
+ * @return {Array<{user: number, duration: number, equipment: Array<string>}>>}
+ */
+export default function selectData(sessions, options = {}) {
+  const {
+    user,
+    minDuration,
+    equipment,
+    merge = false,
+  } = options || {};
+
+  const hasUserFilter = user !== undefined;
+  const hasMinDurationFilter = minDuration !== undefined;
+  const hasEquipmentFilter = equipment !== undefined;
+  const equipmentFilterSet = hasEquipmentFilter ? new Set(equipment) : null;
+
+  /**
+   * @param {{user: number, duration: number, equipment: Array<string>}} session
+   * @returns {boolean}
+   */
+  const matchesFilters = (session) => {
+    if (hasUserFilter && session.user !== user) {
+      return false;
+    }
+
+    if (hasMinDurationFilter && session.duration < minDuration) {
+      return false;
+    }
+
+    if (hasEquipmentFilter) {
+      let found = false;
+
+      for (const item of session.equipment) {
+        if (equipmentFilterSet.has(item)) {
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  if (!merge) {
+    return sessions.filter(matchesFilters);
+  }
+
+  const mergedByUser = new Map();
+
+  for (let i = 0; i < sessions.length; i++) {
+    const session = sessions[i];
+    const existing = mergedByUser.get(session.user);
+
+    if (!existing) {
+      mergedByUser.set(session.user, {
+        user: session.user,
+        duration: session.duration,
+        equipmentSet: new Set(session.equipment),
+        lastIndex: i,
+      });
+      continue;
+    }
+
+    existing.duration += session.duration;
+    existing.lastIndex = i;
+
+    for (const item of session.equipment) {
+      existing.equipmentSet.add(item);
+    }
+  }
+
+  const mergedRows = Array.from(mergedByUser.values())
+    .sort((a, b) => a.lastIndex - b.lastIndex)
+    .map((row) => ({
+      user: row.user,
+      duration: row.duration,
+      equipment: Array.from(row.equipmentSet).sort(),
+    }));
+
+  return mergedRows.filter(matchesFilters);
+}
+
+
+/** Test cases for the selectData function
+selectData(sessions);
+// [
+//   { user: 8, duration: 50, equipment: ['bench'] },
+//   { user: 7, duration: 150, equipment: ['dumbbell', 'kettlebell'] },
+//   { user: 1, duration: 10, equipment: ['barbell'] },
+//   { user: 7, duration: 100, equipment: ['bike', 'kettlebell'] },
+//   { user: 7, duration: 200, equipment: ['bike'] },
+//   { user: 2, duration: 200, equipment: ['treadmill'] },
+//   { user: 2, duration: 200, equipment: ['bike'] },
+// ];
+
+selectData(sessions, { user: 2 });
+// [
+//   { user: 2, duration: 200, equipment: ['treadmill'] },
+//   { user: 2, duration: 200, equipment: ['bike'] },
+// ];
+
+selectData(sessions, { minDuration: 200 });
+// [
+//   { user: 7, duration: 200, equipment: ['bike'] },
+//   { user: 2, duration: 200, equipment: ['treadmill'] },
+//   { user: 2, duration: 200, equipment: ['bike'] },
+// ];
+
+selectData(sessions, { minDuration: 400 });
+// [];
+
+selectData(sessions, { equipment: ['bike', 'dumbbell'] });
+// [
+//   { user: 7, duration: 150, equipment: ['dumbbell', 'kettlebell'] },
+//   { user: 7, duration: 100, equipment: ['bike', 'kettlebell'] },
+//   { user: 7, duration: 200, equipment: ['bike'] },
+//   { user: 2, duration: 200, equipment: ['bike'] },
+// ];
+
+selectData(sessions, { merge: true });
+// [
+//   { user: 8, duration: 50, equipment: ['bench'] },
+//   { user: 1, duration: 10, equipment: ['barbell'] },
+//   { user: 7, duration: 450, equipment: ['bike', 'dumbbell', 'kettlebell'] },
+//   { user: 2, duration: 400, equipment: ['bike', 'treadmill'] },
+// ];
+
+selectData(sessions, { merge: true, minDuration: 400 });
+// [
+//   { user: 7, duration: 450, equipment: ['bike', 'dumbbell', 'kettlebell'] },
+//   { user: 2, duration: 400, equipment: ['bike', 'treadmill'] },
+// ];
+
+*/

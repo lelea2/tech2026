@@ -4,6 +4,12 @@ title: maxSubArray
 
 # maxSubArray
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="python" label="Python">
+
 ~~~python
 class Solution:
     # @param A : tuple of integers
@@ -16,8 +22,37 @@ class Solution:
         current_sum = A[0]
 
         for i in range(1, len(A)):
-            current_sum = max(A[i], current_sum + A[i])
-            max_sum = max(max_sum, current_sum)
+          current_sum = max(A[i], current_sum + A[i])
+          max_sum = max(max_sum, current_sum)
 
         return max_sum  
 ~~~
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+~~~javascript
+/**
+ * @param {number[]} arr
+ * @returns {number}
+ */
+export default function maxSubArray(arr) {
+  if (!arr || arr.length === 0) {
+    return 0;
+  }
+
+  let maxSum = arr[0];
+  let currentSum = arr[0];
+
+  for (let i = 1; i < arr.length; i += 1) {
+    currentSum = Math.max(arr[i], currentSum + arr[i]);
+    maxSum = Math.max(maxSum, currentSum);
+  }
+
+  return maxSum;
+}
+
+~~~
+
+  </TabItem>
+</Tabs>

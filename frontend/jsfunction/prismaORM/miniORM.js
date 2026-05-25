@@ -1,0 +1,123 @@
+/**
+ * Small in-memory ORM with one delegate per model name.
+ *
+ * Supported delegate methods:
+ * - findMany({ where? })
+ * - create({ data })
+ * - update({ where, data })
+ * - delete({ where })
+ */
+export default class MiniORM {
+	/**
+	 * @param {Record<string, Array<Record<string, unknown>>>} data
+	 */
+	constructor(data) {
+		/** @type {Record<string, Array<Record<string, unknown>>>} */
+		this._store = {};
+
+		for (const [modelName, records] of Object.entries(data || {})) {
+			// Clone initial records so external mutations do not affect ORM state.
+			this._store[modelName] = records.map((record) => ({ ...record }));
+			this[modelName] = this._createDelegate(modelName);
+		}
+	}
+
+	/**
+	 * @param {string} modelName
+	 * @returns {{
+	 *   findMany: (args?: { where?: Record<string, unknown> }) => Array<Record<string, unknown>>,
+	 *   create: (args: { data: Record<string, unknown> }) => Record<string, unknown>,
+	 *   update: (args: { where: Record<string, unknown>, data: Record<string, unknown> }) => Record<string, unknown>,
+	 *   delete: (args: { where: Record<string, unknown> }) => Record<string, unknown>
+	 * }}
+	 */
+	_createDelegate(modelName) {
+		return {
+			findMany: (args = {}) => {
+				const table = this._store[modelName];
+				const where = args.where;
+
+				if (!where) {
+					return table.map((record) => ({ ...record }));
+				}
+
+				return table
+					.filter((record) => matchesWhere(record, where))
+					.map((record) => ({ ...record }));
+			},
+
+			create: ({ data }) => {
+				const table = this._store[modelName];
+				const created = { ...data };
+				table.push(created);
+				return { ...created };
+			},
+
+			update: ({ where, data }) => {
+				const table = this._store[modelName];
+				const index = table.findIndex((record) => matchesWhere(record, where));
+				const updated = { ...table[index], ...data };
+				table[index] = updated;
+				return { ...updated };
+			},
+
+			delete: ({ where }) => {
+				const table = this._store[modelName];
+				const index = table.findIndex((record) => matchesWhere(record, where));
+				const [deleted] = table.splice(index, 1);
+				return { ...deleted };
+			},
+		};
+	}
+}
+
+/**
+ * Exact-match predicate: every field in where must match via ===.
+ *
+ * @param {Record<string, unknown>} record
+ * @param {Record<string, unknown>} where
+ * @returns {boolean}
+ */
+function matchesWhere(record, where) {
+	for (const [key, value] of Object.entries(where)) {
+		if (record[key] !== value) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/**
+Example test cases:
+
+const db = new MiniORM({
+	article: [
+		{ id: 1, title: 'Intro to ORMs', published: true },
+		{ id: 2, title: 'Query Builders', published: false },
+	],
+});
+
+db.article.findMany();
+// [
+//   { id: 1, title: 'Intro to ORMs', published: true },
+//   { id: 2, title: 'Query Builders', published: false },
+// ]
+
+db.article.findMany({ where: { published: true } });
+// [{ id: 1, title: 'Intro to ORMs', published: true }]
+
+db.article.create({
+	data: { id: 3, title: 'Includes and Selects', published: true },
+});
+// { id: 3, title: 'Includes and Selects', published: true }
+
+db.article.update({
+	where: { id: 2 },
+	data: { published: true },
+});
+// { id: 2, title: 'Query Builders', published: true }
+
+db.article.delete({ where: { id: 1 } });
+// { id: 1, title: 'Intro to ORMs', published: true }
+*/

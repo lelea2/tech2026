@@ -1,0 +1,60 @@
+/**
+ * Merge all sessions belonging to the same user into a single row.
+ *
+ * Rules:
+ * - Sum duration for the same user.
+ * - Combine equipment, remove duplicates, then sort alphabetically.
+ * - Keep output order by the user's earliest occurrence in input.
+ * - Do not mutate input rows.
+ *
+ * @param {Array<{user: number, duration: number, equipment: Array<string>}>} sessions
+ * @returns {Array<{user: number, duration: number, equipment: Array<string>}>>}
+ */
+export default function mergeData(sessions) {
+	const mergedByUser = new Map();
+
+	for (let i = 0; i < sessions.length; i++) {
+		const session = sessions[i];
+		const existing = mergedByUser.get(session.user);
+
+		if (!existing) {
+			mergedByUser.set(session.user, {
+				user: session.user,
+				duration: session.duration,
+				equipmentSet: new Set(session.equipment),
+				firstIndex: i,
+			});
+			continue;
+		}
+
+		existing.duration += session.duration;
+		for (const item of session.equipment) {
+			existing.equipmentSet.add(item);
+		}
+	}
+
+	return Array.from(mergedByUser.values())
+		.sort((a, b) => a.firstIndex - b.firstIndex)
+		.map((row) => ({
+			user: row.user,
+			duration: row.duration,
+			equipment: Array.from(row.equipmentSet).sort(),
+		}));
+}
+
+// Example:
+// mergeData([
+//   { user: 8, duration: 50, equipment: ['bench'] },
+//   { user: 7, duration: 150, equipment: ['dumbbell'] },
+//   { user: 1, duration: 10, equipment: ['barbell'] },
+//   { user: 7, duration: 100, equipment: ['bike', 'kettlebell'] },
+//   { user: 7, duration: 200, equipment: ['bike'] },
+//   { user: 2, duration: 200, equipment: ['treadmill'] },
+//   { user: 2, duration: 200, equipment: ['bike'] },
+// ]);
+// => [
+//   { user: 8, duration: 50, equipment: ['bench'] },
+//   { user: 7, duration: 450, equipment: ['bike', 'dumbbell', 'kettlebell'] },
+//   { user: 1, duration: 10, equipment: ['barbell'] },
+//   { user: 2, duration: 400, equipment: ['bike', 'treadmill'] },
+// ]

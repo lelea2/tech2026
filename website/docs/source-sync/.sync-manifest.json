@@ -24,6 +24,14 @@
       "hash": "55f425d054249466b2e041273cd17b3a266085dcdf1af48ed49d45b2fafbdbff",
       "docRelative": "frontend/jsfunction/classNamesAdvance.mdx"
     },
+    "frontend/jsfunction/dataMerge.js": {
+      "hash": "1bf24e525b354a15f804cc58180a667213e4351d6895b9f7ad3d3c2fe20f9d02",
+      "docRelative": "frontend/jsfunction/dataMerge.mdx"
+    },
+    "frontend/jsfunction/dataSelection.js": {
+      "hash": "78bef7c11905f91841915ddf3c2ef433b9e944329c1224ed527cc8f1731ae294",
+      "docRelative": "frontend/jsfunction/dataSelection.mdx"
+    },
     "frontend/jsfunction/debounce.js": {
       "hash": "1f7d22364628068546c6958d490b53578ac20db64cd8c920547f9add55ecba35",
       "docRelative": "frontend/jsfunction/debounce.mdx"
@@ -184,6 +192,14 @@
       "hash": "2781462728bd6fdd0bda4cf1f4ebbe6720264c3b50d273d6b2c0e67df6714d34",
       "docRelative": "frontend/jsfunction/htmlSerialize.mdx"
     },
+    "frontend/jsfunction/jsonStringify/superJSON.js": {
+      "hash": "3e200badd08e753f81aab3cf3a93fa29cec8c30f08371cc1e420c713a34c8225",
+      "docRelative": "frontend/jsfunction/jsonStringify/superJSON.mdx"
+    },
+    "frontend/jsfunction/jsonStringify/superJSONAdvance.js": {
+      "hash": "f0da253c138c093cbdfa67ddf57ae49eb7e5fd49683bc10b2940f32ad76eba39",
+      "docRelative": "frontend/jsfunction/jsonStringify/superJSONAdvance.mdx"
+    },
     "frontend/jsfunction/localStorageWithExpiry.js": {
       "hash": "24dd5401a65b45722ebbeaa06fa0617eb26d088ae4ecd3a55caf65a6e8fdb051",
       "docRelative": "frontend/jsfunction/localStorageWithExpiry.mdx"
@@ -195,6 +211,22 @@
     "frontend/jsfunction/mapAsyncWithRateLimit.js": {
       "hash": "ba9eec807e7718759161cab4fc099dd53aac2fdd6657f5896ec2b2eff93c20f0",
       "docRelative": "frontend/jsfunction/mapAsyncWithRateLimit.mdx"
+    },
+    "frontend/jsfunction/mapWithHistory.js": {
+      "hash": "f2567ffdf1c8470f17922ca71f9b0b7155f5fec338ca7d4543ad40e9755e5f77",
+      "docRelative": "frontend/jsfunction/mapWithHistory.mdx"
+    },
+    "frontend/jsfunction/prismaORM/miniORM.js": {
+      "hash": "618fa65741acd95646ea158845cc07154c0f44f30606eac0612767d1cc1ba234",
+      "docRelative": "frontend/jsfunction/prismaORM/miniORM.mdx"
+    },
+    "frontend/jsfunction/prismaORM/miniORMII.js": {
+      "hash": "005176fd5b7171d5baf564bd0c78e589e79d4c6f6cb3988bfc6055dc2f8beaa4",
+      "docRelative": "frontend/jsfunction/prismaORM/miniORMII.mdx"
+    },
+    "frontend/jsfunction/prismaORM/miniORMIII.js": {
+      "hash": "1ea7dafe0b24d0066fdea4e2862680c915c63a420ca12a9d26641b17a6122342",
+      "docRelative": "frontend/jsfunction/prismaORM/miniORMIII.mdx"
     },
     "frontend/jsfunction/promise/Promise.js": {
       "hash": "6c68c82292965c8a18c3cee15c37f9787cf5b4dd57c3e2c5eb56f98557f1e133",
@@ -249,7 +281,7 @@
       "docRelative": "frontend/jsfunction/promise/promiseWithResolvers.mdx"
     },
     "frontend/jsfunction/rateLimiter.js": {
-      "hash": "a08d1a544757572ba7dda61bdee8bd7b19f238b010833f239cc2504ba38e1025",
+      "hash": "6753f24c3bb9939dd46fb087b1679ff051d3f03eba4634adc0cd27e24c7e849f",
       "docRelative": "frontend/jsfunction/rateLimiter.mdx"
     },
     "frontend/jsfunction/richText.js": {
@@ -259,6 +291,22 @@
     "frontend/jsfunction/sanitizeHTML.js": {
       "hash": "1382433d0525ebc5520121d6b822c888eca510028a3d012834716aa777aa561b",
       "docRelative": "frontend/jsfunction/sanitizeHTML.mdx"
+    },
+    "frontend/jsfunction/spreadSheet/spreadSheetI.js": {
+      "hash": "3bfbb6866df0046cb556de4821bf25df7d6ddcb1bae7450fa959a24ffe92874b",
+      "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetI.mdx"
+    },
+    "frontend/jsfunction/spreadSheet/spreadSheetII.js": {
+      "hash": "b8d225be0e3a64408c41f12c5670511a91505db2bd6c280accef83da3483a68b",
+      "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetII.mdx"
+    },
+    "frontend/jsfunction/spreadSheet/spreadSheetIII.js": {
+      "hash": "1a2cd88fe88b8e41e748b5c50bb30374d95915960d0f9734c6bf89938b540b94",
+      "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetIII.mdx"
+    },
+    "frontend/jsfunction/textSearch.js": {
+      "hash": "52643a188522d465278745e4f34d33e4ff2e3e8bf59204da63896341213132d6",
+      "docRelative": "frontend/jsfunction/textSearch.mdx"
     },
     "frontend/jsfunction/throttle.js": {
       "hash": "3ebd1c9e2e7d7821838993d15f0f906528c50cd2be5a13fb5d31aeffb82057db",
@@ -295,6 +343,54 @@
     "algorithm/two-pointers/isPalindrome.js": {
       "hash": "deef9391463d62bb7822b516dac78e49b14ee20abd3483fcd01044465411114b",
       "docRelative": "algorithm/two-pointers/isPalindrome.mdx"
+    },
+    "__nav__:algorithm": {
+      "hash": "edae57e4d57e9c5546ec8a2a2398a393d1db51834b24895d44c71cee379c82eb",
+      "docRelative": "algorithm/_index.mdx"
+    },
+    "__nav__:algorithm/array": {
+      "hash": "e070906d02a9322a98cce61cf3b78fd969f3e094c9d24d170e7269cf30b3c72b",
+      "docRelative": "algorithm/array/_index.mdx"
+    },
+    "__nav__:algorithm/two-pointers": {
+      "hash": "0d7ff923b0d76c28e7648a09b3763d69fea84553209c069f8499ce45c297db49",
+      "docRelative": "algorithm/two-pointers/_index.mdx"
+    },
+    "__nav__:frontend": {
+      "hash": "8da7ba5928d319f72efdfc0961b6890c74d4da273cf836ba23673af9b6a1a681",
+      "docRelative": "frontend/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction": {
+      "hash": "3fb080e26f48427f2aac876ae650d438158949d3686aa1068ae4eac700324609",
+      "docRelative": "frontend/jsfunction/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/array": {
+      "hash": "380661b9e534e90c1fd0379240eca181592080777e3400a33978ff524d757245",
+      "docRelative": "frontend/jsfunction/array/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/getElementBy": {
+      "hash": "092afa458201949d4909ed9815e5562e9079a865167cac554f04c23eefab891d",
+      "docRelative": "frontend/jsfunction/getElementBy/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/hooks": {
+      "hash": "914900b9322529b7ef330f8ee3dbff0c046e2647c4b1fbf1f2ebaaea8258189f",
+      "docRelative": "frontend/jsfunction/hooks/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/jsonStringify": {
+      "hash": "1adc971acc00647c53b28b1a324e9754cb15a6f470f00275a11d8271031adf83",
+      "docRelative": "frontend/jsfunction/jsonStringify/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/prismaORM": {
+      "hash": "8a4a19273873515148b69411814a233fa484107ea647d7dfb9137035469b434f",
+      "docRelative": "frontend/jsfunction/prismaORM/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/promise": {
+      "hash": "71d750bc6fac21f39b20b800b055edd0899621f90631f83450415570347999a4",
+      "docRelative": "frontend/jsfunction/promise/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/spreadSheet": {
+      "hash": "71a61f136f12f624d49a251c8f83a6a39fc6c216aa14ecc33e9ab699ebcf3036",
+      "docRelative": "frontend/jsfunction/spreadSheet/_index.mdx"
     }
   }
 }
