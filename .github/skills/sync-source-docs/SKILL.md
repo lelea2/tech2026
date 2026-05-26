@@ -36,6 +36,9 @@ Keep documentation in sync when files change under frontend, backend, or algorit
 - After syncing source files, the script now runs a post-hook that auto-creates folder navigation pages:
   - `.../<folder>/_index.mdx`
 - This happens for newly discovered nested folders too (for example `algorithm/two-pointers`, `frontend/jsfunction/spreadSheet`, `frontend/jsfunction/prismaORM`).
+- This also applies to folders that contain multiple files (for example `frontend/jsfunction/textSearch/*` and `frontend/jsfunction/deepClone/*`), generating:
+  - `.../textSearch/_index.mdx` + one page per file
+  - `.../deepClone/_index.mdx` + one page per file
 - These nav pages are generated automatically and tracked in the sync manifest.
 - If a source folder disappears, the corresponding generated nav page is removed on the next sync.
 
@@ -67,6 +70,16 @@ Sync algorithm docs as a separate navigation section:
 This creates/updates:
 
 - website/docs/algorithm
+
+Algorithm root-file entry rule (important):
+
+- Use `algorithm=.` (not `algorithm=algorithm`) so files directly under `algorithm/` are generated directly under `website/docs/algorithm/`.
+- Example root files:
+  - `algorithm/mostCommonElement.js` -> `website/docs/algorithm/mostCommonElement.mdx`
+  - `algorithm/countIslandOnGrid.js` -> `website/docs/algorithm/countIslandOnGrid.mdx`
+- Subfolder files stay in their own subfolder pages (not mixed into root file entries):
+  - `algorithm/array/*` -> `website/docs/algorithm/array/*`
+  - `algorithm/two-pointers/*` -> `website/docs/algorithm/two-pointers/*`
 
 Run FrontEnd + Algorithm sync as two commands (separate docs subdirs):
 
@@ -124,8 +137,12 @@ Mapping format rules:
   - Risky: mapping only selected leaves (new siblings will be missed)
 - Re-run sync; post-hook should generate `/_index.mdx` pages for new folders automatically.
 - Verify generated path exists under docs, for example:
+  - `website/docs/algorithm/mostCommonElement.mdx`
+  - `website/docs/algorithm/countIslandOnGrid.mdx`
   - `website/docs/algorithm/two-pointers/_index.mdx`
   - `website/docs/frontend/jsfunction/spreadSheet/_index.mdx`
+  - `website/docs/frontend/jsfunction/textSearch/_index.mdx`
+  - `website/docs/frontend/jsfunction/deepClone/_index.mdx`
 
 ## Expected Output
 

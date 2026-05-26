@@ -1,0 +1,55 @@
+// You are free to use alternative approaches of
+// instantiating the EventEmitter as long as the
+// default export is correct.
+export default class EventEmitter {
+  constructor() {
+    this.events = new Map();
+  }
+
+  /**
+   * @param {string} eventName
+   * @param {Function} listener
+   * @returns {{off: Function}}
+   */
+  on(eventName, listener) {
+    if (!this.events.has(eventName)) {
+      this.events.set(eventName, []);
+    }
+
+    const listeners = this.events.get(eventName);
+    listeners.push(listener);
+
+    // Return an object with an off method to unsubscribe
+    return {
+      off: () => {
+        const index = listeners.indexOf(listener);
+        if (index !== -1) {
+          listeners.splice(index, 1);
+        }
+      },
+    };
+  }
+
+  /**
+   * @param {string} eventName
+   * @param {...any} args
+   * @returns boolean
+   */
+  emit(eventName, ...args) {
+    if (!this.events.has(eventName)) {
+      return false;
+    }
+
+    const listeners = this.events.get(eventName);
+    if (listeners.length === 0) {
+      return false;
+    }
+
+    // Call all listeners with the provided arguments
+    for (const listener of listeners) {
+      listener(...args);
+    }
+
+    return true;
+  }
+}

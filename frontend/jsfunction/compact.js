@@ -1,0 +1,12 @@
+/**
+ * @param {unknown[]} array
+ * @returns {unknown[]}
+ */
+export default function compact(array) {
+  return array.filter(Boolean);
+}
+
+// Example usage:
+// compact([0, 1, false, 2, '', 3, null]); // => [1, 2, 3]
+// compact(['hello', 123, [], {}]); // => ['hello', 123, [], {}]
+// compact([1, , null, 2, , 3]); // => [1, 2, 3]

@@ -1,0 +1,103 @@
+---
+title: JSON.stringify
+---
+
+# JSON.stringify
+
+~~~javascript
+/**
+ * Convert a JSON-serializable JavaScript value into a JSON string.
+ *
+ * Supported input values:
+ * - string
+ * - number
+ * - boolean
+ * - null
+ * - array
+ * - plain object
+ *
+ * @param {unknown} value
+ * @returns {string}
+ */
+export default function jsonStringify(value) {
+	return stringifyValue(value);
+}
+
+/**
+ * @param {unknown} value
+ * @returns {string}
+ */
+function stringifyValue(value) {
+	if (value === null) {
+		return 'null';
+	}
+
+	const valueType = typeof value;
+
+	if (valueType === 'string') {
+		return quoteString(value);
+	}
+
+	if (valueType === 'number') {
+		// Keep parity with JSON.stringify for non-finite numbers.
+		return Number.isFinite(value) ? String(value) : 'null';
+	}
+
+	if (valueType === 'boolean') {
+		return value ? 'true' : 'false';
+	}
+
+	if (Array.isArray(value)) {
+		const items = [];
+
+		for (let i = 0; i < value.length; i++) {
+			if (Object.prototype.hasOwnProperty.call(value, i)) {
+				items.push(stringifyValue(value[i]));
+			} else {
+				// Sparse holes serialize as null in JSON arrays.
+				items.push('null');
+			}
+		}
+
+		return `[${items.join(',')}]`;
+	}
+
+	if (valueType === 'object') {
+		const pairs = Object.keys(value).map((key) => {
+			return `${quoteString(key)}:${stringifyValue(value[key])}`;
+		});
+
+		return `{${pairs.join(',')}}`;
+	}
+
+	throw new TypeError('Unsupported value for jsonStringify');
+}
+
+/**
+ * @param {string} value
+ * @returns {string}
+ */
+function quoteString(value) {
+	return `"${value.replace(/[\\"\u0000-\u001f]/g, (char) => {
+		switch (char) {
+			case '"':
+				return '\\"';
+			case '\\':
+				return '\\\\';
+			case '\b':
+				return '\\b';
+			case '\f':
+				return '\\f';
+			case '\n':
+				return '\\n';
+			case '\r':
+				return '\\r';
+			case '\t':
+				return '\\t';
+			default:
+				return `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`;
+		}
+	})}"`;
+}
+
+~~~

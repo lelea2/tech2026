@@ -1,0 +1,45 @@
+/**
+ * @template T
+ * @param {number} index
+ * @returns {T | undefined}
+ */
+Array.prototype.myAt = function (index) {
+	const length = this.length >>> 0;
+
+	// Convert index to integer (truncate toward zero), similar to ToIntegerOrInfinity.
+	const numericIndex = Number(index);
+	let integerIndex;
+
+	if (Number.isNaN(numericIndex) || numericIndex === 0) {
+		integerIndex = 0;
+	} else if (!Number.isFinite(numericIndex)) {
+		integerIndex = numericIndex;
+	} else {
+		integerIndex = numericIndex < 0 ? Math.ceil(numericIndex) : Math.floor(numericIndex);
+	}
+
+	const normalizedIndex = integerIndex >= 0 ? integerIndex : length + integerIndex;
+
+	if (normalizedIndex < 0 || normalizedIndex >= length) {
+		return undefined;
+	}
+
+	return this[normalizedIndex];
+};
+
+/**
+Example:
+
+const nums = [10, 20, 30, 40];
+
+nums.myAt(0);    // 10
+nums.myAt(2);    // 30
+nums.myAt(-1);   // 40
+nums.myAt(-3);   // 20
+
+nums.myAt(1.9);  // 20 (index is truncated toward zero)
+nums.myAt(-1.2); // 40
+
+nums.myAt(99);   // undefined
+nums.myAt(-99);  // undefined
+*/

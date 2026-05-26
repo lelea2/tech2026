@@ -1,0 +1,57 @@
+---
+title: listFormat
+---
+
+# listFormat
+
+~~~javascript
+/**
+ * @param {string[]} items
+ * @param {{ sorted?: boolean, length?: number, unique?: boolean }} [options]
+ * @returns {string}
+ */
+export default function listFormat(items, options = {}) {
+	const { sorted = false, length, unique = false } = options;
+
+	let values = items.filter((item) => item !== '');
+
+	if (unique) {
+		values = [...new Set(values)];
+	}
+
+	if (sorted) {
+		values = [...values].sort((a, b) => a.localeCompare(b));
+	}
+
+	const hasValidLength = Number.isInteger(length) && length > 0;
+	if (hasValidLength && values.length > length) {
+		const visible = values.slice(0, length);
+		const remaining = values.length - length;
+		const suffix = `${remaining} ${remaining === 1 ? 'other' : 'others'}`;
+		return joinWithAnd([...visible, suffix]);
+	}
+
+	return joinWithAnd(values);
+}
+
+/**
+ * @param {string[]} values
+ * @returns {string}
+ */
+function joinWithAnd(values) {
+	if (values.length === 0) {
+		return '';
+	}
+
+	if (values.length === 1) {
+		return values[0];
+	}
+
+	if (values.length === 2) {
+		return `${values[0]} and ${values[1]}`;
+	}
+
+	return `${values.slice(0, -1).join(', ')} and ${values[values.length - 1]}`;
+}
+
+~~~

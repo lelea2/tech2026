@@ -1,0 +1,16 @@
+/**
+ * @template T
+ * @param {Array<T>} array
+ * @returns {Array<T>}
+ */
+export default function uniqueArray(array) {
+  const seen = new Set();
+  const result = [];
+  for (const item of array) {
+    if (!seen.has(item)) {
+      seen.add(item);
+      result.push(item);
+    }
+  }
+  return result;
+}

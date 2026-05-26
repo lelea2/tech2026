@@ -1,0 +1,25 @@
+/**
+ * @template T
+ * @param {...(T | Array<T>)} items
+ * @return {Array<T>}
+ */
+Array.prototype.myConcat = function (...items) {
+  const result = new Array(this.length);
+  for (let i = 0; i < this.length; i++) {
+    if (Object.prototype.hasOwnProperty.call(this, i)) {
+      result[i] = this[i];
+    }
+  }
+  for (const item of items) {
+    if (Array.isArray(item)) {
+      for (let i = 0; i < item.length; i++) {
+        if (Object.prototype.hasOwnProperty.call(item, i)) {
+          result.push(item[i]);
+        }
+      }
+    } else {
+      result.push(item);
+    }
+  }
+  return result;
+};

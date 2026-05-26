@@ -16,6 +16,14 @@
       "hash": "4b3e1240c0fa07ee647b825d05bfb8b02f71df68fc18648a99bba3400a6bdc63",
       "docRelative": "array/maxSubArray.mdx"
     },
+    "algorithm/countIslandOnGrid.js": {
+      "hash": "5848556bbb4b81728b72c6a1830cae302d6bdd560bd4a0168a56f17ee69aa6e3",
+      "docRelative": "countIslandOnGrid.mdx"
+    },
+    "algorithm/mostCommonElement.js": {
+      "hash": "15384cd6478e3aaeaa2ba9a8ec1f81f0366d27d5a207c092e1f619ebf97ca3a1",
+      "docRelative": "mostCommonElement.mdx"
+    },
     "algorithm/two-pointers/3Sum.py": {
       "hash": "7de9cb63fe93154c24c46cd744a75b7c07b9f6d4ac399db434300471b23668a3",
       "docRelative": "two-pointers/3Sum.mdx"
@@ -32,12 +40,20 @@
       "hash": "deef9391463d62bb7822b516dac78e49b14ee20abd3483fcd01044465411114b",
       "docRelative": "two-pointers/isPalindrome.mdx"
     },
+    "algorithm/two-pointers/isPalindrome_Pair.py": {
+      "hash": "a453c5808099d9a9434be5719c40772a361e3fe06be75a378b1ca9a97b0bab72",
+      "docRelative": "two-pointers/isPalindrome_Pair.mdx"
+    },
+    "algorithm/two-pointers/isPalindrome_Pair.js": {
+      "hash": "a453c5808099d9a9434be5719c40772a361e3fe06be75a378b1ca9a97b0bab72",
+      "docRelative": "two-pointers/isPalindrome_Pair.mdx"
+    },
     "__nav__:array": {
       "hash": "e070906d02a9322a98cce61cf3b78fd969f3e094c9d24d170e7269cf30b3c72b",
       "docRelative": "array/_index.mdx"
     },
     "__nav__:two-pointers": {
-      "hash": "0d7ff923b0d76c28e7648a09b3763d69fea84553209c069f8499ce45c297db49",
+      "hash": "f058dd483415f41dffc493974a2b2425cddb8492b87c35cde073022b6a4b4ad7",
       "docRelative": "two-pointers/_index.mdx"
     }
   }

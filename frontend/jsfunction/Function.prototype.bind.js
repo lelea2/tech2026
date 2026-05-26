@@ -1,0 +1,49 @@
+/**
+ * @param {any} thisArg
+ * @param {...*} argArray
+ * @return {Function}
+ */
+Function.prototype.myBind = function (thisArg, ...boundArgs) {
+  if (typeof this !== 'function') {
+		throw new TypeError('myBind must be called on a function');
+	}
+
+	const targetFn = this;
+
+	function boundFn(...argArray) {
+		const isCalledWithNew = this instanceof boundFn;
+		const context = isCalledWithNew
+			? this
+			: thisArg === null || thisArg === undefined
+				? globalThis
+				: Object(thisArg);
+
+		return Reflect.apply(targetFn, context, [...boundArgs, ...argArray]);
+	}
+
+	// Preserve prototype chain behavior for constructor calls: new (fn.bind(...))().
+	if (targetFn.prototype) {
+		boundFn.prototype = Object.create(targetFn.prototype);
+		boundFn.prototype.constructor = boundFn;
+	}
+
+	return boundFn;
+};
+
+
+/**
+Example:
+
+const john = {
+	age: 42,
+	getAge: function () {
+		return this.age;
+	},
+};
+
+const unboundGetAge = john.getAge;
+// unboundGetAge(); // undefined (in strict environments)
+
+const boundGetAge = john.getAge.myBind(john);
+boundGetAge(); // 42
+*/

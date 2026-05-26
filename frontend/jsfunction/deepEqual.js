@@ -1,0 +1,44 @@
+/**
+ * @param {unknown} valueA
+ * @param {unknown} valueB
+ * @returns {boolean}
+ */
+export default function deepEqual(valueA, valueB) {
+  if (valueA === valueB) {
+    return true;
+  }
+
+  if (typeof valueA !== typeof valueB) {
+    return false;
+  }
+
+  if (valueA === null || valueB === null) {
+    return valueA === valueB;
+  }
+
+  if (typeof valueA !== 'object') {
+    return false;
+  }
+
+  if (Array.isArray(valueA) !== Array.isArray(valueB)) {
+    return false;
+  }
+
+  const keysA = Object.keys(valueA);
+  const keysB = Object.keys(valueB);
+
+  if (keysA.length !== keysB.length) {
+    return false;
+  }
+
+  for (const key of keysA) {
+    if (!keysB.includes(key)) {
+      return false;
+    }
+    if (!deepEqual(valueA[key], valueB[key])) {
+      return false;
+    }
+  }
+
+  return true;
+}
