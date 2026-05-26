@@ -1,0 +1,8 @@
+/* Makes this wrapper behave as the flex child that the original nav was */
+.contentWithSearch {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
