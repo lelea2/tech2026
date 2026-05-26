@@ -68,9 +68,25 @@
       "hash": "02bbad3eb1d714a644485867a1e48c17bdc5ce54e62cdf03132e6a225cf5fa9f",
       "docRelative": "frontend/jsfunction/array/flattenArray.mdx"
     },
+    "frontend/jsfunction/array/intersection.js": {
+      "hash": "cb8192d033d643ffad8f88914d247b317945f18ab2f20ddbbf39812ab889a67e",
+      "docRelative": "frontend/jsfunction/array/intersection.mdx"
+    },
     "frontend/jsfunction/array/kRowPascalTriangle.js": {
       "hash": "1d39811dc7b9366637a5e69f93b1f62261b23f10a944a971db303fdbd915d5de",
       "docRelative": "frontend/jsfunction/array/kRowPascalTriangle.mdx"
+    },
+    "frontend/jsfunction/array/maxBy.js": {
+      "hash": "c4f694f7f3d9a31df5aa79506b1851a3d4060a51ba1a2970ee8686f6a9f03335",
+      "docRelative": "frontend/jsfunction/array/maxBy.mdx"
+    },
+    "frontend/jsfunction/array/minBy.js": {
+      "hash": "a934405e1b1f7cd1400a5db78ae605b58ebf309809cb525a4b2adc1537507fd8",
+      "docRelative": "frontend/jsfunction/array/minBy.mdx"
+    },
+    "frontend/jsfunction/array/once.js": {
+      "hash": "c8af59ac000b7b502c6320b199de95af3ad0ad6b67f8daa7bf1ceeb064bb07f7",
+      "docRelative": "frontend/jsfunction/array/once.mdx"
     },
     "frontend/jsfunction/array/uniqueArray.js": {
       "hash": "b4bd05d46458a737a7d946021c082520c9f47e3e9c883b77e826fb45c08167f7",
@@ -476,6 +492,10 @@
       "hash": "1382433d0525ebc5520121d6b822c888eca510028a3d012834716aa777aa561b",
       "docRelative": "frontend/jsfunction/sanitizeHTML.mdx"
     },
+    "frontend/jsfunction/size.js": {
+      "hash": "f1d7031ff0d7deefc6a309ed4e2a86c14f519638c093b045f7741f1acc5fb876",
+      "docRelative": "frontend/jsfunction/size.mdx"
+    },
     "frontend/jsfunction/sleep.js": {
       "hash": "1c133a5e439f8412cf79933c4f033a4194183139204bffae9a0b1b36b1e25c5d",
       "docRelative": "frontend/jsfunction/sleep.mdx"
@@ -577,11 +597,11 @@
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
-      "hash": "c2e5b54cf1fc666571f5b8dc6de391f11f4b6f2edcf0044ee83817ea1d7c91b1",
+      "hash": "497f13c67cd1e7d8e85c10c410a2a5be4843dacc7f222c19fabc4b1c38b778b9",
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/array": {
-      "hash": "a46e2f9b4b88e99dd5638ff3bb25f5e497bff340e12c9e419f57b390c7692c52",
+      "hash": "8480ff4324d441ea7033d01e099bdc7cd986051ca98d5ba33b10e6ffb5fb5563",
       "docRelative": "frontend/jsfunction/array/_index.mdx"
     },
     "__nav__:frontend/jsfunction/curry": {

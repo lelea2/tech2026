@@ -1,0 +1,29 @@
+/**
+ * @param {Array} array The array to iterate over.
+ * @param {Function} iteratee The iteratee invoked per element.
+ * @returns {*} Returns the maximum value.
+ */
+export default function maxBy(array, iteratee) {
+  if (array.length === 0) {
+    return undefined;
+  }
+
+  let maxItem;
+  let maxValue;
+
+  for (const item of array) {
+    const value = iteratee(item);
+
+    // Skip undefined results
+    if (value === undefined) {
+      continue;
+    }
+
+    if (maxItem === undefined || value > maxValue) {
+      maxItem = item;
+      maxValue = value;
+    }
+  }
+
+  return maxItem;
+}
