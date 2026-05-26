@@ -1,0 +1,16 @@
+/**
+ * @template T, U
+ * @param { (value: T, index: number, array: Array<T>) => U } callbackFn
+ * @param {any} [thisArg]
+ * @return {Array<U>}
+ */
+Array.prototype.myMap = function (callbackFn, thisArg) {
+  const result = new Array(this.length);
+  for (let i = 0; i < this.length; i++) {
+    if (Object.prototype.hasOwnProperty.call(this, i)) {
+      result[i] = callbackFn.call(thisArg, this[i], i, this);
+    }
+  }
+  return result;
+};
+  

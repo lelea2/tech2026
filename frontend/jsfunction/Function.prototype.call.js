@@ -8,7 +8,7 @@
  * @param {...unknown} args
  * @returns {unknown}
  */
-Function.prototype.myCall = function (thisArg, ...args) {
+Function.prototype.myCall = function (thisArg, ...argArray) {
 	if (typeof this !== 'function') {
 		throw new TypeError('myCall must be called on a function');
 	}
@@ -22,7 +22,7 @@ Function.prototype.myCall = function (thisArg, ...args) {
 	context[tempKey] = this;
 
 	try {
-		return context[tempKey](...args);
+		return context[tempKey](...argArray);
 	} finally {
 		delete context[tempKey];
 	}

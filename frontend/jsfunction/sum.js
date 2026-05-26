@@ -1,0 +1,20 @@
+/**
+ * @param {number} value
+ * @return {Function}
+ */
+export default function sum(value) {
+  function create(currentTotal) {
+    return function(next) {
+      if (next === undefined) {
+        return currentTotal;
+      }
+      return create(currentTotal + next);
+    }
+  }
+  return create(value);
+}
+
+
+// sum(1)(); // 1
+// sum(1)(2)(); // 3
+// sum(1)(2)(-3)(); // 0

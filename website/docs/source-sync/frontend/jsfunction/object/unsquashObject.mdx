@@ -1,0 +1,70 @@
+---
+title: unsquashObject
+---
+
+# unsquashObject
+
+~~~javascript
+/**
+ * @param {Object} object
+ * @returns {Object}
+ */
+export default function unsquashObject(object) {
+  const result = {};
+
+  // Check if string is array index
+  const isNumeric = (str) => /^\d+$/.test(str);
+
+  for (const [flatKey, value] of Object.entries(object)) {
+    // Remove empty path segments
+    const keys = flatKey.split('.').filter(Boolean);
+
+    let current = result;
+
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      const isLast = i === keys.length - 1;
+
+      // Last key → assign value
+      if (isLast) {
+        current[key] = value;
+        continue;
+      }
+
+      const nextKey = keys[i + 1];
+
+      // Create next layer if missing
+      if (!(key in current)) {
+        current[key] = isNumeric(nextKey) ? [] : {};
+      }
+
+      current = current[key];
+    }
+  }
+
+  return result;
+}
+
+
+// Test
+// const object = {
+//   a: 5,
+//   b: 6,
+//   'c.f': 9,
+//   'c.g.m': 17,
+//   'c.g.n': 3,
+// };
+
+// unsquashObject(object);
+// {
+//   a: 5,
+//   b: 6,
+//   c: {
+//     f: 9,
+//     g: {
+//       m: 17,
+//       n: 3,
+//     },
+//   },
+// }
+~~~

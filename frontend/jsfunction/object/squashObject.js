@@ -1,0 +1,33 @@
+/*
+ * Flattens an object by converting nested properties into a single level.
+ * @param {Object} object
+ * @returns {Object}
+ */
+export default function squashObject(object) {
+  const result = {};
+
+  // Recursive function to traverse the object, depth-first search
+  function dfs(value, path) {
+    // null / undefined should still be included
+    if (value == null || typeof value !== 'object') {
+      result[path] = value;
+      return;
+    }
+
+    // Traverse objects and arrays
+    for (const key of Object.keys(value)) {
+      // Empty key should not add a "." layer
+      const newPath = key === ''
+        ? path
+        : path === ''
+          ? key
+          : `${path}.${key}`;
+
+      dfs(value[key], newPath);
+    }
+  }
+
+  dfs(object, '');
+
+  return result;
+}

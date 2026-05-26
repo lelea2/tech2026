@@ -17,7 +17,7 @@
       "docRelative": "frontend/jsfunction/Function.prototype.bind.mdx"
     },
     "frontend/jsfunction/Function.prototype.call.js": {
-      "hash": "8a6804003efaa0da537f4c193b94d047ecd49c1fa4b7de4c3bd53c620615e349",
+      "hash": "b598a55a8eb2d18b7d16ba33896af1906edead859078d277fb60490ea0c64905",
       "docRelative": "frontend/jsfunction/Function.prototype.call.mdx"
     },
     "frontend/jsfunction/array/Array.prototype.at.js": {
@@ -41,7 +41,7 @@
       "docRelative": "frontend/jsfunction/array/Array.prototype.square.mdx"
     },
     "frontend/jsfunction/array/Array.ptotype.map.js": {
-      "hash": "9ac243f61d86a2b9206c0dad1c7eb2089b2f8bd72b38fe46c4dccda589950d07",
+      "hash": "6b6630befb0c6dc0364526f3aa7c189da2fd19e13f681267f854c5603275d5f0",
       "docRelative": "frontend/jsfunction/array/Array.ptotype.map.mdx"
     },
     "frontend/jsfunction/array/dropRightWhile.js": {
@@ -175,6 +175,10 @@
     "frontend/jsfunction/deepMerge.js": {
       "hash": "91e0a020471409197d820a1dabc65e474a02d4cc7a379f03ad6628f0d748b572",
       "docRelative": "frontend/jsfunction/deepMerge.mdx"
+    },
+    "frontend/jsfunction/deepOmit.js": {
+      "hash": "c00e1beac6bdbe6115902801bddc9a6507ffe5e943d2c0b22c6ac94829472618",
+      "docRelative": "frontend/jsfunction/deepOmit.mdx"
     },
     "frontend/jsfunction/difference.js": {
       "hash": "55fd34c67dc748ac51cd1deaed397ce61d6e24385f411716202c418bf1d3cf50",
@@ -368,9 +372,13 @@
       "hash": "24dd5401a65b45722ebbeaa06fa0617eb26d088ae4ecd3a55caf65a6e8fdb051",
       "docRelative": "frontend/jsfunction/localStorageWithExpiry.mdx"
     },
-    "frontend/jsfunction/makeCounter.js": {
-      "hash": "e7d7a9e52f1a66f16cfb0be371b5133fc2ed627b7fb879a01de7af4ce53e91f5",
-      "docRelative": "frontend/jsfunction/makeCounter.mdx"
+    "frontend/jsfunction/makeCounter/makeCounter.js": {
+      "hash": "65291c5ad55c53861d413b9d6c7df94656605632904469444760a87edbbec7c7",
+      "docRelative": "frontend/jsfunction/makeCounter/makeCounter.mdx"
+    },
+    "frontend/jsfunction/makeCounter/makeCounterII.js": {
+      "hash": "556195b8882613e377e73a54d09580b71928b34c2633c7239ed71bae4a036673",
+      "docRelative": "frontend/jsfunction/makeCounter/makeCounterII.mdx"
     },
     "frontend/jsfunction/mapAsync.js": {
       "hash": "7022bdb39d759ef644d81d4a03c092620ebd2a778d4e76eb6f010a6e030ca39d",
@@ -407,6 +415,22 @@
     "frontend/jsfunction/numArguments.js": {
       "hash": "e4d26b1226938e3ce46331c299839cd0d31330ecaa8e67dfb067c51d187e8c3b",
       "docRelative": "frontend/jsfunction/numArguments.mdx"
+    },
+    "frontend/jsfunction/object/fromPairs.js": {
+      "hash": "c0ba1b4bcdf110fa4b8cf059a36d6b344997bfbefd62244b3366b6c8ac9aac06",
+      "docRelative": "frontend/jsfunction/object/fromPairs.mdx"
+    },
+    "frontend/jsfunction/object/objectMap.js": {
+      "hash": "ba16a423a16230245d94c16347509d085a4d28e34df5ed3f75a71d6471c44f6f",
+      "docRelative": "frontend/jsfunction/object/objectMap.mdx"
+    },
+    "frontend/jsfunction/object/squashObject.js": {
+      "hash": "be5c2ca7bf1f5e746cdf17ffa7a5b21f3cc85a06d0ff162793791589d26804e1",
+      "docRelative": "frontend/jsfunction/object/squashObject.mdx"
+    },
+    "frontend/jsfunction/object/unsquashObject.js": {
+      "hash": "b96cc54fd254592b67e8afeb13f2972d911e9221061de12691d3cdc33c12b011",
+      "docRelative": "frontend/jsfunction/object/unsquashObject.mdx"
     },
     "frontend/jsfunction/prismaORM/miniORM.js": {
       "hash": "618fa65741acd95646ea158845cc07154c0f44f30606eac0612767d1cc1ba234",
@@ -476,6 +500,14 @@
       "hash": "e0df6becc1a9001820ed77faceba0d55fab7f05ef4d3dac47cf729ffff251d89",
       "docRelative": "frontend/jsfunction/promise/promiseWithResolvers.mdx"
     },
+    "frontend/jsfunction/range/range.js": {
+      "hash": "1103b3a50f77c5293b1b18bfacfe1189e423a5fbba5c3eb2aa57291e7ed3b53e",
+      "docRelative": "frontend/jsfunction/range/range.mdx"
+    },
+    "frontend/jsfunction/range/rangeRight.js": {
+      "hash": "06cdee7df6efd29ab0d89df7695ba791c7ff18f7b5e2a14211509644f1828730",
+      "docRelative": "frontend/jsfunction/range/rangeRight.mdx"
+    },
     "frontend/jsfunction/rateLimiter.js": {
       "hash": "6753f24c3bb9939dd46fb087b1679ff051d3f03eba4634adc0cd27e24c7e849f",
       "docRelative": "frontend/jsfunction/rateLimiter.mdx"
@@ -491,6 +523,10 @@
     "frontend/jsfunction/sanitizeHTML.js": {
       "hash": "1382433d0525ebc5520121d6b822c888eca510028a3d012834716aa777aa561b",
       "docRelative": "frontend/jsfunction/sanitizeHTML.mdx"
+    },
+    "frontend/jsfunction/singleton.js": {
+      "hash": "e5c30f6162479cf3a2ea1da729d630c9e72038ebe3265b166d8d32f90cbe70db",
+      "docRelative": "frontend/jsfunction/singleton.mdx"
     },
     "frontend/jsfunction/size.js": {
       "hash": "f1d7031ff0d7deefc6a309ed4e2a86c14f519638c093b045f7741f1acc5fb876",
@@ -511,6 +547,10 @@
     "frontend/jsfunction/spreadSheet/spreadSheetIII.js": {
       "hash": "1a2cd88fe88b8e41e748b5c50bb30374d95915960d0f9734c6bf89938b540b94",
       "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetIII.mdx"
+    },
+    "frontend/jsfunction/sum.js": {
+      "hash": "df9c8fa223c79ad643398f7bb34a75bd1e38230ebe66e7a71d8f5d88c0d8be03",
+      "docRelative": "frontend/jsfunction/sum.mdx"
     },
     "frontend/jsfunction/textSearch/textSearch.js": {
       "hash": "2dec27133076b8a19af06048afdd51b0d26ff2b5f30e86c4bc89a43349a9a928",
@@ -565,11 +605,11 @@
       "docRelative": "algorithm/two-pointers/3Sum.mdx"
     },
     "algorithm/two-pointers/isPalindrome.py": {
-      "hash": "deef9391463d62bb7822b516dac78e49b14ee20abd3483fcd01044465411114b",
+      "hash": "b589b9708bde13add20e7fe04dcfc7932c32dd7eba605e1853d9356d638e20ae",
       "docRelative": "algorithm/two-pointers/isPalindrome.mdx"
     },
     "algorithm/two-pointers/isPalindrome.js": {
-      "hash": "deef9391463d62bb7822b516dac78e49b14ee20abd3483fcd01044465411114b",
+      "hash": "b589b9708bde13add20e7fe04dcfc7932c32dd7eba605e1853d9356d638e20ae",
       "docRelative": "algorithm/two-pointers/isPalindrome.mdx"
     },
     "algorithm/two-pointers/isPalindrome_Pair.py": {
@@ -597,7 +637,7 @@
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
-      "hash": "497f13c67cd1e7d8e85c10c410a2a5be4843dacc7f222c19fabc4b1c38b778b9",
+      "hash": "bc7682e3c01fc26c7cfdba22771913d7252aa24998e44da396b75a35f7a41211",
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/array": {
@@ -624,6 +664,14 @@
       "hash": "55245a69dcf715674d00d38bb9a1d698753bccad11fe6aa0eedc8b62f232c00a",
       "docRelative": "frontend/jsfunction/jsonStringify/_index.mdx"
     },
+    "__nav__:frontend/jsfunction/makeCounter": {
+      "hash": "5633773ab825136a7958d7b4770b0dce70c763425bd6e500dd2a80303e2832fd",
+      "docRelative": "frontend/jsfunction/makeCounter/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/object": {
+      "hash": "a68a5500920fd6c02e871f8bce09eecbc751f6da0f8238819980109c2726c827",
+      "docRelative": "frontend/jsfunction/object/_index.mdx"
+    },
     "__nav__:frontend/jsfunction/prismaORM": {
       "hash": "8a4a19273873515148b69411814a233fa484107ea647d7dfb9137035469b434f",
       "docRelative": "frontend/jsfunction/prismaORM/_index.mdx"
@@ -631,6 +679,10 @@
     "__nav__:frontend/jsfunction/promise": {
       "hash": "84a79c6e07a4db2d87383dff0d9ebb4a969d9ed9dac64f2dc82c09d835909023",
       "docRelative": "frontend/jsfunction/promise/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/range": {
+      "hash": "d6dfe80f32a738eb96c08cfee2b9a40993df6d5eee154e8d2601860b5b8970a9",
+      "docRelative": "frontend/jsfunction/range/_index.mdx"
     },
     "__nav__:frontend/jsfunction/spreadSheet": {
       "hash": "71a61f136f12f624d49a251c8f83a6a39fc6c216aa14ecc33e9ab699ebcf3036",
