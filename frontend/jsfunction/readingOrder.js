@@ -1,0 +1,56 @@
+/**
+ * Interview-style explanation:
+ *
+ * Problem:
+ * - On a 2D canvas, elements are stored in arbitrary order.
+ * - Determine their "reading order": top to bottom, left to right within each row.
+ * - Return array of element ids in reading order.
+ *
+ * Constraints:
+ * - Elements in the same row always have the same y.
+ * - Different rows do not overlap vertically.
+ *
+ * Plan:
+ * 1. Sort elements by y first (top to bottom).
+ * 2. For elements with same y, sort by x (left to right).
+ * 3. Extract and return ids in sorted order.
+ *
+ * Why this works:
+ * - Primary sort by y groups elements into rows.
+ * - Secondary sort by x orders them left-to-right within rows.
+ * - Stable sort preserves relative order for ties (though y/x pair is unique).
+ *
+ * Complexity:
+ * - Time: O(n log n) for sorting
+ * - Space: O(n) for sorted array and result ids
+ *
+ * @param {Array<{id: string, x: number, y: number, width: number, height: number}>} elements
+ * @returns {string[]} Array of element ids in reading order
+ */
+export default function readingOrder(elements) {
+  return [...elements]
+    .sort((a, b) => {
+      // Primary sort: by y (top to bottom)
+      if (a.y !== b.y) {
+        return a.y - b.y;
+      }
+
+      // Secondary sort: by x (left to right)
+      return a.x - b.x;
+    })
+    .map((element) => element.id);
+}
+
+// Example usage:
+// readingOrder([
+//   { id: 'd', x: 50, y: 40, width: 40, height: 20 },
+//   { id: 'b', x: 60, y: 0, width: 40, height: 20 },
+//   { id: 'c', x: 10, y: 40, width: 30, height: 20 },
+//   { id: 'a', x: 0, y: 0, width: 40, height: 20 },
+// ]); // => ['a', 'b', 'c', 'd']
+
+// readingOrder([
+//   { id: 'hero', x: 0, y: 0, width: 200, height: 80 },
+//   { id: 'cta', x: 220, y: 0, width: 80, height: 80 },
+//   { id: 'footer', x: 0, y: 120, width: 300, height: 40 },
+// ]); // => ['hero', 'cta', 'footer']
