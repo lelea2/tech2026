@@ -56,6 +56,14 @@
       "hash": "1c84cbc0a969c975d2691170718b8cc22dc15872c5648e2398c4279d16ba85cb",
       "docRelative": "frontend/jsfunction/array/fill.mdx"
     },
+    "frontend/jsfunction/array/findIndex.js": {
+      "hash": "be108f1dad942960ac92c78c04ffd0da8252274bad4776f43c044c08804a3d15",
+      "docRelative": "frontend/jsfunction/array/findIndex.mdx"
+    },
+    "frontend/jsfunction/array/findLastIndex.js": {
+      "hash": "0a54360345dcfbb7758c8b80b87a8828701c63db80814c3d99e3d9f97ae2d426",
+      "docRelative": "frontend/jsfunction/array/findLastIndex.mdx"
+    },
     "frontend/jsfunction/array/flattenArray.js": {
       "hash": "02bbad3eb1d714a644485867a1e48c17bdc5ce54e62cdf03132e6a225cf5fa9f",
       "docRelative": "frontend/jsfunction/array/flattenArray.mdx"
@@ -312,6 +320,10 @@
       "hash": "2781462728bd6fdd0bda4cf1f4ebbe6720264c3b50d273d6b2c0e67df6714d34",
       "docRelative": "frontend/jsfunction/htmlSerialize.mdx"
     },
+    "frontend/jsfunction/inRange.js": {
+      "hash": "cb1434275ca6054c87369c3aec353467ef6cb68793bdc7c2b52fce7ddb6a9c1f",
+      "docRelative": "frontend/jsfunction/inRange.mdx"
+    },
     "frontend/jsfunction/jQuery.css.js": {
       "hash": "bfd0457965d1487bc9ceee85b0179c713c784bf7372bb063143586a2ec028004",
       "docRelative": "frontend/jsfunction/jQuery.css.mdx"
@@ -565,11 +577,11 @@
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
-      "hash": "4ef74b5d784563557fbcc5ef1c167c91cf210537db5b993eb2052a99194ae7f0",
+      "hash": "c2e5b54cf1fc666571f5b8dc6de391f11f4b6f2edcf0044ee83817ea1d7c91b1",
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/array": {
-      "hash": "a53ae06b8cbad268a9f7ff07c18ac78e3a22a0e9f1544b5abfef8319f235a9af",
+      "hash": "a46e2f9b4b88e99dd5638ff3bb25f5e497bff340e12c9e419f57b390c7692c52",
       "docRelative": "frontend/jsfunction/array/_index.mdx"
     },
     "__nav__:frontend/jsfunction/curry": {
