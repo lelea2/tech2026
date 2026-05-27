@@ -1,0 +1,170 @@
+/**
+ * @typedef {Record<string, unknown>} Row
+ * @typedef {Record<string, Array<Row>>} DatabaseData
+ * @typedef {Record<string, Row | null>} RowContext
+ * @typedef {{ kind: 'integer' | 'text', name: string }} ColumnBuilder
+ * @typedef {{ kind: 'integer' | 'text', name: string, tableName: string }} Column
+ * @typedef {(context: RowContext) => boolean} Condition
+ * @typedef {{ column: Column, direction: 'asc' | 'desc' }} Ordering
+ */
+/**
+ * Data structures:
+- table object: stores table name and column metadata
+- condition functions: take row context and return boolean
+- ordering objects: store column + direction
+- query builder: stores mutable query state
+
+Execution order in all():
+1. clone table rows
+2. apply where condition
+3. apply orderBy sorting
+4. apply offset
+5. apply limit
+6. return fresh row copies
+ */
+export function integer(name) {
+  return { kind: 'integer', name };
+}
+
+export function text(name) {
+  return { kind: 'text', name };
+}
+
+export function table(name, columns) {
+  const result = {
+    _: { name },
+  };
+
+  for (const key of Object.keys(columns)) {
+    result[key] = {
+      kind: columns[key].kind,
+      name: columns[key].name,
+      tableName: name,
+    };
+  }
+
+  return result;
+}
+
+export function eq(left, right) {
+  return function (context) {
+    const row = context[left.tableName];
+    return row[left.name] === right;
+  };
+}
+
+export function and(...conditions) {
+  return function (context) {
+    return conditions.every((condition) => condition(context));
+  };
+}
+
+export function or(...conditions) {
+  return function (context) {
+    return conditions.some((condition) => condition(context));
+  };
+}
+
+export function asc(column) {
+  return { column, direction: 'asc' };
+}
+
+export function desc(column) {
+  return { column, direction: 'desc' };
+}
+
+export default function drizzle(data) {
+  const clonedData = {};
+
+  for (const tableName of Object.keys(data)) {
+    clonedData[tableName] = data[tableName].map((row) => ({ ...row }));
+  }
+
+  return {
+    select() {
+      return new QueryBuilder(clonedData);
+    },
+  };
+}
+
+class QueryBuilder {
+  constructor(data) {
+    this.data = data;
+
+    this.table = null;
+    this.condition = null;
+    this.orderings = [];
+    this.limitCount = null;
+    this.offsetCount = 0;
+  }
+
+  from(table) {
+    this.table = table;
+    return this;
+  }
+
+  where(condition) {
+    this.condition = condition;
+    return this;
+  }
+
+  orderBy(...orderings) {
+    this.orderings = orderings;
+    return this;
+  }
+
+  limit(count) {
+    this.limitCount = count;
+    return this;
+  }
+
+  offset(count) {
+    this.offsetCount = count;
+    return this;
+  }
+
+  all() {
+    const tableName = this.table._.name;
+
+    let rows = this.data[tableName].map((row) => ({ ...row }));
+
+    if (this.condition) {
+      rows = rows.filter((row) => {
+        const context = {
+          [tableName]: row,
+        };
+
+        return this.condition(context);
+      });
+    }
+
+    if (this.orderings.length > 0) {
+      rows.sort((a, b) => {
+        for (const ordering of this.orderings) {
+          const columnName = ordering.column.name;
+          const direction = ordering.direction;
+
+          if (a[columnName] < b[columnName]) {
+            return direction === 'asc' ? -1 : 1;
+          }
+
+          if (a[columnName] > b[columnName]) {
+            return direction === 'asc' ? 1 : -1;
+          }
+        }
+
+        return 0;
+      });
+    }
+
+    if (this.offsetCount > 0) {
+      rows = rows.slice(this.offsetCount);
+    }
+
+    if (this.limitCount !== null) {
+      rows = rows.slice(0, this.limitCount);
+    }
+
+    return rows.map((row) => ({ ...row }));
+  }
+}
