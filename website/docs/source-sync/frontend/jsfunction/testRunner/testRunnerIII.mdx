@@ -1,0 +1,195 @@
+---
+title: testRunnerIII
+---
+
+# testRunnerIII
+
+~~~javascript
+/**
+ * @typedef {() => void} HookFn
+ * @typedef {() => void} SpecFn
+ * @typedef {{
+ *   toBe(expected: unknown): void,
+ *   readonly not: Matcher,
+ * }} Matcher
+ *
+ * @typedef {{
+ *   total: number,
+ *   passed: number,
+ *   failed: number,
+ *   results: Array<
+ *     | { name: string, status: 'passed' }
+ *     | { name: string, status: 'failed', error: string }
+ *   >,
+ * }} RunResult
+ *
+ * @typedef {{
+ *   suite(name: string, fn: SpecFn): void,
+ *   setupEach(fn: HookFn): void,
+ *   cleanupEach(fn: HookFn): void,
+ *   spec(name: string, fn: SpecFn): void,
+ *   check(actual: unknown): Matcher,
+ *   run(): RunResult,
+ * }} TestRunner
+ */
+
+/**
+ * @returns {TestRunner}
+ */
+// I model nested suites using a stack.
+
+// Each suite context stores:
+// - suite name
+// - setupEach hooks
+// - cleanupEach hooks
+
+// When defining a spec, I snapshot:
+// - the full suite path
+// - inherited setup hooks from outer to inner
+// - inherited cleanup hooks from inner to outer
+
+// Then run() simply executes:
+// 1. setup hooks
+// 2. spec body
+// 3. cleanup hooks
+// 4. record pass/fail
+export default function createTestRunner() {
+  const specs = [];
+
+  // Root suite context.
+  const rootSuite = {
+    name: '',
+    setupHooks: [],
+    cleanupHooks: [],
+  };
+
+  // Stack of active suite contexts.
+  const suiteStack = [rootSuite];
+
+  function suite(name, fn) {
+    const suiteContext = {
+      name,
+      setupHooks: [],
+      cleanupHooks: [],
+    };
+
+    suiteStack.push(suiteContext);
+
+    try {
+      fn();
+    } finally {
+      suiteStack.pop();
+    }
+  }
+
+  function setupEach(fn) {
+    const currentSuite = suiteStack[suiteStack.length - 1];
+    currentSuite.setupHooks.push(fn);
+  }
+
+  function cleanupEach(fn) {
+    const currentSuite = suiteStack[suiteStack.length - 1];
+    currentSuite.cleanupHooks.push(fn);
+  }
+
+  function spec(name, fn) {
+    const suitePath = suiteStack
+      .slice(1)
+      .map((suite) => suite.name);
+
+    const fullName = [...suitePath, name].join(' > ');
+
+    const setupHooks = suiteStack.flatMap(
+      (suite) => suite.setupHooks,
+    );
+
+    const cleanupHooks = suiteStack
+      .flatMap((suite) => suite.cleanupHooks)
+      .reverse();
+
+    specs.push({
+      name: fullName,
+      fn,
+      setupHooks,
+      cleanupHooks,
+    });
+  }
+
+  function check(actual) {
+    return createMatchers(actual, false);
+  }
+
+  function createMatchers(actual, negated) {
+    return {
+      get not() {
+        return createMatchers(actual, !negated);
+      },
+
+      toBe(expected) {
+        const pass = Object.is(actual, expected);
+
+        if (!negated && !pass) {
+          throw new Error(
+            `Expected ${String(actual)} to be ${String(expected)}`,
+          );
+        }
+
+        if (negated && pass) {
+          throw new Error(
+            `Expected ${String(actual)} not to be ${String(expected)}`,
+          );
+        }
+      },
+    };
+  }
+
+  function run() {
+    const results = [];
+
+    for (const test of specs) {
+      try {
+        for (const hook of test.setupHooks) {
+          hook();
+        }
+
+        test.fn();
+
+        for (const hook of test.cleanupHooks) {
+          hook();
+        }
+
+        results.push({
+          name: test.name,
+          status: 'passed',
+        });
+      } catch (error) {
+        results.push({
+          name: test.name,
+          status: 'failed',
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+
+    const failed = results.filter(
+      (result) => result.status === 'failed',
+    ).length;
+
+    return {
+      total: results.length,
+      passed: results.length - failed,
+      failed,
+      results,
+    };
+  }
+
+  return {
+    suite,
+    spec,
+    check,
+    run,
+    setupEach,
+    cleanupEach,
+  };
+}
+~~~

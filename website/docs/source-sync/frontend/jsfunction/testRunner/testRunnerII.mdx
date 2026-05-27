@@ -1,0 +1,129 @@
+---
+title: testRunnerII
+---
+
+# testRunnerII
+
+~~~javascript
+/**
+ * @typedef {{
+ *   toBe(expected: unknown): void,
+ *   readonly not: Matcher,
+ * }} Matcher
+ *
+ * @typedef {{
+ *   total: number,
+ *   passed: number,
+ *   failed: number,
+ *   results: Array<
+ *     | { name: string, status: 'passed' }
+ *     | { name: string, status: 'failed', error: string }
+ *   >,
+ * }} RunResult
+ *
+ * @typedef {{
+ *   suite(name: string, fn: () => void): void,
+ *   spec(name: string, fn: () => void): void,
+ *   check(actual: unknown): Matcher,
+ *   run(): RunResult,
+ * }} TestRunner
+ */
+
+/**
+ * @returns {TestRunner}
+ */
+export default function createTestRunner() {
+  const specs = [];
+
+  // Tracks current nested suite path.
+  const suiteStack = [];
+
+  function suite(name, fn) {
+    suiteStack.push(name);
+
+    try {
+      // Register nested suites/specs immediately.
+      fn();
+    } finally {
+      // Always restore parent suite, even if fn throws.
+      suiteStack.pop();
+    }
+  }
+
+  function spec(name, fn) {
+    const fullName = [...suiteStack, name].join(' > ');
+
+    specs.push({
+      name: fullName,
+      fn,
+    });
+  }
+
+  function check(actual) {
+    return createMatchers(actual, false);
+  }
+
+  function createMatchers(actual, negated) {
+    return {
+      get not() {
+        return createMatchers(actual, !negated);
+      },
+
+      toBe(expected) {
+        const pass = Object.is(actual, expected);
+
+        if (!negated && !pass) {
+          throw new Error(
+            `Expected ${String(actual)} to be ${String(expected)}`,
+          );
+        }
+
+        if (negated && pass) {
+          throw new Error(
+            `Expected ${String(actual)} not to be ${String(expected)}`,
+          );
+        }
+      },
+    };
+  }
+
+  function run() {
+    const results = [];
+
+    for (const { name, fn } of specs) {
+      try {
+        fn();
+
+        results.push({
+          name,
+          status: 'passed',
+        });
+      } catch (error) {
+        results.push({
+          name,
+          status: 'failed',
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+
+    const failed = results.filter(
+      (result) => result.status === 'failed',
+    ).length;
+
+    return {
+      total: results.length,
+      passed: results.length - failed,
+      failed,
+      results,
+    };
+  }
+
+  return {
+    suite,
+    spec,
+    check,
+    run,
+  };
+}
+~~~

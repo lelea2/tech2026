@@ -632,6 +632,22 @@
       "hash": "df9c8fa223c79ad643398f7bb34a75bd1e38230ebe66e7a71d8f5d88c0d8be03",
       "docRelative": "frontend/jsfunction/sum.mdx"
     },
+    "frontend/jsfunction/testRunner/testRunner.js": {
+      "hash": "8e4f4c26a0cdc96ffd56d2737b82f39c4c184a4d063ecb5556ac6320b6d75ed0",
+      "docRelative": "frontend/jsfunction/testRunner/testRunner.mdx"
+    },
+    "frontend/jsfunction/testRunner/testRunnerII.js": {
+      "hash": "c88aa6cf230798d0487f59c0b4d7b53091e11ccd984b7a3ddd48bdd7a8c046c2",
+      "docRelative": "frontend/jsfunction/testRunner/testRunnerII.mdx"
+    },
+    "frontend/jsfunction/testRunner/testRunnerIII.js": {
+      "hash": "be9278876a78463e0f051ccd65f930ecd13857bf902a5a05ae1b0001dff327fd",
+      "docRelative": "frontend/jsfunction/testRunner/testRunnerIII.mdx"
+    },
+    "frontend/jsfunction/testRunner/testRunnerIV_Promise.js": {
+      "hash": "9cffaf34e19035e5aca07e35f249a64bd7d652fa25ed2b2a6810412fd3505cb5",
+      "docRelative": "frontend/jsfunction/testRunner/testRunnerIV_Promise.mdx"
+    },
     "frontend/jsfunction/textSearch/textSearch.js": {
       "hash": "2dec27133076b8a19af06048afdd51b0d26ff2b5f30e86c4bc89a43349a9a928",
       "docRelative": "frontend/jsfunction/textSearch/textSearch.mdx"
@@ -733,7 +749,7 @@
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
-      "hash": "8dbec2f22e311f485b2e41e0a1656e64ca2c3a85ccb6791b6cfcd1995e3976f0",
+      "hash": "4b0f1174267eed1480e37534e92fa7ff4adc7549fc79b2977042dd27f64fad64",
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/Emitter": {
@@ -795,6 +811,10 @@
     "__nav__:frontend/jsfunction/spreadSheet": {
       "hash": "71a61f136f12f624d49a251c8f83a6a39fc6c216aa14ecc33e9ab699ebcf3036",
       "docRelative": "frontend/jsfunction/spreadSheet/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/testRunner": {
+      "hash": "946ed57a2d9a50d02259f4350dd70641021104bb88cad5d70d305ddb54dc19aa",
+      "docRelative": "frontend/jsfunction/testRunner/_index.mdx"
     },
     "__nav__:frontend/jsfunction/textSearch": {
       "hash": "5d2bf779df92e7216cec41ec8a824f500b64a457f801c059df76e1e2849db525",
