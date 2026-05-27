@@ -1,0 +1,124 @@
+/**
+ * @typedef {string | number} PathSegment
+ *
+ * @typedef {{
+ *   path: PathSegment[],
+ *   message: string,
+ * }} ValidationError
+ *
+ * @typedef {{
+ *   success: true,
+ *   data: unknown,
+ * } | {
+ *   success: false,
+ *   errors: ValidationError[],
+ * }} ParseResult
+ *
+ * @typedef {{
+ *   safeParse(value: unknown): ParseResult,
+ * }} Schema
+ */
+
+/**
+ * @type {{
+ *   string(): Schema,
+ *   number(): Schema,
+ *   boolean(): Schema,
+ *   object(shape: Record<string, Schema>): Schema,
+ * }}
+ */
+const v = {
+  string() {
+    return createPrimitiveSchema('string', 'Expected string');
+  },
+  number() {
+    return createPrimitiveSchema('number', 'Expected number');
+  },
+  boolean() {
+    return createPrimitiveSchema('boolean', 'Expected boolean');
+  },
+  object(shape) {
+    return {
+      safeParse(value) {
+        if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+          return {
+            success: false,
+            errors: [{path: [], message: 'Expected object'}]
+          };
+        }
+
+        const errors = [];
+        for (const key of Object.keys(shape)) {
+          if (value[key] === undefined) {
+            errors.push({
+              path: [key],
+              message: 'Required'
+            });
+            continue;
+          }
+          const result = shape[key].safeParse(value[key]);
+          if (!result.success) {
+            errors.push({
+              path: [key],
+              message: result.errors[0].message
+            });
+          }
+        }
+        if (errors.length > 0) {
+          return {
+            success: false,
+            errors,
+          };
+        }
+        return {
+          success: true,
+          data: {...value}
+        };
+      }
+    }
+  },
+};
+
+function createPrimitiveSchema(type, message) {
+  return {
+    safeParse(value) {
+      if (typeof value === type) {
+        return {
+          success: true,
+          data: value;
+        };
+      }
+      return {
+        success: false,
+        errors: [{path: [], message}]
+      }
+    }
+  }
+}
+
+export default v;
+
+/**
+const User = v.object({
+  name: v.string(),
+  age: v.number(),
+  admin: v.boolean(),
+});
+
+User.safeParse({
+  name: 'Alice',
+  age: 30,
+  admin: false,
+  team: 'Core',
+});
+// {
+//   success: true,
+//   data: {
+//     name: 'Alice',
+//     age: 30,
+//     admin: false,
+//     team: 'Core',
+//   },
+// }
+
+ */

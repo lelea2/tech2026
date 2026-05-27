@@ -25,11 +25,19 @@ Keep documentation in sync when files change under frontend, backend, or algorit
 ## Workflow
 
 1. Confirm changed files in source folders only.
-2. Build a complete mapping list for the target docs subdir.
+2. Build a complete, stable parent mapping list for the target docs subdir (not only changed leaf folders).
 3. Prefer parent-folder mappings (example: `frontend/jsfunction=jsfunction`) so newly added `.js` files in nested folders are auto-included.
-4. Run source sync script once with all mappings for that docs subdir.
+4. For each docs subdir, run source sync once with the full mapping set that should exist after the run.
 5. Verify docs update summary.
 6. Run docs build to validate output.
+
+### Mapping stability rule (required)
+
+- Do not generate mappings from only the currently changed files.
+- Do not map only selected child folders when a stable parent exists.
+- If any file under `frontend/jsfunction/**` is in scope, include `frontend/jsfunction=jsfunction`.
+- If any file under `algorithm/**` is in scope, include `algorithm=.` for algorithm docs.
+- This guarantees new sibling folders and moved files are reflected correctly on the next sync.
 
 ### Post-hook behavior (new)
 
@@ -51,13 +59,18 @@ From repository root:
 
 With custom mapping format:
 
-- cd website && npm run sync:source-docs -- --format "frontend/jsfunction/hooks=frontend/jsfunction/hooks;backend/system-design=backend/system-design"
+- cd website && npm run sync:source-docs -- --format "frontend/jsfunction=frontend/jsfunction;backend/system-design=backend/system-design"
 
 Preferred pattern for ongoing maintenance (map parent folders, not only leaf folders):
 
 - cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"
 
 This ensures newly added files under `frontend/jsfunction/**` are synced automatically in the next run.
+
+Moved-file safety (same docs subdir):
+
+- Keep using the same stable parent mapping(s) on each run.
+- The script removes stale docs from old locations and writes docs at the new locations.
 
 Canonical FrontEnd sync command (includes folders like `getElementBy`, `hooks`, `promise`, `array` automatically):
 
@@ -86,24 +99,11 @@ Run FrontEnd + Algorithm sync as two commands (separate docs subdirs):
 - cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"
 - cd website && npm run sync:source-docs -- --docs-subdir algorithm --format "algorithm=."
 
-Create a new FrontEnd subtab from folder name (example: `array`):
+Avoid narrow leaf-only mapping for main sync runs:
 
-- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction/hooks=array"
-
-This creates/updates:
-
-- website/docs/frontend/array
-
-And the sidebar subtab name is mapped from the folder name (`array`).
-
-Generate jsfunction docs page with all jsfunction tabs plus array subnavigation:
-
-- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction;frontend/jsfunction/array=array"
-
-This creates/updates:
-
-- website/docs/frontend/jsfunction
-- website/docs/frontend/array
+- Risky example: `frontend/jsfunction/array=array`
+- Preferred: `frontend/jsfunction=jsfunction`
+- If a separate curated subtab is truly needed, include the stable parent mapping in the same command.
 
 With custom docs output root:
 
@@ -118,6 +118,7 @@ Mapping format rules:
 - Missing mapped folder paths are created automatically
 - Important: only mapped paths are kept for the selected docs subdir. Include all mappings you want to preserve in the same command.
 - To capture new files reliably, map stable parent folders (for example `frontend/jsfunction`) instead of many narrow subfolder mappings.
+- Rule of thumb: one stable parent mapping per source domain is preferred over many leaf mappings.
 
 ## Troubleshooting: New `.js` files not appearing
 
@@ -136,6 +137,7 @@ Mapping format rules:
   - Good: `frontend/jsfunction=jsfunction`
   - Risky: mapping only selected leaves (new siblings will be missed)
 - Re-run sync; post-hook should generate `/_index.mdx` pages for new folders automatically.
+- If files were moved across folders, run sync again with the same stable parent mapping; stale old pages should be removed.
 - Verify generated path exists under docs, for example:
   - `website/docs/algorithm/mostCommonElement.mdx`
   - `website/docs/algorithm/countIslandOnGrid.mdx`
