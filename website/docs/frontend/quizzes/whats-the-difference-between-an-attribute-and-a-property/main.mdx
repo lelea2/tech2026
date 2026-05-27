@@ -1,0 +1,191 @@
+---
+title: What's the difference between an "attribute" and a "property" in the DOM?
+---
+
+
+## TL;DR
+
+Attributes are defined in the HTML and provide initial values for properties. Properties are part of the DOM and represent the current state of an element. For example, the `value` attribute of an `<input>` element sets its initial value, while the `value` property reflects the current value as the user interacts with it.
+
+---
+
+## Difference between an "attribute" and a "property" in the DOM
+
+### Attributes
+
+Attributes are defined in the HTML markup and provide initial values for elements. They are static and do not change once the page is loaded unless explicitly modified using JavaScript.
+
+#### Example
+
+```html
+<input type="text" value="initial value" />
+```
+
+In this example, `value="initial value"` is an attribute.
+
+### Properties
+
+Properties are part of the DOM and represent the current state of an element. They are dynamic and can change as the user interacts with the page or through JavaScript.
+
+#### Example
+
+```javascript
+const inputElement = document.querySelector('input');
+console.log(inputElement.value); // Logs the current value of the input element
+inputElement.value = 'new value'; // Changes the current value of the input element
+```
+
+In this example, `value` is a property of the `inputElement` object.
+
+### Key differences
+
+- **Initialization**: Attributes initialize DOM properties.
+- **State**: Attributes are static, while properties are dynamic.
+- **Access**: Attributes can be accessed using `getAttribute` and `setAttribute` methods, while properties can be accessed directly on the DOM object.
+
+#### Example
+
+```html
+<input id="myInput" type="text" value="initial value" />
+```
+
+```javascript
+const inputElement = document.getElementById('myInput');
+
+// Accessing attribute
+console.log(inputElement.getAttribute('value')); // "initial value"
+
+// Accessing property
+console.log(inputElement.value); // "initial value"
+
+// Changing property
+inputElement.value = 'new value';
+console.log(inputElement.value); // "new value"
+console.log(inputElement.getAttribute('value')); // "initial value"
+```
+
+In this example, changing the `value` property does not affect the `value` attribute.
+
+## The classic example: input value (try it live)
+
+This is the canonical interview demonstration. Open the input below, type into it, and watch how the **attribute** stays at the initial value while the **property** tracks what the user typed:
+
+```js live
+document.body.innerHTML = `
+  <input id="demo" type="text" value="initial value" />
+  <button id="check">Log attribute vs property</button>
+  <pre id="out"></pre>
+`;
+
+const input = document.getElementById('demo');
+const out = document.getElementById('out');
+
+document.getElementById('check').addEventListener('click', () => {
+  out.textContent =
+    `attribute (getAttribute('value')): ${input.getAttribute('value')}\n` +
+    `property  (input.value):           ${input.value}`;
+});
+
+// Programmatic demo if no user typing happens:
+input.value = 'typed by user';
+out.textContent =
+  `attribute (getAttribute('value')): ${input.getAttribute('value')}\n` +
+  `property  (input.value):           ${input.value}`;
+```
+
+The takeaway: **the attribute is the original markup; the property is the current state**. They diverge the moment the user (or your code) interacts with the element.
+
+To **reset** an input back to its attribute, set the property back to the attribute value (`input.value = input.defaultValue`). To **persist** a new initial value across resets, you have to set the attribute too (`input.setAttribute('value', '...')` or `input.defaultValue = '...'`).
+
+## Other attributes that diverge from their properties
+
+The `value` attribute is the most-cited example, but several other attributes have a meaningfully different DOM property. Each of these comes up regularly in real bugs.
+
+### `checked` on checkboxes and radios
+
+```js live
+document.body.innerHTML = `<input type="checkbox" id="cb" checked />`;
+const cb = document.getElementById('cb');
+
+console.log(cb.getAttribute('checked')); // "" (present in markup)
+console.log(cb.checked); // true
+
+cb.checked = false; // user un-checks (or your code does)
+console.log(cb.getAttribute('checked')); // still "" (attribute did not change)
+console.log(cb.checked); // false
+```
+
+Same pattern: the attribute is the **default** state used on form reset; the property is the **current** state.
+
+### `disabled` on inputs and buttons
+
+```js live
+document.body.innerHTML = `<button id="b">Submit</button>`;
+const b = document.getElementById('b');
+
+b.setAttribute('disabled', 'disabled'); // sets the attribute
+console.log(b.disabled); // true (property reflects the attribute)
+
+b.disabled = false; // sets the property
+console.log(b.getAttribute('disabled')); // null (attribute is removed)
+```
+
+Boolean attributes like `disabled`, `readonly`, `required`, and `hidden` are **reflected**: setting the property automatically adds or removes the attribute. This is different from `value`/`checked`, where the attribute stays put.
+
+### `class` (attribute) vs `className` and `classList` (properties)
+
+```js live
+document.body.innerHTML = `<div id="d" class="a b c"></div>`;
+const d = document.getElementById('d');
+
+console.log(d.getAttribute('class')); // "a b c"
+console.log(d.className); // "a b c" (same string)
+console.log(d.classList); // DOMTokenList ['a', 'b', 'c']
+
+d.classList.add('d');
+console.log(d.getAttribute('class')); // "a b c d"
+```
+
+The attribute is `class`; the DOM property is `className` (because `class` is a reserved word in JavaScript). The modern `classList` API gives you `add`/`remove`/`toggle` methods that update both for you.
+
+### `for` (attribute) vs `htmlFor` (property)
+
+The `for` attribute on a `<label>` becomes the `htmlFor` property, for the same reason (`for` is a reserved word in JavaScript). This is a common stumbling block for React developers because JSX uses `htmlFor`:
+
+```jsx
+// React JSX uses the property name
+<label htmlFor="email">Email</label>;
+
+// Plain HTML uses the attribute name
+<label for="email">Email</label>;
+```
+
+### `style`: string vs object
+
+The `style` attribute is a string. The `style` property is a `CSSStyleDeclaration` object:
+
+```js
+element.getAttribute('style'); // 'color: red; font-size: 14px' (string)
+element.style; // CSSStyleDeclaration object; element.style.color === 'red'
+```
+
+You read individual rules from the property (`element.style.fontSize`) but cannot read computed values that way. For computed styles, use `getComputedStyle(element).fontSize`.
+
+## Why this matters in React, Vue, and other frameworks
+
+Frameworks set properties in some places and attributes in others, and knowing which they choose explains a class of "this attribute won't update" bugs.
+
+- **React** sets DOM properties when a matching one exists, so `<input value={x}>` updates the property, not the attribute. This is why `defaultValue` exists: it is the way to set the underlying attribute. The same pattern applies to `defaultChecked` on checkboxes.
+- **Vue 3** intelligently chooses between property and attribute for each binding. For standard interactive elements (such as `value` on `<input>`, `<select>`, and `<progress>`), it sets the DOM property. You can force one or the other with the `.prop` and `.attr` modifiers on `v-bind`.
+- **Custom elements** declared with attributes need `attributeChangedCallback` and `observedAttributes` to react to attribute changes. Properties do not go through that path.
+
+If you ever see a React form where setting `<input value={state}>` works fine, but inspecting the rendered DOM shows the `value="..."` attribute stuck at the old value, that is not a bug. The attribute is intentionally the initial-value marker; the property is what reflects the live state.
+
+## Further reading
+
+- [MDN Web Docs: Element.getAttribute()](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute)
+- [MDN Web Docs: Element.setAttribute()](https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute)
+- [MDN Web Docs: HTML attributes vs. DOM properties](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes#html_attributes_vs_dom_properties)
+---
+
+_Source: [greatfrontend/top-javascript-interview-questions](https://github.com/greatfrontend/top-javascript-interview-questions/blob/main/questions/whats-the-difference-between-an-attribute-and-a-property/en-US.mdx)_

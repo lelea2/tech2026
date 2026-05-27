@@ -1,0 +1,55 @@
+---
+title: unionBy
+---
+
+# unionBy
+
+~~~javascript
+/**
+ * @param {(value: unknown) => unknown} iteratee The iteratee invoked per element.
+ * @param {...Array<unknown>} arrays The arrays to inspect.
+ * @returns {Array<unknown>} Returns the new array of combined values.
+ */
+export default function unionBy(iteratee, ...arrays) {
+  // Result array that stores unique values in insertion order.
+  const result = [];
+
+  // Track computed uniqueness values.
+  // Example:
+  // Math.floor(2.1) => 2
+  // Math.floor(2.3) => 2
+  // So only the first one should be kept.
+  const seen = new Set();
+
+  // Iterate through every array provided.
+  for (const array of arrays) {
+    // Skip invalid/falsy arrays safely.
+    if (!Array.isArray(array)) {
+      continue;
+    }
+
+    // Process each value in the current array.
+    for (const value of array) {
+      // Compute uniqueness criterion using iteratee.
+      const computed = iteratee(value);
+
+      // Only add value if we haven't seen
+      // the computed key before.
+      if (!seen.has(computed)) {
+        seen.add(computed);
+        result.push(value);
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+unionBy((value: any) => value, [2], [1, 2]); // => [2, 1]
+
+unionBy(Math.floor, [2.1], [1.2, 2.3]); // => [2.1, 1.2]
+
+unionBy((o) => o.x, [{ x: 1 }], [{ x: 2 }, { x: 1 }]); // => [{ 'x': 1 }, { 'x': 2 }]
+ */
+~~~

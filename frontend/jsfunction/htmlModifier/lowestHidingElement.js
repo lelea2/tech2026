@@ -1,0 +1,77 @@
+/**
+ * Find the deepest DOM element that contains all given elements.
+ *
+ * =========================================================
+ * Data Structure
+ * =========================================================
+ * - DOM Tree (N-ary tree)
+ *
+ * =========================================================
+ * Core Idea
+ * =========================================================
+ * This is essentially a Lowest Common Ancestor (LCA) problem.
+ *
+ * We start from the first element and walk upward through
+ * its ancestors until we find the first ancestor that
+ * contains every element in the input array.
+ *
+ * Since we move from deepest -> root,
+ * the first valid ancestor is the answer.
+ *
+ * =========================================================
+ * Example
+ * =========================================================
+ *
+ * <section>
+ *   <button>Save</button>
+ *   <button>Cancel</button>
+ * </section>
+ *
+ * Start from:
+ * - Save button
+ *
+ * Check:
+ * - saveButton.contains(cancelButton) => false
+ * - section.contains(saveButton) => true
+ * - section.contains(cancelButton) => true
+ *
+ * Therefore:
+ * => section is the lowest hiding element.
+ *
+ * =========================================================
+ * Time Complexity
+ * =========================================================
+ * O(h * n)
+ *
+ * h = height of DOM tree
+ * n = number of elements
+ *
+ * =========================================================
+ * Space Complexity
+ * =========================================================
+ * O(1)
+ *
+ * @param {Element[]} elements
+ * @returns {Element | null}
+ */
+export default function lowestHidingElement(elements) {
+  // Start from the first element itself.
+  let current = elements[0];
+
+  // Walk upward toward the root.
+  while (current) {
+    // Check whether current ancestor contains all elements.
+    const containsAll = elements.every((element) =>
+      current.contains(element),
+    );
+
+    // First matching ancestor is the deepest valid answer.
+    if (containsAll) {
+      return current;
+    }
+
+    current = current.parentElement;
+  }
+
+  return null;
+}

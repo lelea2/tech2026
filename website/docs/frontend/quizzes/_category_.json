@@ -1,0 +1,10 @@
+{
+  "label": "Quizzes",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "title": "JavaScript Interview Quizzes",
+    "description": "Top JavaScript interview questions from greatfrontend.",
+    "slug": "/frontend/quizzes"
+  }
+}

@@ -1,0 +1,133 @@
+/**
+ * Convert plain text + formatting ranges into canonical HTML.
+ *
+ * Ranges are half-open: [start, end)
+ * Earlier ranges should become outer tags.
+ *
+ * @param {string} text
+ * @param {{ start: number, end: number, tag: string }[]} ranges
+ * @returns {string}
+ */
+/**
+ * richTextToHTML('abcdef', [
+  { start: 1, end: 4, tag: 'b' },
+  { start: 2, end: 5, tag: 'i' },
+]);
+// 'a<b>b<i>cd</i></b><i>e</i>f'
+richTextToHTML('abcdef', [
+  { start: 1, end: 4, tag: 'i' },
+  { start: 1, end: 4, tag: 'b' },
+]);
+// 'a<i><b>bcd</b></i>ef'
+ */
+/**
+ * I treat every character position as a boundary where formatting may change.
+At each position:
+- compute active ranges covering this character
+- preserve input order because earlier ranges should wrap later ranges
+- compare previous active stack with current active stack
+- close tags after the common prefix
+- open new tags after the common prefix
+- append the current character
+This handles nesting, overlapping, crossing ranges, and adjacent same-tag ranges naturally.
+----
+The core data structure here is essentially a stack-like active tag list.
+Specifically:
+* prevActive behaves like a stack of currently open tags
+* active is the desired stack for the current character position
+* The algorithm performs a diff between two stacks
+ */
+export default function richTextToHTML(text, ranges) {
+  const normalizeRanges = _normalizeRanges(ranges); // handle normalize range first
+
+  let html = '';
+  let prevActive = [];
+
+  for (let i = 0; i < text.length; i++) {
+    // Find all tags active at this character.
+    // Keep original range order so earlier ranges are outer tags.
+    const active = normalizeRanges.filter(
+      (range) => range.start <= i && i < range.end,
+    );
+
+    // Find common prefix between previous active ranges and current active ranges.
+    let common = 0;
+    while (
+      common < prevActive.length &&
+      common < active.length &&
+      prevActive[common] === active[common]
+    ) {
+      common++;
+    }
+
+    // Close tags that are no longer active.
+    for (let j = prevActive.length - 1; j >= common; j--) {
+      html += `</${prevActive[j].tag}>`;
+    }
+
+    // Open newly active tags.
+    for (let j = common; j < active.length; j++) {
+      html += `<${active[j].tag}>`;
+    }
+
+    html += text[i];
+    prevActive = active;
+  }
+
+  // Close any remaining open tags.
+  for (let i = prevActive.length - 1; i >= 0; i--) {
+    html += `</${prevActive[i].tag}>`;
+  }
+
+  return html;
+}
+
+// normalize the input ranges.
+// This reduces overlapping or adjacent ranges
+// with the same tag into a single interval.
+// That guarantees canonical HTML output and simplifies the rendering phase because
+// I no longer need to reason about duplicated wrappers.
+/**
+ * const ranges = [
+  { start: 1, end: 3, tag: 'b' },
+  { start: 2, end: 5, tag: 'b' },
+  { start: 6, end: 8, tag: 'b' },
+  { start: 8, end: 10, tag: 'b' },
+  { start: 1, end: 4, tag: 'i' },
+];
+===>
+[
+  { start: 1, end: 5, tag: 'b' },
+  { start: 6, end: 10, tag: 'b' },
+  { start: 1, end: 4, tag: 'i' }
+]
+ */
+function _normalizeRanges(ranges) {
+  if (ranges.length <= 1) {
+    // no need to normalize
+    return ranges;
+  }
+  const byTag = new Map();
+  for (const range of ranges) {
+    if (!byTag.has(range.tag)) {
+      byTag.set(range.tag, []);
+    }
+    // push the new range in tag
+    byTag.get(range.tag).push({ ...range });
+  }
+
+  const merged = [];
+  byTag.forEach((group, tag) => {
+    // sorting in order, left to right
+    group.sort((a, b) => a.start - b.start || a.end - b.end);
+    for (const range of group) {
+      const last = merged[merged.length - 1];
+      if (last && last.tag === tag && range.start <= last.end) {
+        last.end = Math.max(last.end, range.end);
+      } else {
+        merged.push({ ...range });
+      }
+    }
+  });
+  return merged;
+}

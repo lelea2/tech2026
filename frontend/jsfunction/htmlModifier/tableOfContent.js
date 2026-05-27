@@ -1,0 +1,68 @@
+/**
+ * On websites, heading tags give a hierarchy to the page and heading information
+ * can be used by user agents (including screen readers) to 
+ * construct a table of contents for a document automatically.
+
+* Given a document node, write a function tableOfContents that generates an HTML string representing a
+ table of contents based on the headings (<h1>, <h2>, ..., <h6>) in the document. 
+* Following the best practices, heading levels won't be skipped, i.e. <h1> will be followed by <h2> and so on.
+
+The returned string doesn't need to contain any indentation.
+ */
+/**
+ * Build a nested HTML table of contents from h1-h6 headings.
+ *
+ * Idea:
+ * - Read headings in document order.
+ * - Open a new <ul> when heading level increases.
+ * - Close previous <li> when staying on the same level.
+ * - Close lists/items when heading level decreases.
+ *
+ * Assumption:
+ * - Heading levels are not skipped.
+ * - The first heading in the document sets the base level. (which means there is no higher level heading in the document for following elements)
+ */
+/**
+ * @param {Document} doc
+ * @return {string}
+ */
+export default function tableOfContents(doc) {
+  // allow heading tags
+  const headings = [...doc.querySelectorAll('h1,h2,h3,h4,h5,h6')];
+  // dom does not have any heading tag
+  if (headings.length === 0) {
+    return '';
+  }
+
+  let html = '';
+  let currentLevel = 0;
+  const baseLevel = Number(headings[0].tagName[1]);
+
+  for (const heading of headings) {
+    const level = Number(heading.tagName[1]);
+    // normalize h2 as depth 1 if h2 is the first heading
+    const depth = level - baseLevel +1;
+    const text = heading.textContent;
+
+    if (depth > currentLevel) {
+      html += '<ul>'
+    } else if (depth === currentLevel) {
+      html += '</li>'
+    } else {
+      console.log('>>>> currentLevel', currentLevel, level);
+      while (currentLevel > depth) {
+        html += '</li></ul>'
+        currentLevel--;
+      }
+      html += '</li>'
+    }
+    html += `<li>${text}`;
+    currentLevel = depth;
+  }
+
+  while (currentLevel > 0) {
+    html += '</li></ul>';
+    currentLevel--;
+  }
+  return html;
+}

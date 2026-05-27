@@ -1,0 +1,49 @@
+/**
+ * @param {unknown} input
+ * @return {unknown}
+ */
+export default function camelCaseKeys(input) {
+  // Helper function to convert snake_case -> camelCase.
+  function toCamelCase(str) {
+    const camel = str.replace(/_([a-zA-Z])/g, (_, char) => {
+      return char.toUpperCase();
+    });
+    return camel.charAt(0).toLowerCase() + camel.slice(1);
+  }
+
+  // Base case:
+  // If value is an array, recursively transform each item.
+  if (Array.isArray(input)) {
+    return input.map((item) => camelCaseKeys(item));
+  }
+
+  // If value is an object, transform all keys recursively.
+  if (input !== null && typeof input === 'object') {
+    const result = {};
+
+    // Iterate through all keys in the object.
+    for (const key in input) {
+      // Convert current key to camelCase.
+      const camelKey = toCamelCase(key);
+      // Recursively transform nested values.
+      result[camelKey] = camelCaseKeys(input[key]);
+    }
+
+    return result;
+  }
+
+  // Primitive values (string, number, boolean, null, etc.)
+  // should be returned as-is.
+  return input;
+}
+
+/**
+camelCaseKeys({ foo_bar: true });
+// { fooBar: true }
+
+camelCaseKeys({ foo_bar: true, bar_baz: { baz_qux: '1' } });
+// { fooBar: true, barBaz: { bazQux: '1' } }
+
+camelCaseKeys([{ baz_qux: true }, { foo: true, bar: [{ foo_bar: 'hello' }] }]);
+// [{ bazQux: true }, { foo: true, bar: [{ fooBar: 'hello' }] }]
+ */

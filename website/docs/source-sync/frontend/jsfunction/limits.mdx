@@ -1,0 +1,60 @@
+---
+title: limits
+---
+
+# limits
+
+~~~javascript
+/**
+ * Implement a function that accepts a callback and a number n, 
+ * which restricts invocation of the callback to at most n times. 
+ * Subsequent calls of the created function will return the result of the last invocation of the callback function. 
+ * The callback function is invoked with the this binding and arguments of the created function.
+ */
+/**
+ * @param {(...args: Array<unknown>) => unknown} func
+ * @param {number} n
+ * @returns {(...args: Array<unknown>) => unknown}
+ */
+export default function limit(func, n) {
+  // Track how many times the function has been invoked.
+
+  let callCount = 0;
+  // Store the result of the last successful invocation.
+  let lastResult;
+  // Return a wrapper function.
+  return function (...args) {
+    // If we have not reached the limit yet,
+    // invoke the original callback.
+    if (callCount < n) {
+      callCount++;
+      // Preserve both:
+      // 1. `this` binding
+      // 2. function arguments
+      lastResult = func.apply(this, args);
+    }
+
+    // Once limit is reached,
+    // always return the last computed result.
+    return lastResult;
+  };
+}
+
+/**
+let i = 1;
+
+function incrementBy(value) {
+  i += value;
+  return i;
+}
+
+const incrementByAtMostThrice = limit(incrementBy, 3);
+incrementByAtMostThrice(2); // i is now 3; The function returns 3.
+incrementByAtMostThrice(3); // i is now 6; The function returns 6.
+incrementByAtMostThrice(4); // i is now 10; The function returns 10.
+incrementByAtMostThrice(5); // i is still 10 as this is the 4th invocation; The function returns 10 as it's the result of the last invocation.
+i = 4;
+incrementByAtMostThrice(2); // i is still 4 as it is not modified. The function still returns 10.
+
+ */
+~~~

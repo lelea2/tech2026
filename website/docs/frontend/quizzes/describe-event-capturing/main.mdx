@@ -1,0 +1,191 @@
+---
+title: Describe event capturing in JavaScript and browsers
+---
+
+## TL;DR
+
+Event capturing is a lesser-used counterpart to [event bubbling](../describe-event-bubbling/main) in the DOM event propagation mechanism. It follows the opposite order, where an event triggers first on the ancestor element and then travels down to the target element.
+
+Event capturing is rarely used as compared to event bubbling, but it can be used in specific scenarios where you need to intercept events at a higher level before they reach the target element. It is disabled by default but can be enabled through an option on `addEventListener()`.
+
+---
+
+## What is event capturing?
+
+Event capturing is a propagation mechanism in the DOM (Document Object Model) where an event, such as a click or a keyboard event, is first triggered at the root of the document and then flows down through the DOM tree to the target element.
+
+Capturing has a higher priority than bubbling, meaning that capturing event handlers are executed before bubbling event handlers, as shown by the phases of event propagation:
+
+- **Capturing phase**: The event moves down towards the target element
+- **Target phase**: The event reaches the target element
+- **Bubbling phase**: The event bubbles up from the target element
+
+Note that event capturing is disabled by default. To enable it, you have to pass the capture option into `addEventListener()`.
+
+## Capturing phase
+
+During the capturing phase, the event starts at the document root and propagates down to the target element. Any event listeners on ancestor elements in this path will be triggered before the target element's handler. Note that event capturing will not happen unless the third argument of `addEventListener()` is set to `true` as shown below (the default value is `false`).
+
+Here's an example using modern ES2015 syntax to demonstrate event capturing:
+
+```js
+// HTML:
+// <div id="parent">
+//   <button id="child">Click me!</button>
+// </div>
+
+const parent = document.getElementById('parent');
+const child = document.getElementById('child');
+
+parent.addEventListener(
+  'click',
+  () => {
+    console.log('Parent element clicked (capturing)');
+  },
+  true, // Set third argument to true for capturing
+);
+
+child.addEventListener('click', () => {
+  console.log('Child element clicked');
+});
+```
+
+When you click the "Click me!" button, it will trigger the parent element's capturing handler first, followed by the child element's handler.
+
+## Stopping propagation
+
+Event propagation can be stopped during the capturing phase using the `stopPropagation()` method. This prevents the event from traveling further down the DOM tree.
+
+```js
+// HTML:
+// <div id="parent">
+//   <button id="child">Click me!</button>
+// </div>
+
+const parent = document.getElementById('parent');
+const child = document.getElementById('child');
+
+parent.addEventListener(
+  'click',
+  (event) => {
+    console.log('Parent element clicked (capturing)');
+    event.stopPropagation(); // Stop event propagation
+  },
+  true,
+);
+
+child.addEventListener('click', () => {
+  console.log('Child element clicked');
+});
+```
+
+As a result of stopping event propagation, only the `parent` event listener will be called when you click the "Click me!" button, and the `child` event listener will never be called because event propagation has stopped at the `parent` element.
+
+## Predict the output: capture, target, bubble in order
+
+The complete event flow is the part candidates most often get wrong. The same `click` event passes through every ancestor on the way down (capture), arrives at the target, then walks back up (bubble). Here is the full sequence in one runnable example:
+
+```js live
+const grandparent = document.createElement('div');
+const parent = document.createElement('div');
+const child = document.createElement('button');
+grandparent.appendChild(parent);
+parent.appendChild(child);
+document.body.appendChild(grandparent);
+
+// Capture handlers (third arg = true)
+grandparent.addEventListener(
+  'click',
+  () => console.log('1. grandparent capture'),
+  true,
+);
+parent.addEventListener('click', () => console.log('2. parent capture'), true);
+
+// Target handler (default: bubble phase)
+child.addEventListener('click', () => console.log('3. target'));
+
+// Bubble handlers
+parent.addEventListener('click', () => console.log('4. parent bubble'));
+grandparent.addEventListener('click', () =>
+  console.log('5. grandparent bubble'),
+);
+
+child.click();
+// Output (in this exact order):
+// 1. grandparent capture
+// 2. parent capture
+// 3. target
+// 4. parent bubble
+// 5. grandparent bubble
+```
+
+The full picture: events go down, then up. Capture handlers fire from the root toward the target; bubble handlers fire from the target back toward the root. The target's own handler runs in the middle. (Listeners on the target itself fire in registration order regardless of the `capture` argument; the capture/bubble distinction only applies to ancestors.)
+
+## Bubbling vs capturing comparison
+
+|  | Capturing | Bubbling |
+| --- | --- | --- |
+| Phase order | First (down from root) | Last (up to root) |
+| `useCapture` argument | `true` (or `{ capture: true }`) | `false` (the default) |
+| Default behavior | Off; must opt in | On; every listener bubbles by default |
+| Effect of `event.stopPropagation()` | Stops the event before it reaches the target | Stops the event before higher ancestors see it |
+| Common use cases | Intercepting non-bubbling events; pre-empting child handlers; analytics | Most click, input, and change handlers; event delegation |
+
+## When to use the capture phase in real apps
+
+In practice, the capture phase is the right tool for three specific situations:
+
+1. **Delegating non-bubbling events.** `focus`, `blur`, `scroll`, and `mouseenter`/`mouseleave` do not bubble, but they are visible to ancestors during the capture phase. Adding `addEventListener('focus', handler, true)` to a form gives you a delegated focus listener for every input inside it.
+
+   ```js
+   form.addEventListener(
+     'focus',
+     (event) => {
+       highlightField(event.target);
+     },
+     true, // capture: catches focus events before they stop at the input
+   );
+   ```
+
+2. **Pre-empting child handlers** for analytics or feature gates. The capture phase runs before any child's bubble handler, so a region-wide "intercept clicks" listener can record the click (or block the action with `stopPropagation()`) before component code sees it.
+
+3. **Modal libraries that need first-look at clicks.** A modal dialog often listens at the document level with `capture: true` for outside-click dismissal. Using the bubble phase would let inner handlers call `stopPropagation()` and accidentally prevent the modal from closing.
+
+## `stopPropagation()` in capture vs bubble
+
+`stopPropagation()` blocks all subsequent phases, not just the next ancestor.
+
+```js live
+const outer = document.createElement('div');
+const inner = document.createElement('button');
+outer.appendChild(inner);
+document.body.appendChild(outer);
+
+outer.addEventListener(
+  'click',
+  (event) => {
+    console.log('outer capture: stopping here');
+    event.stopPropagation();
+  },
+  true,
+);
+inner.addEventListener('click', () => console.log('inner target'));
+outer.addEventListener('click', () => console.log('outer bubble'));
+
+inner.click();
+// Output: 'outer capture: stopping here'
+// The target handler and bubble handler are both skipped.
+```
+
+Calling `stopPropagation()` during the capture phase prevents the target's own handlers and every bubble-phase ancestor from running. This is useful for an "intercept and replace" pattern, but if the target needs to keep working, listen during the bubble phase instead.
+
+There is also `event.stopImmediatePropagation()`, which additionally prevents other listeners on the same element (registered in the same phase) from firing. Use it when multiple scripts add listeners to the same element and only one of them should run.
+
+## Further reading
+
+- [Event Capturing | MDN](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#event_capture)
+- [Bubbling and Capturing | JavaScript.info](https://javascript.info/bubbling-and-capturing)
+- [W3C DOM Level 3 Events Specification](https://www.w3.org/TR/DOM-Level-3-Events/#event-flow)
+---
+
+_Source: [greatfrontend/top-javascript-interview-questions](https://github.com/greatfrontend/top-javascript-interview-questions/blob/main/questions/describe-event-capturing/en-US.mdx)_
