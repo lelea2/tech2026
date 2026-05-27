@@ -380,6 +380,10 @@
       "hash": "c88b682014ea7bfc3d08a2f328b96ef283cfe097532165f57cc66938ae4525b5",
       "docRelative": "frontend/jsfunction/htmlModifier/classVarianceAuthority.mdx"
     },
+    "frontend/jsfunction/htmlModifier/htmlSerialize.js": {
+      "hash": "ca2fa1d6927f51b78720522d8cd1a31cecff4d5d2ddfebfa7d2483d23c0f511d",
+      "docRelative": "frontend/jsfunction/htmlModifier/htmlSerialize.mdx"
+    },
     "frontend/jsfunction/htmlModifier/identicalDOMTree.js": {
       "hash": "dc2f39838599232efe5a0303625abba2de7f9da9fd8cf55482e2c20f31b63251",
       "docRelative": "frontend/jsfunction/htmlModifier/identicalDOMTree.mdx"
@@ -403,10 +407,6 @@
     "frontend/jsfunction/htmlModifier/textBetweenNode.js": {
       "hash": "ff27528ff15ec3aeb3f4204cc74f86ebee82bf7358ef186a43a6622a1d714874",
       "docRelative": "frontend/jsfunction/htmlModifier/textBetweenNode.mdx"
-    },
-    "frontend/jsfunction/htmlSerialize.js": {
-      "hash": "2781462728bd6fdd0bda4cf1f4ebbe6720264c3b50d273d6b2c0e67df6714d34",
-      "docRelative": "frontend/jsfunction/htmlSerialize.mdx"
     },
     "frontend/jsfunction/inRange.js": {
       "hash": "cb1434275ca6054c87369c3aec353467ef6cb68793bdc7c2b52fce7ddb6a9c1f",
@@ -456,17 +456,21 @@
       "hash": "556195b8882613e377e73a54d09580b71928b34c2633c7239ed71bae4a036673",
       "docRelative": "frontend/jsfunction/makeCounter/makeCounterII.mdx"
     },
-    "frontend/jsfunction/mapAsync.js": {
-      "hash": "7022bdb39d759ef644d81d4a03c092620ebd2a778d4e76eb6f010a6e030ca39d",
-      "docRelative": "frontend/jsfunction/mapAsync.mdx"
+    "frontend/jsfunction/map/mapAsync.js": {
+      "hash": "a5d0dfdd0f860080fed9e48f5435586837f21a74e7df3f7b6a859beac3bbb70f",
+      "docRelative": "frontend/jsfunction/map/mapAsync.mdx"
     },
-    "frontend/jsfunction/mapAsyncWithRateLimit.js": {
-      "hash": "ba9eec807e7718759161cab4fc099dd53aac2fdd6657f5896ec2b2eff93c20f0",
-      "docRelative": "frontend/jsfunction/mapAsyncWithRateLimit.mdx"
+    "frontend/jsfunction/map/mapAsyncWithRateLimit.js": {
+      "hash": "4b153d17798a448f45aa4a82cd1bcb998e62f8e08a4fa8dcdc6c94ea323414b1",
+      "docRelative": "frontend/jsfunction/map/mapAsyncWithRateLimit.mdx"
     },
-    "frontend/jsfunction/mapWithHistory.js": {
-      "hash": "f2567ffdf1c8470f17922ca71f9b0b7155f5fec338ca7d4543ad40e9755e5f77",
-      "docRelative": "frontend/jsfunction/mapWithHistory.mdx"
+    "frontend/jsfunction/map/mapWithHistory.js": {
+      "hash": "f9d69b0bfe7b64767608033e6391a1973b567af7ffd5f24371c9325c403711e8",
+      "docRelative": "frontend/jsfunction/map/mapWithHistory.mdx"
+    },
+    "frontend/jsfunction/map/weakMap.js": {
+      "hash": "4ca6726dcb1ef14395fa83cf9bb39279f1752e0501da73d65a64683c888080d6",
+      "docRelative": "frontend/jsfunction/map/weakMap.mdx"
     },
     "frontend/jsfunction/mean.js": {
       "hash": "17cce513111445693552314d6bb8b9843e05dd6668bd7c7564a0e761830f6498",
@@ -749,7 +753,7 @@
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
-      "hash": "4b0f1174267eed1480e37534e92fa7ff4adc7549fc79b2977042dd27f64fad64",
+      "hash": "4e13e045ed775a2fe1c6435365442d61ec70f9b7c753b6eb83efc070add85c20",
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/Emitter": {
@@ -777,7 +781,7 @@
       "docRelative": "frontend/jsfunction/hooks/_index.mdx"
     },
     "__nav__:frontend/jsfunction/htmlModifier": {
-      "hash": "20bc12c5bf25f2de2a55dbfcf33f0edbaf5e78d412e4a4eea7b64e4267d4bbc8",
+      "hash": "db778394b452452ccb630a696dd6c09a97245068c1e2faedde9d55b31d8502b7",
       "docRelative": "frontend/jsfunction/htmlModifier/_index.mdx"
     },
     "__nav__:frontend/jsfunction/jsonStringify": {
@@ -787,6 +791,10 @@
     "__nav__:frontend/jsfunction/makeCounter": {
       "hash": "5633773ab825136a7958d7b4770b0dce70c763425bd6e500dd2a80303e2832fd",
       "docRelative": "frontend/jsfunction/makeCounter/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/map": {
+      "hash": "050b771e345d2ebe9dda052c21b13bf6697f50e2846e10c4a0642abff065c0f7",
+      "docRelative": "frontend/jsfunction/map/_index.mdx"
     },
     "__nav__:frontend/jsfunction/object": {
       "hash": "8b85cd659b36c1fcfa4cc20f3fe466ce2009352e7a29b50cd64126da58fd0023",
