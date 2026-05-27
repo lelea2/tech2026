@@ -44,6 +44,10 @@
       "hash": "6b6630befb0c6dc0364526f3aa7c189da2fd19e13f681267f854c5603275d5f0",
       "docRelative": "frontend/jsfunction/array/Array.ptotype.map.mdx"
     },
+    "frontend/jsfunction/array/countBy.js": {
+      "hash": "fc12edd94ce4aa8d7966276f32e9fb4f39231179cdd91a4fded17120b8d36123",
+      "docRelative": "frontend/jsfunction/array/countBy.mdx"
+    },
     "frontend/jsfunction/array/dropRightWhile.js": {
       "hash": "3bd6e55bef82d6ca3034008c66a914a184a9f4aa44d1a106fcacadeff6d63af2",
       "docRelative": "frontend/jsfunction/array/dropRightWhile.mdx"
@@ -68,9 +72,21 @@
       "hash": "02bbad3eb1d714a644485867a1e48c17bdc5ce54e62cdf03132e6a225cf5fa9f",
       "docRelative": "frontend/jsfunction/array/flattenArray.mdx"
     },
+    "frontend/jsfunction/array/groupBy.js": {
+      "hash": "f4fa97b353f3409541323d9e545a1ca92c3206d0bb53e7183c3dce484363bc39",
+      "docRelative": "frontend/jsfunction/array/groupBy.mdx"
+    },
     "frontend/jsfunction/array/intersection.js": {
       "hash": "cb8192d033d643ffad8f88914d247b317945f18ab2f20ddbbf39812ab889a67e",
       "docRelative": "frontend/jsfunction/array/intersection.mdx"
+    },
+    "frontend/jsfunction/array/intersectionBy.js": {
+      "hash": "32fb3847a68610f5d126b9f6b169ec0f6c47f57cfe16c4d284d691701e630155",
+      "docRelative": "frontend/jsfunction/array/intersectionBy.mdx"
+    },
+    "frontend/jsfunction/array/intersectionWith.js": {
+      "hash": "5c6de0ed1eb58067a2443648407590fc91fc5432ed6b22d6e5d10a0bf14ab014",
+      "docRelative": "frontend/jsfunction/array/intersectionWith.mdx"
     },
     "frontend/jsfunction/array/kRowPascalTriangle.js": {
       "hash": "1d39811dc7b9366637a5e69f93b1f62261b23f10a944a971db303fdbd915d5de",
@@ -641,7 +657,7 @@
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/array": {
-      "hash": "8480ff4324d441ea7033d01e099bdc7cd986051ca98d5ba33b10e6ffb5fb5563",
+      "hash": "736f9ac1cf3c1d0fc1946818d27740e65f4d53c445cfb02ee982d4c741fdccaf",
       "docRelative": "frontend/jsfunction/array/_index.mdx"
     },
     "__nav__:frontend/jsfunction/curry": {

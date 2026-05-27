@@ -1,0 +1,83 @@
+/**
+ * Returns the intersection of arrays
+ * based on transformed iteratee values.
+ *
+ * The returned values are ORIGINAL values
+ * from the first array.
+ *
+ * Time Complexity:
+ * O(n * k)
+ * where:
+ * n = size of first array
+ * k = number of arrays
+ *
+ * @param {(value: any) => any} iteratee
+ * @param {...Array} arrays
+ * @returns {Array}
+ */
+export default function intersectionBy(iteratee, ...arrays) {
+  // No arrays
+  if (arrays.length === 0) {
+    return [];
+  }
+
+  // Single array -> return copy
+  if (arrays.length === 1) {
+    return [...arrays[0]];
+  }
+
+  const [firstArray, ...restArrays] = arrays;
+
+  // Create transformed lookup sets
+  const transformedSets = restArrays.map((arr) => {
+    return new Set(arr.map(iteratee));
+  });
+
+  const result = [];
+  const seen = new Set();
+
+  for (const item of firstArray) {
+    const transformed = iteratee(item);
+
+    // Prevent duplicates in final result
+    if (seen.has(transformed)) {
+      continue;
+    }
+
+    // Check if transformed value exists
+    // in every other array
+    const existsInAll = transformedSets.every((set) =>
+      set.has(transformed),
+    );
+
+    if (existsInAll) {
+      result.push(item);
+      seen.add(transformed);
+    }
+  }
+
+  return result;
+}
+
+/**
+Examples
+
+// Get the intersection based on the floor value of each number
+const result = intersectionBy(Math.floor, [1.2, 2.4], [2.5, 3.6]);
+// Compares floored values ([1, 2] vs [2, 3]). Common floor value is 2.
+// Original value from the first array that floors to 2 is 2.4.
+// => [2.4]
+
+// Get the intersection based on the lowercase value of each string
+const result2 = intersectionBy(
+  (str) => str.toLowerCase(),
+  ['apple', 'banana', 'ORANGE', 'orange'],
+  ['Apple', 'Banana', 'Orange'],
+);
+// Common lowercase results are 'apple', 'banana', 'orange'.
+// Returns corresponding first-occurrence originals from the first array: 'apple', 'banana', 'ORANGE'.
+// => ['apple', 'banana', 'ORANGE']
+
+// Single array case
+intersectionBy(Math.floor, [1, 2.5, 3]); // => [1, 2.5, 3]
+ */
