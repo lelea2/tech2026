@@ -1,0 +1,37 @@
+---
+title: minBy
+---
+
+# minBy
+
+~~~javascript
+/**
+ * @param {Array} array The array to iterate over.
+ * @param {Function} iteratee The iteratee invoked per element.
+ * @returns {*} Returns the minimum value.
+ */
+export default function minBy(array, iteratee) {
+  if (array.length === 0) {
+    return undefined;
+  }
+
+  let minItem;
+  let minValue;
+
+  for (const item of array) {
+    const value = iteratee(item);
+
+    // Skip undefined results
+    if (value === undefined) {
+      continue;
+    }
+
+    if (minItem === undefined || value < minValue) {
+      minItem = item;
+      minValue = value;
+    }
+  }
+
+  return minItem;
+}
+~~~

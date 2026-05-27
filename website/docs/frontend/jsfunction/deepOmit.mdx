@@ -1,0 +1,78 @@
+---
+title: deepOmit
+---
+
+# deepOmit
+
+~~~javascript
+/**
+ * Recursively removes specified keys
+ * from nested objects and arrays.
+ *
+ * Time Complexity:
+ * O(n) where n is total number of properties/elements.
+ *
+ * Space Complexity:
+ * O(n) due to creating a new deep structure.
+ *
+ * @param {*} obj
+ * @param {string[]} keys
+ * @returns {*}
+ */
+export default function deepOmit(obj, keys) {
+  // Convert keys array into Set for fast lookup.
+  const omitSet = new Set(keys);
+
+  /**
+   * Recursive DFS helper.
+   */
+  function omit(value) {
+    // Handle arrays:
+    // recursively process every item.
+    if (Array.isArray(value)) {
+      return value.map(omit);
+    }
+
+    // Handle objects (excluding null).
+    if (
+      value !== null &&
+      typeof value === 'object'
+    ) {
+      const result = {};
+
+      // Iterate through own enumerable keys.
+      for (const key of Object.keys(value)) {
+        // Skip keys that should be removed.
+        if (omitSet.has(key)) {
+          continue;
+        }
+
+        // Recursively process nested values.
+        result[key] = omit(value[key]);
+      }
+
+      return result;
+    }
+
+    // Primitive values are returned directly.
+    return value;
+  }
+
+  return omit(obj);
+}
+
+// deepOmit({ a: 1, b: 2, c: 3 }, ['b']); // { a: 1, c: 3 }
+// deepOmit({ a: 1, b: 2, c: 3 }, ['b', 'c']); // { a: 1 }
+/*
+const obj = {
+  a: 1,
+  b: 2,
+  c: {
+    d: 3,
+    e: 4,
+  },
+  f: [5, 6],
+};
+deepOmit(obj, ['b', 'c', 'e']); // { a: 1, f: [5, 6] }
+*/
+~~~

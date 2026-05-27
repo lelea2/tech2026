@@ -20,10 +20,6 @@
       "hash": "b598a55a8eb2d18b7d16ba33896af1906edead859078d277fb60490ea0c64905",
       "docRelative": "frontend/jsfunction/Function.prototype.call.mdx"
     },
-    "frontend/jsfunction/UndoRedoManager.js": {
-      "hash": "88dbb579c64b042cce20cc819e78e51ecfe9bdd72e54ca170674f032f252b71a",
-      "docRelative": "frontend/jsfunction/UndoRedoManager.mdx"
-    },
     "frontend/jsfunction/array/Array.prototype.at.js": {
       "hash": "db446548c8ed4c701c5d90718ebe0a1b4b7ba2493177e89136f04470d8ae1c3c",
       "docRelative": "frontend/jsfunction/array/Array.prototype.at.mdx"
@@ -600,6 +596,14 @@
       "hash": "42b65828c15a9f6f767dfff22c8ab095d8777454cef324863dd5e28d11c8ec50",
       "docRelative": "frontend/jsfunction/readingOrder.mdx"
     },
+    "frontend/jsfunction/schemaValidator/schemaValidator.js": {
+      "hash": "6d0c1e2890f4003c59ae295534321439833df0885d1e795b5dda3bdd714a1189",
+      "docRelative": "frontend/jsfunction/schemaValidator/schemaValidator.mdx"
+    },
+    "frontend/jsfunction/schemaValidator/schemaValidatorII.js": {
+      "hash": "f1eadeb1bbec76669bb7d098f806b6eaea04fa3b4d68f913f79deaf471937161",
+      "docRelative": "frontend/jsfunction/schemaValidator/schemaValidatorII.mdx"
+    },
     "frontend/jsfunction/singleton.js": {
       "hash": "e5c30f6162479cf3a2ea1da729d630c9e72038ebe3265b166d8d32f90cbe70db",
       "docRelative": "frontend/jsfunction/singleton.mdx"
@@ -647,6 +651,10 @@
     "frontend/jsfunction/typeUtilitiesII.js": {
       "hash": "c767632e6a2600d1eedc8b4e6d49a8c3e546e68bf56592afa41ea757fb800630",
       "docRelative": "frontend/jsfunction/typeUtilitiesII.mdx"
+    },
+    "frontend/jsfunction/undoRedoManager/UndoRedoManager.js": {
+      "hash": "b6415de48788e14c8d24df0480fffb42f6a34dbfb5e32f0aa16369dbd31d441a",
+      "docRelative": "frontend/jsfunction/undoRedoManager/UndoRedoManager.mdx"
     },
     "algorithm/array/kRowPascalTriangle.py": {
       "hash": "c3594094add1189a12c514811274cc91ff579752522c1753b82f155d71b54528",
@@ -725,7 +733,7 @@
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
-      "hash": "b89fb69bc078276db4f3a10291a1e1610e5530e8066232e568fd54f98cfc6d12",
+      "hash": "8dbec2f22e311f485b2e41e0a1656e64ca2c3a85ccb6791b6cfcd1995e3976f0",
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/Emitter": {
@@ -780,6 +788,10 @@
       "hash": "d6dfe80f32a738eb96c08cfee2b9a40993df6d5eee154e8d2601860b5b8970a9",
       "docRelative": "frontend/jsfunction/range/_index.mdx"
     },
+    "__nav__:frontend/jsfunction/schemaValidator": {
+      "hash": "8e62fcc6c6bdc73ae9694fbbdd3b28ad313d3634dd1582b1e130b021ffb54a30",
+      "docRelative": "frontend/jsfunction/schemaValidator/_index.mdx"
+    },
     "__nav__:frontend/jsfunction/spreadSheet": {
       "hash": "71a61f136f12f624d49a251c8f83a6a39fc6c216aa14ecc33e9ab699ebcf3036",
       "docRelative": "frontend/jsfunction/spreadSheet/_index.mdx"
@@ -787,6 +799,10 @@
     "__nav__:frontend/jsfunction/textSearch": {
       "hash": "5d2bf779df92e7216cec41ec8a824f500b64a457f801c059df76e1e2849db525",
       "docRelative": "frontend/jsfunction/textSearch/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/undoRedoManager": {
+      "hash": "f21ca657f4f3e9289ff1068b4ca7f2d12d6c69c9d86682887282d7798d8d864a",
+      "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
     }
   }
 }

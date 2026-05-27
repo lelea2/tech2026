@@ -1,12 +1,12 @@
 {
   "files": {
-    "frontend/jsfunction/EventEmitter.js": {
-      "hash": "661898a85863be1554b3c439765c2b3b0e10a114f5528795aeaf78ade2854088",
-      "docRelative": "jsfunction/EventEmitter.mdx"
+    "frontend/jsfunction/Emitter/EventEmitter.js": {
+      "hash": "4826c4a95cbac56fc3d96dd495cfc93d3aa4a7b12a00ba1ded29e60f1b144c9b",
+      "docRelative": "jsfunction/Emitter/EventEmitter.mdx"
     },
-    "frontend/jsfunction/EventEmitterII.js": {
-      "hash": "30fcc41b3775ee3f9d560aab058fa92e15b748edd48833cca195f302386c0814",
-      "docRelative": "jsfunction/EventEmitterII.mdx"
+    "frontend/jsfunction/Emitter/EventEmitterII.js": {
+      "hash": "8969b8fc6d266a1a90c51402cd3d812381643ef85343813b27a74ebe98fa0660",
+      "docRelative": "jsfunction/Emitter/EventEmitterII.mdx"
     },
     "frontend/jsfunction/Function.prototype.apply.js": {
       "hash": "3cda639dbf6e76f6082616b629fea342a146342609a33a63f1eb618a198e7bd8",
@@ -17,7 +17,7 @@
       "docRelative": "jsfunction/Function.prototype.bind.mdx"
     },
     "frontend/jsfunction/Function.prototype.call.js": {
-      "hash": "8a6804003efaa0da537f4c193b94d047ecd49c1fa4b7de4c3bd53c620615e349",
+      "hash": "b598a55a8eb2d18b7d16ba33896af1906edead859078d277fb60490ea0c64905",
       "docRelative": "jsfunction/Function.prototype.call.mdx"
     },
     "frontend/jsfunction/array/Array.prototype.at.js": {
@@ -41,20 +41,92 @@
       "docRelative": "jsfunction/array/Array.prototype.square.mdx"
     },
     "frontend/jsfunction/array/Array.ptotype.map.js": {
-      "hash": "9ac243f61d86a2b9206c0dad1c7eb2089b2f8bd72b38fe46c4dccda589950d07",
+      "hash": "6b6630befb0c6dc0364526f3aa7c189da2fd19e13f681267f854c5603275d5f0",
       "docRelative": "jsfunction/array/Array.ptotype.map.mdx"
+    },
+    "frontend/jsfunction/array/compact.js": {
+      "hash": "51ef08b22fcaf8005eea63e5477674c02a38772995a6a40892889cfba43d130f",
+      "docRelative": "jsfunction/array/compact.mdx"
+    },
+    "frontend/jsfunction/array/compactII.js": {
+      "hash": "0af20c0ca042b3ddb0bd00b281cd30f603e03c8915994fd5de90561046224fa3",
+      "docRelative": "jsfunction/array/compactII.mdx"
+    },
+    "frontend/jsfunction/array/countBy.js": {
+      "hash": "fc12edd94ce4aa8d7966276f32e9fb4f39231179cdd91a4fded17120b8d36123",
+      "docRelative": "jsfunction/array/countBy.mdx"
+    },
+    "frontend/jsfunction/array/dropRightWhile.js": {
+      "hash": "3bd6e55bef82d6ca3034008c66a914a184a9f4aa44d1a106fcacadeff6d63af2",
+      "docRelative": "jsfunction/array/dropRightWhile.mdx"
+    },
+    "frontend/jsfunction/array/dropWhile.js": {
+      "hash": "bc898ce8a55ff9041c7a35201b96d21eef4a4157ddbb9ea0765cd4543cbe2547",
+      "docRelative": "jsfunction/array/dropWhile.mdx"
+    },
+    "frontend/jsfunction/array/fill.js": {
+      "hash": "1c84cbc0a969c975d2691170718b8cc22dc15872c5648e2398c4279d16ba85cb",
+      "docRelative": "jsfunction/array/fill.mdx"
+    },
+    "frontend/jsfunction/array/findIndex.js": {
+      "hash": "be108f1dad942960ac92c78c04ffd0da8252274bad4776f43c044c08804a3d15",
+      "docRelative": "jsfunction/array/findIndex.mdx"
+    },
+    "frontend/jsfunction/array/findLastIndex.js": {
+      "hash": "0a54360345dcfbb7758c8b80b87a8828701c63db80814c3d99e3d9f97ae2d426",
+      "docRelative": "jsfunction/array/findLastIndex.mdx"
     },
     "frontend/jsfunction/array/flattenArray.js": {
       "hash": "02bbad3eb1d714a644485867a1e48c17bdc5ce54e62cdf03132e6a225cf5fa9f",
       "docRelative": "jsfunction/array/flattenArray.mdx"
     },
+    "frontend/jsfunction/array/groupBy.js": {
+      "hash": "f4fa97b353f3409541323d9e545a1ca92c3206d0bb53e7183c3dce484363bc39",
+      "docRelative": "jsfunction/array/groupBy.mdx"
+    },
+    "frontend/jsfunction/array/intersection.js": {
+      "hash": "cb8192d033d643ffad8f88914d247b317945f18ab2f20ddbbf39812ab889a67e",
+      "docRelative": "jsfunction/array/intersection.mdx"
+    },
+    "frontend/jsfunction/array/intersectionBy.js": {
+      "hash": "32fb3847a68610f5d126b9f6b169ec0f6c47f57cfe16c4d284d691701e630155",
+      "docRelative": "jsfunction/array/intersectionBy.mdx"
+    },
+    "frontend/jsfunction/array/intersectionWith.js": {
+      "hash": "5c6de0ed1eb58067a2443648407590fc91fc5432ed6b22d6e5d10a0bf14ab014",
+      "docRelative": "jsfunction/array/intersectionWith.mdx"
+    },
     "frontend/jsfunction/array/kRowPascalTriangle.js": {
       "hash": "1d39811dc7b9366637a5e69f93b1f62261b23f10a944a971db303fdbd915d5de",
       "docRelative": "jsfunction/array/kRowPascalTriangle.mdx"
     },
+    "frontend/jsfunction/array/maxBy.js": {
+      "hash": "c4f694f7f3d9a31df5aa79506b1851a3d4060a51ba1a2970ee8686f6a9f03335",
+      "docRelative": "jsfunction/array/maxBy.mdx"
+    },
+    "frontend/jsfunction/array/minBy.js": {
+      "hash": "a934405e1b1f7cd1400a5db78ae605b58ebf309809cb525a4b2adc1537507fd8",
+      "docRelative": "jsfunction/array/minBy.mdx"
+    },
+    "frontend/jsfunction/array/once.js": {
+      "hash": "c8af59ac000b7b502c6320b199de95af3ad0ad6b67f8daa7bf1ceeb064bb07f7",
+      "docRelative": "jsfunction/array/once.mdx"
+    },
+    "frontend/jsfunction/array/turtle.js": {
+      "hash": "95dbc24ab5ec418e4afccdf1e4074f0dda3235932041e9b7bda7b724827e9319",
+      "docRelative": "jsfunction/array/turtle.mdx"
+    },
+    "frontend/jsfunction/array/unionBy.js": {
+      "hash": "ee9ccec4451ae7204dfd4cce6cd2c69c220b094e6f657612262948aa99ebff82",
+      "docRelative": "jsfunction/array/unionBy.mdx"
+    },
     "frontend/jsfunction/array/uniqueArray.js": {
       "hash": "b4bd05d46458a737a7d946021c082520c9f47e3e9c883b77e826fb45c08167f7",
       "docRelative": "jsfunction/array/uniqueArray.mdx"
+    },
+    "frontend/jsfunction/camelCaseKey.js": {
+      "hash": "e8db68b46173e5988851e8fc78a99d7b8703a3645d6338599b08b61a3440868f",
+      "docRelative": "jsfunction/camelCaseKey.mdx"
     },
     "frontend/jsfunction/cancellableInterval.js": {
       "hash": "1278a2e8236b8cac2abbe7498b5f8c93f6fd6d3638fa61d41af0de6490513f57",
@@ -72,18 +144,6 @@
       "hash": "666d9bfd7bb82a3e5fe523dcf8f1e0057d2948d40d1d71ea7f6d89d4adc0c905",
       "docRelative": "jsfunction/clamp.mdx"
     },
-    "frontend/jsfunction/classNames.js": {
-      "hash": "07711fd28ee997ea5c57ed5c26b73f066fd237dc188d41ec2ba543423036cc72",
-      "docRelative": "jsfunction/classNames.mdx"
-    },
-    "frontend/jsfunction/classNamesAdvance.js": {
-      "hash": "55f425d054249466b2e041273cd17b3a266085dcdf1af48ed49d45b2fafbdbff",
-      "docRelative": "jsfunction/classNamesAdvance.mdx"
-    },
-    "frontend/jsfunction/compact.js": {
-      "hash": "1b0e2bc9007bc15489414726c0594351efdfd63e05937d5a2c5000692eabe6bc",
-      "docRelative": "jsfunction/compact.mdx"
-    },
     "frontend/jsfunction/compose.js": {
       "hash": "1e7ccab4f5e4cb08e89523b7749de3adc953559870b90d2ad899fdaa09c801b6",
       "docRelative": "jsfunction/compose.mdx"
@@ -91,6 +151,10 @@
     "frontend/jsfunction/consoleLogHistory.js": {
       "hash": "d15f81cf2c2ccda68f89070724aedad2955f3a60c72c20c4ab91f50be5d8c1bc",
       "docRelative": "jsfunction/consoleLogHistory.mdx"
+    },
+    "frontend/jsfunction/createResumableInterval.js": {
+      "hash": "3383a7ec634e687d22ef312de278d45c9ef6b7d5aa562b42a23c17b04e0b6d2c",
+      "docRelative": "jsfunction/createResumableInterval.mdx"
     },
     "frontend/jsfunction/curry/curry.js": {
       "hash": "e15ccc80a47238c0995932be85c636b4b9a23500240e03c513cb043b939a4ead",
@@ -107,6 +171,10 @@
     "frontend/jsfunction/cycle.js": {
       "hash": "a9f22ae987eb467c024bf6329287890f9c422c206b53196ba9910607fce508a8",
       "docRelative": "jsfunction/cycle.mdx"
+    },
+    "frontend/jsfunction/cyclicJSON.js": {
+      "hash": "8e48641b4d5dc146ec3d2625598363636d1e8c7cb4c58aaf7da76401821b360e",
+      "docRelative": "jsfunction/cyclicJSON.mdx"
     },
     "frontend/jsfunction/dataMerge.js": {
       "hash": "1bf24e525b354a15f804cc58180a667213e4351d6895b9f7ad3d3c2fe20f9d02",
@@ -135,6 +203,14 @@
     "frontend/jsfunction/deepEqual.js": {
       "hash": "6938c809658e84ed62956bcdd5f5377206d8bfe928f4d8b329864662f0561c75",
       "docRelative": "jsfunction/deepEqual.mdx"
+    },
+    "frontend/jsfunction/deepMerge.js": {
+      "hash": "91e0a020471409197d820a1dabc65e474a02d4cc7a379f03ad6628f0d748b572",
+      "docRelative": "jsfunction/deepMerge.mdx"
+    },
+    "frontend/jsfunction/deepOmit.js": {
+      "hash": "c00e1beac6bdbe6115902801bddc9a6507ffe5e943d2c0b22c6ac94829472618",
+      "docRelative": "jsfunction/deepOmit.mdx"
     },
     "frontend/jsfunction/difference.js": {
       "hash": "55fd34c67dc748ac51cd1deaed397ce61d6e24385f411716202c418bf1d3cf50",
@@ -292,9 +368,53 @@
       "hash": "faa7f291edb163b5074561af1eb42023841035ad1a44bce0088f073420799718",
       "docRelative": "jsfunction/hooks/useWindowResize.mdx"
     },
+    "frontend/jsfunction/htmlModifier/classNames.js": {
+      "hash": "783891181e78093e1c0c75c5e6f34afbf7baa6b182e6383243d1eba0fd6c70eb",
+      "docRelative": "jsfunction/htmlModifier/classNames.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/classNamesAdvance.js": {
+      "hash": "60a161a385ef139b81b29796f232fc088dc95984818799365d228bb484b4390e",
+      "docRelative": "jsfunction/htmlModifier/classNamesAdvance.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/classVarianceAuthority.js": {
+      "hash": "c88b682014ea7bfc3d08a2f328b96ef283cfe097532165f57cc66938ae4525b5",
+      "docRelative": "jsfunction/htmlModifier/classVarianceAuthority.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/identicalDOMTree.js": {
+      "hash": "dc2f39838599232efe5a0303625abba2de7f9da9fd8cf55482e2c20f31b63251",
+      "docRelative": "jsfunction/htmlModifier/identicalDOMTree.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/lowestHidingElement.js": {
+      "hash": "4493b80336277cc836d3380af9f29ee7ce617bc8349658a2d442abed3600777a",
+      "docRelative": "jsfunction/htmlModifier/lowestHidingElement.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/richText.js": {
+      "hash": "f2f64e3f52cde0479aedd3834b045f380aca42021b453fe1c5ab9ae33a89d36e",
+      "docRelative": "jsfunction/htmlModifier/richText.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/sanitizeHTML.js": {
+      "hash": "2a3a55b49a375dbb189c5aa633316ef0195542d0c981ce7d70ff2598b2f313fc",
+      "docRelative": "jsfunction/htmlModifier/sanitizeHTML.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/tableOfContent.js": {
+      "hash": "68bc221ec4b04cae0d92ad509021ac9eb6bfacbaa1cebcc61475d1c2f0707f6f",
+      "docRelative": "jsfunction/htmlModifier/tableOfContent.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/textBetweenNode.js": {
+      "hash": "ff27528ff15ec3aeb3f4204cc74f86ebee82bf7358ef186a43a6622a1d714874",
+      "docRelative": "jsfunction/htmlModifier/textBetweenNode.mdx"
+    },
     "frontend/jsfunction/htmlSerialize.js": {
       "hash": "2781462728bd6fdd0bda4cf1f4ebbe6720264c3b50d273d6b2c0e67df6714d34",
       "docRelative": "jsfunction/htmlSerialize.mdx"
+    },
+    "frontend/jsfunction/inRange.js": {
+      "hash": "cb1434275ca6054c87369c3aec353467ef6cb68793bdc7c2b52fce7ddb6a9c1f",
+      "docRelative": "jsfunction/inRange.mdx"
+    },
+    "frontend/jsfunction/isEmpty.js": {
+      "hash": "54f8e6838245b472bcc08c3274eca3891d8f414a614062c4813da011a8e119bf",
+      "docRelative": "jsfunction/isEmpty.mdx"
     },
     "frontend/jsfunction/jQuery.css.js": {
       "hash": "bfd0457965d1487bc9ceee85b0179c713c784bf7372bb063143586a2ec028004",
@@ -316,6 +436,10 @@
       "hash": "f0da253c138c093cbdfa67ddf57ae49eb7e5fd49683bc10b2940f32ad76eba39",
       "docRelative": "jsfunction/jsonStringify/superJSONAdvance.mdx"
     },
+    "frontend/jsfunction/limits.js": {
+      "hash": "3343bd68c658b2bd9cc37e8a3e52d7888729c705a99b908b8e0482f0fe2b8675",
+      "docRelative": "jsfunction/limits.mdx"
+    },
     "frontend/jsfunction/listFormat.js": {
       "hash": "21a5358c25483ca4364b64a977497b28ac6bc0c314f1a5ab3f7801faa5a7fc5c",
       "docRelative": "jsfunction/listFormat.mdx"
@@ -324,9 +448,13 @@
       "hash": "24dd5401a65b45722ebbeaa06fa0617eb26d088ae4ecd3a55caf65a6e8fdb051",
       "docRelative": "jsfunction/localStorageWithExpiry.mdx"
     },
-    "frontend/jsfunction/makeCounter.js": {
-      "hash": "e7d7a9e52f1a66f16cfb0be371b5133fc2ed627b7fb879a01de7af4ce53e91f5",
-      "docRelative": "jsfunction/makeCounter.mdx"
+    "frontend/jsfunction/makeCounter/makeCounter.js": {
+      "hash": "65291c5ad55c53861d413b9d6c7df94656605632904469444760a87edbbec7c7",
+      "docRelative": "jsfunction/makeCounter/makeCounter.mdx"
+    },
+    "frontend/jsfunction/makeCounter/makeCounterII.js": {
+      "hash": "556195b8882613e377e73a54d09580b71928b34c2633c7239ed71bae4a036673",
+      "docRelative": "jsfunction/makeCounter/makeCounterII.mdx"
     },
     "frontend/jsfunction/mapAsync.js": {
       "hash": "7022bdb39d759ef644d81d4a03c092620ebd2a778d4e76eb6f010a6e030ca39d",
@@ -363,6 +491,26 @@
     "frontend/jsfunction/numArguments.js": {
       "hash": "e4d26b1226938e3ce46331c299839cd0d31330ecaa8e67dfb067c51d187e8c3b",
       "docRelative": "jsfunction/numArguments.mdx"
+    },
+    "frontend/jsfunction/object/conformTo.js": {
+      "hash": "025cf4f8a29ffe8231d93b2eb9d44f99c9bc3782e4092ab63f575f8059efe442",
+      "docRelative": "jsfunction/object/conformTo.mdx"
+    },
+    "frontend/jsfunction/object/fromPairs.js": {
+      "hash": "c0ba1b4bcdf110fa4b8cf059a36d6b344997bfbefd62244b3366b6c8ac9aac06",
+      "docRelative": "jsfunction/object/fromPairs.mdx"
+    },
+    "frontend/jsfunction/object/objectMap.js": {
+      "hash": "ba16a423a16230245d94c16347509d085a4d28e34df5ed3f75a71d6471c44f6f",
+      "docRelative": "jsfunction/object/objectMap.mdx"
+    },
+    "frontend/jsfunction/object/squashObject.js": {
+      "hash": "be5c2ca7bf1f5e746cdf17ffa7a5b21f3cc85a06d0ff162793791589d26804e1",
+      "docRelative": "jsfunction/object/squashObject.mdx"
+    },
+    "frontend/jsfunction/object/unsquashObject.js": {
+      "hash": "b96cc54fd254592b67e8afeb13f2972d911e9221061de12691d3cdc33c12b011",
+      "docRelative": "jsfunction/object/unsquashObject.mdx"
     },
     "frontend/jsfunction/prismaORM/miniORM.js": {
       "hash": "618fa65741acd95646ea158845cc07154c0f44f30606eac0612767d1cc1ba234",
@@ -432,17 +580,37 @@
       "hash": "e0df6becc1a9001820ed77faceba0d55fab7f05ef4d3dac47cf729ffff251d89",
       "docRelative": "jsfunction/promise/promiseWithResolvers.mdx"
     },
+    "frontend/jsfunction/range/range.js": {
+      "hash": "1103b3a50f77c5293b1b18bfacfe1189e423a5fbba5c3eb2aa57291e7ed3b53e",
+      "docRelative": "jsfunction/range/range.mdx"
+    },
+    "frontend/jsfunction/range/rangeRight.js": {
+      "hash": "06cdee7df6efd29ab0d89df7695ba791c7ff18f7b5e2a14211509644f1828730",
+      "docRelative": "jsfunction/range/rangeRight.mdx"
+    },
     "frontend/jsfunction/rateLimiter.js": {
       "hash": "6753f24c3bb9939dd46fb087b1679ff051d3f03eba4634adc0cd27e24c7e849f",
       "docRelative": "jsfunction/rateLimiter.mdx"
     },
-    "frontend/jsfunction/richText.js": {
-      "hash": "ed05db5deab9f2b7f31f17837a09e251f23da8cfc799455b1a8a7eac1ed99c5f",
-      "docRelative": "jsfunction/richText.mdx"
+    "frontend/jsfunction/readingOrder.js": {
+      "hash": "42b65828c15a9f6f767dfff22c8ab095d8777454cef324863dd5e28d11c8ec50",
+      "docRelative": "jsfunction/readingOrder.mdx"
     },
-    "frontend/jsfunction/sanitizeHTML.js": {
-      "hash": "1382433d0525ebc5520121d6b822c888eca510028a3d012834716aa777aa561b",
-      "docRelative": "jsfunction/sanitizeHTML.mdx"
+    "frontend/jsfunction/schemaValidator/schemaValidator.js": {
+      "hash": "6d0c1e2890f4003c59ae295534321439833df0885d1e795b5dda3bdd714a1189",
+      "docRelative": "jsfunction/schemaValidator/schemaValidator.mdx"
+    },
+    "frontend/jsfunction/schemaValidator/schemaValidatorII.js": {
+      "hash": "f1eadeb1bbec76669bb7d098f806b6eaea04fa3b4d68f913f79deaf471937161",
+      "docRelative": "jsfunction/schemaValidator/schemaValidatorII.mdx"
+    },
+    "frontend/jsfunction/singleton.js": {
+      "hash": "e5c30f6162479cf3a2ea1da729d630c9e72038ebe3265b166d8d32f90cbe70db",
+      "docRelative": "jsfunction/singleton.mdx"
+    },
+    "frontend/jsfunction/size.js": {
+      "hash": "f1d7031ff0d7deefc6a309ed4e2a86c14f519638c093b045f7741f1acc5fb876",
+      "docRelative": "jsfunction/size.mdx"
     },
     "frontend/jsfunction/sleep.js": {
       "hash": "1c133a5e439f8412cf79933c4f033a4194183139204bffae9a0b1b36b1e25c5d",
@@ -459,6 +627,10 @@
     "frontend/jsfunction/spreadSheet/spreadSheetIII.js": {
       "hash": "1a2cd88fe88b8e41e748b5c50bb30374d95915960d0f9734c6bf89938b540b94",
       "docRelative": "jsfunction/spreadSheet/spreadSheetIII.mdx"
+    },
+    "frontend/jsfunction/sum.js": {
+      "hash": "df9c8fa223c79ad643398f7bb34a75bd1e38230ebe66e7a71d8f5d88c0d8be03",
+      "docRelative": "jsfunction/sum.mdx"
     },
     "frontend/jsfunction/textSearch/textSearch.js": {
       "hash": "2dec27133076b8a19af06048afdd51b0d26ff2b5f30e86c4bc89a43349a9a928",
@@ -480,12 +652,20 @@
       "hash": "c767632e6a2600d1eedc8b4e6d49a8c3e546e68bf56592afa41ea757fb800630",
       "docRelative": "jsfunction/typeUtilitiesII.mdx"
     },
+    "frontend/jsfunction/undoRedoManager/UndoRedoManager.js": {
+      "hash": "b6415de48788e14c8d24df0480fffb42f6a34dbfb5e32f0aa16369dbd31d441a",
+      "docRelative": "jsfunction/undoRedoManager/UndoRedoManager.mdx"
+    },
     "__nav__:jsfunction": {
-      "hash": "f98aef26a6dcddd66507425faacfc73ac6f4d0dad9c9ed846b659c81169b6cf0",
+      "hash": "8dbec2f22e311f485b2e41e0a1656e64ca2c3a85ccb6791b6cfcd1995e3976f0",
       "docRelative": "jsfunction/_index.mdx"
     },
+    "__nav__:jsfunction/Emitter": {
+      "hash": "19ccee1404d5bd8d4320969d52fa97df341cefe9de73106f57ad7687f1f21ad9",
+      "docRelative": "jsfunction/Emitter/_index.mdx"
+    },
     "__nav__:jsfunction/array": {
-      "hash": "12f5cb38d93cdd604c584b737a8601dd139d5aea4cc2b731ea8990f03e6a32c9",
+      "hash": "260401672b830d6611c359710e2866ad978620ca51032484a1c25aee3699c3c5",
       "docRelative": "jsfunction/array/_index.mdx"
     },
     "__nav__:jsfunction/curry": {
@@ -504,9 +684,21 @@
       "hash": "914900b9322529b7ef330f8ee3dbff0c046e2647c4b1fbf1f2ebaaea8258189f",
       "docRelative": "jsfunction/hooks/_index.mdx"
     },
+    "__nav__:jsfunction/htmlModifier": {
+      "hash": "20bc12c5bf25f2de2a55dbfcf33f0edbaf5e78d412e4a4eea7b64e4267d4bbc8",
+      "docRelative": "jsfunction/htmlModifier/_index.mdx"
+    },
     "__nav__:jsfunction/jsonStringify": {
       "hash": "55245a69dcf715674d00d38bb9a1d698753bccad11fe6aa0eedc8b62f232c00a",
       "docRelative": "jsfunction/jsonStringify/_index.mdx"
+    },
+    "__nav__:jsfunction/makeCounter": {
+      "hash": "5633773ab825136a7958d7b4770b0dce70c763425bd6e500dd2a80303e2832fd",
+      "docRelative": "jsfunction/makeCounter/_index.mdx"
+    },
+    "__nav__:jsfunction/object": {
+      "hash": "8b85cd659b36c1fcfa4cc20f3fe466ce2009352e7a29b50cd64126da58fd0023",
+      "docRelative": "jsfunction/object/_index.mdx"
     },
     "__nav__:jsfunction/prismaORM": {
       "hash": "8a4a19273873515148b69411814a233fa484107ea647d7dfb9137035469b434f",
@@ -516,6 +708,14 @@
       "hash": "84a79c6e07a4db2d87383dff0d9ebb4a969d9ed9dac64f2dc82c09d835909023",
       "docRelative": "jsfunction/promise/_index.mdx"
     },
+    "__nav__:jsfunction/range": {
+      "hash": "d6dfe80f32a738eb96c08cfee2b9a40993df6d5eee154e8d2601860b5b8970a9",
+      "docRelative": "jsfunction/range/_index.mdx"
+    },
+    "__nav__:jsfunction/schemaValidator": {
+      "hash": "8e62fcc6c6bdc73ae9694fbbdd3b28ad313d3634dd1582b1e130b021ffb54a30",
+      "docRelative": "jsfunction/schemaValidator/_index.mdx"
+    },
     "__nav__:jsfunction/spreadSheet": {
       "hash": "71a61f136f12f624d49a251c8f83a6a39fc6c216aa14ecc33e9ab699ebcf3036",
       "docRelative": "jsfunction/spreadSheet/_index.mdx"
@@ -523,6 +723,10 @@
     "__nav__:jsfunction/textSearch": {
       "hash": "5d2bf779df92e7216cec41ec8a824f500b64a457f801c059df76e1e2849db525",
       "docRelative": "jsfunction/textSearch/_index.mdx"
+    },
+    "__nav__:jsfunction/undoRedoManager": {
+      "hash": "f21ca657f4f3e9289ff1068b4ca7f2d12d6c69c9d86682887282d7798d8d864a",
+      "docRelative": "jsfunction/undoRedoManager/_index.mdx"
     }
   }
 }
