@@ -6,6 +6,18 @@ title: correspondingNode
 
 ~~~javascript
 /**
+ * Real-time collaboration apps like Google Docs and Figma often sync actions 
+ * between two webpages 
+ * that render the same DOM structure. 
+ * For example, hovering, selecting, or inspecting a node on one page 
+ * might require highlighting the corresponding node on the other page.
+---------------
+Implement correspondingNodeAcrossPages(rootA, rootB, target), 
+which takes the root nodes of two pages with the same DOM structure 
+and a target node inside rootA, then returns the node in rootB 
+at the same relative position.
+ */
+/**
  * @param {Node} rootA
  * @param {Node} rootB
  * @param {Node} target

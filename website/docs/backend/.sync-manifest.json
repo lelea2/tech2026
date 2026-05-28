@@ -1,0 +1,12 @@
+{
+  "files": {
+    "backend/quizzes/rest-vs-graphql-vs-gRPC.md": {
+      "hash": "8756d325f3f83de73a6802aee712cbfa3b0f6d2f14852b625748aab110102af6",
+      "docRelative": "quizzes/rest-vs-graphql-vs-gRPC.mdx"
+    },
+    "__nav__:quizzes": {
+      "hash": "ad58f68630476ea7bf8d9fff5e492620e7f26bcc211f9ebe3ad3a64359c3cc65",
+      "docRelative": "quizzes/_index.mdx"
+    }
+  }
+}

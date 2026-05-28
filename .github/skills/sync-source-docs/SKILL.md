@@ -1,6 +1,6 @@
 ---
 name: sync-source-docs
-description: Use when frontend, backend, or algorithm source files changed and docs need to be synced into website docs automatically. Also use when a custom folder format/path mapping is provided and document paths must be generated accordingly, including frontend/jsfunction, frontend/array, and separate algorithm navigation. Trigger phrases: sync docs, update documentation, refresh source docs, frontend changed, backend changed, algorithm changed, folder format mapping, jsfunction docs sync, algorithm docs sync, py js compare docs.
+description: Use when frontend, backend, or algorithm source files changed and docs need to be synced into website docs automatically. Also use when a custom folder format/path mapping is provided and document paths must be generated accordingly, including frontend/jsfunction, frontend/array, backend/quizzes, backend markdown/mdx content, and separate algorithm navigation. Trigger phrases: sync docs, update documentation, refresh source docs, frontend changed, backend changed, algorithm changed, folder format mapping, jsfunction docs sync, backend quizzes sync, backend md sync, algorithm docs sync, py js compare docs.
 ---
 
 # Sync Source Docs
@@ -36,6 +36,7 @@ Keep documentation in sync when files change under frontend, backend, or algorit
 - Do not generate mappings from only the currently changed files.
 - Do not map only selected child folders when a stable parent exists.
 - If any file under `frontend/jsfunction/**` is in scope, include `frontend/jsfunction=jsfunction`.
+- If any file under `backend/**` is in scope (including `backend/quizzes/**` and backend `.md`/`.mdx`), include `backend=.` for backend docs.
 - If any file under `algorithm/**` is in scope, include `algorithm=.` for algorithm docs.
 - This guarantees new sibling folders and moved files are reflected correctly on the next sync.
 
@@ -76,6 +77,14 @@ Canonical FrontEnd sync command (includes folders like `getElementBy`, `hooks`, 
 
 - cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"
 
+Sync backend docs as a separate navigation section (includes `backend/quizzes/**`, `backend/system-design/**`, and backend root `.md`/`.mdx` files):
+
+- cd website && npm run sync:source-docs -- --docs-subdir backend --format "backend=."
+
+This creates/updates:
+
+- website/docs/backend
+
 Sync algorithm docs as a separate navigation section:
 
 - cd website && npm run sync:source-docs -- --docs-subdir algorithm --format "algorithm=."
@@ -98,6 +107,10 @@ Run FrontEnd + Algorithm sync as two commands (separate docs subdirs):
 
 - cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"
 - cd website && npm run sync:source-docs -- --docs-subdir algorithm --format "algorithm=."
+
+Run Backend sync as a separate command (recommended):
+
+- cd website && npm run sync:source-docs -- --docs-subdir backend --format "backend=."
 
 Avoid narrow leaf-only mapping for main sync runs:
 
@@ -134,6 +147,7 @@ Mapping format rules:
 
 - Use a parent mapping, not only leaf mappings:
   - Good: `algorithm=.`
+  - Good: `backend=.`
   - Good: `frontend/jsfunction=jsfunction`
   - Risky: mapping only selected leaves (new siblings will be missed)
 - Re-run sync; post-hook should generate `/_index.mdx` pages for new folders automatically.
@@ -146,6 +160,16 @@ Mapping format rules:
   - `website/docs/frontend/jsfunction/textSearch/_index.mdx`
   - `website/docs/frontend/jsfunction/deepClone/_index.mdx`
 
+## Troubleshooting: Backend markdown/mdx or quizzes docs missing
+
+- Use stable parent mapping for backend docs: `--docs-subdir backend --format "backend=."`.
+- This includes:
+  - `backend/quizzes/**`
+  - any backend `.md`/`.mdx` file under `backend/**`
+- Source backend markdown and mdx files are generated as `.mdx` docs pages under `website/docs/backend/**`.
+- Folder navigation pages (`_index.mdx`) are generated for backend subfolders on sync.
+- If files were moved, rerun with the same mapping so stale old paths are removed.
+
 ## Expected Output
 
 The sync command prints a summary in this format:
@@ -157,6 +181,7 @@ The sync command prints a summary in this format:
 ## Notes
 
 - Every synced source file is rendered as an MDX page with a code block.
+- Backend markdown sources (`.md`/`.mdx`) are also emitted into MDX output pages and included in backend folder navigation.
 - If both `.py` and `.js` files share the same relative basename (for example `kRowPascalTriangle.py` + `kRowPascalTriangle.js`), they are merged into one MDX page with language tabs so readers can compare side-by-side in a single page.
 - Output filenames strip the source extension: `useBoolean.js` → `useBoolean.mdx` (never `useBoolean.js.mdx`).
 - Titles and headings also use the base name without extension (e.g. `useBoolean`, not `useBoolean.js`).

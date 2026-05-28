@@ -68,6 +68,7 @@ const config = {
       ({
         docs: {
           sidebarPath: './sidebars.js',
+          exclude: ['tutorial-basics/**', 'tutorial-extras/**'],
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
@@ -102,7 +103,7 @@ const config = {
             label: 'Algorithm',
           },
           {
-            to: '/docs/tutorial-extras/manage-docs-versions',
+            to: '/docs/backend',
             position: 'left',
             label: 'BackEnd',
           },

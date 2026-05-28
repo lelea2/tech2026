@@ -413,7 +413,7 @@
       "docRelative": "frontend/jsfunction/htmlModifier/classVarianceAuthority.mdx"
     },
     "frontend/jsfunction/htmlModifier/correspondingNode.js": {
-      "hash": "b2cd8f9c90cefe9924f7ded71bc02a7ea3af07dd56dbf90f6905907a07711fda",
+      "hash": "f97803a45eae4b138049b97a5ba774bd9343c797d3949cd3a126492311f8142d",
       "docRelative": "frontend/jsfunction/htmlModifier/correspondingNode.mdx"
     },
     "frontend/jsfunction/htmlModifier/htmlSerialize.js": {
@@ -744,6 +744,14 @@
       "hash": "6e749e687d72904f46c7f2a87afa97a01508cd034ec8367e095e8fec5381ec2e",
       "docRelative": "frontend/jsfunction/undoRedoManager/UndoRedoManagerWithDraftCommit.mdx"
     },
+    "frontend/uicoding/main.md": {
+      "hash": "3b3a8806784b1190b30eed8763b342f2dc2d1ff84317c55e1519fcc8a0596851",
+      "docRelative": "frontend/uicoding/main.mdx"
+    },
+    "backend/quizzes/rest-vs-graphql-vs-gRPC.md": {
+      "hash": "8756d325f3f83de73a6802aee712cbfa3b0f6d2f14852b625748aab110102af6",
+      "docRelative": "backend/quizzes/rest-vs-graphql-vs-gRPC.mdx"
+    },
     "algorithm/array/kRowPascalTriangle.py": {
       "hash": "c3594094add1189a12c514811274cc91ff579752522c1753b82f155d71b54528",
       "docRelative": "algorithm/array/kRowPascalTriangle.mdx"
@@ -816,8 +824,16 @@
       "hash": "f058dd483415f41dffc493974a2b2425cddb8492b87c35cde073022b6a4b4ad7",
       "docRelative": "algorithm/two-pointers/_index.mdx"
     },
+    "__nav__:backend": {
+      "hash": "5cb94ef79bcb0c4173f9ec7e2f77a696ffcce2450e57cf20194ad3a4b0520898",
+      "docRelative": "backend/_index.mdx"
+    },
+    "__nav__:backend/quizzes": {
+      "hash": "ad58f68630476ea7bf8d9fff5e492620e7f26bcc211f9ebe3ad3a64359c3cc65",
+      "docRelative": "backend/quizzes/_index.mdx"
+    },
     "__nav__:frontend": {
-      "hash": "8da7ba5928d319f72efdfc0961b6890c74d4da273cf836ba23673af9b6a1a681",
+      "hash": "ce5c923f0bce290ef8ae7108869c673b64c4d20e3d0948210a2fcd507cfe3365",
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
@@ -927,6 +943,10 @@
     "__nav__:frontend/jsfunction/undoRedoManager": {
       "hash": "f8a225eb80e55bb0c095b26691f00e9255720f4e52236eac71ab4d719b58a4e1",
       "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
+    },
+    "__nav__:frontend/uicoding": {
+      "hash": "d8009c2833215f5552411ba4d5c7c0f979efc0a23cce21cde49f2ffe9921e1e1",
+      "docRelative": "frontend/uicoding/_index.mdx"
     }
   }
 }

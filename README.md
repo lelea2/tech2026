@@ -20,21 +20,31 @@ Workspace skill location:
 
 - `.github/skills/sync-source-docs/SKILL.md`
 
-Use this skill when `frontend` or `backend` changes and you want docs refreshed automatically in:
+Use this skill when `frontend`, `backend`, or `algorithm` changes and you want docs refreshed automatically in docs subdirs such as:
 
-- `website/docs/source-sync`
+- `website/docs/frontend`
+- `website/docs/backend`
+- `website/docs/algorithm`
+- `website/docs/source-sync` (optional catch-all)
 
 ### How To Run `sync-source-docs`
 
 From repository root:
 
 1. `cd website`
-2. `npm run sync:source-docs`
+2. Run one or more targeted sync commands:
+   - `npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"`
+   - `npm run sync:source-docs -- --docs-subdir backend --format "backend=."`
+   - `npm run sync:source-docs -- --docs-subdir algorithm --format "algorithm=."`
 3. `npm run build`
+
+Optional: use catch-all output folder.
+
+- `npm run sync:source-docs -- --docs-subdir source-sync --format "frontend=frontend;backend=backend;algorithm=algorithm"`
 
 Optional: pass custom folder mapping format.
 
-- `npm run sync:source-docs -- --format "frontend/jsfunction/hooks=frontend/jsfunction/array"`
+- `npm run sync:source-docs -- --format "frontend/jsfunction=frontend/jsfunction;backend=backend"`
 
 Optional: pass custom docs output subfolder.
 

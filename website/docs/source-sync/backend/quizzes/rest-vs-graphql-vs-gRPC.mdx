@@ -1,0 +1,97 @@
+---
+title: rest-vs-graphql-vs-gRPC
+---
+
+# rest-vs-graphql-vs-gRPC
+
+~~~markdown
+---
+title: REST API vs gRPC vs GraphQL
+description: Comparing REST, gRPC, and GraphQL — strengths, tradeoffs, and when to use each.
+---
+
+# REST API vs gRPC vs GraphQL
+
+Modern systems rarely use a single communication protocol everywhere.
+
+Most scalable architectures combine multiple approaches depending on:
+
+- client needs
+- performance requirements
+- internal vs external traffic
+- developer experience
+- realtime capability
+- data flexibility
+
+This guide compares:
+
+- REST API
+- gRPC
+- GraphQL
+
+---
+
+# Quick Comparison
+
+| Feature | REST API | gRPC | GraphQL |
+|---|---|---|---|
+| Protocol | HTTP/1.1 or HTTP/2 | HTTP/2 | HTTP |
+| Data Format | JSON | Protobuf (binary) | JSON |
+| Performance | Medium | Very Fast | Medium |
+| Type Safety | Weak/Optional | Strong | Strong |
+| Streaming | Limited | Excellent | Possible with subscriptions |
+| Browser Friendly | Excellent | Limited | Excellent |
+| Learning Curve | Easy | Medium | Medium/Hard |
+| Best For | Public APIs | Internal microservices | Flexible frontend APIs |
+| Over-fetching | Common | Minimal | Solved |
+| Under-fetching | Common | Minimal | Solved |
+| Schema Contract | Optional | Required | Required |
+| Mobile Efficiency | Medium | Excellent | Good |
+| Human Readable | Yes | No | Yes |
+| Tooling Ecosystem | Massive | Strong backend tooling | Strong frontend tooling |
+
+---
+
+# REST API
+
+## What is REST?
+
+REST (Representational State Transfer) is the traditional HTTP API architecture.
+
+Resources are exposed through endpoints:
+
+```http
+GET /users/123
+POST /orders
+PUT /profile
+DELETE /cart/1
+```
+
+
+## Rule of Thumb
+
+### Use REST when:
+
+* simplicity matters most
+* building public APIs
+* CRUD dominates
+* broad compatibility is required
+
+⸻
+
+### Use gRPC when:
+
+* performance is critical
+* services communicate internally
+* low latency matters
+* strong contracts are important
+
+⸻
+
+### Use GraphQL when:
+
+* frontend flexibility matters
+* multiple clients need different data
+* reducing API roundtrips is important
+* building complex UI systems
+~~~

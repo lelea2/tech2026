@@ -186,10 +186,16 @@ function navMdxForDirectory(dirRelative, directDocs, childDirs) {
   }
 
   if (directDocs.length > 0) {
+    const dirName = path.basename(dirRelative);
     const docLinks = directDocs
       .map((docRelative) => {
         const fileName = path.basename(docRelative, '.mdx');
-        return `- [${fileName}](./${fileName})`;
+        // Docusaurus treats a file with the same name as its parent dir (case-insensitively)
+        // as the category index, serving it at dirname/ instead of dirname/filename.
+        // Use ../dirname to link to the correct route.
+        const isCategoryIndex = fileName.toLowerCase() === dirName.toLowerCase();
+        const link = isCategoryIndex ? `../${dirName}` : `./${fileName}`;
+        return `- [${fileName}](${link})`;
       })
       .join('\n');
 
