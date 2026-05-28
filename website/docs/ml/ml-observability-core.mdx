@@ -1,0 +1,230 @@
+---
+title: ML Observability — Core Concepts
+description: Data drift, concept drift, metrics, telemetry, and the three pillars of ML observability.
+tags: [machine-learning, observability, drift, mlops, monitoring]
+date: 2026-05-28
+---
+
+import { Callout } from '@/components/ui/callout'
+import { Tabs, Tab } from '@/components/ui/tabs'
+
+# ML Observability — Core Concepts
+
+---
+
+## 1. Data Drift and Concept Drift
+
+### What is the difference between data drift and concept drift?
+
+| | Definition | What changes |
+|---|---|---|
+| **Data drift** | Change in the distribution of input features P(X) | The inputs themselves |
+| **Concept drift** | Change in the statistical relationship between inputs and target P(Y\|X) | What the inputs *mean* for the prediction |
+
+<Callout type="insight">
+  A model can experience data drift without concept drift (new users with different
+  demographics, same behavior patterns) or concept drift without data drift (same
+  inputs, but user intent has shifted — e.g. a query that meant one thing in 2022
+  means something different in 2024).
+</Callout>
+
+---
+
+### How do you detect drift for high-dimensional or categorical features?
+
+<Tabs>
+  <Tab label="Continuous features">
+
+    **Kolmogorov-Smirnov (KS) test** — measures the maximum distance between two
+    cumulative distribution functions. Good for univariate feature drift.
+
+    ```python
+    from scipy.stats import ks_2samp
+
+    stat, p_value = ks_2samp(train_values, serving_values)
+    drifted = p_value < 0.05
+    ```
+
+    **Wasserstein distance** (Earth Mover's Distance) — measures how much
+    "work" it takes to transform one distribution into another. More sensitive
+    to subtle shifts than KS.
+
+    ```python
+    from scipy.stats import wasserstein_distance
+
+    distance = wasserstein_distance(train_values, serving_values)
+    ```
+
+  </Tab>
+  <Tab label="Categorical features">
+
+    **Population Stability Index (PSI)** — industry standard for categorical
+    and bucketed continuous features. Widely used in financial ML.
+
+    ```python
+    def compute_psi(expected, actual, buckets=10):
+        # PSI < 0.1  → stable
+        # PSI 0.1–0.2 → monitor closely
+        # PSI > 0.2  → significant drift, action required
+        ...
+    ```
+
+    **Kullback-Leibler (KL) divergence** — measures information lost when
+    using the training distribution to approximate the serving distribution.
+    Asymmetric — order matters.
+
+    ```python
+    from scipy.stats import entropy
+
+    kl_div = entropy(train_dist, serving_dist)
+    ```
+
+  </Tab>
+</Tabs>
+
+---
+
+### How do you differentiate between an anomaly, an outage, and gradual drift?
+
+| Type | Pattern | Detection approach |
+|---|---|---|
+| **Anomaly** | Point-in-time spike or error | Static threshold alerting, z-score |
+| **Outage** | Sudden drop to zero in traffic or data flow | Heartbeat checks, missing data alerts |
+| **Gradual drift** | Slow, systemic shift in underlying data | Moving average baselines, PSI over rolling windows |
+
+Observability tools distinguish these by combining **alerting thresholds**
+(for anomalies and outages) with **trend detection over time** (for drift).
+A spike that resolves in minutes is an anomaly. A metric that has been
+slowly declining over two weeks is drift.
+
+---
+
+### How do you handle drift once it's detected?
+
+Responses scale with severity:
+
+```
+PSI < 0.1   →  no action, continue monitoring
+PSI 0.1–0.2 →  increase alert frequency, investigate root cause
+PSI > 0.2   →  trigger automated response
+```
+
+Automated responses include:
+
+1. **Fallback to a rule-based system** — remove the model from the serving path
+   until the issue is resolved
+2. **Route traffic to a previous stable version** — canary rollback to the last
+   known-good model artifact
+3. **Trigger an automated retraining pipeline** — retrain on the most recent
+   data window and promote through the standard validation gate
+
+<Callout type="warning">
+  Don't automatically retrain on drifted data without first validating that the
+  drift is real signal, not a pipeline bug. Retraining on corrupted features
+  makes the problem worse.
+</Callout>
+
+---
+
+## 2. Metrics and Telemetry — The Three Pillars
+
+### What are the three pillars of ML observability?
+
+Mirroring the three pillars of DevOps observability, but extended for ML:
+
+#### 1. Metrics
+Aggregated, time-series data that summarizes system behavior.
+
+```yaml
+# Examples
+- inference_latency_p99_ms
+- request_throughput_rps
+- gpu_utilization_pct
+- prediction_confidence_mean
+- feature_null_rate_pct
+```
+
+#### 2. Logs
+Immutable event records capturing system state at specific timestamps.
+
+```json
+{
+  "timestamp": "2026-05-28T10:13:26Z",
+  "model_version": "2.4.1",
+  "request_id": "req_abc123",
+  "input_features": { "user_tenure_days": 42, "device_type": "mobile" },
+  "prediction": 0.87,
+  "latency_ms": 34
+}
+```
+
+#### 3. Traces
+End-to-end tracing of a single prediction request as it flows through
+the ML pipeline — from feature fetch → preprocessing → inference → postprocessing.
+
+```
+trace_id: abc123
+  ├── feature_store_fetch     12ms
+  ├── preprocessing           4ms
+  ├── model_inference         28ms   ← bottleneck
+  └── postprocessing          2ms
+  total: 46ms
+```
+
+<Callout type="insight">
+  Traces are the most underused pillar in ML. When a p99 latency alert fires,
+  metrics tell you *something is slow*. Traces tell you *exactly which stage*
+  in the pipeline is responsible.
+</Callout>
+
+---
+
+### What is the difference between monitoring and observability?
+
+| | Monitoring | Observability |
+|---|---|---|
+| **Question answered** | Is the system failing? | Why is the system failing? |
+| **Approach** | Alert when a known metric crosses a threshold | Inspect internal state to diagnose unknown failures |
+| **Requires new code?** | No — dashboards and alerts on existing signals | No — infer behavior from existing outputs |
+| **ML example** | Alert when accuracy drops below 92% | Determine whether the drop is caused by drift, a pipeline bug, or a data quality issue |
+
+> Monitoring tells you **when** a system fails.
+> Observability lets you infer **why** it failed by inspecting its internal
+> state — without deploying new code.
+
+---
+
+### How do you set up an SLO for an ML model?
+
+An ML SLO should cover both the **serving system** and the **model behavior**:
+
+```yaml
+# Example ML SLO definition
+slos:
+  serving:
+    - name: inference_latency
+      objective: 95% of predictions returned in under 50ms
+      window: rolling_7d
+
+  model_quality:
+    - name: f1_score_stability
+      objective: F1 score does not drop by more than 2% vs baseline
+      window: rolling_7d
+      baseline: weekly_eval_snapshot
+
+    - name: prediction_confidence
+      objective: Mean confidence stays within 1 stddev of training baseline
+      window: rolling_24h
+
+  data_quality:
+    - name: feature_completeness
+      objective: Null rate on critical features stays below 1%
+      window: rolling_1h
+```
+
+<Callout type="tip">
+  Start with **three SLOs**: one for latency, one for model quality, one for
+  data quality. Add more only after you've operationalized alerting and
+  on-call response for the first three. Unenforced SLOs are worse than none —
+  they erode trust in the observability system.
+</Callout>

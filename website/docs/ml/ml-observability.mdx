@@ -62,6 +62,16 @@ In traditional software, correctness is **deterministic**. In ML, correctness is
 
 ---
 
+## Compare Traditional Software vs. ML Observability
+| Dimension | Traditional software | ML systems |
+|---|---|---|
+| Failure mode | Loud, deterministic | Silent, probabilistic |
+| What drifts | Nothing (code is static) | Data, features, labels, world |
+| Ground truth | Immediate | Delayed or absent |
+| Debugging | Reproducible | Requires full context capture |
+| "Healthy" signal | Uptime + latency | + prediction dist + feature health + business metrics |
+| Fix mechanism | Deploy a patch | Retrain, rollback, or pipeline fix |
+
 ## The Temporal Problem
 
 Software observability is **synchronous** — you observe what happened during a request.

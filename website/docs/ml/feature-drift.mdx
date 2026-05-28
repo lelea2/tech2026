@@ -1,0 +1,247 @@
+---
+title: Feature drift — what it is, how it differs from data drift, and how to monitor it
+description: A practitioner's guide to feature drift in production ML systems, covering definitions, the relationship to data drift, monitoring metrics, and response thresholds.
+tags: [machine-learning, observability, feature-drift, data-drift, mlops, monitoring]
+date: 2026-05-28
+---
+
+import { Callout } from '@/components/ui/callout'
+import { Tabs, Tab } from '@/components/ui/tabs'
+
+# Feature drift
+
+**Feature drift** is when the statistical properties of one or more individual
+input features change over time in production. The feature pipeline keeps running,
+values keep arriving — but the distribution of those values no longer matches
+what the model was trained on.
+
+A `user_tenure_days` feature that averaged 180 days during training might average
+12 days six months later as the product acquired a surge of new users. The model
+never saw that pattern. It silently degrades.
+
+---
+
+## Feature drift vs data drift
+
+Data drift is the umbrella term — it means the overall input distribution P(X)
+has shifted. Feature drift is the same concept examined at the individual feature
+level.
+
+| | Scope | What it tells you |
+|---|---|---|
+| **Data drift** | Entire input space P(X) | *Something* is wrong with the inputs |
+| **Feature drift** | Individual feature P(x_i) | *Which specific features* are responsible and by how much |
+| **Concept drift** | Output relationship P(Y\|X) | Same inputs now mean something different for the prediction |
+| **Label drift** | Target distribution P(Y) | Class balance has changed (e.g. fraud rate spikes seasonally) |
+
+<Callout type="insight">
+  Data drift tells you something is wrong. Feature drift analysis tells you
+  what and where. You can't fix data drift without first identifying which
+  features drifted.
+</Callout>
+
+You can have data drift without concept drift — new users with different
+demographics but the same behavioral patterns. You can also have concept drift
+without feature drift — the same inputs, but user intent has shifted (a query
+that meant one thing in 2022 means something different today).
+
+---
+
+## What feature drift looks like
+
+When a feature drifts, its serving-time distribution separates from its
+training-time distribution. The model was optimized for the training shape —
+so the further the serving distribution moves, the less reliable its predictions
+become.
+
+Typical causes:
+
+- **Seasonal patterns** — a `days_since_last_purchase` feature behaves
+  differently in December vs March
+- **Product changes** — a new onboarding flow changes the distribution of
+  `user_tenure_days` for new cohorts
+- **Upstream schema changes** — a partner data feed silently changes encoding
+  (e.g. `null` becomes `0`), shifting the null rate and mean simultaneously
+- **Population shift** — the model was trained on power users; it's now serving
+  casual users with a completely different engagement profile
+
+---
+
+## How to monitor feature drift
+
+### The three core metrics
+
+<Tabs>
+  <Tab label="PSI (Population Stability Index)">
+
+    The industry default for threshold-based alerting. Produces a single
+    actionable number. Originally designed for credit risk modelling — widely
+    adopted in financial ML and ad systems for exactly the "is this population
+    still the same?" question.
+
+    ```python
+    def compute_psi(expected, actual, buckets=10):
+        import numpy as np
+        breakpoints = np.percentile(expected, np.linspace(0, 100, buckets + 1))
+        exp_pct = np.histogram(expected, bins=breakpoints)[0] / len(expected)
+        act_pct = np.histogram(actual,   bins=breakpoints)[0] / len(actual)
+        exp_pct = np.where(exp_pct == 0, 1e-6, exp_pct)
+        act_pct = np.where(act_pct == 0, 1e-6, act_pct)
+        return np.sum((act_pct - exp_pct) * np.log(act_pct / exp_pct))
+    ```
+
+    | PSI | Status | Action |
+    |---|---|---|
+    | `< 0.1` | Stable | No action. Continue scheduled monitoring. |
+    | `0.1 – 0.2` | Monitor | Investigate root cause. Increase alert frequency. |
+    | `> 0.2` | Act | Trigger retrain pipeline or fallback to rule-based system. |
+
+  </Tab>
+  <Tab label="KS test (Kolmogorov-Smirnov)">
+
+    More sensitive to localized shape changes — detects when the *shape* of the
+    distribution changes even if the mean hasn't moved much. The p-value drops
+    fast once distributions meaningfully separate.
+
+    ```python
+    from scipy.stats import ks_2samp
+
+    stat, p_value = ks_2samp(train_values, serving_values)
+
+    # p_value < 0.05 → distributions are statistically different
+    drifted = p_value < 0.05
+    ```
+
+    Best for: **continuous features** where the tail behavior matters
+    (e.g. spend amounts, session duration, embedding norms).
+
+  </Tab>
+  <Tab label="Wasserstein distance">
+
+    The most physically intuitive metric — measures how much "work" it takes
+    to reshape one distribution into the other (Earth Mover's Distance).
+    Handles multimodal distributions better than KS, which only looks at the
+    maximum gap between CDFs.
+
+    ```python
+    from scipy.stats import wasserstein_distance
+
+    distance = wasserstein_distance(train_values, serving_values)
+    # Interpret relative to the feature's natural scale
+    ```
+
+    Best for: **features with multiple modes** or when you need a metric that
+    scales continuously with drift severity rather than producing a binary
+    significant/not-significant result.
+
+  </Tab>
+</Tabs>
+
+### For categorical features
+
+PSI works on bucketed distributions. For raw categorical features, use
+**KL divergence** or **Jensen-Shannon divergence**:
+
+```python
+from scipy.stats import entropy
+import numpy as np
+
+def js_divergence(p, q):
+    """Jensen-Shannon divergence — symmetric, bounded [0, 1]."""
+    m = 0.5 * (p + q)
+    return 0.5 * entropy(p, m) + 0.5 * entropy(q, m)
+
+# Build category frequency distributions
+train_freq = train_df['device_type'].value_counts(normalize=True)
+serve_freq = serve_df['device_type'].value_counts(normalize=True)
+
+# Align categories
+all_cats = train_freq.index.union(serve_freq.index)
+p = train_freq.reindex(all_cats, fill_value=1e-6).values
+q = serve_freq.reindex(all_cats, fill_value=1e-6).values
+
+jsd = js_divergence(p, q)
+```
+
+---
+
+## The monitoring pipeline
+
+Run drift checks on a rolling window — hourly for high-stakes features,
+daily for stable ones. Baseline is captured at training time and stored as
+a reference snapshot.
+
+```python
+from scipy.stats import ks_2samp
+
+def run_drift_check(baseline: dict, window: str = "24h") -> list[dict]:
+    """
+    Run PSI + KS drift check for every feature.
+    Returns list of alerts sorted by PSI descending.
+    """
+    alerts = []
+
+    for feature_name, train_dist in baseline.items():
+        serve_dist = fetch_serving_window(feature_name, window=window)
+
+        psi     = compute_psi(train_dist, serve_dist)
+        ks_stat, p_val = ks_2samp(train_dist, serve_dist)
+
+        severity = (
+            "critical" if psi > 0.2 else
+            "warning"  if psi > 0.1 else
+            "ok"
+        )
+
+        alerts.append({
+            "feature":  feature_name,
+            "psi":      round(psi, 4),
+            "ks_stat":  round(ks_stat, 4),
+            "p_value":  round(p_val, 4),
+            "severity": severity,
+        })
+
+    # Worst-drifting features at the top of the on-call queue
+    return sorted(alerts, key=lambda x: x["psi"], reverse=True)
+```
+
+The output feeds a feature health dashboard — sorted by PSI descending so
+the worst-drifting features are always at the top of the on-call queue.
+
+---
+
+## Response playbook
+
+```
+PSI < 0.1
+  → no action, continue monitoring
+
+PSI 0.1 – 0.2
+  → increase check frequency (hourly instead of daily)
+  → investigate upstream: schema changes, pipeline bugs, population shift
+  → notify model owner
+
+PSI > 0.2
+  → option 1: fallback to rule-based system (remove model from serving path)
+  → option 2: canary rollback to last known-good model artifact
+  → option 3: trigger automated retraining on most recent data window
+               then promote through standard validation gate
+```
+
+<Callout type="warning">
+  Don't automatically retrain on drifted data without first validating that
+  the drift is real signal, not a pipeline bug. Retraining on corrupted
+  features makes the problem worse.
+</Callout>
+
+---
+
+## Quick reference
+
+| Metric | Best for | Threshold |
+|---|---|---|
+| PSI | All features; categorical + continuous | `> 0.1` warn, `> 0.2` act |
+| KS test | Continuous; shape-sensitive detection | `p < 0.05` act |
+| Wasserstein | Multimodal or heavy-tailed continuous | Feature-scale relative |
+| JS divergence | Categorical with many categories | `> 0.1` investigate |
+| Mean / std delta | Quick sanity check on any numeric feature | `> 2 stddev` investigate |
