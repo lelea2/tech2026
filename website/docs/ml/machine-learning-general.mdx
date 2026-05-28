@@ -1,0 +1,636 @@
+# Machine Learning Interview Questions — Extended Reference
+
+---
+
+## Core ML Concepts
+
+### 1. What is overfitting? How can you avoid it?
+
+Overfitting happens when a model learns specific details and noise in the training data, performing well on the training set but failing to generalize on unseen data.
+
+**Signs:** Good accuracy on training data, poor performance on unseen data.
+
+**Prevention techniques:**
+- Data splitting
+- L1 (Lasso) and L2 (Ridge) regularization
+- Data augmentation
+- Model fine-tuning
+- Early stopping
+- Dropout
+
+---
+
+### 2. Explain the bias-variance tradeoff.
+
+| | Bias | Variance |
+|---|---|---|
+| **Definition** | Error from wrong assumptions in the model | Sensitivity to fluctuations in training data |
+| **Cause** | Simpler models that miss finer patterns | Complex models that overfit training data |
+
+**How to balance:** Dataset splitting, appropriate model selection, and regularization techniques.
+
+---
+
+### 3. What is hyperparameter tuning?
+
+Hyperparameters control the model learning process and are set *before* training begins.
+
+**Common hyperparameters:**
+- Train-test split ratio
+- Activation function
+- Number of hidden layers
+
+**Best practices:**
+- Use a validation set
+- Cross-validation
+- Grid search or random search
+- Model performance analysis and comparison
+
+---
+
+### 4. How do you handle missing or corrupted data? Mention some imputation techniques.
+
+**Two broad strategies:**
+1. **Data deletion** — remove rows or columns with missing values
+2. **Data imputation** — fill in missing values
+
+**Imputation techniques:**
+
+| Technique | Description | Trade-off |
+|---|---|---|
+| Mean/Median/Mode | Replace with column statistic | Simple but can introduce bias |
+| KNN Imputation | Use K nearest neighbors to impute the mean of K samples | More accurate, higher compute |
+| Iterative Imputation | Predict missing values from available data iteratively | Best estimation, most complex |
+
+---
+
+### 5. Explain a confusion matrix.
+
+A confusion matrix evaluates classification algorithm performance using actual vs. predicted classes.
+
+| | Predicted Positive | Predicted Negative |
+|---|---|---|
+| **Actual Positive** | True Positive (TP) | False Negative (FN) |
+| **Actual Negative** | False Positive (FP) | True Negative (TN) |
+
+**Derived metrics:** Accuracy, Precision, Recall, F1 Score.
+
+**Value:** Ensures accurate model representation, reveals error types, and guides precision/recall tradeoffs.
+
+---
+
+### 6. What are false positives and false negatives?
+
+- **False Positive (Type I error):** Model classifies a negative as positive (e.g., marking a legitimate email as spam)
+- **False Negative (Type II error):** Model classifies a positive as negative (e.g., marking spam as legitimate)
+
+**Real-world impact:** Critical in facial recognition, disease diagnosis, fraud detection, and anomaly detection. The confusion matrix helps quantify these errors during evaluation.
+
+---
+
+### 7. How do you pick a suitable ML algorithm for your problem?
+
+1. Understand the problem — classification, regression, or clustering?
+2. Analyze data format, size, linearity, and quality
+3. Define speed and accuracy thresholds
+4. Select multiple candidate algorithms
+5. Use cross-validation to evaluate and compare performance
+6. Choose the best-performing model
+
+---
+
+### 8. Explain PCA and its significance.
+
+**Principal Component Analysis (PCA)** is a dimensionality reduction technique.
+
+**How it works:**
+1. Standardize the data
+2. Compute covariance between features
+3. Calculate eigenvectors (direction) and eigenvalues (magnitude) from the covariance matrix
+4. Sort by descending eigenvalue — highest = most important features (principal components)
+
+**Benefits:**
+- Improves model performance
+- Reduces computational cost
+- Enables visualization of high-dimensional data
+
+---
+
+### 9. Explain the architecture of a CNN.
+
+**Convolutional Neural Networks (CNNs)** are deep learning architectures for computer vision tasks.
+
+| Layer | Role |
+|---|---|
+| Input | Receives raw image as vectors |
+| Convolutional | Applies filters to extract features (edges, shapes, colors); produces feature maps |
+| Pooling | Reduces feature map dimensionality via avg/max pooling |
+| Activation | Introduces non-linearity to learn complex patterns |
+| Fully Connected | Connects all neurons and classifies input into target labels |
+| Output | Produces final prediction |
+
+---
+
+### 10. Explain batch, mini-batch, and stochastic gradient descent.
+
+Gradient descent is an optimization technique that minimizes loss by taking steps in the direction of steepest descent.
+
+| Type | Description |
+|---|---|
+| **Batch GD** | Uses the entire training set; computes one gradient and takes one step |
+| **Mini-batch GD** | Divides training set into batches; computes gradient and updates per batch |
+| **Stochastic GD** | Randomly shuffles training set, divides into small batches, and updates per batch |
+
+---
+
+### 11. Describe precision, recall, and F1-score. When would you use each?
+
+| Metric | Formula | Use When |
+|---|---|---|
+| **Precision** | TP / (TP + FP) | Cost of false positives is high (e.g., spam filtering, healthcare) |
+| **Recall** | TP / (TP + FN) | Cost of false negatives is high (e.g., disease diagnosis) |
+| **F1-Score** | 2 × (Precision × Recall) / (Precision + Recall) | Dealing with imbalanced datasets |
+
+---
+
+### 12. What is the difference between one-hot encoding and label encoding?
+
+| | One-Hot Encoding | Label Encoding |
+|---|---|---|
+| **Method** | Represents categories as binary vectors | Assigns an integer to each category |
+| **Dimensionality** | Increases | Maintained |
+| **Bias risk** | Treats all categories equally | Can introduce ordinal bias |
+| **Best for** | Algorithms that handle higher dimensions | Ordinal categories or tree-based models |
+
+---
+
+### 13. How do you ensure data quality in ML tasks?
+
+1. Acquire data from reliable sources; understand its origin, format, and features
+2. Handle missing values, inconsistencies, and outliers
+3. Explore data distribution and patterns
+4. Standardize/normalize features; apply feature engineering
+5. Split into validation and test sets; use cross-validation scores
+6. Track model performance and analyze errors for bias detection
+
+---
+
+### 14. Explain classification vs. regression.
+
+| | Classification | Regression |
+|---|---|---|
+| **Predicts** | Categories (e.g., Yes/No, Hot/Cold) | Continuous/numerical values (e.g., height, price) |
+| **Output** | Discrete labels | Numeric value |
+
+Both are supervised learning approaches.
+
+---
+
+### 15. Explain the lifecycle of a machine learning application.
+
+1. Problem definition, motivation, and business understanding
+2. Data acquisition and exploration
+3. Data cleansing and preprocessing
+4. Model selection and training
+5. Model evaluation on unseen data; identify bias and errors
+6. Model deployment for real-world use
+7. Performance monitoring and iterative refinement
+
+---
+
+### 16. Explain dropout in neural networks.
+
+**Dropout** is a regularization technique to prevent overfitting.
+
+During training, it randomly deactivates neurons, forcing the network to learn redundant representations without depending on specific neurons.
+
+**Benefits:** Improved generalization and robustness on unseen data.
+
+---
+
+### 17. How does batch normalization work? What are its benefits?
+
+Batch normalization addresses **internal covariate shift** — the change in activation distributions during training that can hinder learning.
+
+**How it works:**
+1. Compute mean and standard deviation of activations per layer per mini-batch
+2. Standardize activations
+3. Apply learnable **gamma** (scale) and **beta** (shift) parameters to avoid information loss
+
+**Benefits:** Faster convergence, reduced sensitivity to initialization, supports higher learning rates.
+
+---
+
+### 18. How do you handle an imbalanced dataset?
+
+- **Choose the right metric:** F1-score is preferred over accuracy for imbalanced data
+- **Oversampling:** Use SMOTE (Synthetic Minority Over-sampling Technique) to generate synthetic samples
+- **Undersampling:** Delete majority class samples to balance distribution
+- **Balanced bagging classifier:** Ensemble method using random undersampling per subset
+- **Threshold moving:** Adjust the classification threshold to improve class separation
+
+---
+
+### 19. What are the different types of machine learning?
+
+| Type | Description | Examples |
+|---|---|---|
+| **Supervised** | Learns from labeled data | Spam filtering, breed classification |
+| **Unsupervised** | Finds hidden patterns in unlabeled data | Clustering, dimensionality reduction |
+| **Reinforcement** | Learns via trial and error with penalties | Self-driving cars, game AI |
+| **Semi-supervised** | Combines labeled and unlabeled data | Improves generalizability with sparse labels |
+| **Deep Learning** | Subfield using neural networks for complex patterns | Chatbots, image classification |
+
+---
+
+### 20. Explain training and testing data.
+
+- **Training data:** The portion of data an ML algorithm uses to learn patterns
+- **Test data:** Unseen data used to evaluate the algorithm's performance and generalization
+
+---
+
+### 21. What is a recommendation system? How does it work?
+
+A recommendation system analyzes user data to suggest relevant items (products, movies, songs).
+
+**How it works:**
+1. Collects user data — interactions, browsing/purchase history, ratings, reviews
+2. Builds user profiles via collaborative or content-based filtering:
+   - **Collaborative filtering:** Recommends items liked by users with similar tastes
+   - **Content-based filtering:** Recommends items similar to a user's past interactions
+3. Generates personalized recommendations from profiles
+
+---
+
+### 22. What is the curse of dimensionality?
+
+High-dimensional data introduces:
+- **Data sparsity** — most of the high-dimensional space is empty
+- **Distance degradation** — algorithms like KNN struggle when distances become less meaningful
+- **Overfitting** — models memorize sparse high-dimensional patterns
+- **High compute cost** — more features = more processing
+
+---
+
+### 23. Explain Support Vector Machine (SVM).
+
+SVM is a supervised classification algorithm that finds a **hyperplane** with the maximum margin to separate classes.
+
+- **Hyperplane:** Decision boundary that separates classes
+- **Support vectors:** Data points closest to the hyperplane
+- **Objective:** Maximize the margin (distance) between the support vectors of each class
+
+---
+
+### 24. What is the difference between random forests and decision trees?
+
+| | Decision Tree | Random Forest |
+|---|---|---|
+| **Structure** | Single tree | Ensemble of trees |
+| **Data used** | Full training dataset | Random subsets (bootstrapping) |
+| **Feature selection** | All features at each split | Random subset of features per split |
+| **Overfitting** | More prone | Less prone |
+| **Generalizability** | Lower | Higher |
+
+---
+
+### 25. Explain ETL.
+
+| Step | Description |
+|---|---|
+| **Extract** | Pull data from databases, APIs, spreadsheets, flat files |
+| **Transform** | Clean, format, and standardize for consistency and compatibility |
+| **Load** | Write transformed data to target system for analysis and decision-making |
+
+---
+
+## ML Coding Questions
+
+### Approach
+
+1. **Understand the problem** (5–7 min) — ask clarifying questions, trace toy examples
+2. **Discuss the approach** (3–5 min) — outline algorithm in pseudocode, get buy-in
+3. **Implement** (20–25 min) — choose framework (PyTorch/TensorFlow) and language (Python); talk through your code
+4. **Test and discuss** (7–8 min) — test, note takeaways, answer follow-ups
+
+---
+
+### 1. Pre-process a dataset for ML
+
+```python
+import pandas as pd
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.model_selection import train_test_split
+
+data = pd.read_csv("data.csv")
+
+# Impute missing values
+imputer = SimpleImputer(strategy="mean")
+data = pd.DataFrame(imputer.fit_transform(data))
+
+# Encode categorical features
+categorical_cols = [col for col in data.columns if data[col].dtype == object]
+le = LabelEncoder()
+for col in categorical_cols:
+    data[col] = le.fit_transform(data[col])
+
+# Scale numerical features
+scaler = StandardScaler()
+numerical_cols = [col for col in data.columns if data[col].dtype != object]
+data[numerical_cols] = scaler.fit_transform(data[numerical_cols])
+
+# Split into train/test
+X = data.drop("target_column", axis=1)
+y = data["target_column"]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+```
+
+---
+
+### 2. Evaluate a model on a held-out test set
+
+```python
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.linear_model import LogisticRegression
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+model = LogisticRegression()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Precision:", precision_score(y_test, y_pred))
+print("Recall:", recall_score(y_test, y_pred))
+print("F1-score:", f1_score(y_test, y_pred))
+```
+
+---
+
+### 3. Fine-tune a pre-trained deep learning model
+
+```python
+from tensorflow.keras.applications import VGG16
+from tensorflow.keras.layers import Flatten, Dense
+from tensorflow.keras.models import Model
+
+base_model = VGG16(weights="imagenet", include_top=False, input_shape=(224, 224, 3))
+
+for layer in base_model.layers:
+    layer.trainable = False  # Freeze base layers
+
+x = Flatten()(base_model.output)
+x = Dense(1024, activation="relu")(x)
+predictions = Dense(num_classes, activation="softmax")(x)
+
+model = Model(inputs=base_model.input, outputs=predictions)
+model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
+```
+
+---
+
+### 4. Code a linear regression model
+
+```python
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import cross_val_score
+
+lr = LinearRegression()
+lr.fit(X_train, y_train)
+y_pred = lr.predict(X_test)
+
+scores = cross_val_score(lr, X_train, y_train, cv=5)
+print("Accuracy per fold:", scores)
+print("Mean accuracy:", scores.mean())
+```
+
+---
+
+### 5. Implement K-means clustering
+
+```python
+import numpy as np
+
+class Centroid:
+    def __init__(self, location, vectors):
+        self.location = location
+        self.vectors = vectors
+
+class KMeans:
+    def __init__(self, n_features, k):
+        self.n_features = n_features
+        self.centroids = [
+            Centroid(np.random.randn(n_features), np.empty((0, n_features)))
+            for _ in range(k)
+        ]
+
+    def distance(self, x, y):
+        return np.sqrt(np.dot(x - y, x - y))
+
+    def fit(self, X, n_iterations):
+        for _ in range(n_iterations):
+            for c in self.centroids:
+                c.vectors = np.empty((0, self.n_features))
+            for x_i in X:
+                distances = [self.distance(x_i, c.location) for c in self.centroids]
+                idx = distances.index(min(distances))
+                self.centroids[idx].vectors = np.vstack((self.centroids[idx].vectors, x_i))
+            for c in self.centroids:
+                if c.vectors.size > 0:
+                    c.location = np.mean(c.vectors, axis=0)
+
+    def predict(self, x):
+        distances = [self.distance(x, c.location) for c in self.centroids]
+        return distances.index(min(distances))
+```
+
+---
+
+### 6. Split a dataset into train, validation, and test sets
+
+```python
+from sklearn.model_selection import train_test_split
+
+X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.2, random_state=42)
+X_test, X_val, y_test, y_val = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42)
+```
+
+---
+
+## ML System Design
+
+### Approach Formula
+
+1. **Problem formulation** — define the ML task, business goal, latency requirements
+2. **Metrics** — choose precision, recall, F1, ROC AUC, MSE, MAE as appropriate
+3. **MVP architecture** — sketch high-level components (app, server, DB, knowledge graph)
+4. **Data collection** — identify sources, costs, availability, and data type
+5. **Feature engineering** — select features, transform, normalize
+6. **Model development** — select, train, and evaluate on unseen data
+7. **Testing** — validate robustness before deployment
+8. **Deployment** — integrate with existing systems
+9. **Monitoring** — track performance, drift, and risks continuously
+
+---
+
+### Core architectural components
+
+- Data acquisition
+- Data storage
+- Model training and evaluation
+- Model deployment
+- Monitoring and feedback loop
+- Security, privacy, and scalability (cross-cutting concerns)
+
+---
+
+### Design: Spotify Recommendation System
+
+**Step 1 — Problem definition**
+- Success metric: user engagement (clicks)
+- Data sources: click data (JSON), user metadata (Postgres)
+- Processing: batch-based (easier to manage, cost-effective); update cache every few hours via serverless jobs
+
+**Step 2 — Feature engineering pipeline**
+1. Read and deserialize raw data
+2. Extract features: age group (PII-masked), location, top 100 artists, last 100 songs
+3. Clean: lowercase, remove spaces/punctuation, deduplicate, format timestamps
+4. Load cleaned features to Postgres → export to feature store
+
+**Step 3 — Model architecture**
+- Create feature vectors per user (scores normalized –1 to 1)
+- Build user-item matrix; compute product of user and song feature vectors
+- Use a threshold (–1 to 1) to determine recommendations; start low to gather data
+
+**Step 4 — Evaluation**
+- Collect positive feedback via clicks; click ratio = accuracy proxy
+- Analyze feature differences between clicked and non-clicked recommendations for weighting
+
+**Step 5 — Deployment**
+- A/B test to assess engagement improvements
+- Stack: AWS SageMaker (training), Lambda (inference), Elasticache (storage)
+
+---
+
+### Design: Fraud Detection — High Availability & Fault Tolerance
+
+| Strategy | Description |
+|---|---|
+| Distributed architecture | Redundant components prevent single points of failure |
+| Load balancing | Distribute load across workers to avoid overload |
+| Redundant data pipelines | Ensure continuous data flow if one pipeline fails |
+| Data duplication | Replicate training data across servers |
+| Model redundancy | Deploy model across multiple servers |
+| Health monitoring | Auto-failover to healthy backups on failure detection |
+| Error detection | Catch errors during data processing or inference |
+| Alerting | Real-time notifications for system performance issues |
+
+---
+
+### Design: ETA System for Maps
+
+**Data sources:**
+- Road info: distance, speed limit, free flow speed, priority class
+- Historical travel data: cars per segment per 2-min interval, average speed
+
+**Pipeline:**
+1. Clean map and travel tables (remove null/invalid rows)
+2. Create `record_table` mapping (segment, time interval) → ETA
+3. ETA = distance ÷ average speed (weighted by car count)
+4. Train: historical mean per (segment_id, interval_within_week)
+5. Validate: 80/20 month-level train/validation split; measure mean absolute error
+6. Deploy: store model in key-value store; ETA backend calls ETA function + shortest path algorithm
+
+---
+
+### Monitoring Strategy
+
+| Area | Approach |
+|---|---|
+| **Model performance** | Track evaluation metrics, set thresholds, detect model drift |
+| **Data quality** | Validate schemas, monitor ingestion frequency, detect distribution shifts |
+| **System health** | Track CPU/bandwidth usage, error rates, prediction latency; set up logging and alerts |
+
+---
+
+## FAANG+ Questions
+
+### 1. What is the ROC AUC?
+
+ROC (Receiver Operating Characteristics) shows the tradeoff between **sensitivity** (true positive rate) and **specificity** (true negative rate) for binary classifiers.
+
+| AUC Value | Interpretation |
+|---|---|
+| 0.5 | Model is random |
+| Closer to 1.0 | Strong model performance |
+| Closer to 0.0 | Poor model performance |
+
+---
+
+### 2. Methods for dimensionality reduction
+
+| Method | Techniques |
+|---|---|
+| **Feature selection** | Filter, Wrapper, Embedded methods — identify most impactful features |
+| **Feature extraction** | PCA, LDA — transform features into a lower-dimensional representation without information loss |
+
+---
+
+### 3. Design a product recommendation system
+
+**Example: PhotoShare (mobile photo-sharing app)**
+
+- **Target:** Millennials, Gen Z, celebrities; privacy-first sharing (temporary photos, granular controls)
+- **Phase 1 — Rule-based model variables:** preferred photo type, sharer-viewer closeness, engagement, recency, mood
+- **Phase 2 — AI model variables:** optimize watch time (North Star metric) using same variables, trained on phase 1 data
+- **Evaluation metrics:** Watch time (primary); clicks, likes, comments, DAU/WAU/MAU, retention (secondary)
+- **Iteration:** Continuous A/B testing on the recommendation algorithm
+
+---
+
+### 4. Types of activation functions
+
+| Function | Output Range | Use Case | Weakness |
+|---|---|---|---|
+| **Sigmoid** | 0–1 | Binary classification | Vanishing gradient in deep nets |
+| **Softmax** | 0–1 (multi-class) | Multi-class classification | — |
+| **ReLU** | 0 to ∞ | General hidden layers | Dying ReLU (dead neurons) |
+| **Leaky ReLU** | Small slope for negatives | Addresses dying ReLU | Slightly more complex |
+
+---
+
+### 5. Explain the vanishing gradient problem
+
+Gradients become too small to update weights effectively during backpropagation.
+
+**Causes:** Multiplying gradients with near-zero or negative values; activation functions that compress outputs to 0–1.
+
+**Effects:** Slow, shallow learning; deep layers fail to learn meaningful patterns.
+
+---
+
+### 6. Assumptions of linear regression
+
+1. Residuals are independent
+2. Linear relationship between independent and dependent variables
+3. Constant residual variance (homoscedasticity)
+4. Residuals are normally distributed
+
+---
+
+### 7. Linear regression vs. logistic regression
+
+| | Linear Regression | Logistic Regression |
+|---|---|---|
+| **Predicts** | Continuous numerical values | Categories/probabilities |
+| **Output** | Any real number | 0–1 (binary) or multi-class probabilities |
+| **Example** | Price recommendation engine | Movie genre classification |
+
+---
+
+### 8. How would you explain computer vision to a non-technical audience?
+
+Just like a child learns to match letters to pictures (D for dish, F for fish), computers can be trained to recognize patterns in images. Algorithms teach them to distinguish between objects — like a cat vs. a dog — so when asked to identify something in a photo, they can give an accurate answer based on what they've learned.

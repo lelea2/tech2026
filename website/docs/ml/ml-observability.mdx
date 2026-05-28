@@ -1,0 +1,106 @@
+# Software Observability vs ML Observability
+
+> A staff engineer's breakdown of the fundamental differences — not just in tooling, but in failure modes, instrumentation, and team ownership.
+
+---
+
+"In traditional software, a bug is deterministic — the same input always produces the same wrong output, and you can reproduce it. In ML, the model can silently become wrong over time with no code change, no deployment, and no error log. That's a fundamentally different observability problem."
+
+## Core Philosophical Difference
+
+| | Question |
+|---|---|
+| **Software observability** | *"Is the code doing what I wrote it to do?"* |
+| **ML observability** | *"Is the model doing what the world needs it to do?"* |
+
+In traditional software, correctness is **deterministic**. In ML, correctness is **statistical, contextual, and degrades silently** over time — without a single line of code changing.
+
+---
+
+## The Three Pillars — How They Diverge
+
+| Pillar | Software | ML |
+|---|---|---|
+| **Logs** | Structured events, errors, traces | Prediction logs, feature snapshots, ground truth labels |
+| **Metrics** | Latency, error rate, throughput, saturation | Data drift (PSI, KL divergence), accuracy, calibration, fairness |
+| **Traces** | Distributed request tracing (spans, DAGs) | Lineage: data → features → model version → prediction |
+
+---
+
+## Failure Mode Taxonomy
+
+**Software fails loudly** — exceptions, 5xx, OOM crashes. You get paged.
+
+**ML fails silently** — the system returns HTTP 200, latency looks fine, but the model is confidently wrong:
+
+| Failure Type | Description |
+|---|---|
+| **Data drift** | Input distribution shifted (e.g., new device type, post-COVID behavior) |
+| **Concept drift** | Relationship between features and target changed (e.g., "high income" post-inflation) |
+| **Training-serving skew** | Feature pipelines diverge between training and inference |
+| **Label drift** | Ground truth itself shifts (fraud patterns, toxicity norms) |
+| **Feedback loop corruption** | Model predictions contaminate future training data |
+
+---
+
+## What You Actually Instrument
+
+### Software Observability Stack
+- **APM** — Datadog, New Relic, Honeycomb
+- **Distributed tracing** — OpenTelemetry, Jaeger
+- **Structured logs** — Elasticsearch, Loki
+- **SLOs** around latency and availability
+
+### ML Observability Stack
+- **Feature stores with monitoring** — Feast, Tecton (detect skew at feature level)
+- **Statistical drift detectors** — PSI, Wasserstein distance, KS tests on input distributions
+- **Prediction monitoring** — output distribution shifts, confidence score degradation
+- **Ground truth pipelines** — delayed label joins *(the hard part: labels arrive hours/days/weeks later)*
+- **Model registries with lineage** — MLflow, W&B, Vertex AI
+- **Slice-based evaluation** — aggregate metrics hide subpopulation degradation
+- **Platforms** — Arize, WhyLabs, Evidently AI, Fiddler
+
+---
+
+## The Temporal Problem
+
+Software observability is **synchronous** — you observe what happened during a request.
+
+ML observability is **asynchronous** — the feedback loop looks like:
+
+```
+prediction made → user acts (or doesn't) → outcome observed → label derived
+                ↑_______________ hours / days / weeks later _______________↑
+```
+
+This requires **time-travel joins** — correlating a prediction at `T₀` with a label arriving at `T₀ + Δ`. This is a hard **data engineering** problem, not a monitoring problem.
+
+---
+
+## Ownership & Cultural Gap
+
+In software, a single on-call owns the service. In ML, no one person owns the full stack:
+
+| Role | Owns |
+|---|---|
+| Data engineers | Upstream pipelines |
+| ML engineers | Model training |
+| Platform engineers | Serving infrastructure |
+| Product / data scientists | Definition of "correct" behavior |
+
+Staff engineers often need to build **observability contracts** between these teams — agreeing on drift SLOs, who gets paged when feature distributions shift, and how ground truth is operationally defined.
+
+---
+
+## The Unified Mental Model
+
+```
+Software observability  =  code health
+
+ML observability        =  code health
+                        +  data health
+                        +  model health
+                        +  world health
+```
+
+The **"world health"** piece is what makes ML observability fundamentally harder — and why standard DevOps tooling is insufficient out of the box.

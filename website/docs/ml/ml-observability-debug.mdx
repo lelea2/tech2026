@@ -1,0 +1,417 @@
+---
+title: ML Observability — Debugging Production Models & Why It's Different
+description: A practitioner's guide to diagnosing underperforming ML models in production and understanding why ML observability is a distinct discipline from traditional software monitoring.
+author: Khanh Dao
+tags: [machine-learning, observability, production, debugging, mlops]
+date: 2026-05-28
+---
+
+import { Callout } from '@/components/ui/callout'
+import { Tabs, Tab } from '@/components/ui/tabs'
+import { Steps, Step } from '@/components/ui/steps'
+import { Table, Thead, Tbody, Tr, Th, Td } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+
+# ML Observability: Debugging Production Models & Why It's Different
+
+<Callout type="insight">
+  In traditional software, a bug is deterministic — the same input always produces
+  the same wrong output, and you can reproduce it. In ML, a model can silently
+  become wrong over time with **no code change, no deployment, and no error log**.
+  That's a fundamentally different observability problem.
+</Callout>
+
+---
+
+## Why ML Observability Is a Distinct Discipline
+
+### The Silent Failure Problem
+
+Traditional software fails **loudly**. A null pointer exception surfaces immediately.
+A broken API returns a `500`. You know something is wrong.
+
+ML fails **quietly**. A model serving stale embeddings, encountering a new user
+demographic it wasn't trained on, or receiving a feature with a subtle encoding
+change will keep returning predictions. They look valid. They're just wrong.
+
+This is the **"confident and incorrect"** failure mode — and it's the hardest to
+catch without purpose-built observability.
+
+### What You're Actually Monitoring
+
+In normal software you monitor *system behavior*:
+
+- Latency, error rates, uptime, throughput
+- The code is static — if it's broken, it's broken the same way every time
+
+In ML you have **three additional layers** that don't exist in traditional systems:
+
+| Layer | What it covers | Example signal |
+|---|---|---|
+| **Data layer** | Are inputs today the same kind the model was trained on? | PSI score, feature null rate |
+| **Model layer** | Are predictions drifting, collapsing, or miscalibrated? | Prediction entropy, confidence distribution |
+| **Outcome layer** | Are downstream business metrics still moving as expected? | CTR, conversion rate, revenue lift |
+
+A model can pass every system health check — zero errors, p99 latency fine,
+100% uptime — and **still be silently wrong**.
+
+### Ground Truth Latency
+
+<Tabs>
+  <Tab label="Traditional software">
+
+    If your payment API returns the wrong amount, you know **instantly** —
+    the transaction fails or the user calls in. Ground truth is immediate.
+
+  </Tab>
+  <Tab label="ML systems">
+
+    A recommendation model's correctness might only be measurable **days later**
+    when you see whether the user engaged. A fraud model's ground truth arrives
+    when a chargeback happens **weeks later**.
+
+    This means observability has to work *without* knowing the right answer in
+    real time — you monitor **proxies** instead: prediction distribution,
+    confidence calibration, and feature health.
+
+  </Tab>
+</Tabs>
+
+### Non-Determinism and Versioning Complexity
+
+Traditional software: same input → same output, always. Debugging is reproducible.
+
+ML: same input → potentially different output depending on:
+
+- Model artifact version
+- Preprocessing code version
+- Feature values **at inference time**
+- Runtime environment (GPU vs CPU floating point, batch size, random seed)
+
+Reproducing a failure requires capturing the **entire serving context**, not just
+the input. This is why model lineage tracing is a first-class requirement in ML
+observability — incident reproduction is nearly impossible without it.
+
+### Side-by-Side Comparison
+
+<Table>
+  <Thead>
+    <Tr>
+      <Th>Dimension</Th>
+      <Th>Traditional software</Th>
+      <Th>ML systems</Th>
+    </Tr>
+  </Thead>
+  <Tbody>
+    <Tr>
+      <Td>**Failure mode**</Td>
+      <Td>Loud, deterministic</Td>
+      <Td>Silent, probabilistic</Td>
+    </Tr>
+    <Tr>
+      <Td>**What drifts**</Td>
+      <Td>Nothing (code is static)</Td>
+      <Td>Data, features, labels, world</Td>
+    </Tr>
+    <Tr>
+      <Td>**Ground truth**</Td>
+      <Td>Immediate</Td>
+      <Td>Delayed or absent</Td>
+    </Tr>
+    <Tr>
+      <Td>**Debugging**</Td>
+      <Td>Reproducible</Td>
+      <Td>Requires full context capture</Td>
+    </Tr>
+    <Tr>
+      <Td>**"Healthy" signal**</Td>
+      <Td>Uptime + latency SLOs</Td>
+      <Td>+ prediction dist + feature health + business metrics</Td>
+    </Tr>
+    <Tr>
+      <Td>**Fix mechanism**</Td>
+      <Td>Deploy a patch</Td>
+      <Td>Retrain, rollback, or pipeline fix</Td>
+    </Tr>
+  </Tbody>
+</Table>
+
+---
+
+## Debugging an Underperforming Model in Production
+
+<Callout type="warning">
+  The core principle: **measure before you move**. Every time teams jump straight
+  to retraining, they fix the wrong thing. Diagnosis first, intervention second.
+</Callout>
+
+<Steps>
+
+  <Step title="Establish what 'underperforming' actually means">
+
+    Before touching anything, lock in the degradation type:
+
+    - **Accuracy regression** — offline metrics diverging from online
+    - **Latency spike** — p99 serving time exceeding SLO
+    - **Prediction distribution shift** — output collapsing or spreading unexpectedly
+    - **Business metric drop** — CTR, conversion, revenue moving against the model
+
+    Without this, you're guessing. Instrument every model with a standard
+    telemetry contract covering training metrics, serving metrics, and data
+    quality metrics side by side.
+
+  </Step>
+
+  <Step title="Check infrastructure before the model">
+
+    Roughly **30–40% of production model regressions** are actually pipeline bugs
+    or serving environment mismatches — not the model at all.
+
+    Rule out these first:
+
+    ```bash
+    # Check recent deployments
+    git log --oneline -20 --all
+
+    # Compare feature distributions: training vs live
+    python scripts/drift_check.py --baseline training_stats.json --live serving_stats.json
+
+    # Shadow traffic comparison
+    python scripts/shadow_diff.py --model-a v1 --model-b v2 --window 1h
+    ```
+
+    Check deployment logs, shadow traffic diffs, and feature value distributions
+    before touching model weights.
+
+  </Step>
+
+  <Step title="Run training–serving skew analysis">
+
+    If infrastructure is clean, compare the live input distribution against the
+    training distribution feature by feature:
+
+    ```python
+    from scipy.stats import ks_2samp
+    import numpy as np
+
+    def detect_drift(train_values: np.ndarray, serve_values: np.ndarray,
+                     threshold: float = 0.05) -> dict:
+        """
+        KS test for feature drift detection.
+        Returns drift signal and p-value per feature.
+        """
+        stat, p_value = ks_2samp(train_values, serve_values)
+        psi = compute_psi(train_values, serve_values)
+
+        return {
+            "ks_statistic": stat,
+            "p_value": p_value,
+            "psi": psi,
+            "drifted": p_value < threshold or psi > 0.2,
+        }
+
+    def compute_psi(expected: np.ndarray, actual: np.ndarray,
+                    buckets: int = 10) -> float:
+        """Population Stability Index — PSI > 0.2 indicates significant drift."""
+        breakpoints = np.percentile(expected, np.linspace(0, 100, buckets + 1))
+        expected_pct = np.histogram(expected, bins=breakpoints)[0] / len(expected)
+        actual_pct   = np.histogram(actual,   bins=breakpoints)[0] / len(actual)
+        # Avoid log(0)
+        expected_pct = np.where(expected_pct == 0, 1e-6, expected_pct)
+        actual_pct   = np.where(actual_pct   == 0, 1e-6, actual_pct)
+        return np.sum((actual_pct - expected_pct) * np.log(actual_pct / expected_pct))
+    ```
+
+    <Callout type="tip">
+      PSI thresholds: `< 0.1` = stable, `0.1–0.2` = monitor closely,
+      `> 0.2` = significant drift, action required.
+    </Callout>
+
+  </Step>
+
+  <Step title="Isolate which layer broke">
+
+    For deep models or multi-stage pipelines, add intermediate logging to
+    pinpoint where degradation starts:
+
+    ```python
+    import torch
+    from contextlib import contextmanager
+
+    @contextmanager
+    def layer_probe(model, layer_names: list[str]):
+        """
+        Context manager to capture intermediate activations
+        for anomaly detection.
+        """
+        hooks = []
+        activations = {}
+
+        def make_hook(name):
+            def hook(module, input, output):
+                activations[name] = {
+                    "mean": output.mean().item(),
+                    "std":  output.std().item(),
+                    "has_nan": output.isnan().any().item(),
+                    "has_inf": output.isinf().any().item(),
+                }
+            return hook
+
+        for name, module in model.named_modules():
+            if name in layer_names:
+                hooks.append(module.register_forward_hook(make_hook(name)))
+        try:
+            yield activations
+        finally:
+            for h in hooks:
+                h.remove()
+    ```
+
+    Key questions at each layer:
+    - Is the **representation layer** still healthy but the decision boundary shifted?
+    - Is the **feature store** returning stale or malformed values upstream?
+    - Are **embedding activations** within expected norm ranges?
+
+  </Step>
+
+  <Step title="Scope the blast radius before fixing">
+
+    Before retraining or rolling back anything, determine:
+
+    - Is this affecting **5% of traffic or 100%**?
+    - Is it **one segment** (mobile, a geo region, a new ad format) or global?
+    - When did it **start** — correlate with deployments, data pipeline changes, upstream schema changes
+
+    Scoping determines the intervention:
+
+    | Blast radius | Root cause | Action |
+    |---|---|---|
+    | Narrow segment | Feature encoding bug | Hotfix pipeline |
+    | Gradual global | Data drift | Scheduled retrain |
+    | Sudden global | Bad deployment | Rollback serving artifact |
+    | Infra-correlated | Latency / memory | Scale or optimize |
+
+  </Step>
+
+  <Step title="Fix, validate in shadow, then promote">
+
+    Never push a fix straight to production. The promotion ladder:
+
+    ```
+    fix branch
+        → shadow deploy (0% live traffic, full logging)
+        → canary 5%  (automated rollback gate: accuracy + latency)
+        → canary 20% (hold 30 min, check business metrics)
+        → full rollout 100%
+    ```
+
+    ```python
+    # Example automated rollback gate
+    def should_rollback(
+        baseline_metrics: dict,
+        candidate_metrics: dict,
+        thresholds: dict,
+    ) -> bool:
+        for metric, threshold in thresholds.items():
+            delta = candidate_metrics[metric] - baseline_metrics[metric]
+            if delta < -threshold:
+                print(f"Rollback triggered: {metric} degraded by {abs(delta):.4f}")
+                return True
+        return False
+
+    thresholds = {
+        "accuracy":  0.005,   # 0.5% regression triggers rollback
+        "p99_ms":   50.0,     # 50ms latency increase triggers rollback
+        "ctr_lift":  0.002,   # 0.2% CTR drop triggers rollback
+    }
+    ```
+
+  </Step>
+
+  <Step title="Postmortem and close the monitoring gap">
+
+    Whatever was found should be **automatically detectable next time**.
+
+    After every incident, add:
+    - A new drift alert (PSI threshold, feature null rate, prediction entropy)
+    - An entry to the model changelog with root cause and resolution
+    - A regression test in the offline eval suite covering the failure scenario
+
+    ```yaml
+    # model-changelog.yaml
+    - version: "2.4.1"
+      date: "2026-05-28"
+      incident: "INC-4821"
+      root_cause: "Cold-start user segment not represented in training data"
+      drift_signal: "PSI > 0.31 on user_tenure_days feature"
+      resolution: "Retrained with 90-day rolling window + cold-start oversampling"
+      new_alerts_added:
+        - name: psi_user_tenure_days
+          threshold: 0.15
+          channel: "#ml-alerts"
+    ```
+
+  </Step>
+
+</Steps>
+
+---
+
+## Key Observability Signals Reference
+
+### Data Layer
+
+```python
+DRIFT_SIGNALS = {
+    "psi":              {"warn": 0.1,  "critical": 0.2},
+    "ks_p_value":       {"warn": 0.05, "critical": 0.01},
+    "null_rate_delta":  {"warn": 0.02, "critical": 0.05},
+    "js_divergence":    {"warn": 0.05, "critical": 0.1},
+}
+```
+
+### Model Layer
+
+```python
+MODEL_SIGNALS = {
+    "prediction_entropy":    {"warn": "stddev > 2x baseline"},
+    "confidence_calibration":{"warn": "ECE > 0.05"},
+    "output_collapse":       {"warn": "top-1 rate > 80%"},
+    "embedding_norm_drift":  {"warn": "mean norm delta > 15%"},
+}
+```
+
+### Business Outcome Layer
+
+```python
+BUSINESS_SIGNALS = {
+    "ctr_lift":      {"warn": "-0.5%", "critical": "-1.0%"},
+    "conversion":    {"warn": "-0.3%", "critical": "-0.8%"},
+    "revenue_delta": {"warn": "-0.2%", "critical": "-0.5%"},
+}
+```
+
+---
+
+## Prevention: Closing the Loop
+
+The three investments that prevent recurrence:
+
+1. **Automated drift monitoring** — PSI thresholds on every production feature,
+   scheduled nightly, alerting to on-call before humans notice the regression
+
+2. **Continuous or trigger-based retraining** — scheduled retraining on a rolling
+   data window, with quality gates before promotion; or event-triggered when PSI
+   exceeds threshold
+
+3. **Model cards and lineage tracing** — every model artifact tagged with training
+   data window, feature versions, eval snapshots, and upstream dependency hashes
+   so any future incident can be reproduced and attributed
+
+<Callout type="insight">
+  The existing infrastructure monitoring tools will tell you the **servers** are
+  healthy — they can't tell you whether the **models** are healthy. You need a
+  separate telemetry layer covering training metrics, serving metrics, data
+  quality, and model lineage before you can actually trust what's running in
+  production.
+</Callout>
