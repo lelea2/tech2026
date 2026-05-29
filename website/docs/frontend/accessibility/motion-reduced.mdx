@@ -1,0 +1,189 @@
+---
+title: Reduced Motion
+sidebar_position: 14
+---
+
+# Reduced Motion Accessibility
+
+> Respecting user preferences for reduced motion using `prefers-reduced-motion`.
+
+## Why It Matters
+
+Motion sensitivity can cause **physical illness** — nausea, headaches, disorientation — in people with vestibular disorders. This affects approximately 35% of adults over 40 and an estimated 69 million Americans.
+
+This is a genuine medical need, not a preference. WCAG 2.1 Success Criterion 2.3.3 (AAA level) requires providing an option to turn off non-essential motion.
+
+## The prefers-reduced-motion Media Query
+
+Users enable this via OS settings:
+- **macOS:** System Preferences → Accessibility → Display → Reduce motion
+- **Windows:** Settings → Ease of Access → Display → Show animations (off)
+- **iOS:** Settings → Accessibility → Motion → Reduce Motion
+- **Android:** Settings → Accessibility → Remove animations
+
+```css
+/* Default: animations enabled */
+.element {
+  transition: transform 0.3s ease-out;
+  animation: spin 2s linear infinite;
+}
+
+/* Reduced: disable or minimize */
+@media (prefers-reduced-motion: reduce) {
+  .element {
+    transition: none;
+    animation: none;
+  }
+}
+```
+
+## Essential vs. Decorative Motion
+
+**Decorative animations** (parallax scrolling, auto-playing backgrounds, hover sparkles) → **disable entirely**.
+
+**Essential animations** (loading indicators, progress bars) → **use subtle alternatives**.
+
+```css
+/* Decorative: disable completely */
+@media (prefers-reduced-motion: reduce) {
+  .parallax-hero { background-attachment: scroll; } /* Remove parallax */
+  .animated-bg { animation: none; }
+  .hover-sparkle { display: none; }
+}
+
+/* Essential: replace with subtle alternative */
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner {
+    animation: none;
+    /* Replace spinning with pulsing opacity */
+    animation: pulse 1s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+```
+
+## Implementation Patterns
+
+### CSS Variables Approach
+
+```css
+:root {
+  --duration: 300ms;
+  --easing: ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration: 0ms;
+    --easing: step-end;
+  }
+}
+
+.animated {
+  transition: transform var(--duration) var(--easing);
+}
+```
+
+### JavaScript Check
+
+```javascript
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function animateElement(element) {
+  if (prefersReducedMotion) {
+    // Instant state change, no animation
+    element.style.opacity = 1;
+    return;
+  }
+  // Full animation
+  element.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
+}
+```
+
+### React Hook
+
+```jsx
+function usePrefersReducedMotion() {
+  const [reducedMotion, setReducedMotion] = useState(
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handler = (e) => setReducedMotion(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  return reducedMotion;
+}
+
+// Usage
+function AnimatedComponent() {
+  const reducedMotion = usePrefersReducedMotion();
+
+  return (
+    <motion.div
+      animate={{ x: 100 }}
+      transition={reducedMotion ? { duration: 0 } : { duration: 0.5 }}
+    >
+      Content
+    </motion.div>
+  );
+}
+```
+
+### Framer Motion Integration
+
+```jsx
+import { useReducedMotion } from 'framer-motion';
+
+function AnimatedCard({ children }) {
+  const shouldReduceMotion = useReducedMotion();
+
+  const variants = {
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  return (
+    <motion.div
+      variants={variants}
+      initial="hidden"
+      animate="visible"
+      transition={{ duration: shouldReduceMotion ? 0 : 0.3 }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+```
+
+## What to Disable vs. What to Keep
+
+| Animation Type | Reduced Motion Action |
+|---|---|
+| Parallax scrolling | Remove entirely |
+| Auto-playing background video | Pause or remove |
+| Infinite spinning loaders | Replace with pulse |
+| Page transition slides | Instant transition (no slide) |
+| Hover effects (scale, rotate) | Remove or minimize |
+| Progress bar fill | Keep (essential feedback) |
+| Loading skeleton shimmer | Reduce or remove shimmer |
+| Accordion expand | Instant open (no transition) |
+
+## Real-World Impact
+
+A website implementing reduced motion saw:
+- **Bounce rate:** 67% → 28% for users with motion sensitivity
+- **Session duration:** 45 seconds → 4.2 minutes
+
+The accessibility improvement also measurably benefited business metrics.
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

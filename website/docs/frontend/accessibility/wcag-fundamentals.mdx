@@ -1,0 +1,209 @@
+---
+title: WCAG Fundamentals
+sidebar_position: 17
+---
+
+# WCAG and Accessibility Fundamentals
+
+> **Master web accessibility — WCAG guidelines, ARIA, semantic HTML, keyboard navigation, and screen reader support**
+
+## Question: What are WCAG guidelines and the POUR principles?
+
+**Difficulty:** 🟡 Medium | **Frequency:** ⭐⭐⭐⭐⭐ | **Companies:** Google, Meta, Amazon, Microsoft, Apple
+
+## Answer
+
+WCAG (Web Content Accessibility Guidelines) provides standards for making web content accessible to people with disabilities, published by the W3C.
+
+### WCAG Levels
+
+| Level | Description | When Required |
+|-------|-------------|---------------|
+| **Level A** | Basic accessibility — minimum requirements | Floor |
+| **Level AA** | Standard accessibility — recommended target | Legal requirement in many countries (ADA, Section 508, AODA) |
+| **Level AAA** | Enhanced accessibility | Government, healthcare, education |
+
+### POUR Principles
+
+**P — Perceivable:** Information and UI must be presentable to users in ways they can perceive.
+
+```html
+<!-- Text alternatives for images -->
+<img src="chart.png" alt="Sales increased 45% from Q1 to Q2">
+
+<!-- Captions for video -->
+<video controls>
+  <source src="tutorial.mp4" type="video/mp4">
+  <track kind="captions" src="captions.vtt" srclang="en" label="English">
+</video>
+
+<!-- Color is not the only visual means -->
+<span class="error">
+  <span aria-hidden="true">⚠️</span> Invalid email address
+</span>
+```
+
+**O — Operable:** UI components and navigation must be operable.
+
+```html
+<!-- Keyboard accessible: use native elements -->
+<button onclick="submit()">Submit</button>  <!-- ✅ not div -->
+
+<!-- Skip navigation -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- Enough time: no aggressive timeouts -->
+<!-- No seizure-inducing content: no fast flashing -->
+```
+
+**U — Understandable:** Information and operation must be understandable.
+
+```html
+<!-- Readable: set language -->
+<html lang="en">
+
+<!-- Predictable: consistent navigation -->
+<nav aria-label="Main navigation">...</nav>
+
+<!-- Input assistance: clear error messages -->
+<input aria-invalid="true" aria-describedby="email-error">
+<span id="email-error" role="alert">
+  Please enter a valid email address (example@domain.com)
+</span>
+```
+
+**R — Robust:** Content must be robust enough for assistive technologies to interpret.
+
+```html
+<!-- Valid HTML -->
+<!-- Use semantic elements with proper ARIA -->
+<button role="button">...</button>  <!-- redundant but not harmful -->
+<div role="button" tabindex="0">...</div>  <!-- required when div used -->
+
+<!-- Compatible with assistive tech: test with NVDA, JAWS, VoiceOver -->
+```
+
+## Why It Matters
+
+- **15% of world population** has some disability
+- **Legal requirements:** ADA (US), Section 508 (US federal), AODA (Canada), EAA (EU)
+- **Better SEO:** Screen readers and search engines both use semantic HTML
+- **Larger audience:** Accessible sites work for everyone (mobile users, elderly, situational disabilities)
+- **Business impact:** ADA lawsuits increased 300%+ since 2017
+
+## Common Disabilities
+
+| Type | Examples | Accommodations |
+|------|---------|----------------|
+| **Visual** | Blindness, low vision, color blindness | Alt text, screen readers, contrast |
+| **Auditory** | Deafness, hard of hearing | Captions, transcripts |
+| **Motor** | Limited movement, tremors, paralysis | Keyboard navigation, large targets |
+| **Cognitive** | Dyslexia, ADHD, learning disabilities | Clear language, consistent layout |
+
+## WCAG 2.1 Key Success Criteria
+
+### Level A (Must Have)
+
+```html
+<!-- 1.1.1 Non-text Content: alt text -->
+<img src="logo.png" alt="Company Name">
+
+<!-- 1.3.1 Info and Relationships: semantic structure -->
+<h1>Page Title</h1>
+<h2>Section Title</h2>
+<ul><li>List item</li></ul>
+
+<!-- 2.1.1 Keyboard: all functionality via keyboard -->
+<button onclick="save()">Save</button>  <!-- not <div> -->
+
+<!-- 4.1.1 Parsing: valid HTML, unique IDs -->
+<label for="name">Name</label>
+<input id="name" type="text">
+```
+
+### Level AA (Recommended)
+
+```css
+/* 1.4.3 Contrast Minimum: 4.5:1 for normal text */
+body { color: #595959; background: #fff; } /* 4.54:1 ✅ */
+
+/* 1.4.4 Resize Text: works at 200% zoom */
+/* 1.4.5 Images of Text: use real text, not images of text */
+
+/* 2.4.7 Focus Visible: visible focus indicator */
+:focus-visible { outline: 3px solid #0078d4; }
+```
+
+```html
+<!-- 2.4.3 Focus Order: logical tab order -->
+<!-- 2.4.6 Headings and Labels: descriptive labels -->
+<label for="email">Email address</label>  <!-- not just "Email" -->
+
+<!-- 3.1.2 Language of Parts: mark language changes -->
+<p>The French phrase <span lang="fr">au revoir</span> means goodbye.</p>
+```
+
+### Level AAA (Enhanced)
+
+```css
+/* 1.4.6 Contrast Enhanced: 7:1 */
+body { color: #333; background: #fff; } /* 12.6:1 ✅ */
+
+/* 2.3.3 Animation from Interactions: respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none; animation: none; }
+}
+```
+
+## Quick WCAG Checklist
+
+```
+Perceivable:
+□ All images have alt text (or alt="" if decorative)
+□ Videos have captions and transcripts
+□ Color is not the only way to convey information
+□ Text contrast is at least 4.5:1 (AA) or 7:1 (AAA)
+□ Content works at 200% zoom
+
+Operable:
+□ All functionality accessible via keyboard
+□ Skip navigation link at top of page
+□ No keyboard traps
+□ Focus indicator visible
+□ No content causes seizures
+
+Understandable:
+□ Language set in <html lang="...">
+□ Form errors are descriptive and helpful
+□ Navigation is consistent across pages
+□ Labels describe their purpose clearly
+
+Robust:
+□ HTML is valid (no duplicate IDs)
+□ Name, role, value available for all UI components
+□ Tested with NVDA, JAWS, and/or VoiceOver
+□ No ARIA misuse (first rule: don't use ARIA)
+```
+
+## Interview Answer Template
+
+"WCAG provides standards for making web content accessible. It has three levels — A, AA, and AAA — where AA is the legal requirement in most countries.
+
+The four POUR principles guide accessibility:
+- **Perceivable:** Users can perceive the content (alt text, captions, sufficient contrast)
+- **Operable:** Users can operate the interface (keyboard accessible, no traps, visible focus)
+- **Understandable:** Users understand the content and UI (clear language, error messages, predictable navigation)
+- **Robust:** Content works across assistive technologies (valid HTML, proper ARIA)
+
+The most common issues I fix are: missing alt text, insufficient color contrast, missing form labels, broken keyboard navigation, and missing focus indicators."
+
+## Resources
+
+- [WCAG 2.1 Quick Reference](https://www.w3.org/WAI/WCAG21/quickref/)
+- [WebAIM: Introduction to Accessibility](https://webaim.org/intro/)
+- [MDN: Accessibility](https://developer.mozilla.org/en-US/docs/Web/Accessibility)
+- [a11y Project Checklist](https://www.a11yproject.com/checklist/)
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

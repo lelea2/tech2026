@@ -1,0 +1,189 @@
+---
+title: Screen Readers Basics
+sidebar_position: 15
+---
+
+# Screen Readers and Assistive Technology
+
+> ARIA attributes, semantic HTML, and screen reader testing fundamentals.
+
+## Question: What are ARIA roles and when should you use them?
+
+**Difficulty:** 🟡 Medium | **Frequency:** ⭐⭐⭐⭐ | **Companies:** Google, Meta, Airbnb
+
+## The First Rule of ARIA
+
+**Don't use ARIA.** Use semantic HTML first. When you use a native HTML element, the browser handles role, state, and interaction automatically.
+
+```html
+<!-- ❌ Bad: div lacks built-in keyboard support and semantics -->
+<div onclick="toggleMenu()">Menu</div>
+
+<!-- ✅ Better: button has role="button", keyboard support, focus handling -->
+<button onclick="toggleMenu()">Menu</button>
+
+<!-- ✅ When truly needed: custom widget with full ARIA -->
+<div
+  role="button"
+  tabindex="0"
+  aria-label="Toggle menu"
+  aria-expanded="false"
+  onclick="toggleMenu()"
+  onkeypress="if(event.key==='Enter'||event.key===' ') toggleMenu()"
+>
+  Menu
+</div>
+```
+
+## Popular Screen Readers
+
+| Screen Reader | Platform | Cost |
+|---|---|---|
+| **NVDA** | Windows | Free |
+| **JAWS** | Windows | Paid |
+| **VoiceOver** | macOS / iOS | Built-in |
+| **TalkBack** | Android | Built-in |
+| **Narrator** | Windows | Built-in |
+
+## How Screen Readers Work: The Accessibility Tree
+
+The browser maintains two parallel structures:
+1. **DOM Tree** — the actual HTML
+2. **Accessibility Tree** — a simplified version consumed by screen readers
+
+ARIA modifies the accessibility tree without changing the DOM. When you add `role="button"` to a div, the accessibility tree shows a button — but you still must implement keyboard behavior manually.
+
+```html
+<!-- DOM: div element -->
+<div role="button" tabindex="0" aria-label="Close">×</div>
+
+<!-- Accessibility tree node:
+  Role: button
+  Name: "Close"
+  State: focusable
+  (keyboard behavior: you must implement)
+-->
+```
+
+## Common ARIA Patterns
+
+### Navigation with Landmark
+
+```html
+<nav aria-label="Main navigation">
+  <ul>
+    <li><a href="/" aria-current="page">Home</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/contact">Contact</a></li>
+  </ul>
+</nav>
+```
+
+### Live Region for Dynamic Content
+
+```html
+<!-- Alerts: announced immediately -->
+<div role="alert">Payment failed: card declined</div>
+
+<!-- Status: announced when user is idle -->
+<div role="status" aria-live="polite">Changes saved</div>
+```
+
+### Accessible Image
+
+```html
+<!-- Informative: describe the meaning -->
+<img src="chart.png" alt="Sales grew 45% from Q1 to Q2 2024">
+
+<!-- Decorative: empty alt -->
+<img src="divider.png" alt="">
+```
+
+### Accessible Custom Widget
+
+```html
+<div role="tablist" aria-label="Product tabs">
+  <button role="tab" aria-selected="true" aria-controls="panel-1" id="tab-1">
+    Description
+  </button>
+  <button role="tab" aria-selected="false" aria-controls="panel-2" id="tab-2" tabindex="-1">
+    Reviews
+  </button>
+</div>
+<div role="tabpanel" id="panel-1" aria-labelledby="tab-1">...</div>
+<div role="tabpanel" id="panel-2" aria-labelledby="tab-2" hidden>...</div>
+```
+
+## Testing with Screen Readers
+
+### NVDA (Windows — Free)
+
+1. Download from [nvaccess.org](https://www.nvaccess.org)
+2. Start NVDA → your screen reader is active
+3. Key shortcuts:
+   - `H` — next heading
+   - `D` — next landmark
+   - `Tab` — next focusable element
+   - `Enter` — activate link/button
+   - `NVDA+Space` — switch between Browse/Forms mode
+
+### VoiceOver (macOS — Built-in)
+
+1. Enable: `Cmd+F5` or System Preferences → Accessibility → VoiceOver
+2. Key shortcuts:
+   - `VO+U` — open Rotor (headings, links, landmarks)
+   - `VO+Right/Left` — navigate elements
+   - `VO+Space` — activate element
+   - `Cmd+F5` — toggle VoiceOver
+
+### What to Test
+
+- [ ] Page title announced on load
+- [ ] All images have appropriate alt text
+- [ ] Form labels are announced with inputs
+- [ ] Error messages are announced (via `role="alert"` or `aria-describedby`)
+- [ ] Modal dialogs trap focus and announce title
+- [ ] Dynamic updates are announced (live regions)
+- [ ] Navigation landmarks are distinguishable
+- [ ] Custom widgets respond to keyboard
+
+## Screen Reader Announcement Order
+
+Different screen readers announce elements in slightly different order:
+
+**NVDA example for a button:**
+```
+"Submit, button"  (name → role)
+
+With description:
+"Submit, button, This will create your account"  (name → role → description)
+```
+
+**When an error appears with `role="alert"`:**
+```
+"Error: Please enter a valid email address"  (interrupts immediately)
+```
+
+## Common Accessibility Mistakes Screen Readers Catch
+
+```html
+<!-- ❌ Image with no alt -->
+<img src="product.jpg">
+<!-- SR: "product.jpg, image" (useless) -->
+
+<!-- ❌ Button with no name -->
+<button>×</button>
+<!-- SR: "×, button" (unclear) -->
+
+<!-- ❌ Form field with no label -->
+<input type="email" placeholder="Email">
+<!-- SR: "email, edit text" (from placeholder — disappears when typing) -->
+
+<!-- ❌ Click handler on non-interactive element -->
+<div onclick="handleClick()">Open menu</div>
+<!-- SR: "Open menu" — no role, not keyboard accessible -->
+```
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

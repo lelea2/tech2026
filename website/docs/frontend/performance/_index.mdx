@@ -1,0 +1,128 @@
+---
+title: Performance Overview
+sidebar_position: 0
+---
+
+# Frontend Performance
+
+> 18+ questions covering optimization techniques, image optimization, caching, lazy loading, and monitoring.
+
+Master frontend performance optimization from fundamentals to advanced patterns. Essential for senior frontend interviews.
+
+> Content sourced from [maurya-sachin/Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/) — see the [07-performance directory](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/07-performance) for the original files.
+
+---
+
+## Topics
+
+| Topic | Questions | Difficulty |
+|-------|-----------|------------|
+| [Optimization Techniques](./optimization-techniques) | ~8 Q&A | Medium / Hard |
+| [Image Optimization](./image-optimization) | ~4 Q&A | Medium |
+| [Caching Strategies](./caching-strategies) | ~2 Q&A | Medium / Hard |
+| [Lazy Loading & Code Splitting](./lazy-loading) | ~2 Q&A | Medium |
+| [Core Web Vitals](./core-vitals) | ~2 Q&A | Medium / Hard |
+| [Performance Monitoring](./monitoring-tools) | ~2 Q&A | Medium / Hard |
+
+---
+
+## Most Frequently Asked
+
+1. **Code Splitting** — How to reduce bundle size (⭐⭐⭐⭐⭐)
+2. **Core Web Vitals** — LCP, FID, CLS optimization (⭐⭐⭐⭐⭐)
+3. **Image Optimization** — Formats, lazy loading, responsive images (⭐⭐⭐⭐)
+4. **Caching Strategies** — Browser cache, service workers (⭐⭐⭐⭐)
+5. **React Performance** — memo, useMemo, useCallback (⭐⭐⭐⭐)
+
+---
+
+## Key Concepts
+
+### Performance Metrics
+
+| Metric | What it measures | Good threshold |
+|--------|-----------------|----------------|
+| **LCP** (Largest Contentful Paint) | Loading performance | &lt; 2.5s |
+| **INP** (Interaction to Next Paint) | Interactivity | &lt; 200ms |
+| **CLS** (Cumulative Layout Shift) | Visual stability | &lt; 0.1 |
+| **TTFB** (Time to First Byte) | Server response | &lt; 800ms |
+| **FCP** (First Contentful Paint) | Initial rendering | &lt; 1.8s |
+
+### Optimization Strategies
+
+```
+1. Reduce Bundle Size
+   - Code splitting
+   - Tree shaking
+   - Minification
+   - Compression (gzip/brotli)
+
+2. Optimize Assets
+   - Image compression
+   - Lazy loading
+   - Responsive images
+   - WebP/AVIF formats
+
+3. Caching
+   - Browser cache
+   - Service workers
+   - CDN
+   - Cache invalidation
+
+4. Critical Rendering Path
+   - Minimize render-blocking resources
+   - Inline critical CSS
+   - Defer non-critical JS
+   - Optimize font loading
+```
+
+---
+
+## Interview Readiness Checklist
+
+### Junior Level (0–2 years)
+- [ ] Understand basic optimization concepts
+- [ ] Can implement lazy loading for images
+- [ ] Know what Core Web Vitals are
+- [ ] Can use Lighthouse for basic audits
+- [ ] Understand code splitting basics
+
+### Mid Level (2–4 years)
+- [ ] Can optimize bundle size with code splitting
+- [ ] Understand image optimization strategies
+- [ ] Can implement caching strategies
+- [ ] Proficient with React performance optimization
+- [ ] Can debug performance issues with DevTools
+- [ ] Understand service workers basics
+- [ ] Know how to measure and improve Core Web Vitals
+
+### Senior Level (4+ years)
+- [ ] Can architect performance optimization strategies
+- [ ] Expert in bundle optimization and tree shaking
+- [ ] Can implement advanced caching patterns
+- [ ] Understand browser rendering pipeline
+- [ ] Can optimize Critical Rendering Path
+- [ ] Proficient with performance profiling tools
+- [ ] Can mentor juniors on performance best practices
+- [ ] Understand trade-offs in performance decisions
+
+---
+
+## Tools & Libraries
+
+### Measurement
+- **Lighthouse** — Performance audits
+- **WebPageTest** — Real-world testing
+- **Chrome DevTools** — Profiling and debugging
+- **PageSpeed Insights** — Field data + lab data
+
+### Optimization
+- **webpack-bundle-analyzer** — Bundle visualization
+- **imagemin** — Image compression
+- **sharp** — Image processing
+- **workbox** — Service worker toolkit
+
+### Monitoring
+- **web-vitals** — Core Web Vitals library
+- **Performance Observer API** — Real user monitoring
+- **Sentry** — Performance monitoring

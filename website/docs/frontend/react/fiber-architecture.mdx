@@ -1,0 +1,150 @@
+---
+title: Fiber Architecture
+sidebar_position: 10
+---
+
+# React Fiber Architecture
+
+> **Difficulty:** 🔴 Hard | **Frequency:** ⭐⭐⭐
+
+## Why Fiber Was Created
+
+The original stack reconciler processed updates **synchronously without interruption**. Once React began rendering, it had to complete the entire tree before returning control to the browser. Problems:
+
+- **UI blocking:** Large updates prevented input handling
+- **Dropped frames:** Complex renders caused animations to stutter
+- **No prioritization:** Critical updates couldn't interrupt background work
+- **Mobile:** Limited CPU made blocking worse
+
+## What Fiber Is
+
+Every React element corresponds to a **Fiber node** — a JavaScript object:
+
+```javascript
+// Fiber node (simplified)
+{
+  type: ComponentFunction,   // Component or DOM element type
+  key: null,
+  child: Fiber | null,       // First child
+  sibling: Fiber | null,     // Next sibling
+  return: Fiber | null,      // Parent
+  memoizedState: Hook | null, // Hook state linked list
+  memoizedProps: Props,
+  flags: number,             // What DOM operation is needed
+  lanes: Lanes,              // Update priority
+  alternate: Fiber | null,   // Double buffer (current vs work-in-progress)
+}
+```
+
+The tree structure allows traversal **without recursion** — React walks child → sibling → parent, enabling pausing at any point.
+
+## Two-Phase Rendering
+
+### Render Phase (Interruptible)
+
+- Reconciles component changes
+- Calls component functions and lifecycle methods
+- Creates/updates fiber nodes
+- **Can be paused, resumed, or aborted**
+- No DOM changes happen here
+
+### Commit Phase (Synchronous)
+
+- Applies all DOM changes at once
+- Fires `useLayoutEffect` (before paint)
+- Fires `useEffect` (after paint)
+- **Cannot be interrupted** — always completes once started
+
+## Time-Slicing
+
+React performs work in ~5ms chunks. Between chunks, it checks if higher-priority work arrived:
+
+```
+Render chunk 1 (5ms) → Check: high priority work? 
+  No → Render chunk 2 (5ms) → Check: high priority work?
+  Yes → Pause, handle urgent work → Resume
+```
+
+This maintains 60 FPS (16.67ms per frame) even during heavy rendering.
+
+## Priority Lanes (React 18)
+
+Updates are assigned priority:
+
+| Priority | Example |
+|----------|---------|
+| Discrete (highest) | Click, keypress, focus |
+| Continuous | Drag, mouse move, scroll |
+| Default | Data fetching, transitions |
+| Idle (lowest) | Analytics, prefetching |
+
+High-priority updates interrupt lower-priority work in progress.
+
+## Double Buffering
+
+React maintains two fiber trees:
+
+- **`current`** — the tree currently rendered on screen
+- **`workInProgress`** — the tree being built for the next render
+
+After commit, `workInProgress` becomes `current`. This prevents showing partially-rendered UI.
+
+## Concurrent Features Built on Fiber
+
+```jsx
+// useTransition: explicitly mark non-urgent updates
+function SearchPage() {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [isPending, startTransition] = useTransition();
+
+  const handleChange = (e) => {
+    setQuery(e.target.value); // Urgent: immediate
+
+    startTransition(() => {
+      setResults(filter(allItems, e.target.value)); // Non-urgent: deferrable
+    });
+  };
+
+  return (
+    <>
+      <input value={query} onChange={handleChange} />
+      {isPending && <Spinner />}
+      <Results items={results} />
+    </>
+  );
+}
+
+// useDeferredValue: auto-deferred copy of a value
+function App({ data }) {
+  const deferredData = useDeferredValue(data);
+  return <ExpensiveChart data={deferredData} />;
+}
+```
+
+## Suspense Integration
+
+Fiber enables components to "suspend" — throw a promise — and React catches it at the nearest `<Suspense>` boundary:
+
+```jsx
+<Suspense fallback={<Loading />}>
+  <DataComponent /> {/* Can suspend while loading */}
+</Suspense>
+```
+
+React pauses rendering the suspended component, shows the fallback, and resumes when the promise resolves.
+
+## Performance Characteristics
+
+| Concern | Before Fiber | After Fiber |
+|---------|-------------|------------|
+| Large list filter | Freezes input (500ms+) | Input responsive (0ms) |
+| Slow network render | Blank screen until done | Progressive content display |
+| Animation during update | Dropped frames | Smooth 60fps |
+| Prioritization | None | Time-slicing + lanes |
+
+Fiber overhead: ~3KB additional bundle size. Justified when renders exceed ~50ms.
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [03-react](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/03-react)_

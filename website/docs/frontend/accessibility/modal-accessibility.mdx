@@ -1,0 +1,234 @@
+---
+title: Modal Accessibility
+sidebar_position: 13
+---
+
+# Modal Accessibility
+
+> Focus traps, aria-modal, keyboard interaction, and screen reader announcements for dialogs.
+
+## Core Requirements
+
+Five essential components for an accessible modal:
+
+1. **Focus trap** — Tab key cycles only within the modal, not the page behind it
+2. **Keyboard support** — Escape closes; Tab/Shift+Tab cycles within
+3. **ARIA attributes** — `role="dialog"`, `aria-modal="true"`, `aria-labelledby`
+4. **Screen reader announcement** — Dialog title and description announced on open
+5. **Background isolation** — Page content hidden from assistive technology while modal is open
+
+## Implementation
+
+```javascript
+class AccessibleModal {
+  constructor(modal) {
+    this.modal = modal;
+    this.previousFocus = null;
+    this.focusableSelectors = [
+      'a[href]', 'button:not([disabled])', 'textarea:not([disabled])',
+      'input:not([disabled])', 'select:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])'
+    ].join(', ');
+  }
+
+  getFocusable() {
+    return Array.from(this.modal.querySelectorAll(this.focusableSelectors));
+  }
+
+  open() {
+    this.previousFocus = document.activeElement; // Save focus
+
+    this.modal.hidden = false;
+    this.modal.setAttribute('aria-modal', 'true');
+
+    // Hide background from screen readers
+    document.querySelector('main').setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = 'hidden';
+
+    // Focus first element
+    const focusable = this.getFocusable();
+    focusable[0]?.focus();
+
+    // Add keyboard handler
+    this.keyHandler = (e) => this.handleKeyDown(e);
+    this.modal.addEventListener('keydown', this.keyHandler);
+  }
+
+  close() {
+    this.modal.hidden = true;
+
+    // Restore background
+    document.querySelector('main').removeAttribute('aria-hidden');
+    document.body.style.overflow = '';
+
+    this.modal.removeEventListener('keydown', this.keyHandler);
+
+    // Restore focus to trigger element
+    this.previousFocus?.focus();
+  }
+
+  handleKeyDown(e) {
+    if (e.key === 'Escape') { this.close(); return; }
+    if (e.key !== 'Tab') return;
+
+    const focusable = this.getFocusable();
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault(); last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault(); first.focus();
+    }
+  }
+}
+```
+
+## HTML Structure
+
+```html
+<!-- Trigger -->
+<button id="open-btn" onclick="modal.open()">Delete Account</button>
+
+<!-- Modal -->
+<div
+  id="confirm-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="modal-title"
+  aria-describedby="modal-desc"
+  hidden
+>
+  <h2 id="modal-title">Delete Account</h2>
+  <p id="modal-desc">
+    This will permanently delete your account and all data.
+    This action cannot be undone.
+  </p>
+  <button onclick="confirmDelete()">Delete My Account</button>
+  <button onclick="modal.close()">Cancel</button>
+</div>
+```
+
+Screen reader announces on open: **"Delete Account, dialog, This will permanently delete your account..."**
+
+## React Implementation
+
+```jsx
+function AccessibleModal({ isOpen, onClose, title, description, children }) {
+  const modalRef = useRef(null);
+  const previousFocusRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      previousFocusRef.current = document.activeElement;
+
+      // Focus first focusable element
+      const focusable = modalRef.current?.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      focusable?.[0]?.focus();
+
+      // Hide background
+      document.querySelector('main')?.setAttribute('aria-hidden', 'true');
+    } else {
+      document.querySelector('main')?.removeAttribute('aria-hidden');
+      previousFocusRef.current?.focus();
+    }
+  }, [isOpen]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape') { onClose(); return; }
+    if (e.key !== 'Tab') return;
+
+    const focusable = Array.from(
+      modalRef.current?.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      ) ?? []
+    );
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault(); last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault(); first.focus();
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      ref={modalRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      aria-describedby={description ? 'modal-desc' : undefined}
+      onKeyDown={handleKeyDown}
+      className="modal"
+    >
+      <h2 id="modal-title">{title}</h2>
+      {description && <p id="modal-desc">{description}</p>}
+      {children}
+      <button onClick={onClose} aria-label="Close dialog">×</button>
+    </div>
+  );
+}
+```
+
+## Alert Dialog vs Regular Dialog
+
+```html
+<!-- Regular dialog: informational, non-urgent -->
+<div role="dialog" aria-modal="true" aria-labelledby="title">
+  <h2 id="title">Edit Profile</h2>
+  <!-- form content -->
+</div>
+
+<!-- Alert dialog: requires immediate response, urgent -->
+<div role="alertdialog" aria-modal="true" aria-labelledby="title" aria-describedby="msg">
+  <h2 id="title">Warning: Unsaved Changes</h2>
+  <p id="msg">You have unsaved changes. Do you want to leave without saving?</p>
+  <button>Leave</button>
+  <button>Stay</button>
+</div>
+```
+
+`role="alertdialog"` causes screen readers to announce the dialog immediately and more forcefully.
+
+## Using the inert Attribute (Modern Approach)
+
+The `inert` attribute makes all descendant elements non-interactive and hidden from assistive technology:
+
+```html
+<!-- Make background inert when modal opens -->
+<main inert>...</main>
+<div role="dialog" aria-modal="true">...</div>
+```
+
+```javascript
+function openModal() {
+  document.querySelector('main').inert = true;
+  // ... show modal, focus first element
+}
+
+function closeModal() {
+  document.querySelector('main').inert = false;
+  // ... hide modal, restore focus
+}
+```
+
+Browser support: Chrome 102+, Firefox 112+, Safari 15.5+.
+
+## Common Mistakes
+
+- Not saving focus before opening (can't restore on close)
+- Closing on overlay click but not Escape key
+- Using `display: none` to show modal instead of `hidden` attribute
+- Not using `aria-modal="true"` (screen readers may still read background)
+- Missing `aria-labelledby` (dialog has no announced title)
+- Forgetting to restore focus when modal closes
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

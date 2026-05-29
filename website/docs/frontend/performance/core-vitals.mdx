@@ -1,0 +1,389 @@
+---
+title: Core Web Vitals
+sidebar_position: 5
+---
+
+# Core Web Vitals
+
+> LCP, INP, CLS — Google's user-centric metrics for web experience and SEO ranking.
+
+---
+
+## Question 1: What are Core Web Vitals and why do they matter?
+
+**Difficulty:** 🟡 Medium
+**Frequency:** ⭐⭐⭐⭐⭐
+**Time:** 10 minutes
+**Companies:** Google, Meta, Vercel, Amazon, Netflix
+
+### Question
+
+What are Core Web Vitals and why has Google made them critical ranking factors?
+
+### Answer
+
+**Core Web Vitals** are three user-centric metrics that measure different aspects of web page experience:
+
+| Metric | Measures | Good | Needs Improvement | Poor |
+|--------|----------|------|-------------------|------|
+| **LCP** (Largest Contentful Paint) | Loading performance | &lt; 2.5s | 2.5–4s | &gt; 4s |
+| **INP** (Interaction to Next Paint) | Responsiveness | &lt; 200ms | 200–500ms | &gt; 500ms |
+| **CLS** (Cumulative Layout Shift) | Visual stability | &lt; 0.1 | 0.1–0.25 | &gt; 0.25 |
+
+**Why Google cares:**
+- Direct correlation with user retention and conversion rates
+- Official SEO ranking factor (~60% weight in ranking algorithms)
+- Mobile-first indexing prioritizes these metrics
+
+```javascript
+// Measure all three with web-vitals library
+import { onLCP, onINP, onCLS } from 'web-vitals';
+
+onLCP(metric => {
+  console.log('LCP:', metric.value); // milliseconds
+});
+
+onINP(metric => {
+  console.log('INP:', metric.value); // milliseconds
+});
+
+onCLS(metric => {
+  console.log('CLS:', metric.value); // 0–1 score
+});
+
+// Send to analytics
+function sendToAnalytics(metric) {
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon('/analytics', JSON.stringify({
+      name: metric.name,
+      value: metric.value,
+      rating: metric.rating, // 'good', 'needs-improvement', 'poor'
+      url: window.location.href,
+    }));
+  }
+}
+
+onLCP(sendToAnalytics);
+onINP(sendToAnalytics);
+onCLS(sendToAnalytics);
+```
+
+### Resources
+- [Web Vitals](https://web.dev/vitals/)
+- [web-vitals Library](https://github.com/GoogleChrome/web-vitals)
+
+---
+
+## LCP (Largest Contentful Paint) Deep Dive
+
+**What counts as LCP candidates:**
+- `<img>` elements
+- `<image>` inside `<svg>`
+- `<video>` poster images
+- Elements with CSS background images
+- Block-level text nodes
+
+**LCP finalization:** The browser keeps updating LCP until the user interacts (click, scroll, keypress) or the page unloads.
+
+```javascript
+// Track LCP with PerformanceObserver
+const observer = new PerformanceObserver((list) => {
+  const entries = list.getEntries();
+  const lastEntry = entries[entries.length - 1];
+
+  console.log('LCP element:', lastEntry.element);
+  console.log('LCP time:', lastEntry.renderTime || lastEntry.loadTime);
+  console.log('LCP size:', lastEntry.size, 'px²');
+});
+
+observer.observe({ type: 'largest-contentful-paint', buffered: true });
+
+// Example timeline:
+// T=0.5s: Hero text (50,000 px²) → LCP = 0.5s
+// T=1.2s: Hero image (200,000 px²) → LCP = 1.2s (updated!)
+// T=2.1s: User clicks → LCP finalizes at 1.2s
+```
+
+**LCP optimization priorities (Chrome team data):**
+
+| Optimization | Avg Improvement |
+|-------------|----------------|
+| Preload LCP image | −40% |
+| Remove render-blocking JS/CSS | −30% |
+| Use CDN for images | −25% |
+| Optimize server TTFB | −20% |
+| Compress images (WebP) | −15% |
+
+```html
+<!-- Preload LCP image (most impactful) -->
+<link
+  rel="preload"
+  as="image"
+  href="hero.webp"
+  fetchpriority="high"
+/>
+
+<!-- Responsive preload -->
+<link
+  rel="preload"
+  as="image"
+  href="hero.webp"
+  imagesrcset="hero-480.webp 480w, hero-960.webp 960w"
+  imagesizes="100vw"
+/>
+
+<!-- Before: blocking JS -->
+<script src="bundle.js"></script>
+<img src="hero.jpg" />
+
+<!-- After: async JS + optimized image -->
+<script src="bundle.js" async></script>
+<img
+  src="hero.webp"
+  srcset="hero-small.webp 480w, hero-large.webp 1920w"
+  sizes="min(100vw, 1200px)"
+/>
+```
+
+---
+
+## INP (Interaction to Next Paint) Deep Dive
+
+INP replaced FID in March 2024. Unlike FID (which only measured the first interaction), **INP measures ALL interactions throughout the page lifetime** and reports the worst one.
+
+```
+User clicks button
+         ↓
+    [Input Delay]      ← FID measured only this
+         ↓
+   Browser processes event handler
+         ↓
+    [Processing Time]  ← INP includes this too
+         ↓
+   Browser paints next frame
+         ↓
+    [Presentation Delay] ← INP includes this too
+         ↓
+    User sees response
+```
+
+```javascript
+// Track INP
+const observer = new PerformanceObserver((list) => {
+  let worstDuration = 0;
+
+  for (const entry of list.getEntries()) {
+    if (entry.duration > worstDuration) {
+      worstDuration = entry.duration;
+      console.log(`Worst interaction: ${worstDuration}ms on`, entry.interactionTarget);
+    }
+  }
+});
+
+observer.observe({ type: 'event', buffered: true, durationThreshold: 40 });
+
+// Fix: Break up long tasks with yielding
+// ❌ Bad: 700ms blocking task
+function processData(items) {
+  for (let i = 0; i < 1000000; i++) { /* heavy computation */ }
+}
+
+// ✅ Good: Yield every 100 items
+async function processData(items) {
+  for (let i = 0; i < items.length; i++) {
+    if (i % 100 === 0) {
+      await new Promise(resolve => setTimeout(resolve, 0)); // yield to main thread
+    }
+    processItem(items[i]);
+  }
+}
+
+// ✅ React 18: startTransition for non-urgent updates
+import { startTransition } from 'react';
+
+function handleClick() {
+  // Urgent: paint response immediately
+  setButtonLoading(true);
+
+  // Non-urgent: can be interrupted
+  startTransition(() => {
+    setFilteredResults(filterData(rawData));
+  });
+}
+```
+
+---
+
+## CLS (Cumulative Layout Shift) Deep Dive
+
+**CLS Score calculation:**
+
+```
+CLS = largest session window (5s window, max 5min total)
+
+Per-shift score = impact_fraction × distance_fraction
+
+Example:
+  Element moves 20% of viewport height (impact_fraction)
+  Shifted 25% of viewport height down (distance_fraction)
+  Shift score = 0.20 × 0.25 = 0.05
+```
+
+```javascript
+// Track CLS
+const observer = new PerformanceObserver((list) => {
+  let cls = 0;
+  list.getEntries().forEach((entry) => {
+    if (!entry.hadRecentInput) { // Only count unexpected shifts
+      cls += entry.value;
+      console.log('Layout shift:', entry.value, 'from:', entry.sources);
+    }
+  });
+  console.log('Total CLS:', cls);
+});
+
+observer.observe({ type: 'layout-shift', buffered: true });
+```
+
+**Common CLS causes and fixes:**
+
+```html
+<!-- ❌ Bad: image with no dimensions -->
+<img src="photo.jpg" />
+<!-- Causes shift when image loads (browser didn't know height) -->
+
+<!-- ✅ Good: explicit dimensions -->
+<img src="photo.jpg" width="800" height="600" />
+<!-- or CSS aspect-ratio -->
+<div style="aspect-ratio: 4/3">
+  <img src="photo.jpg" />
+</div>
+```
+
+```jsx
+// ❌ Bad: content appears without placeholder
+{chartData && <Chart data={chartData} />}
+
+// ✅ Good: reserve space with skeleton
+<div style={{ minHeight: '400px' }}>
+  {chartData ? <Chart data={chartData} /> : <ChartSkeleton />}
+</div>
+```
+
+```css
+/* ❌ Bad: web font causes text to shift (FOIT/FOUT) */
+@font-face {
+  font-family: 'CustomFont';
+  src: url('/fonts/custom.woff2');
+}
+
+/* ✅ Good: font-display: swap prevents CLS */
+@font-face {
+  font-family: 'CustomFont';
+  src: url('/fonts/custom.woff2');
+  font-display: swap;
+}
+```
+
+---
+
+## Real-World Scenario: E-commerce Performance Crisis
+
+**Site metrics (before):**
+- LCP: 6.2s, INP: 350ms, CLS: 0.34
+- Result: 15% bounce rate increase, $2.3M lost revenue annually
+
+**Diagnosis:**
+
+```javascript
+// LCP investigation: waterfall analysis showed
+// - Hero image: 2.5 MB JPEG (uncompressed!)
+// - JavaScript bundle: 850 KB blocking rendering
+// - No preload for hero image
+
+// CLS investigation: debug layout shifts
+const clsDebug = [];
+new PerformanceObserver((list) => {
+  list.getEntries().forEach((entry) => {
+    if (!entry.hadRecentInput) {
+      clsDebug.push({
+        value: entry.value,
+        sources: entry.sources,
+      });
+    }
+  });
+}).observe({ type: 'layout-shift', buffered: true });
+
+// Results:
+// Shift 1 (0.8s): Logo loads, no height → 0.12
+// Shift 2 (1.2s): Navigation expands → 0.08
+// Shift 3 (2.4s): Chart container resizes → 0.15
+// Shift 4 (3.1s): Ads inject without placeholder → 0.07
+// Total: 0.42
+```
+
+**Fixes:**
+
+```jsx
+// LCP: Preload + parallel fetching
+async function loadDashboard() {
+  // Before: sequential fetch (waterfall)
+  // const user = await fetch('/api/user');
+  // const metrics = await fetch('/api/metrics'); // waited for user!
+
+  // After: parallel fetch
+  const [user, metrics, chart] = await Promise.all([
+    fetch('/api/user').then(r => r.json()),
+    fetch('/api/metrics').then(r => r.json()),
+    fetch('/api/chart-data').then(r => r.json()),
+  ]);
+}
+
+// CLS: Reserve space for all dynamic content
+<img src="/logo.png" alt="Logo" width="200" height="50" />
+
+<div className="chart-container" style={{ minHeight: '400px' }}>
+  {chartData ? <Chart data={chartData} /> : <ChartSkeleton />}
+</div>
+
+// INP: Code splitting + defer analytics
+const Analytics = dynamic(() => import('./analytics'), { ssr: false });
+
+useEffect(() => {
+  window.addEventListener('load', () => {
+    import('./analytics').then(m => m.init());
+  });
+}, []);
+```
+
+**Results:**
+
+| Metric | Before | After |
+|--------|--------|-------|
+| LCP | 6.2s | 1.8s |
+| INP | 350ms | 85ms |
+| CLS | 0.34 | 0.04 |
+| Bounce rate | — | −15% |
+
+---
+
+## Lab vs Field Metrics
+
+| Source | Data Type | Conditions | Use For |
+|--------|-----------|------------|---------|
+| **Lighthouse (lab)** | Synthetic | Controlled (fast WiFi, desktop) | Development, CI/CD |
+| **RUM (field)** | Real users | Real-world (3G, mobile, global) | Production monitoring |
+| **CrUX** | 28-day Chrome data | Real Chrome users globally | SEO benchmarking |
+
+**Always optimize for P75 (75th percentile):**
+
+```javascript
+const lcpTimes = [1.2, 1.5, 1.8, 2.1, 2.4, 3.2, 4.5, 8.1];
+const p75 = lcpTimes[Math.floor(lcpTimes.length * 0.75)]; // 4.5s
+// 75% of your users have LCP ≤ 4.5s
+// Google ranks you based on this number, not the average
+```
+
+---
+
+_Content from [maurya-sachin/Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/07-performance)_

@@ -1,0 +1,167 @@
+---
+title: Lifecycle Methods
+sidebar_position: 12
+---
+
+# React Lifecycle Methods
+
+## Lifecycle Phases
+
+React components go through three phases: **mounting**, **updating**, and **unmounting**.
+
+## Class Lifecycle Methods → Hook Equivalents
+
+| Lifecycle | Class Method | Hook Equivalent |
+|-----------|-------------|-----------------|
+| After mount | `componentDidMount` | `useEffect(() => {...}, [])` |
+| After update | `componentDidUpdate` | `useEffect(() => {...}, [deps])` |
+| Before unmount | `componentWillUnmount` | `return () => cleanup` from useEffect |
+| Before render | `getDerivedStateFromProps` | Compute in render or `useMemo` |
+| Error capture | `componentDidCatch` + `getDerivedStateFromError` | Error Boundary class |
+
+## useEffect as Lifecycle
+
+```javascript
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+
+  // componentDidMount + componentDidUpdate (when userId changes)
+  useEffect(() => {
+    fetch(`/api/users/${userId}`)
+      .then(r => r.json())
+      .then(setUser);
+
+    // componentWillUnmount (or before next effect runs)
+    return () => {
+      // Cleanup: cancel requests, subscriptions
+    };
+  }, [userId]); // Dependency: re-run when userId changes
+
+  return <div>{user?.name}</div>;
+}
+```
+
+## Class Lifecycle Example (Legacy)
+
+```javascript
+class UserProfile extends React.Component {
+  state = { user: null };
+
+  componentDidMount() {
+    // Runs once after initial render
+    this.fetchUser(this.props.userId);
+  }
+
+  componentDidUpdate(prevProps) {
+    // Runs after every update; compare to avoid infinite loops
+    if (prevProps.userId !== this.props.userId) {
+      this.fetchUser(this.props.userId);
+    }
+  }
+
+  componentWillUnmount() {
+    // Cleanup before removal
+    this.abortController?.abort();
+  }
+
+  fetchUser(userId) {
+    this.abortController = new AbortController();
+    fetch(`/api/users/${userId}`, { signal: this.abortController.signal })
+      .then(r => r.json())
+      .then(user => this.setState({ user }));
+  }
+
+  render() {
+    return <div>{this.state.user?.name}</div>;
+  }
+}
+```
+
+## Critical Best Practices
+
+**Never side effects in render/constructor:**
+
+```javascript
+// ❌ Bad: side effects during render
+render() {
+  fetch('/api/data'); // Runs every render!
+  return <div />;
+}
+
+// ✅ Good: side effects in componentDidMount or useEffect
+componentDidMount() {
+  fetch('/api/data').then(d => this.setState({ data: d }));
+}
+```
+
+**Guard componentDidUpdate:**
+
+```javascript
+// ❌ Infinite loop: sets state → triggers update → sets state...
+componentDidUpdate() {
+  this.setState({ count: this.state.count + 1 }); // No condition!
+}
+
+// ✅ Always compare before setting state
+componentDidUpdate(prevProps, prevState) {
+  if (prevProps.userId !== this.props.userId) {
+    this.fetchUser(this.props.userId); // Only when prop changed
+  }
+}
+```
+
+**Cancel in-flight requests:**
+
+```javascript
+componentWillUnmount() {
+  this.abortController?.abort(); // Prevent setState on unmounted component
+}
+
+// hooks equivalent
+useEffect(() => {
+  let cancelled = false;
+  fetch(url).then(d => { if (!cancelled) setData(d); });
+  return () => { cancelled = true; };
+}, [url]);
+```
+
+## getDerivedStateFromError + componentDidCatch
+
+The only lifecycle still requiring class components — **Error Boundaries**:
+
+```javascript
+class ErrorBoundary extends React.Component {
+  state = { hasError: false, error: null };
+
+  static getDerivedStateFromError(error) {
+    // Called during render phase — must be pure
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, info) {
+    // Called during commit phase — can log, side effects OK
+    logErrorToService(error, info.componentStack);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong: {this.state.error.message}</h1>;
+    }
+    return this.props.children;
+  }
+}
+```
+
+## Execution Order in Strict Mode (React 18)
+
+Strict mode double-invokes certain lifecycle methods to surface side-effect bugs:
+
+- `constructor` twice
+- `render` twice
+- `componentDidMount` → cleanup → `componentDidMount` again
+
+This is **development-only** to help catch missing cleanup.
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [03-react](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/03-react)_

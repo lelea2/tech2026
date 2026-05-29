@@ -1,0 +1,184 @@
+---
+title: Form Accessibility
+sidebar_position: 9
+---
+
+# Form Accessibility
+
+> Labels, fieldsets, error handling, and custom controls for accessible forms.
+
+## Core Principles
+
+1. **Every input must have a label** — Screen readers need labels to announce field purpose
+2. **Use semantic HTML** — `<label>`, `<fieldset>`, `<legend>` provide proper structure
+3. **Provide clear error messages** — Users need to understand what went wrong and how to fix it
+
+## Label Association
+
+Always associate labels with inputs using `for`/`id` attributes:
+
+```html
+<!-- ✅ Best: explicit for/id association -->
+<label for="email">Email</label>
+<input type="email" id="email" name="email">
+
+<!-- ✅ Also OK: wrapping label -->
+<label>
+  Email
+  <input type="email" name="email">
+</label>
+
+<!-- ❌ Bad: placeholder only (disappears when typing) -->
+<input type="email" placeholder="Email">
+```
+
+## Grouping with Fieldset/Legend
+
+Related fields need `<fieldset>` + `<legend>` so screen reader users understand the context:
+
+```html
+<!-- Shipping address group -->
+<fieldset>
+  <legend>Shipping Address</legend>
+  <label for="street">Street</label>
+  <input type="text" id="street" name="street">
+  <label for="city">City</label>
+  <input type="text" id="city" name="city">
+</fieldset>
+
+<!-- Radio buttons MUST be grouped -->
+<fieldset>
+  <legend>T-shirt size</legend>
+  <label><input type="radio" name="size" value="s"> Small</label>
+  <label><input type="radio" name="size" value="m"> Medium</label>
+  <label><input type="radio" name="size" value="l"> Large</label>
+</fieldset>
+```
+
+Without grouping, screen readers announce "Small, radio button, unchecked" with no context about size options.
+
+## Required Fields
+
+```html
+<!-- Use required attribute + visible text indicator -->
+<label for="email">
+  Email
+  <span aria-hidden="true">*</span>
+  <span class="sr-only">(required)</span>
+</label>
+<input type="email" id="email" required aria-required="true">
+```
+
+## Error Handling
+
+```html
+<label for="email">Email</label>
+<input
+  type="email"
+  id="email"
+  aria-required="true"
+  aria-invalid="true"
+  aria-describedby="email-error"
+>
+<span id="email-error" role="alert">
+  Please enter a valid email address
+</span>
+```
+
+### Error Display Strategy
+
+| Phase | Behavior |
+|-------|----------|
+| First attempt | Validate on submit only (non-intrusive) |
+| After first submit | Add blur validation (helpful without annoyance) |
+| After field validates | Add input validation (catch new mistakes immediately) |
+
+### Error Summary at Top
+
+For forms with multiple errors, show a summary at the top of the form on submit:
+
+```html
+<div role="alert" aria-label="Form errors">
+  <p>Please fix the following errors:</p>
+  <ul>
+    <li><a href="#email">Email: Invalid format</a></li>
+    <li><a href="#password">Password: Too short</a></li>
+  </ul>
+</div>
+```
+
+## React: Accessible Form Field Component
+
+```jsx
+function FormField({ label, type = 'text', required, error, hint }) {
+  const id = useId();
+  const hintId = hint ? `${id}-hint` : undefined;
+  const errorId = error ? `${id}-error` : undefined;
+  const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined;
+
+  return (
+    <div>
+      <label htmlFor={id}>
+        {label}
+        {required && <span aria-hidden="true"> *</span>}
+      </label>
+
+      <input
+        id={id}
+        type={type}
+        required={required}
+        aria-required={required}
+        aria-invalid={!!error}
+        aria-describedby={describedBy}
+      />
+
+      {hint && <span id={hintId} className="hint">{hint}</span>}
+
+      {error && (
+        <span id={errorId} role="alert" className="error">
+          {error}
+        </span>
+      )}
+    </div>
+  );
+}
+```
+
+## Custom Controls
+
+Custom dropdowns and toggles need proper ARIA:
+
+```html
+<!-- Custom select/listbox -->
+<div
+  role="listbox"
+  aria-label="Choose a color"
+  aria-activedescendant="option-blue"
+  tabindex="0"
+>
+  <div id="option-blue" role="option" aria-selected="true">Blue</div>
+  <div id="option-red" role="option" aria-selected="false">Red</div>
+</div>
+
+<!-- Toggle switch -->
+<button
+  role="switch"
+  aria-checked="false"
+  onclick="this.setAttribute('aria-checked', this.getAttribute('aria-checked') === 'true' ? 'false' : 'true')"
+>
+  Dark mode
+</button>
+```
+
+## Common Pitfalls
+
+- Relying on placeholder text instead of real labels
+- Showing errors visually without semantic connection (`aria-describedby`)
+- Creating custom form controls without ARIA support
+- Forgetting keyboard accessibility (Tab, arrow keys, Enter, Escape)
+- Using visual-only indicators for required fields
+- Omitting `<fieldset>`/`<legend>` for radio/checkbox groups
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

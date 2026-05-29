@@ -1,0 +1,73 @@
+---
+title: Accessible Names — Calculation
+sidebar_position: 1
+---
+
+# Accessible Names — Calculation
+
+## Overview
+
+The accessible name is the text assistive technologies use to identify elements. Browsers follow a strict priority order when multiple naming methods exist on the same element.
+
+## Priority Order (Highest to Lowest)
+
+1. **aria-labelledby** — References other element(s) by ID
+2. **aria-label** — Direct text label
+3. **Native label** — `<label>`, `alt`, `<caption>`, `<legend>`
+4. **title** — Tooltip attribute (last resort)
+5. **Placeholder** — NOT used for accessible names
+
+## Why This Matters
+
+Screen readers announce accessible names to identify controls, voice control software uses them for commands, and incorrect priority can cause confusing announcements. Missing names make elements unusable for assistive technology users.
+
+## Critical Best Practices
+
+**Match Accessible Names to Visible Text**
+
+Mismatches between what users see and what assistive technologies announce break voice control functionality. When a button displays "Save" but has `aria-label="Submit the form"`, voice commands like "Click Save" fail because the accessible name doesn't match.
+
+**Use Native Labels When Possible**
+
+```html
+<label for="email">Email:</label>
+<input type="email" id="email">
+```
+
+This provides the best compatibility and ensures consistency between visual and accessible names.
+
+**Never Use Placeholder as Only Label**
+
+Placeholders disappear when users type and aren't included in accessible name calculation. They're hints, not labels.
+
+**Icon Buttons Need Accessible Names**
+
+```html
+<button aria-label="Delete">
+  <svg aria-hidden="true">...</svg>
+</button>
+```
+
+Without names, icon buttons are invisible to screen reader and voice control users.
+
+**Avoid aria-labelledby Circular References**
+
+Browsers detect cycles and fall back to text content. Use `aria-labelledby` to combine multiple text sources, such as section headings with specific field labels for contextual information.
+
+## Algorithm Behavior
+
+The W3C Accessible Name and Description Computation specification defines how browsers calculate names. When `aria-labelledby` references an element, its text is included in name calculation regardless of visual hiding methods (`display: none`, `visibility: hidden`, or `aria-hidden`). This allows developers to use visually hidden text to contribute to accessible names while keeping the display clean.
+
+Content within referenced elements is always included, even if hidden, because explicit `aria-labelledby` references indicate intentional semantic association.
+
+## Real-World Impact
+
+Production data from enterprise dashboards showed that accessible name mismatches caused 34% voice control failure rates, with users taking 3.2× longer to complete tasks. After standardizing naming conventions to match visible text and providing consistent patterns across similar buttons, voice control failure dropped to 2%, and user productivity increased by 185%.
+
+## Testing Voice Control
+
+Voice control software matches on the beginning of accessible names. "Click Save" succeeds when the accessible name starts with "Save," but fails when the name is "Submit the form" even though both convey similar meaning. Consistency across similar controls (all delete buttons using "Delete" verb) prevents ambiguity.
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

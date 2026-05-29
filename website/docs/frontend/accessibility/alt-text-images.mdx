@@ -1,0 +1,85 @@
+---
+title: Alt Text for Images
+sidebar_position: 2
+---
+
+# Alt Text for Images
+
+## Core Principles
+
+Alt text serves a critical accessibility function by describing images for screen reader users and displaying when images fail to load. The fundamental approach involves three key practices:
+
+**Focus on meaning over description.** Rather than stating "image of a sunset," convey the actual content: "Sunset over the ocean." Avoid redundant phrasing that announces the image format itself.
+
+**Keep descriptions brief.** Aim for under 125 characters to respect screen reader limitations and maintain user attention. Lengthy descriptions can overwhelm users navigating through content.
+
+**Match context appropriately.** The same photograph requires different alt text depending on where it appears—a product listing needs "Blue cotton t-shirt, size M" while a blog post featuring the same shirt might read "Model wearing blue t-shirt at fashion event."
+
+## Decorative vs. Informative Images
+
+The critical distinction determines how to mark images in code:
+
+**Decorative images** add visual style without conveying essential information. Examples include bullet point icons, divider lines, and background patterns. Mark these with empty alt attributes:
+
+```html
+<img src="decorative-divider.png" alt="">
+<!-- or -->
+<img src="decorative-divider.png" role="presentation">
+```
+
+**Informative images** provide content necessary for understanding the page—product photos, charts, logos in navigation, or icons without accompanying text. These require descriptive alt text:
+
+```html
+<img src="chart.png" alt="Sales increased 45% from Q1 to Q2 2024">
+```
+
+A practical test: If removing the image loses information, it's informative. If removing it changes nothing, it's decorative.
+
+## Complex Image Scenarios
+
+For charts and diagrams, combine short alt text with detailed descriptions using `aria-describedby`:
+
+```html
+<figure>
+  <img
+    src="org-chart.png"
+    alt="Company organizational structure"
+    aria-describedby="chart-details">
+  <figcaption id="chart-details">
+    CEO oversees three departments: Engineering (50 employees),
+    Sales (30 employees), Marketing (20 employees).
+  </figcaption>
+</figure>
+```
+
+SVG images require proper ARIA labeling for screen reader accessibility:
+
+```html
+<svg role="img" aria-labelledby="svg-title svg-desc">
+  <title id="svg-title">Company Revenue Chart</title>
+  <desc id="svg-desc">Bar chart showing quarterly revenue growth from $2M in Q1 to $3.5M in Q4</desc>
+  <!-- SVG content -->
+</svg>
+```
+
+## Common Implementation Errors
+
+- Don't start alt text with "image of" or "picture of" — the screen reader already announces the element type
+- Don't use filenames as alt text (e.g., `alt="img_0847.jpg"`)
+- Never use the `title` attribute as a substitute for proper `alt`
+- For interactive images (links, buttons), describe the action or destination, not just the image
+
+## Quick Reference
+
+| Image Type | Alt Text |
+|-----------|----------|
+| Decorative | `alt=""` |
+| Informative | Describe meaning in context |
+| Icon with text label | `alt=""` (text already provides name) |
+| Icon without label | Describe the action/content |
+| Complex chart | Short alt + `aria-describedby` for detail |
+| Logo (in nav) | Company name |
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

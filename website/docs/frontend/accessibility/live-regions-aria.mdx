@@ -1,0 +1,208 @@
+---
+title: ARIA Live Regions
+sidebar_position: 12
+---
+
+# ARIA Live Regions
+
+> Dynamic page updates announced to screen reader users without requiring focus changes.
+
+## What Are Live Regions?
+
+ARIA live regions enable screen reader users to receive announcements when page content changes dynamically — such as search results loading, form validation errors appearing, or cart counts updating — without requiring the user to navigate to the changed element.
+
+The browser's accessibility tree monitors designated live regions and fires events when content updates occur.
+
+## Key Attributes
+
+### aria-live
+
+Controls when announcements are made:
+
+| Value | Behavior | Use Case |
+|-------|----------|----------|
+| `off` | No announcements (default) | Static content |
+| `polite` | Announces when user is idle | Search results, cart updates, notifications |
+| `assertive` | Interrupts immediately | Critical errors, security warnings, payment failures |
+
+### aria-atomic
+
+```html
+<!-- true: announce entire region when any part changes -->
+<div aria-live="polite" aria-atomic="true">
+  Item 1 of 12
+</div>
+
+<!-- false (default): announce only the changed content -->
+<ul aria-live="polite" aria-atomic="false">
+  <!-- only newly added items announced -->
+</ul>
+```
+
+### aria-relevant
+
+Specifies what types of changes to announce:
+
+- `additions` — New nodes added (default)
+- `removals` — Nodes removed
+- `text` — Text content changes
+- `all` — All changes
+
+## Critical Implementation Rule
+
+**Live regions MUST exist in the DOM before content updates occur.**
+
+```html
+<!-- ✅ Good: region exists on page load, content updated later -->
+<div aria-live="polite" id="status"></div>
+
+<script>
+  // Later, update content:
+  document.getElementById('status').textContent = 'Search complete: 42 results';
+</script>
+
+<!-- ❌ Bad: dynamically created live region won't announce -->
+<script>
+  const region = document.createElement('div');
+  region.setAttribute('aria-live', 'polite');
+  region.textContent = 'Results loaded'; // Too late — browser ignores it
+  document.body.appendChild(region);
+</script>
+```
+
+## Polite vs. Assertive
+
+```html
+<!-- Polite: waits for user to finish current action -->
+<div aria-live="polite" id="cart-count">
+  3 items in cart
+</div>
+
+<!-- Assertive: interrupts immediately — use sparingly -->
+<div role="alert" aria-live="assertive" id="error-message">
+  <!-- Payment failed: card declined -->
+</div>
+```
+
+`role="alert"` is shorthand for `aria-live="assertive" aria-atomic="true"`. Use it for critical messages that require immediate attention.
+
+## Common Patterns
+
+### Search Results Announcement
+
+```jsx
+function SearchResults({ results, isLoading }) {
+  return (
+    <>
+      {/* Status region — always in DOM */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {isLoading ? 'Searching...' : `${results.length} results found`}
+      </div>
+
+      <ul>
+        {results.map(result => (
+          <li key={result.id}>{result.title}</li>
+        ))}
+      </ul>
+    </>
+  );
+}
+```
+
+### Form Validation
+
+```jsx
+function SubmitButton({ onSubmit }) {
+  const [status, setStatus] = useState('');
+
+  const handleSubmit = async () => {
+    setStatus('Submitting...');
+    try {
+      await onSubmit();
+      setStatus('Form submitted successfully!');
+    } catch (e) {
+      setStatus('Error: ' + e.message);
+    }
+  };
+
+  return (
+    <>
+      <button onClick={handleSubmit}>Submit</button>
+      <div role="status" aria-live="polite" className="sr-only">
+        {status}
+      </div>
+    </>
+  );
+}
+```
+
+### Toast Notifications
+
+```jsx
+function ToastNotification({ message, type }) {
+  return (
+    <div
+      role={type === 'error' ? 'alert' : 'status'}
+      aria-live={type === 'error' ? 'assertive' : 'polite'}
+      aria-atomic="true"
+      className={`toast toast--${type}`}
+    >
+      {message}
+    </div>
+  );
+}
+```
+
+## React: Reusable Live Region Hook
+
+```jsx
+function useLiveRegion() {
+  const [message, setMessage] = useState('');
+
+  const announce = useCallback((text, { assertive = false } = {}) => {
+    setMessage(''); // Clear first to re-trigger announcement
+    setTimeout(() => setMessage(text), 100);
+  }, []);
+
+  const LiveRegion = () => (
+    <div
+      aria-live={assertive ? 'assertive' : 'polite'}
+      aria-atomic="true"
+      className="sr-only"
+    >
+      {message}
+    </div>
+  );
+
+  return { announce, LiveRegion };
+}
+
+// Usage
+function SearchPage() {
+  const { announce, LiveRegion } = useLiveRegion();
+
+  const handleSearch = async (query) => {
+    announce('Searching...');
+    const results = await search(query);
+    announce(`${results.length} results for "${query}"`);
+  };
+
+  return (
+    <>
+      <LiveRegion />
+      <SearchInput onSearch={handleSearch} />
+    </>
+  );
+}
+```
+
+## Testing
+
+Manual testing with actual screen readers remains most reliable:
+- **NVDA:** Announces polite regions automatically; check the Speech Viewer
+- **VoiceOver:** Live region updates appear in caption panel
+- **Automated:** axe DevTools can flag missing live regions but can't verify timing
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

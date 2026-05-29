@@ -17,7 +17,7 @@
 // Time Complexity: O(N * M^2) where N is the length of words and M is the average length of the words in words
 // Space Complexity: O(N) for wmap
 
-const palindromePairs = function(words) {
+export default function isPalindromePair(words) {
   let wmap = new Map();
   let ans = [];
 

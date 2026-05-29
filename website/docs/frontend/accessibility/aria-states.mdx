@@ -1,0 +1,257 @@
+---
+title: ARIA States and Dynamic Updates
+sidebar_position: 5
+---
+
+# ARIA States and Dynamic Updates
+
+> **Master ARIA states — aria-expanded, aria-hidden, aria-disabled, and dynamic state management**
+
+## Question: What are ARIA states and how do you manage them?
+
+**Difficulty:** 🟡 Medium | **Frequency:** ⭐⭐⭐⭐⭐ | **Companies:** Google, Meta, Amazon, Microsoft, Apple
+
+Explain ARIA states like `aria-expanded`, `aria-hidden`, `aria-disabled`, `aria-selected`, `aria-checked`. How do you keep them synchronized with visual state changes?
+
+## Answer
+
+ARIA states communicate the current status of interactive elements to assistive technologies. Unlike properties (mostly static), **states change frequently and MUST stay synchronized with visual changes**.
+
+### Key ARIA States
+
+| State | Values | Use Case |
+|-------|--------|----------|
+| `aria-expanded` | true/false | Accordions, dropdowns, menus |
+| `aria-hidden` | true/false | Hides from accessibility tree |
+| `aria-disabled` | true/false | Disabled (different from `disabled` attribute) |
+| `aria-selected` | true/false | Tabs, listbox options |
+| `aria-checked` | true/false/mixed | Checkboxes, radios, switches |
+| `aria-pressed` | true/false | Toggle buttons |
+| `aria-busy` | true/false | Loading/processing |
+| `aria-invalid` | true/false | Form validation errors |
+
+### The Golden Rule
+
+**Visual state MUST match ARIA state.** When you toggle an accordion open, update `aria-expanded` to `"true"` at the same time.
+
+## Code Examples
+
+### aria-expanded — Accordion/Dropdown
+
+```html
+<button
+  id="menu-btn"
+  aria-expanded="false"
+  aria-controls="menu"
+  onclick="toggleMenu()"
+>
+  Menu <span aria-hidden="true">▼</span>
+</button>
+
+<div id="menu" hidden>
+  <a href="/home">Home</a>
+  <a href="/about">About</a>
+</div>
+
+<script>
+function toggleMenu() {
+  const button = document.getElementById('menu-btn');
+  const menu = document.getElementById('menu');
+  const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+  // Update ARIA and visual state simultaneously
+  button.setAttribute('aria-expanded', !isExpanded);
+  menu.hidden = isExpanded;
+}
+</script>
+```
+
+### aria-hidden — Visibility Control
+
+```html
+<!-- Hide decorative elements from screen readers -->
+<button aria-label="Delete">
+  <span aria-hidden="true">🗑️</span>
+</button>
+
+<!-- Hide background when modal is open -->
+<div class="page-content" aria-hidden="true"><!-- hidden from SR --></div>
+<div role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+  <h2 id="dialog-title">Confirm Delete</h2>
+</div>
+```
+
+### aria-disabled vs disabled attribute
+
+```html
+<!-- disabled attribute: removes from tab order, prevents ALL interaction -->
+<button disabled>Submit</button>
+
+<!-- aria-disabled: keeps in tab order, requires JS to prevent interaction -->
+<button
+  aria-disabled="true"
+  aria-describedby="reason"
+  onclick="handleClick(event)"
+>
+  Submit
+</button>
+<span id="reason">Please fill in all required fields</span>
+
+<script>
+function handleClick(event) {
+  if (event.currentTarget.getAttribute('aria-disabled') === 'true') {
+    event.preventDefault();
+    return;
+  }
+  // Normal submit logic
+}
+</script>
+```
+
+Use `aria-disabled` when you want keyboard users to discover the element and understand WHY it's disabled.
+
+### aria-selected — Tabs
+
+```html
+<div role="tablist" aria-label="Settings">
+  <button role="tab" id="tab-1" aria-selected="true" aria-controls="panel-1" tabindex="0">General</button>
+  <button role="tab" id="tab-2" aria-selected="false" aria-controls="panel-2" tabindex="-1">Privacy</button>
+</div>
+
+<div role="tabpanel" id="panel-1" aria-labelledby="tab-1">General Settings</div>
+<div role="tabpanel" id="panel-2" aria-labelledby="tab-2" hidden>Privacy Settings</div>
+```
+
+### aria-invalid — Form Validation
+
+```html
+<label for="email">Email</label>
+<input
+  type="email"
+  id="email"
+  aria-required="true"
+  aria-invalid="false"
+  aria-describedby="email-error"
+  onblur="validateEmail()"
+>
+<span id="email-error" role="alert" hidden>Please enter a valid email</span>
+
+<script>
+function validateEmail() {
+  const input = document.getElementById('email');
+  const error = document.getElementById('email-error');
+  const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value);
+
+  input.setAttribute('aria-invalid', !isValid);
+  error.hidden = isValid;
+}
+</script>
+```
+
+### React: Accordion with Synchronized State
+
+```jsx
+function AccessibleAccordion({ items }) {
+  const [openIndex, setOpenIndex] = useState(null);
+  const accordionId = useId();
+
+  const toggle = (index) => setOpenIndex(prev => prev === index ? null : index);
+
+  const handleKeyDown = (e, index) => {
+    const buttons = document.querySelectorAll(`[data-accordion="${accordionId}"] button`);
+    const current = Array.from(buttons).indexOf(e.target);
+    if (e.key === 'ArrowDown') { buttons[(current + 1) % buttons.length].focus(); e.preventDefault(); }
+    if (e.key === 'ArrowUp') { buttons[(current - 1 + buttons.length) % buttons.length].focus(); e.preventDefault(); }
+    if (e.key === 'Home') { buttons[0].focus(); e.preventDefault(); }
+    if (e.key === 'End') { buttons[buttons.length - 1].focus(); e.preventDefault(); }
+  };
+
+  return (
+    <div data-accordion={accordionId}>
+      {items.map((item, index) => {
+        const isOpen = openIndex === index;
+        const buttonId = `${accordionId}-btn-${index}`;
+        const panelId = `${accordionId}-panel-${index}`;
+
+        return (
+          <div key={index}>
+            <button
+              id={buttonId}
+              aria-expanded={isOpen}
+              aria-controls={panelId}
+              onClick={() => toggle(index)}
+              onKeyDown={(e) => handleKeyDown(e, index)}
+            >
+              {item.title}
+              <span aria-hidden="true">{isOpen ? '▼' : '▶'}</span>
+            </button>
+            <div id={panelId} role="region" aria-labelledby={buttonId} hidden={!isOpen}>
+              {item.content}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+```
+
+## Common Mistakes
+
+```html
+<!-- ❌ aria-expanded without aria-controls -->
+<button aria-expanded="false">Menu</button>
+
+<!-- ✅ Link state to controlled element -->
+<button aria-expanded="false" aria-controls="menu">Menu</button>
+
+<!-- ❌ aria-hidden on focusable element (still reachable via Tab!) -->
+<button aria-hidden="true">Click me</button>
+
+<!-- ✅ Use hidden attribute for complete removal -->
+<button hidden>Click me</button>
+```
+
+## Deep Dive: State Update Timing
+
+When you update an ARIA state attribute:
+1. DOM mutation occurs (`setAttribute`)
+2. Browser updates accessibility tree (5–50ms delay)
+3. Accessibility API notifies screen reader
+4. Screen reader announces change
+
+**Critical:** Update ARIA state synchronously with visual changes, not in a `setTimeout` or `useEffect` that fires after render. Async updates can cause mismatches where the screen reader reads stale state.
+
+```jsx
+// ❌ Bad: Async state update via useEffect
+useEffect(() => {
+  button?.setAttribute('aria-expanded', isOpen);
+}, [isOpen]);
+
+// ✅ Good: Synchronous in render (React)
+<button aria-expanded={isOpen} onClick={toggle}>Menu</button>
+```
+
+## Decision Guide: disabled vs aria-disabled
+
+| Need | Use |
+|------|-----|
+| Prevent interaction entirely | `disabled` attribute |
+| Keep in tab order so SR can discover why it's disabled | `aria-disabled="true"` + `aria-describedby` |
+| Temporary loading state | `aria-busy="true"` + `disabled` |
+
+## Follow-up Questions
+
+- What's the difference between `hidden` and `aria-hidden`?
+- When should you use `aria-disabled` instead of the `disabled` attribute?
+- What happens if `aria-expanded` and visual state don't match?
+- When should you use `aria-pressed` vs `aria-checked`?
+
+## Resources
+
+- [ARIA States and Properties Spec](https://www.w3.org/TR/wai-aria-1.2/#states_and_properties)
+- [MDN: ARIA States](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes)
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

@@ -1,0 +1,346 @@
+---
+title: Lazy Loading & Code Splitting
+sidebar_position: 4
+---
+
+# Lazy Loading & Code Splitting
+
+> Dynamic imports, React.lazy, route-based splitting, component-level splitting, and optimization strategies.
+
+---
+
+## Question 1: Code Splitting with React.lazy
+
+**Difficulty:** 🟡 Medium
+**Frequency:** ⭐⭐⭐⭐⭐
+**Time:** 8 minutes
+**Companies:** Meta, Google, Netflix
+
+### Question
+
+How does React.lazy work? Demonstrate route-based code splitting.
+
+### Answer
+
+**React.lazy** dynamically imports components, creating separate JS chunks loaded on demand.
+
+```jsx
+import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// Each route becomes a separate chunk
+const Home = lazy(() => import('./pages/Home'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Profile = lazy(() => import('./pages/Profile'));
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  );
+}
+```
+
+**Benefits:**
+- Smaller initial bundle
+- Faster first load (Time to Interactive)
+- Load on demand
+
+### Resources
+- [React Code Splitting](https://react.dev/reference/react/lazy)
+
+---
+
+## Deep Dive: How React.lazy and Webpack Work Under the Hood
+
+### The Bundling Problem
+
+Default build output (no code splitting):
+
+```
+main.bundle.js (850 KB)
+├── React core (40 KB)
+├── React Router (25 KB)
+├── App code (200 KB)
+├── Third-party libs (300 KB)
+└── All route components (285 KB)
+    ├── Home.js (45 KB)
+    ├── Dashboard.js (120 KB)
+    ├── Profile.js (60 KB)
+    └── Settings.js (60 KB)
+```
+
+Users visiting the home page must download **all 850 KB** even if they never navigate to Dashboard.
+
+### Dynamic Import Mechanics
+
+```javascript
+// Static import — bundled together
+import Dashboard from './Dashboard';
+// Compiled to: require('./Dashboard')
+
+// Dynamic import — separate chunk
+const Dashboard = lazy(() => import('./Dashboard'));
+// Webpack creates: Dashboard.[hash].chunk.js
+// Injects loading function that fetches the chunk at runtime
+```
+
+### React.lazy Internal Implementation
+
+```javascript
+// Simplified React.lazy implementation
+function lazy(loader) {
+  let Component = null;
+  let error = null;
+  let promise = null;
+
+  return function LazyComponent(props) {
+    if (!Component && !error && !promise) {
+      promise = loader()
+        .then(module => { Component = module.default; })
+        .catch(err => { error = err; });
+    }
+
+    if (!Component && !error) throw promise;  // triggers Suspense
+    if (error) throw error;                    // triggers ErrorBoundary
+    return <Component {...props} />;
+  };
+}
+```
+
+### Webpack Chunk Loading Process
+
+When a dynamic import executes:
+
+1. Check chunk cache: `if (installedChunks[chunkId]) return cached;`
+2. Create script tag: `<script src="Dashboard.chunk.js">`
+3. Chunk registers itself: `window.webpackJsonp.push([chunkId, { modules }])`
+4. Resolve promise: module is now available
+
+### Advanced Splitting Strategies
+
+```javascript
+// 1. Named chunks (better debugging + long-term caching)
+const Dashboard = lazy(() =>
+  import(/* webpackChunkName: "dashboard" */ './Dashboard')
+);
+
+// 2. Prefetch during idle time (user hasn't clicked yet)
+const Profile = lazy(() =>
+  import(/* webpackPrefetch: true */ './Profile')
+);
+
+// 3. Preload in parallel with parent (user is likely to need this)
+const Settings = lazy(() =>
+  import(/* webpackPreload: true */ './Settings')
+);
+
+// 4. Component-level splitting (heavy widgets)
+function Dashboard() {
+  const HeavyChart = lazy(() => import('./HeavyChart')); // 80 KB
+
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <Suspense fallback={<Skeleton />}>
+        <HeavyChart />
+      </Suspense>
+    </div>
+  );
+}
+
+// 5. Retry mechanism for flaky networks
+function lazyWithRetry(importFn, retries = 3) {
+  return lazy(() =>
+    new Promise((resolve, reject) => {
+      const attempt = (n) => {
+        importFn()
+          .then(resolve)
+          .catch(error => n === 1 ? reject(error) : setTimeout(() => attempt(n - 1), 1000));
+      };
+      attempt(retries);
+    })
+  );
+}
+```
+
+### Webpack splitChunks Configuration
+
+```javascript
+// webpack.config.js
+optimization: {
+  splitChunks: {
+    chunks: 'all',
+    cacheGroups: {
+      // Vendor: React, Router (rarely change)
+      vendor: {
+        test: /[\\/]node_modules[\\/](react|react-dom|react-router-dom)[\\/]/,
+        name: 'vendor',
+        priority: 10,
+      },
+      // Common: code used by 2+ chunks
+      common: {
+        minChunks: 2,
+        name: 'common',
+        priority: 5,
+        reuseExistingChunk: true,
+      },
+    },
+  },
+  runtimeChunk: 'single', // Separate webpack runtime
+}
+
+// Result:
+// vendor.chunk.js: 148 KB (cached long-term)
+// common.chunk.js: 45 KB
+// dashboard.chunk.js: 85 KB (only Dashboard-specific code)
+```
+
+---
+
+## Real-World Scenario: Dashboard App with 8s Load Time
+
+**Initial state (November 2024):**
+
+```
+main.bundle.js: 2.3 MB (687 KB gzipped)
+Lighthouse Performance: 23/100
+Time to Interactive: 8.7s on 3G
+Bounce rate: 42% (was 29%)
+```
+
+**Bundle analysis revealed:**
+
+```
+node_modules (1.2 MB):
+├── moment.js: 287 KB  ← only used for date formatting!
+├── lodash: 531 KB     ← only 3 functions used!
+├── chart.js: 243 KB
+
+src/pages (780 KB):
+├── Dashboard.js: 245 KB
+├── Analytics.js: 198 KB
+├── Reports.js: 165 KB
+```
+
+**Solutions applied:**
+
+**Phase 1 — Route-based splitting:**
+
+```javascript
+// Before: all pages in main bundle
+import Dashboard from './Dashboard'; // 245 KB loaded on every page
+
+// After: each page as a separate chunk
+const Dashboard = lazy(() =>
+  import(/* webpackChunkName: "dashboard" */ './Dashboard')
+);
+```
+
+**Phase 2 — Library optimization:**
+
+```javascript
+// Before: moment.js (287 KB)
+import moment from 'moment';
+const formatted = moment(date).format('YYYY-MM-DD');
+
+// After: date-fns (2 KB for this function)
+import { format } from 'date-fns';
+const formatted = format(date, 'yyyy-MM-dd');
+
+// Before: full lodash (531 KB)
+import _ from 'lodash';
+const unique = _.uniq(array);
+
+// After: individual function (1 KB)
+import uniq from 'lodash/uniq';
+const unique = uniq(array);
+```
+
+**Results:**
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Main bundle (homepage) | 2.3 MB | 320 KB |
+| Lighthouse score | 23/100 | 91/100 |
+| Time to Interactive (3G) | 8.7s | 2.1s |
+| Bounce rate | 42% | 24% |
+| Conversion rate | — | +31% |
+
+**Caching benefit:** When only the Dashboard chunk changes, users re-download only ~90 KB instead of the full 2.3 MB bundle.
+
+---
+
+## Trade-offs: Lazy vs Eager Loading
+
+```
+Decision matrix:
+
+< 5 KB component       → Eager (overhead not worth it)
+5–30 KB, used >70%     → Eager
+5–30 KB, used <50%     → Lazy
+30–100 KB, non-critical → Lazy
+> 100 KB               → Always lazy
+```
+
+| Aspect | Lazy Loading | Eager Loading |
+|--------|-------------|---------------|
+| **Initial bundle** | Small (best for landing pages) | Large (cached for return visits) |
+| **Navigation speed** | 200–800ms delay per chunk | Instant |
+| **Maintenance** | More complex (Suspense, error handling) | Simple |
+| **Mobile users** | Much better | Poor on slow networks |
+| **Internal tools** | Overkill | Preferred (fast WiFi) |
+
+**With prefetching, navigation delay can be near-zero:**
+
+```javascript
+// Prefetch during idle time when user hovers the nav link
+function NavLink({ to, children }) {
+  const handleMouseEnter = () => {
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = `/static/js/${to}.chunk.js`;
+    document.head.appendChild(link);
+  };
+
+  return <a href={to} onMouseEnter={handleMouseEnter}>{children}</a>;
+}
+```
+
+---
+
+## Explain Like I'm Five: Lazy Loading
+
+**The Restaurant Buffet Analogy:**
+
+**Eager loading:** Pile all 20 dishes on the customer's plate immediately. Heavy, slow, wasteful.
+
+**Lazy loading:** Start with an empty plate. Customer orders pizza — it arrives in 30 seconds. If they want dessert later, they order it then.
+
+```javascript
+// Eager: buy the book outright (in your hands now)
+import Dashboard from './Dashboard';
+
+// Lazy: borrow from library (request it, wait for delivery)
+const Dashboard = lazy(() => import('./Dashboard'));
+```
+
+**Mental model:**
+1. `React.lazy` = "Download this component later"
+2. `Suspense` = "Show this fallback while downloading"
+3. `import()` = Dynamic import (returns a Promise)
+
+**Interview Answer Template:**
+
+> "Code splitting breaks the JS bundle into chunks loaded on demand. In React, `lazy()` creates a dynamically-loaded component and `Suspense` provides fallback UI while it loads. I split by routes first—each page is a separate chunk—then heavy components like charts. In one project this reduced our homepage bundle from 2.3 MB to 320 KB, cutting Time to Interactive from 8.7s to 2.1s on 3G. I use `webpack-bundle-analyzer` to identify large chunks before optimizing. The trade-off is a short navigation delay (~300ms), which we mitigate with prefetching for likely routes."
+
+---
+
+_Content from [maurya-sachin/Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/07-performance)_

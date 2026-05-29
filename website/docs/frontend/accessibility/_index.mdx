@@ -1,0 +1,147 @@
+---
+title: Accessibility (A11y) Interview Preparation
+sidebar_position: 0
+---
+
+# Accessibility (A11y) Interview Preparation
+
+> **10+ questions covering WCAG, keyboard navigation, screen readers, and accessibility testing**
+
+Master web accessibility from fundamentals to advanced patterns. Essential for inclusive web development.
+
+---
+
+## Topics
+
+| File | Topics | Difficulty |
+|------|--------|------------|
+| [WCAG Fundamentals](./wcag-fundamentals) | WCAG guidelines, POUR principles, conformance levels | 🟡 |
+| [Keyboard Navigation](./keyboard-navigation) | Focus management, keyboard shortcuts, tab order | 🟡 |
+| [Screen Readers Basics](./screen-readers-basics) | ARIA, semantic HTML, screen reader testing | 🟡 🔴 |
+| [Testing Tools](./testing-tools) | Automated testing, manual testing, accessibility audits | 🟡 |
+| [ARIA Roles](./aria-roles) | Landmark roles, widget roles, when to use ARIA | 🟡 |
+| [ARIA Properties](./aria-properties) | aria-label, aria-labelledby, aria-describedby | 🟡 |
+| [ARIA States](./aria-states) | aria-expanded, aria-hidden, aria-disabled, dynamic updates | 🟡 |
+| [Accessible Names](./accessible-names-calculation) | Accessible name computation, priority order | 🔴 |
+| [Alt Text for Images](./alt-text-images) | Decorative vs informative images, complex scenarios | 🟢 |
+| [Color Contrast](./color-contrast) | WCAG AA/AAA ratios, contrast calculation, testing | 🟡 |
+| [Focus Management](./focus-management) | Focus traps, skip links, focus restoration | 🟡 |
+| [Focus Visible](./focus-visible) | :focus-visible, custom focus indicators | 🟢 |
+| [Form Accessibility](./forms-accessibility) | Labels, fieldsets, error handling, custom controls | 🟡 |
+| [Landmark Regions](./landmark-regions) | HTML5 landmarks, semantic structure | 🟢 |
+| [ARIA Live Regions](./live-regions-aria) | aria-live, polite vs assertive, dynamic content | 🟡 |
+| [Modal Accessibility](./modal-accessibility) | Focus traps, aria-modal, keyboard interaction | 🔴 |
+| [Reduced Motion](./motion-reduced) | prefers-reduced-motion, vestibular disorders | 🟢 |
+
+---
+
+## Most Frequently Asked
+
+1. **WCAG Levels** - A, AA, AAA conformance (⭐⭐⭐⭐⭐)
+2. **ARIA Attributes** - When and how to use (⭐⭐⭐⭐⭐)
+3. **Keyboard Navigation** - Focus management (⭐⭐⭐⭐)
+4. **Screen Reader Testing** - NVDA, JAWS, VoiceOver (⭐⭐⭐⭐)
+5. **Semantic HTML** - Importance for accessibility (⭐⭐⭐⭐)
+
+---
+
+## Key Concepts
+
+### POUR Principles
+
+```
+P - Perceivable
+  - Text alternatives for images
+  - Captions for videos
+  - Adaptable content
+
+O - Operable
+  - Keyboard accessible
+  - Enough time to interact
+  - No seizure-inducing content
+
+U - Understandable
+  - Readable text
+  - Predictable navigation
+  - Input assistance
+
+R - Robust
+  - Compatible with assistive tech
+  - Valid HTML
+  - Progressive enhancement
+```
+
+### WCAG Conformance Levels
+
+- **Level A** — Minimum accessibility (basic)
+- **Level AA** — Target for most sites (recommended, legal requirement in many countries)
+- **Level AAA** — Enhanced accessibility (ideal for healthcare, government)
+
+### Common ARIA Roles
+
+- `role="button"` — Interactive button
+- `role="navigation"` — Navigation landmark
+- `role="dialog"` — Modal dialog
+- `role="alert"` — Important message
+- `role="tablist"` — Tab interface
+
+---
+
+## Do's and Don'ts
+
+### DO's ✅
+- Use semantic HTML first
+- Provide text alternatives for images
+- Ensure keyboard navigation works
+- Manage focus properly
+- Test with screen readers
+- Use sufficient color contrast (4.5:1 minimum)
+- Label all form inputs
+- Provide skip links
+- Use ARIA when HTML isn't enough
+
+### DON'Ts ❌
+- Use divs for interactive elements
+- Rely only on color to convey information
+- Skip keyboard testing
+- Remove focus outlines without replacement
+- Overuse ARIA
+- Ignore form labels
+- Forget alt text
+- Disable zoom
+
+---
+
+## Tools
+
+### Testing
+- **axe DevTools** — Browser extension for accessibility testing
+- **WAVE** — Web accessibility evaluation tool
+- **Lighthouse** — Accessibility audits in Chrome
+- **Pa11y** — Automated CLI accessibility testing
+
+### Screen Readers
+- **NVDA** — Free Windows screen reader
+- **JAWS** — Popular Windows screen reader
+- **VoiceOver** — macOS/iOS screen reader
+- **TalkBack** — Android screen reader
+
+### Testing Libraries
+- **jest-axe** — Jest matcher for accessibility testing
+- **@testing-library/react** — Encourages accessible queries
+- **cypress-axe** — Cypress accessibility testing
+
+---
+
+## Resources
+
+- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+- [MDN - Accessibility](https://developer.mozilla.org/en-US/docs/Web/Accessibility)
+- [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/)
+- [WebAIM](https://webaim.org/)
+- [A11y Project](https://www.a11yproject.com/)
+- [Inclusive Components](https://inclusive-components.design/)
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

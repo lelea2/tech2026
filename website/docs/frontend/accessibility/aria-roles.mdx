@@ -1,0 +1,103 @@
+---
+title: ARIA Roles
+sidebar_position: 3
+---
+
+# ARIA Roles
+
+> Landmark roles, widget roles, and when to use ARIA vs semantic HTML.
+
+## The First Rule of ARIA
+
+**Don't use ARIA.** Use semantic HTML first. Custom ARIA implementations require 5–10× more maintenance than native elements and have worse cross-browser support.
+
+```html
+<!-- ❌ Avoid: div with ARIA role -->
+<div role="button" tabindex="0" onclick="handleClick()">Click me</div>
+
+<!-- ✅ Prefer: native button -->
+<button onclick="handleClick()">Click me</button>
+```
+
+Only use ARIA when semantic HTML genuinely cannot achieve the required functionality.
+
+## Landmark Roles
+
+Landmark roles create navigational structure, allowing screen reader users to skip directly to major page sections.
+
+| HTML Element | ARIA Role | Purpose |
+|---|---|---|
+| `<header>` | `banner` | Site-wide header (top-level only) |
+| `<nav>` | `navigation` | Navigation menus |
+| `<main>` | `main` | Primary content (one per page) |
+| `<aside>` | `complementary` | Sidebars, supplementary content |
+| `<footer>` | `contentinfo` | Site-wide footer (top-level only) |
+| `<section>` | `region` | Requires `aria-labelledby` or `aria-label` |
+| `<article>` | `article` | Self-contained, independently distributable |
+
+When multiple landmarks of the same type exist, distinguish them with labels:
+
+```html
+<nav aria-label="Primary navigation">...</nav>
+<nav aria-label="Footer navigation">...</nav>
+```
+
+## Widget Roles
+
+Widget roles define interactive component behavior for custom UI that native HTML can't express:
+
+```html
+<!-- Tab interface -->
+<div role="tablist" aria-label="Settings">
+  <button role="tab" aria-selected="true" aria-controls="panel-general">General</button>
+  <button role="tab" aria-selected="false" aria-controls="panel-privacy">Privacy</button>
+</div>
+<div role="tabpanel" id="panel-general" aria-labelledby="tab-general">...</div>
+
+<!-- Custom select/listbox -->
+<div role="listbox" aria-label="Choose a color">
+  <div role="option" aria-selected="true">Blue</div>
+  <div role="option" aria-selected="false">Red</div>
+</div>
+
+<!-- Dialog -->
+<div role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+  <h2 id="dialog-title">Confirm Delete</h2>
+  ...
+</div>
+```
+
+## States and Properties
+
+ARIA **properties** are mostly static (define relationships), while **states** change during user interaction.
+
+```html
+<!-- Properties (static relationships) -->
+<button aria-label="Close dialog">×</button>
+<input aria-describedby="hint-id">
+
+<!-- States (dynamic conditions) -->
+<button aria-expanded="false" aria-controls="menu">Menu</button>
+<input aria-invalid="true" aria-required="true">
+<button aria-pressed="false">Mute</button>
+```
+
+Always keep states synchronized with visual changes.
+
+## Real-World Impact
+
+An e-commerce date picker case study showed screen reader users achieving 95% task success after proper ARIA implementation, up from near-zero baseline. The key was using `role="dialog"` with proper focus management and `aria-selected` on calendar date cells.
+
+## When to Use ARIA (Decision Tree)
+
+```
+Is there a native HTML element for this?
+├── YES → Use native HTML
+└── NO → Is the behavior achievable with existing elements + CSS?
+    ├── YES → Use native HTML + CSS
+    └── NO → Use ARIA roles + keyboard support + state management
+```
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

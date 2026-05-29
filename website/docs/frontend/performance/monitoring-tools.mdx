@@ -1,0 +1,383 @@
+---
+title: Performance Monitoring
+sidebar_position: 6
+---
+
+# Performance Monitoring & Profiling
+
+> Web Vitals, Performance APIs, monitoring tools, and React Profiler.
+
+---
+
+## Question 1: Core Web Vitals Monitoring
+
+**Difficulty:** 🟡 Medium
+**Frequency:** ⭐⭐⭐⭐⭐
+**Time:** 8 minutes
+**Companies:** Google, Meta, Vercel
+
+### Question
+
+How do you monitor Core Web Vitals in production?
+
+### Answer
+
+Use the `web-vitals` library for Real User Monitoring (RUM):
+
+```javascript
+import { onCLS, onFID, onLCP, onINP, onFCP, onTTFB } from 'web-vitals';
+
+function sendToAnalytics(metric) {
+  const body = {
+    name: metric.name,
+    value: metric.value,
+    id: metric.id,           // Unique ID for this page load
+    delta: metric.delta,     // Change since last report
+    rating: metric.rating,   // 'good', 'needs-improvement', 'poor'
+    navigationType: metric.navigationType,
+
+    // Custom context
+    url: window.location.href,
+    effectiveType: navigator.connection?.effectiveType, // '4g', '3g', etc.
+    deviceMemory: navigator.deviceMemory,
+    timestamp: Date.now(),
+  };
+
+  // sendBeacon is guaranteed to send even if user closes tab
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon('/analytics', JSON.stringify(body));
+  } else {
+    fetch('/analytics', { method: 'POST', body: JSON.stringify(body), keepalive: true });
+  }
+}
+
+// Monitor all vitals
+onLCP(sendToAnalytics);
+onFID(sendToAnalytics);
+onINP(sendToAnalytics);
+onCLS(sendToAnalytics);
+onFCP(sendToAnalytics);
+onTTFB(sendToAnalytics);
+
+// Debug: get the actual LCP element
+onLCP((metric) => {
+  const entry = metric.entries[metric.entries.length - 1];
+  console.log('LCP element:', entry.element?.tagName);
+  console.log('LCP image URL:', entry.url);
+  console.log('LCP render time:', entry.renderTime);
+});
+```
+
+Using `PerformanceObserver` directly:
+
+```javascript
+const observer = new PerformanceObserver((list) => {
+  for (const entry of list.getEntries()) {
+    console.log('LCP:', entry.renderTime || entry.loadTime);
+  }
+});
+observer.observe({ type: 'largest-contentful-paint', buffered: true });
+```
+
+### Resources
+- [Web Vitals](https://web.dev/vitals/)
+- [web-vitals Library](https://github.com/GoogleChrome/web-vitals)
+
+---
+
+## Question 2: Browser Performance APIs
+
+**Difficulty:** 🟡 Medium
+**Frequency:** ⭐⭐⭐
+**Time:** 8 minutes
+**Companies:** Google, Cloudflare
+
+### Question
+
+How do you use the browser Performance API for custom monitoring?
+
+### Answer
+
+```javascript
+// High-resolution timing (better than Date.now())
+const start = performance.now(); // nanosecond precision
+doSomething();
+const duration = performance.now() - start;
+
+// Navigation Timing: full page load breakdown
+const [navEntry] = performance.getEntriesByType('navigation');
+console.log('DNS lookup:', navEntry.domainLookupEnd - navEntry.domainLookupStart);
+console.log('TCP connect:', navEntry.connectEnd - navEntry.connectStart);
+console.log('TTFB:', navEntry.responseStart - navEntry.requestStart);
+console.log('DOM parse:', navEntry.domContentLoadedEventEnd - navEntry.responseEnd);
+console.log('Total load:', navEntry.loadEventEnd - navEntry.startTime);
+
+// Resource Timing: individual asset performance
+performance.getEntriesByType('resource').forEach(entry => {
+  const cached = entry.transferSize === 0;
+  console.log(`${entry.name}: ${entry.duration.toFixed(0)}ms${cached ? ' (cached)' : ''}`);
+});
+
+// User Timing: custom marks and measures
+performance.mark('feature-start');
+await doExpensiveFeature();
+performance.mark('feature-end');
+performance.measure('feature-duration', 'feature-start', 'feature-end');
+
+const [measure] = performance.getEntriesByName('feature-duration');
+console.log(`Feature took: ${measure.duration.toFixed(2)}ms`);
+```
+
+**Cache hit rate calculation:**
+
+```javascript
+function calculateCacheMetrics() {
+  const resources = performance.getEntriesByType('resource');
+  let hits = 0, misses = 0, bandwidthSaved = 0;
+
+  resources.forEach(r => {
+    if (r.transferSize === 0) {
+      hits++;
+      bandwidthSaved += r.encodedBodySize;
+    } else {
+      misses++;
+    }
+  });
+
+  const hitRate = (hits / (hits + misses)) * 100;
+  console.log(`Cache hit rate: ${hitRate.toFixed(1)}%`); // Target: 90%+
+  console.log(`Bandwidth saved: ${(bandwidthSaved / 1024).toFixed(0)} KB`);
+}
+```
+
+---
+
+## Question 3: React Profiler
+
+**Difficulty:** 🟡 Medium
+**Frequency:** ⭐⭐⭐
+**Time:** 8 minutes
+**Companies:** Meta, Airbnb
+
+### Question
+
+How do you identify and fix React performance issues in production?
+
+### Answer
+
+**Two profiling tools:**
+
+### Chrome DevTools Profiler (development)
+
+1. Open DevTools → Performance tab
+2. Click Record → interact with the app → Stop
+3. Look for long tasks (&gt;50ms) in the flame graph
+4. Check the React component tree in the "Timings" section
+
+### React `<Profiler>` Component (production-safe)
+
+```jsx
+import { Profiler } from 'react';
+
+function onRenderCallback(
+  id,           // component tree identifier
+  phase,        // 'mount' or 'update'
+  actualDuration, // time spent rendering
+  baseDuration,   // estimated time without memoization
+  startTime,
+  commitTime
+) {
+  // Only log slow renders
+  if (actualDuration > 16) { // > 1 frame @ 60fps
+    console.warn(`Slow render: ${id} took ${actualDuration.toFixed(2)}ms`);
+    sendToMonitoring({ id, phase, actualDuration, baseDuration });
+  }
+}
+
+function App() {
+  return (
+    <Profiler id="ProductList" onRender={onRenderCallback}>
+      <ProductList />
+    </Profiler>
+  );
+}
+```
+
+**`actualDuration` vs `baseDuration`:**
+
+```javascript
+// actualDuration: real render time (includes memoized subtrees that were skipped)
+// baseDuration: estimated time if NO memoization existed
+
+// If baseDuration >> actualDuration → memoization is working well
+// If baseDuration ≈ actualDuration → memoization has little effect (consider removing)
+
+// Example:
+// baseDuration: 150ms (full re-render without memo)
+// actualDuration: 12ms (only re-rendered non-memoized children)
+// → React.memo saved 138ms per interaction!
+```
+
+**Production monitoring with sampling:**
+
+```javascript
+const SAMPLE_RATE = 0.1; // Profile 10% of users to reduce overhead
+
+function onRenderCallback(id, phase, actualDuration, baseDuration) {
+  if (Math.random() > SAMPLE_RATE) return;
+
+  sendToMonitoring({
+    component: id,
+    phase,
+    actualDuration,
+    baseDuration,
+    memoEfficiency: ((1 - actualDuration / baseDuration) * 100).toFixed(1) + '%',
+  });
+}
+```
+
+---
+
+## Real-World Scenario: SaaS Dashboard Failing Core Web Vitals
+
+**Problem:** Enterprise dashboard with degraded performance after new features.
+- CLS: 0.42 (target: &lt;0.1) — users complaining about "jumpy UI"
+- LCP: 6.2s on mobile (target: &lt;2.5s) — 58% bounce rate
+- INP: 380ms (target: &lt;200ms) — buttons feel "laggy"
+- Customer support tickets: +240%
+
+**Investigation:**
+
+```javascript
+// Step 1: Record Performance timeline
+// DevTools → Performance → Record → interact → Stop
+//
+// Findings:
+// - Main thread blocked for 4.2s during initial load
+// - Layout shifts at: 0.8s, 1.2s, 2.4s, 3.1s
+// - LCP element: <div> with dynamic chart (renders at 6.2s)
+// - Long tasks: analytics.js (1820ms), charts-lib (2340ms)
+
+// Step 2: Find unused JS
+// DevTools → Coverage → Record
+// Result: 68% of JS unused on initial load (412 KB wasted)
+
+// Step 3: Debug CLS sources
+new PerformanceObserver((list) => {
+  list.getEntries().forEach((entry) => {
+    if (!entry.hadRecentInput) {
+      entry.sources.forEach(source => {
+        console.log('Shift:', entry.value.toFixed(3),
+          'element:', source.node,
+          'moved from:', source.previousRect,
+          'to:', source.currentRect);
+      });
+    }
+  });
+}).observe({ type: 'layout-shift', buffered: true });
+
+// Shift 1 (0.8s): Logo has no height → 0.12
+// Shift 2 (1.2s): Nav expands on font load → 0.08
+// Shift 3 (2.4s): Chart container resizes → 0.15
+// Shift 4 (3.1s): Ads inject without placeholder → 0.07
+```
+
+**Fixes:**
+
+```jsx
+// Fix CLS: reserve space for all dynamic content
+<img src="/logo.png" alt="Logo" width="200" height="50" />
+
+<div className="chart" style={{ minHeight: '400px' }}>
+  {data ? <Chart data={data} /> : <ChartSkeleton />}
+</div>
+
+// Fix LCP: parallel fetch instead of waterfall
+const [user, metrics, chart] = await Promise.all([
+  fetch('/api/user').then(r => r.json()),
+  fetch('/api/metrics').then(r => r.json()),
+  fetch('/api/chart-data').then(r => r.json()),
+]);
+// Before: 6.2s sequential | After: 2.1s parallel (−66%)
+
+// Fix INP: code split + defer heavy analytics
+const Charts = dynamic(() => import('./charts'), {
+  loading: () => <ChartSkeleton />,
+});
+
+useEffect(() => {
+  window.addEventListener('load', () => {
+    import('./analytics').then(m => m.init());
+  });
+}, []);
+
+// Move chart processing off main thread
+const worker = new Worker('/chart-worker.js');
+worker.postMessage(rawData);
+worker.onmessage = (e) => renderChart(e.data);
+```
+
+**Results:**
+
+| Metric | Before | After |
+|--------|--------|-------|
+| LCP | 6.2s | 1.8s |
+| INP | 380ms | 90ms |
+| CLS | 0.42 | 0.06 |
+| Bounce rate | 58% | 24% |
+
+---
+
+## Monitoring Setup: Quick Reference
+
+```javascript
+// Complete RUM setup (add to app entry point)
+import { onCLS, onLCP, onINP } from 'web-vitals';
+
+const vitals = {};
+
+function report(metric) {
+  vitals[metric.name] = metric;
+
+  // Alert on poor values
+  if (metric.rating === 'poor') {
+    console.warn(`Poor ${metric.name}: ${metric.value}`);
+  }
+
+  fetch('/api/vitals', {
+    method: 'POST',
+    body: JSON.stringify({
+      ...metric,
+      url: location.href,
+      connection: navigator.connection?.effectiveType,
+    }),
+    keepalive: true,
+  });
+}
+
+onLCP(report);
+onINP(report);
+onCLS(report);
+
+// Alert on high CLS in development
+if (process.env.NODE_ENV === 'development') {
+  onCLS(({ value }) => {
+    if (value > 0.1) console.error('High CLS detected:', value);
+  });
+}
+```
+
+**Tools overview:**
+
+| Tool | Type | Use Case |
+|------|------|----------|
+| **Chrome DevTools** | Lab | Development profiling, finding bottlenecks |
+| **Lighthouse** | Lab | Automated audit, CI/CD gating |
+| **web-vitals** | Field (RUM) | Real user monitoring in production |
+| **PageSpeed Insights** | Lab + Field | CrUX data + Lighthouse combined |
+| **WebPageTest** | Lab | Deep waterfall analysis, real devices |
+| **Sentry** | Field | Error + performance monitoring combined |
+
+---
+
+_Content from [maurya-sachin/Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/07-performance)_

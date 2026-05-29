@@ -1,0 +1,188 @@
+---
+title: Custom Hooks
+sidebar_position: 8
+---
+
+# React Custom Hooks
+
+## What Are Custom Hooks?
+
+Custom hooks are JavaScript functions **prefixed with `use`** that encapsulate stateful logic for reuse across components. They follow the same rules as built-in hooks: only call at top level, only in React functions.
+
+```javascript
+// Extract reusable logic into a custom hook
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+
+    fetch(url)
+      .then(r => r.json())
+      .then(d => { if (!cancelled) { setData(d); setLoading(false); } })
+      .catch(e => { if (!cancelled) { setError(e); setLoading(false); } });
+
+    return () => { cancelled = true; };
+  }, [url]);
+
+  return { data, loading, error };
+}
+
+// Usage (any component, no prop drilling)
+function UserProfile({ userId }) {
+  const { data: user, loading, error } = useFetch(`/api/users/${userId}`);
+
+  if (loading) return <Spinner />;
+  if (error) return <Error message={error.message} />;
+  return <div>{user.name}</div>;
+}
+```
+
+## Common Custom Hook Patterns
+
+### useDebounce — Delay value updates
+
+```javascript
+function useDebounce(value, delay = 300) {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debounced;
+}
+
+// Usage: search input that waits 300ms after user stops typing
+function Search() {
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
+
+  useEffect(() => {
+    if (debouncedQuery) fetchResults(debouncedQuery);
+  }, [debouncedQuery]);
+}
+```
+
+### useLocalStorage — Persist state to localStorage
+
+```javascript
+function useLocalStorage(key, initialValue) {
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch {
+      return initialValue;
+    }
+  });
+
+  const setValue = useCallback((value) => {
+    const toStore = value instanceof Function ? value(storedValue) : value;
+    setStoredValue(toStore);
+    localStorage.setItem(key, JSON.stringify(toStore));
+  }, [key, storedValue]);
+
+  return [storedValue, setValue];
+}
+
+// Usage
+const [theme, setTheme] = useLocalStorage('theme', 'light');
+```
+
+### useOnClickOutside — Detect clicks outside an element
+
+```javascript
+function useOnClickOutside(ref, handler) {
+  useEffect(() => {
+    const listener = (e) => {
+      if (!ref.current || ref.current.contains(e.target)) return;
+      handler(e);
+    };
+    document.addEventListener('mousedown', listener);
+    return () => document.removeEventListener('mousedown', listener);
+  }, [ref, handler]);
+}
+
+// Usage: close dropdown on outside click
+function Dropdown() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useOnClickOutside(ref, () => setOpen(false));
+
+  return <div ref={ref}>...</div>;
+}
+```
+
+### useMediaQuery — Responsive behavior in JS
+
+```javascript
+function useMediaQuery(query) {
+  const [matches, setMatches] = useState(
+    () => window.matchMedia(query).matches
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const handler = (e) => setMatches(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, [query]);
+
+  return matches;
+}
+
+// Usage
+const isMobile = useMediaQuery('(max-width: 768px)');
+const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+```
+
+### usePrevious — Track previous render value
+
+```javascript
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => { ref.current = value; }); // Runs after render
+  return ref.current; // Returns value from previous render
+}
+```
+
+### useInterval — Timer with cleanup
+
+```javascript
+function useInterval(callback, delay) {
+  const savedCallback = useRef(callback);
+
+  useEffect(() => { savedCallback.current = callback; }, [callback]);
+
+  useEffect(() => {
+    if (delay === null) return;
+    const id = setInterval(() => savedCallback.current(), delay);
+    return () => clearInterval(id);
+  }, [delay]);
+}
+```
+
+## Best Practices
+
+1. **Single responsibility** — one hook, one concern
+2. **Always clean up** — return cleanup from useEffect inside custom hooks
+3. **Dependency discipline** — include all deps; use `eslint-plugin-react-hooks`
+4. **Return objects for multiple values** — easier to extend and rename
+5. **Validate context** — throw meaningful error if used outside required context
+
+```javascript
+function useCart() {
+  const ctx = useContext(CartContext);
+  if (!ctx) throw new Error('useCart must be used within CartProvider');
+  return ctx;
+}
+```
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [03-react](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/03-react)_

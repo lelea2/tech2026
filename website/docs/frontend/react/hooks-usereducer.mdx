@@ -1,0 +1,166 @@
+---
+title: useReducer
+sidebar_position: 7
+---
+
+# React Hooks — useReducer
+
+> **Difficulty:** 🟡 Medium | **Frequency:** ⭐⭐⭐⭐
+
+## What is useReducer?
+
+`useReducer` manages complex state logic through a **reducer function** `(state, action) => newState`, following the Redux pattern. It provides more structure than `useState` for state with multiple related values or complex transitions.
+
+```javascript
+const [state, dispatch] = useReducer(reducer, initialState);
+```
+
+The `dispatch` function is **identity-stable** across re-renders — safe to pass to children without `useCallback`.
+
+## When to Use
+
+| Use `useState` | Use `useReducer` |
+|---------------|-----------------|
+| Simple independent values | Multiple related sub-values |
+| One update pattern | Multiple action types |
+| State doesn't depend on other state | Complex interdependencies |
+| Less than 3–4 state fields | 5+ fields or complex logic |
+
+## Basic Example
+
+```javascript
+function counterReducer(state, action) {
+  switch (action.type) {
+    case 'increment': return { count: state.count + 1 };
+    case 'decrement': return { count: state.count - 1 };
+    case 'reset': return { count: 0 };
+    default: return state;
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = useReducer(counterReducer, { count: 0 });
+
+  return (
+    <>
+      <p>Count: {state.count}</p>
+      <button onClick={() => dispatch({ type: 'increment' })}>+</button>
+      <button onClick={() => dispatch({ type: 'decrement' })}>-</button>
+      <button onClick={() => dispatch({ type: 'reset' })}>Reset</button>
+    </>
+  );
+}
+```
+
+## Real-World: Shopping Cart
+
+```javascript
+const initialCart = { items: [], total: 0, tax: 0, discount: 0 };
+
+function cartReducer(state, action) {
+  switch (action.type) {
+    case 'ADD_ITEM': {
+      const items = [...state.items, action.item];
+      const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+      return { ...state, items, total: subtotal, tax: subtotal * 0.1 };
+    }
+    case 'REMOVE_ITEM': {
+      const items = state.items.filter(i => i.id !== action.id);
+      const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+      return { ...state, items, total: subtotal, tax: subtotal * 0.1 };
+    }
+    case 'APPLY_DISCOUNT':
+      return { ...state, discount: action.amount };
+    case 'CLEAR':
+      return initialCart;
+    default:
+      return state;
+  }
+}
+```
+
+All derived values (total, tax) stay in sync automatically — no risk of forgetting to update one field.
+
+## Lazy Initialization
+
+```javascript
+function init(initialCount) {
+  return { count: initialCount }; // Runs only on mount
+}
+
+const [state, dispatch] = useReducer(reducer, props.initialCount, init);
+```
+
+## Reducer + Context = Global State Without Libraries
+
+```javascript
+const CartContext = createContext();
+const CartDispatchContext = createContext();
+
+function CartProvider({ children }) {
+  const [cart, dispatch] = useReducer(cartReducer, initialCart);
+
+  return (
+    <CartDispatchContext.Provider value={dispatch}>
+      <CartContext.Provider value={cart}>
+        {children}
+      </CartContext.Provider>
+    </CartDispatchContext.Provider>
+  );
+}
+
+// Components only need dispatch won't re-render when cart state changes
+function AddButton({ product }) {
+  const dispatch = useContext(CartDispatchContext);
+  return (
+    <button onClick={() => dispatch({ type: 'ADD_ITEM', item: product })}>
+      Add to Cart
+    </button>
+  );
+}
+```
+
+## Reducers Are Easy to Test
+
+Because reducers are pure functions (no side effects, same inputs always give same output):
+
+```javascript
+test('ADD_ITEM increases item count', () => {
+  const state = { items: [], total: 0, tax: 0 };
+  const next = cartReducer(state, {
+    type: 'ADD_ITEM',
+    item: { id: 1, price: 10, qty: 1 }
+  });
+  expect(next.items).toHaveLength(1);
+  expect(next.total).toBe(10);
+  expect(next.tax).toBe(1);
+});
+```
+
+## State Machines with useReducer
+
+Model complex flows with finite states and valid transitions — prevents impossible states:
+
+```javascript
+const STATES = { IDLE: 'idle', LOADING: 'loading', SUCCESS: 'success', ERROR: 'error' };
+
+function fetchReducer(state, action) {
+  switch (action.type) {
+    case 'FETCH':
+      if (state.status === STATES.LOADING) return state; // Already fetching
+      return { status: STATES.LOADING, data: null, error: null };
+    case 'SUCCESS':
+      return { status: STATES.SUCCESS, data: action.payload, error: null };
+    case 'ERROR':
+      return { status: STATES.ERROR, data: null, error: action.error };
+    case 'RESET':
+      return { status: STATES.IDLE, data: null, error: null };
+    default:
+      return state;
+  }
+}
+```
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [03-react](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/03-react)_

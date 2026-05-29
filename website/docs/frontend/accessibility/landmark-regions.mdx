@@ -1,0 +1,136 @@
+---
+title: Landmark Regions
+sidebar_position: 11
+---
+
+# Landmark Regions
+
+> HTML5 landmarks for accessible page structure and screen reader navigation.
+
+## Why Landmarks Matter
+
+Screen reader users navigate via keyboard shortcut (typically `D` key in NVDA/JAWS) to jump between landmarks instantly, bypassing hundreds of navigation links. Without landmarks, users must tab sequentially through every interactive element on the page.
+
+**Without landmarks:** 8–10 minutes to reach main content on a complex page.
+**With landmarks:** 2–3 seconds.
+
+A major e-commerce site saw a **99.4% navigation time improvement** after implementing proper landmarks, correlating with 74% reduction in abandonment and $1.6M annual revenue recovery.
+
+## The Seven Landmark Elements
+
+| HTML Element | ARIA Role | Purpose |
+|---|---|---|
+| `<header>` | `banner` | Site-wide header — top-level only |
+| `<nav>` | `navigation` | Navigation menus |
+| `<main>` | `main` | Primary content — **one per page** |
+| `<aside>` | `complementary` | Sidebars, related content |
+| `<footer>` | `contentinfo` | Site-wide footer — top-level only |
+| `<section>` | `region` | Requires `aria-labelledby` or `aria-label` |
+| `<article>` | `article` | Self-contained, independently distributable content |
+
+## Implementation
+
+### Basic Page Structure
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head><title>Page Title</title></head>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header>
+    <nav aria-label="Primary navigation">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <h1>Page Heading</h1>
+    <article>
+      <h2>Article Title</h2>
+      <p>Content...</p>
+    </article>
+  </main>
+
+  <aside aria-label="Related articles">
+    <h2>Related</h2>
+    <!-- sidebar content -->
+  </aside>
+
+  <footer>
+    <nav aria-label="Footer navigation">
+      <!-- footer links -->
+    </nav>
+  </footer>
+</body>
+</html>
+```
+
+### Labeling Multiple Landmarks of the Same Type
+
+When the same landmark appears more than once, distinguish them with labels:
+
+```html
+<!-- ✅ Good: labeled nav landmarks -->
+<nav aria-label="Primary navigation">...</nav>
+<nav aria-label="Breadcrumb">...</nav>
+<nav aria-label="Footer navigation">...</nav>
+
+<!-- ❌ Bad: unlabeled duplicate navs — screen readers can't distinguish them -->
+<nav>...</nav>
+<nav>...</nav>
+```
+
+### Section Requires a Label to Become a Landmark
+
+`<section>` only exposes a `region` landmark role when it has an accessible name:
+
+```html
+<!-- ✅ Landmark region — has label -->
+<section aria-labelledby="faq-heading">
+  <h2 id="faq-heading">FAQ</h2>
+  <!-- content -->
+</section>
+
+<!-- ✅ Also OK -->
+<section aria-label="Customer reviews">
+  <!-- content -->
+</section>
+
+<!-- ❌ Not a landmark — no accessible name -->
+<section>
+  <!-- content -->
+</section>
+```
+
+## Critical Rules
+
+1. **One `<main>` per page** — it's the primary content landmark
+2. **`<header>` and `<footer>` as direct children of `<body>`** are `banner`/`contentinfo`; nested inside `<article>` or `<section>` they are generic
+3. **Don't use `<div>` instead of semantic elements** — divs don't expose landmarks
+4. **Skip links must target the `<main>` element** (or add `tabindex="-1"` to it)
+
+## ARIA Landmark Roles (When HTML Isn't Enough)
+
+```html
+<!-- For legacy apps that can't use semantic HTML -->
+<div role="banner"><!-- header --></div>
+<div role="navigation" aria-label="Main"><!-- nav --></div>
+<div role="main"><!-- main content --></div>
+<div role="complementary"><!-- aside --></div>
+<div role="contentinfo"><!-- footer --></div>
+```
+
+## Testing
+
+- **NVDA:** Press `D` to cycle through landmarks, `R` for regions
+- **VoiceOver:** Open Rotor (VO+U), navigate to Landmarks
+- **axe DevTools:** Automatically flags missing or duplicate unlabeled landmarks
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

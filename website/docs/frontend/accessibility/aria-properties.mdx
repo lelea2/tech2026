@@ -1,0 +1,232 @@
+---
+title: ARIA Properties
+sidebar_position: 4
+---
+
+# ARIA Properties and Descriptions
+
+> **Master ARIA properties — aria-label, aria-labelledby, aria-describedby for accessible naming**
+
+## Question: What are aria-label, aria-labelledby, and aria-describedby?
+
+**Difficulty:** 🟡 Medium | **Frequency:** ⭐⭐⭐⭐⭐ | **Companies:** Google, Meta, Amazon, Microsoft, Apple
+
+Explain the difference between `aria-label`, `aria-labelledby`, and `aria-describedby`. When should you use each?
+
+## Answer
+
+### 1. aria-label — Direct string naming
+
+- Provides a **direct text string** as accessible name
+- **Use when:** No visible label exists (icon-only buttons)
+- **Overrides:** Visible text content
+
+```html
+<button aria-label="Close dialog">×</button>
+<button aria-label="Search products">
+  <svg aria-hidden="true"><!-- Search icon --></svg>
+</button>
+```
+
+### 2. aria-labelledby — Naming by element reference
+
+- References **one or more element IDs** for accessible name
+- **Use when:** Visible label exists elsewhere on page
+- **Overrides:** aria-label and native labels
+- **Allows:** Multiple ID references (concatenated)
+
+```html
+<!-- Dialog labeled by heading -->
+<div role="dialog" aria-labelledby="dialog-title" aria-modal="true">
+  <h2 id="dialog-title">Confirm Delete</h2>
+  <p>Are you sure you want to delete this item?</p>
+  <button onclick="confirmDelete()">Delete</button>
+  <button onclick="closeDialog()">Cancel</button>
+</div>
+
+<!-- Multiple ID references (concatenated) -->
+<span id="first-name">John</span>
+<span id="last-name">Doe</span>
+<div aria-labelledby="first-name last-name">
+  <!-- Screen reader says: "John Doe" -->
+</div>
+```
+
+### 3. aria-describedby — Additional descriptions
+
+- References **element IDs** for additional description
+- **Does NOT override:** Names (adds description only)
+- **Common use:** Error messages, password hints, help text
+
+```html
+<!-- Password field with hint -->
+<label for="password">Password</label>
+<input type="password" id="password" aria-describedby="password-hint">
+<span id="password-hint" class="help-text">
+  Must be at least 8 characters with uppercase letter and number
+</span>
+
+<!-- Form field with multiple descriptions -->
+<label for="email">Email</label>
+<input
+  type="email"
+  id="email"
+  aria-required="true"
+  aria-invalid="true"
+  aria-describedby="email-hint email-error"
+>
+<span id="email-hint">We'll never share your email</span>
+<span id="email-error" role="alert">Please enter a valid email address</span>
+```
+
+### Accessible Name Priority Order
+
+1. `aria-labelledby` (highest priority)
+2. `aria-label`
+3. Native HTML label element
+4. Element text content
+5. Placeholder attribute (lowest — not recommended)
+
+## React Example: Accessible Form Field
+
+```jsx
+function FormField({ label, type, error, hint, ...inputProps }) {
+  const inputId = useId();
+  const hintId = `${inputId}-hint`;
+  const errorId = `${inputId}-error`;
+
+  const describedBy = [
+    hint && hintId,
+    error && errorId
+  ].filter(Boolean).join(' ');
+
+  return (
+    <div className="form-field">
+      <label htmlFor={inputId}>{label}</label>
+      <input
+        id={inputId}
+        type={type}
+        aria-required={inputProps.required}
+        aria-invalid={!!error}
+        aria-describedby={describedBy || undefined}
+        {...inputProps}
+      />
+      {hint && <span id={hintId} className="help-text">{hint}</span>}
+      {error && <span id={errorId} role="alert" className="error-text">{error}</span>}
+    </div>
+  );
+}
+```
+
+## Common Mistakes
+
+```html
+<!-- ❌ aria-label on button with visible text (mismatch!) -->
+<button aria-label="Click here">Submit Form</button>
+<!-- Screen reader says "Click here" but user sees "Submit Form" -->
+
+<!-- ✅ No aria-label needed when text is present -->
+<button>Submit Form</button>
+
+<!-- ❌ Both aria-label and aria-labelledby (labelledby wins, aria-label ignored) -->
+<div aria-label="Settings" aria-labelledby="heading-id">
+  <h2 id="heading-id">Account Settings</h2>
+</div>
+
+<!-- ✅ Use one or the other -->
+<div aria-labelledby="heading-id">
+  <h2 id="heading-id">Account Settings</h2>
+</div>
+
+<!-- ❌ aria-describedby for primary name (it's a description, not a name!) -->
+<button aria-describedby="btn-name">×</button>
+<span id="btn-name">Close</span>
+
+<!-- ✅ aria-label for the name, aria-describedby for extra context -->
+<button aria-label="Close" aria-describedby="warning">×</button>
+<span id="warning">Cannot be undone</span>
+```
+
+## Deep Dive: aria-label vs aria-labelledby Decision Matrix
+
+| Scenario | Best Choice | Why |
+|----------|-------------|-----|
+| Icon-only button | `aria-label` | No visible text |
+| Button with visible text | No ARIA | Use text content |
+| Dialog labeled by heading | `aria-labelledby` | Reuse existing heading |
+| Form field | `<label for>` | Native, accessible |
+| Multi-element label | `aria-labelledby` | Concatenate IDs |
+| Translated content | `aria-labelledby` | Auto-translates with page |
+| Form hints/errors | `aria-describedby` | Additional context |
+
+**Performance:** `aria-label` has ~0ms overhead (direct string); `aria-labelledby` with 1 reference adds ~0.1ms. Negligible for under 100 elements.
+
+**i18n:** `aria-label` requires manual translation via your i18n library; `aria-labelledby` pointing to visible text auto-translates with the page.
+
+## Deep Dive: Hidden Elements in aria-labelledby
+
+Screen readers **include hidden elements** when referenced by `aria-labelledby`:
+
+```html
+<span id="hidden-label" style="display: none;">Hidden label text</span>
+<button aria-labelledby="hidden-label">
+  <!-- Announces: "Hidden label text" even though span is hidden -->
+</button>
+```
+
+This allows screen-reader-only labels via `.sr-only` class without affecting visual layout.
+
+## Real-World Scenario: Tooltip Accessibility
+
+An icon-only button with a tooltip failed because:
+1. No accessible name on button (WCAG 4.1.2 failure)
+2. Tooltip not connected via `aria-describedby`
+3. Tooltip only appeared on hover (not keyboard focus)
+
+**Fix:**
+
+```jsx
+function IconButton({ icon, label, tooltip, onClick }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const tooltipId = useId();
+
+  return (
+    <div>
+      <button
+        onClick={onClick}
+        aria-label={label}
+        aria-describedby={showTooltip ? tooltipId : undefined}
+        onFocus={() => setShowTooltip(true)}
+        onBlur={() => setShowTooltip(false)}
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+      >
+        <span aria-hidden="true">{icon}</span>
+      </button>
+      {showTooltip && (
+        <div id={tooltipId} role="tooltip">{tooltip}</div>
+      )}
+    </div>
+  );
+}
+```
+
+**Result:** Screen reader announces "Delete, button, This action cannot be undone." Voice control success rate: 2% (up from 34% failure rate).
+
+## Follow-up Questions
+
+- What happens when both `aria-label` and `aria-labelledby` are present?
+- How do you handle `aria-labelledby` with missing ID references?
+- When should you use `aria-describedby` vs the `title` attribute?
+- How do screen readers announce `aria-describedby` content?
+- How do you test accessible names with screen readers?
+
+## Resources
+
+- [ARIA Authoring Practices — Naming](https://www.w3.org/WAI/ARIA/apg/practices/names-and-descriptions/)
+- [Accessible Name and Description Computation](https://www.w3.org/TR/accname-1.1/)
+- [WebAIM — ARIA Labels](https://webaim.org/techniques/forms/advanced#aria-labels)
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

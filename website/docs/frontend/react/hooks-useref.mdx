@@ -1,0 +1,167 @@
+---
+title: useRef
+sidebar_position: 6
+---
+
+# React Hooks — useRef
+
+## What is useRef?
+
+`useRef` returns a mutable ref object `{ current: initialValue }` that persists across re-renders **without triggering updates**. Unlike `useState`, mutating `.current` doesn't schedule a re-render.
+
+```javascript
+const ref = useRef(initialValue);
+ref.current; // Read
+ref.current = newValue; // Write (no re-render)
+```
+
+## Primary Use Cases
+
+### 1. DOM Access
+
+```javascript
+function FocusInput() {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    inputRef.current.focus(); // Direct DOM access
+  }, []);
+
+  return <input ref={inputRef} type="text" />;
+}
+```
+
+### 2. Storing Mutable Values (Without Re-renders)
+
+Ideal for values that need to persist but shouldn't trigger UI updates — interval IDs, previous values, abort controllers:
+
+```javascript
+function Timer() {
+  const [seconds, setSeconds] = useState(0);
+  const intervalRef = useRef(null);
+
+  const start = () => {
+    intervalRef.current = setInterval(() => {
+      setSeconds(s => s + 1);
+    }, 1000);
+  };
+
+  const stop = () => {
+    clearInterval(intervalRef.current);
+  };
+
+  useEffect(() => () => clearInterval(intervalRef.current), []);
+
+  return (
+    <>
+      <p>{seconds}s</p>
+      <button onClick={start}>Start</button>
+      <button onClick={stop}>Stop</button>
+    </>
+  );
+}
+```
+
+### 3. Tracking Previous Values
+
+```javascript
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value; // Updates after render
+  });
+  return ref.current; // Returns the previous value
+}
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  const prevCount = usePrevious(count);
+
+  return <p>Now: {count}, Before: {prevCount}</p>;
+}
+```
+
+### 4. AbortController for Fetch Cancellation
+
+```javascript
+function SearchResults({ query }) {
+  const abortRef = useRef(null);
+
+  useEffect(() => {
+    abortRef.current?.abort(); // Cancel previous request
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    fetch(`/api/search?q=${query}`, { signal: controller.signal })
+      .then(r => r.json())
+      .then(setResults)
+      .catch(e => { if (e.name !== 'AbortError') setError(e); });
+
+    return () => controller.abort();
+  }, [query]);
+}
+```
+
+## useRef vs useState
+
+| `useRef` | `useState` |
+|---------|-----------|
+| No re-render on change | Re-renders on change |
+| Synchronous update | Async update |
+| No UI impact | Updates UI |
+| Mutable directly | Via setter only |
+| Behind-the-scenes tracking | User-visible values |
+
+**Rule:** If changing the value should update the UI → `useState`. If it's internal bookkeeping → `useRef`.
+
+## forwardRef — Exposing Refs from Children
+
+```javascript
+// Child exposes its DOM element to parent
+const FancyInput = forwardRef(function FancyInput(props, ref) {
+  return <input ref={ref} {...props} className="fancy" />;
+});
+
+function Parent() {
+  const inputRef = useRef(null);
+  return (
+    <>
+      <FancyInput ref={inputRef} />
+      <button onClick={() => inputRef.current.focus()}>Focus</button>
+    </>
+  );
+}
+```
+
+## Common Mistakes
+
+```javascript
+// ❌ Accessing ref during render (it's null before mount)
+function Bad() {
+  const ref = useRef(null);
+  ref.current.focus(); // Error: cannot read .focus of null
+
+  return <input ref={ref} />;
+}
+
+// ✅ Access in useEffect or event handlers
+function Good() {
+  const ref = useRef(null);
+  useEffect(() => { ref.current.focus(); }, []);
+  return <input ref={ref} />;
+}
+
+// ❌ Using state for interval IDs (causes unnecessary re-render)
+const [intervalId, setIntervalId] = useState(null);
+
+// ✅ Use ref (no re-render needed)
+const intervalRef = useRef(null);
+```
+
+## Performance Example
+
+Tracking 60 FPS animation across 20 metrics with `useState`: 1,200 re-renders/second. With `useRef` + batched updates: near-zero unnecessary renders.
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [03-react](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/03-react)_

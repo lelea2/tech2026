@@ -1,0 +1,124 @@
+---
+title: Focus Visible
+sidebar_position: 8
+---
+
+# Focus Visible
+
+> Using `:focus-visible` to provide keyboard focus indicators without affecting mouse users.
+
+## What is :focus-visible?
+
+`:focus-visible` is a CSS pseudo-class that applies focus styles **only when the browser determines a focus indicator should be visible** — typically during keyboard navigation or when using assistive technology. This solves the problem of unwanted focus rings when users click buttons with a mouse.
+
+- **`:focus`** — applies to any focus method (mouse click, keyboard, programmatic)
+- **`:focus-visible`** — applies only for keyboard/assistive technology focus
+
+## Implementation Pattern
+
+```css
+/* Remove default focus ring (safe with :focus-visible below) */
+button:focus {
+  outline: none;
+}
+
+/* Show custom indicator for keyboard users */
+button:focus-visible {
+  outline: 3px solid #ffbf47;
+  outline-offset: 2px;
+}
+```
+
+A simpler approach that enhances rather than replaces:
+
+```css
+/* Enhance default outline for keyboard focus */
+:focus-visible {
+  outline: 3px solid #0078d4;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+```
+
+## WCAG Requirements
+
+Focus indicators must meet WCAG 2.1 SC 2.4.7 (Level AA):
+- **Minimum 3:1** contrast ratio against adjacent colors
+- Visible and distinguishable from other UI elements
+- Should not obscure other important content
+
+```css
+/* ❌ Bad: No focus indicator */
+button:focus { outline: none; }
+
+/* ❌ Bad: Poor contrast */
+button:focus-visible { outline: 1px solid #ddd; }
+
+/* ✅ Good: High contrast, visible */
+button:focus-visible {
+  outline: 3px solid #0066cc; /* 7:1 contrast on white */
+  outline-offset: 2px;
+}
+```
+
+## Browser Support
+
+Modern browsers support `:focus-visible` natively (Chrome 86+, Firefox 85+, Safari 15.4+). For older environments, use the [focus-visible polyfill](https://github.com/WICG/focus-visible):
+
+```javascript
+import 'focus-visible';
+```
+
+The polyfill applies a `.focus-visible` class via JavaScript heuristics, matching the native behavior.
+
+## Real-World Impact
+
+An e-commerce site that implemented proper focus indicators saw:
+- **72% faster** task completion for keyboard users
+- **74% reduction** in checkout abandonment
+
+Users who couldn't see focus were effectively navigating blind — they couldn't tell where Tab had moved them.
+
+## Design Patterns
+
+```css
+/* Solid outline (most common) */
+:focus-visible {
+  outline: 3px solid #0078d4;
+  outline-offset: 2px;
+}
+
+/* Box shadow (for elements with rounded corners) */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.6);
+}
+
+/* Inset for buttons with colored backgrounds */
+button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: -4px;
+}
+
+/* High-contrast mode support */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 3px solid ButtonText;
+  }
+}
+```
+
+## Common Mistake
+
+```css
+/* ❌ This removes focus for ALL users including keyboard users */
+* { outline: none !important; }
+
+/* ✅ Safe: removes mouse-click ring but keeps keyboard ring */
+:focus:not(:focus-visible) { outline: none; }
+:focus-visible { outline: 3px solid #0078d4; }
+```
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

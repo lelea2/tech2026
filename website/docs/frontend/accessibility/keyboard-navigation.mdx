@@ -1,0 +1,240 @@
+---
+title: Keyboard Navigation
+sidebar_position: 10
+---
+
+# Keyboard Navigation
+
+> Focus management, keyboard shortcuts, tab order, skip links, and accessible interactions.
+
+## Question: How do you ensure keyboard accessibility?
+
+**Difficulty:** 🟡 Medium | **Frequency:** ⭐⭐⭐⭐ | **Companies:** Google, Meta, Airbnb
+
+## Answer
+
+Every interactive element must be reachable and operable with keyboard only. Users who rely on keyboard navigation include people with motor disabilities, power users, screen reader users, and people with RSI.
+
+### The Three Golden Rules
+
+**1. Everything clickable must be keyboard-reachable**
+
+```html
+<!-- ❌ Bad: div can't be reached with Tab -->
+<div onclick="handleClick()">Click me</div>
+
+<!-- ✅ Good: button is automatically keyboard-accessible -->
+<button onclick="handleClick()">Click me</button>
+```
+
+**2. Always show where you are (focus indicators)**
+
+```css
+/* ❌ Never do this */
+button:focus { outline: none; }
+
+/* ✅ Make focus visible */
+button:focus-visible {
+  outline: 3px solid #0078d4;
+  outline-offset: 2px;
+}
+```
+
+**3. Logical tab order follows visual layout**
+
+```html
+<!-- ❌ Bad: positive tabindex creates chaos -->
+<input tabindex="3" placeholder="Name">
+<input tabindex="1" placeholder="Email">
+<button tabindex="2">Submit</button>
+
+<!-- ✅ Good: natural DOM order = natural tab order -->
+<input placeholder="Name">
+<input placeholder="Email">
+<button>Submit</button>
+```
+
+## Key Keyboard Patterns
+
+### Standard Keys
+
+| Key | Action |
+|-----|--------|
+| `Tab` | Move focus forward |
+| `Shift+Tab` | Move focus backward |
+| `Enter` | Activate link or button |
+| `Space` | Activate button, scroll page |
+| `Escape` | Close dialog/dropdown |
+| `Arrow keys` | Navigate within widget (tabs, menus) |
+| `Home` / `End` | First / last item in group |
+
+### Skip Links
+
+```html
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav><!-- many links --></nav>
+<main id="main-content"><!-- content --></main>
+```
+
+```css
+.skip-link {
+  position: absolute;
+  top: -40px;
+  background: #000;
+  color: #fff;
+  padding: 8px;
+}
+.skip-link:focus { top: 0; }
+```
+
+### Modal Focus Management
+
+```jsx
+function AccessibleModal({ isOpen, onClose, title, children }) {
+  const modalRef = useRef(null);
+  const previousFocusRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      previousFocusRef.current = document.activeElement;
+      // Focus first element in modal
+      const focusable = modalRef.current?.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      focusable?.[0]?.focus();
+    } else {
+      previousFocusRef.current?.focus(); // Restore focus
+    }
+  }, [isOpen]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape') { onClose(); return; }
+    if (e.key !== 'Tab') return;
+
+    const focusable = Array.from(modalRef.current?.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    ) ?? []);
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault(); last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault(); first.focus();
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="modal-title" onKeyDown={handleKeyDown}>
+      <h2 id="modal-title">{title}</h2>
+      {children}
+      <button onClick={onClose} aria-label="Close dialog">×</button>
+    </div>
+  );
+}
+```
+
+### Roving Tabindex for Widgets
+
+Use arrow keys for navigation within complex widgets (toolbars, tab lists, grids):
+
+```jsx
+function TabList({ tabs }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const handleKeyDown = (e, index) => {
+    const next = (index + 1) % tabs.length;
+    const prev = (index - 1 + tabs.length) % tabs.length;
+
+    if (e.key === 'ArrowRight') { e.preventDefault(); setActiveIndex(next); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); setActiveIndex(prev); }
+    if (e.key === 'Home') { e.preventDefault(); setActiveIndex(0); }
+    if (e.key === 'End') { e.preventDefault(); setActiveIndex(tabs.length - 1); }
+  };
+
+  return (
+    <div role="tablist">
+      {tabs.map((tab, index) => (
+        <button
+          key={tab.id}
+          role="tab"
+          aria-selected={index === activeIndex}
+          aria-controls={`panel-${tab.id}`}
+          tabIndex={index === activeIndex ? 0 : -1}
+          onClick={() => setActiveIndex(index)}
+          onKeyDown={(e) => handleKeyDown(e, index)}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+```
+
+## Keyboard Shortcut System
+
+```javascript
+class KeyboardShortcutManager {
+  constructor() {
+    this.shortcuts = new Map();
+    document.addEventListener('keydown', this.handle.bind(this));
+  }
+
+  register(keys, callback, options = {}) {
+    const normalized = keys.toLowerCase().split('+').sort().join('+');
+    this.shortcuts.set(normalized, { callback, ...options });
+  }
+
+  handle(event) {
+    const modifiers = [];
+    if (event.ctrlKey || event.metaKey) modifiers.push('ctrl');
+    if (event.altKey) modifiers.push('alt');
+    if (event.shiftKey) modifiers.push('shift');
+    const key = [...modifiers, event.key.toLowerCase()].sort().join('+');
+
+    const shortcut = this.shortcuts.get(key);
+    if (!shortcut) return;
+
+    // Don't activate shortcuts when typing in inputs
+    const isTyping = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
+    if (isTyping && !shortcut.scope === 'always') return;
+
+    if (shortcut.preventDefault !== false) event.preventDefault();
+    shortcut.callback(event);
+  }
+}
+
+const shortcuts = new KeyboardShortcutManager();
+shortcuts.register('ctrl+k', () => openSearch());
+shortcuts.register('escape', () => closeModal(), { scope: 'always' });
+```
+
+## Testing Keyboard Accessibility
+
+1. **Tab through entire flow** without touching mouse
+2. **Check focus indicators** are visible on all interactive elements
+3. **Test modal flows**: open → trapped inside → Escape closes → focus restored
+4. **Test with screen reader** (NVDA/JAWS on Windows, VoiceOver on Mac)
+5. **Use axe DevTools** for automated detection
+
+## Real-World: Checkout Keyboard Trap (12% Conversion Loss)
+
+An e-commerce platform's checkout modals broke keyboard navigation because:
+- Focus wasn't moved into modal when it opened
+- No Escape key handler
+- Focus leaked to elements behind the modal
+- Focus wasn't restored after modal closed
+- Close button was a `<span>` with `onClick`, not a `<button>`
+
+**After fixing** proper focus management:
+- Keyboard completion rate: 56% → 66%
+- Cart abandonment at modals: 23% → 8%
+- Support tickets: -89%
+- Estimated additional revenue: $142K/month
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

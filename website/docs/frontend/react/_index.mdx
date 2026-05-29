@@ -1,0 +1,80 @@
+---
+title: React Interview Preparation
+sidebar_position: 0
+---
+
+# React Interview Preparation Guide
+
+> **22+ Q&A covering React hooks, component patterns, performance, state management, forms, testing, and internals**
+
+## Topics
+
+### Hooks
+| File | Topics | Difficulty |
+|------|--------|------------|
+| [useState](./hooks-usestate) | State initialization, functional updates, lazy init | 🟢 |
+| [useEffect](./hooks-useeffect) | Side effects, cleanup, dependency array | 🟡 |
+| [useContext & useReducer](./hooks-usecontext-usereducer) | Context API, complex state, dispatch patterns | 🟡 |
+| [useCallback & useMemo](./hooks-usecallback-usememo) | Memoization, referential equality, performance | 🟡 |
+| [useRef](./hooks-useref) | DOM access, mutable values, timers | 🟢 |
+| [useReducer](./hooks-usereducer) | Reducer pattern, complex state transitions | 🟡 |
+| [Custom Hooks](./hooks-custom) | Encapsulating logic, common patterns | 🟡 |
+
+### Component Patterns
+| File | Topics | Difficulty |
+|------|--------|------------|
+| [Composition](./patterns-composition) | Children, render props, slots, inversion of control | 🟡 |
+| [HOC](./patterns-hoc) | Higher-order components, when to avoid | 🟡 |
+| [Render Props](./patterns-render-props) | Function-as-child, when to use vs hooks | 🟡 |
+| [Error Boundaries](./patterns-error-boundaries) | Catching errors, fallback UI, React 18 | 🟡 |
+| [Code Splitting](./patterns-code-splitting) | React.lazy, Suspense, route splitting | 🟡 |
+
+### Internals & Rendering
+| File | Topics | Difficulty |
+|------|--------|------------|
+| [Virtual DOM & Reconciliation](./rendering-virtual-dom) | Diffing, keys, commit phase | 🟡 |
+| [Fiber Architecture](./fiber-architecture) | Concurrent rendering, time-slicing, priority | 🔴 |
+| [Rendering Optimization](./rendering-optimization) | React.memo, profiling, avoid re-renders | 🟡 |
+| [Component Basics](./components-basics) | Functional vs class, JSX, createElement | 🟢 |
+| [Lifecycle Methods](./lifecycle-methods) | Mount/update/unmount, hooks equivalent | 🟡 |
+
+### State Management
+| File | Topics | Difficulty |
+|------|--------|------------|
+| [State Management](./state-management) | State vs props, lifting state, local vs global | 🟡 |
+| [Context API](./context-api) | Performance pitfalls, splitting contexts | 🟡 |
+| [Redux & Zustand](./state-redux-zustand) | Store patterns, selectors, when to use | 🟡 |
+| [Concurrent Features](./concurrent-features) | useTransition, useDeferredValue, batching | 🔴 |
+
+### Data & Forms
+| File | Topics | Difficulty |
+|------|--------|------------|
+| [Forms](./forms-controlled) | Controlled vs uncontrolled, React Hook Form | 🟡 |
+| [Events](./events-synthetic) | Synthetic event system, delegation, cleanup | 🟡 |
+| [Suspense & Data Fetching](./suspense-data-fetching) | Boundary architecture, transitions | 🔴 |
+| [SSR](./ssr-basics) | Hydration, renderToPipeableStream, CSR vs SSR | 🔴 |
+| [Server Components](./server-components) | RSC, App Router, zero bundle | 🔴 |
+
+### Quality & Tooling
+| File | Topics | Difficulty |
+|------|--------|------------|
+| [Testing](./testing-rtl) | React Testing Library, accessible queries, mocking | 🟡 |
+| [TypeScript](./typescript-integration) | Props typing, generics, utility types | 🟡 |
+| [Security](./security-practices) | XSS, CSRF, token storage, CSP | 🟡 |
+| [Styling](./styling-methods) | CSS Modules, CSS-in-JS, Tailwind, performance | 🟢 |
+| [Routing](./routing-react-router) | React Router v6, protected routes, auth | 🟡 |
+| [Performance](./performance-basics) | Code splitting, Profiler, metrics | 🟡 |
+
+---
+
+## Most Frequently Asked
+
+1. **useState & useEffect fundamentals** (⭐⭐⭐⭐⭐)
+2. **Component re-rendering mechanics** (⭐⭐⭐⭐⭐)
+3. **useCallback vs useMemo** (⭐⭐⭐⭐)
+4. **Context API patterns** (⭐⭐⭐⭐)
+5. **React.memo optimization** (⭐⭐⭐⭐)
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [03-react](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/03-react)_

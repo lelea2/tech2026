@@ -1,0 +1,354 @@
+
+---
+title: Optimization Techniques
+sidebar_position: 1
+---
+
+# Optimization Techniques
+
+> Code splitting, tree shaking, bundle optimization, React rendering performance, and Core Web Vitals.
+
+---
+
+## Question 1: Core Web Vitals Optimization
+
+**Difficulty:** 🟡 Medium
+**Frequency:** ⭐⭐⭐⭐⭐
+**Time:** 10 minutes
+**Companies:** Google, Meta, Vercel, Netflix
+
+### Question
+
+What are Core Web Vitals and how do you optimize for each one?
+
+### Answer
+
+**Core Web Vitals** are Google's three key user-centric metrics:
+
+| Metric | Measures | Good | Needs Improvement | Poor |
+|--------|----------|------|-------------------|------|
+| **LCP** (Largest Contentful Paint) | Loading performance | &lt; 2.5s | 2.5–4s | &gt; 4s |
+| **INP** (Interaction to Next Paint) | Interactivity | &lt; 200ms | 200–500ms | &gt; 500ms |
+| **CLS** (Cumulative Layout Shift) | Visual stability | &lt; 0.1 | 0.1–0.25 | &gt; 0.25 |
+
+**LCP optimization:**
+
+```html
+<!-- Preload LCP image -->
+<link rel="preload" as="image" href="hero.webp" fetchpriority="high" />
+
+<!-- Use modern formats -->
+<picture>
+  <source srcset="hero.avif" type="image/avif" />
+  <source srcset="hero.webp" type="image/webp" />
+  <img src="hero.jpg" alt="Hero" width="1200" height="600" />
+</picture>
+
+<!-- Defer non-critical JS -->
+<script src="bundle.js" defer></script>
+```
+
+**INP optimization:**
+
+```javascript
+// Break up long tasks
+async function processData(items) {
+  const chunkSize = 100;
+  for (let i = 0; i < items.length; i += chunkSize) {
+    await new Promise(resolve => setTimeout(resolve, 0)); // yield to main thread
+    items.slice(i, i + chunkSize).forEach(processItem);
+  }
+}
+
+// Use startTransition for non-urgent updates (React 18)
+import { startTransition } from 'react';
+
+function handleClick() {
+  startTransition(() => {
+    setExpensiveState(newValue);
+  });
+}
+```
+
+**CLS optimization:**
+
+```html
+<!-- Always reserve space for images -->
+<img src="photo.jpg" width="800" height="600" alt="Product" />
+
+<!-- Reserve space for dynamic content -->
+<div style="min-height: 400px">
+  {chartData ? <Chart /> : <Skeleton />}
+</div>
+
+<!-- Prevent font flash -->
+<style>
+  @font-face {
+    font-family: 'CustomFont';
+    src: url('/fonts/custom.woff2');
+    font-display: swap;
+  }
+</style>
+```
+
+### Resources
+- [Core Web Vitals](https://web.dev/vitals/)
+- [Optimize LCP](https://web.dev/optimize-lcp/)
+
+---
+
+## Question 2: JavaScript Bundle Size Reduction
+
+**Difficulty:** 🟡 Medium
+**Frequency:** ⭐⭐⭐⭐⭐
+**Time:** 8 minutes
+**Companies:** Meta, Google, Airbnb
+
+### Question
+
+How do you reduce JavaScript bundle size? Explain code splitting and tree shaking.
+
+### Answer
+
+**Three primary techniques:**
+
+### Code Splitting
+
+Break the monolithic bundle into route-based or feature-based chunks loaded on demand.
+
+```jsx
+import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// Each page becomes a separate chunk
+const Home = lazy(() => import('./pages/Home'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Profile = lazy(() => import('./pages/Profile'));
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  );
+}
+```
+
+**Impact:** Reducing initial bundle from 850 KB to 280 KB (67% reduction) cuts Time to Interactive by 55% on 3G.
+
+### Tree Shaking
+
+Eliminate unused code by using ES module static imports.
+
+```javascript
+// ❌ Bad: Imports entire lodash (531 KB)
+import _ from 'lodash';
+const unique = _.uniq(array);
+
+// ✅ Good: Import only what's needed (8 KB)
+import uniq from 'lodash/uniq';
+const unique = uniq(array);
+
+// ❌ Bad: moment.js (287 KB) for simple formatting
+import moment from 'moment';
+const formatted = moment(date).format('YYYY-MM-DD');
+
+// ✅ Good: date-fns with tree shaking (2 KB)
+import { format } from 'date-fns';
+const formatted = format(date, 'yyyy-MM-dd');
+```
+
+### Webpack Bundle Analysis
+
+```bash
+npm install --save-dev webpack-bundle-analyzer
+```
+
+```javascript
+// webpack.config.js
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+module.exports = {
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+          priority: 10,
+        },
+        common: {
+          minChunks: 2,
+          name: 'common',
+          priority: 5,
+          reuseExistingChunk: true,
+        },
+      },
+    },
+  },
+  plugins: [new BundleAnalyzerPlugin()],
+};
+```
+
+### Resources
+- [Code Splitting](https://webpack.js.org/guides/code-splitting/)
+- [Tree Shaking](https://webpack.js.org/guides/tree-shaking/)
+
+---
+
+## Question 3: React Rendering Performance
+
+**Difficulty:** 🔴 Hard
+**Frequency:** ⭐⭐⭐⭐⭐
+**Time:** 10 minutes
+**Companies:** Meta, Google, Netflix, Airbnb
+
+### Question
+
+How do you optimize React rendering performance? When should you use React.memo, useMemo, and useCallback?
+
+### Answer
+
+**Key optimization tools:**
+
+### React.memo — Skip re-renders when props haven't changed
+
+```jsx
+// Without memo: re-renders on every parent update
+function ProductCard({ product }) {
+  return <div>{product.name} — ${product.price}</div>;
+}
+
+// With memo: skips re-render if props are shallowly equal
+const ProductCard = React.memo(function ProductCard({ product }) {
+  return <div>{product.name} — ${product.price}</div>;
+});
+
+// Custom comparison for deep equality
+const ProductCard = React.memo(
+  function ProductCard({ product }) {
+    return <div>{product.name}</div>;
+  },
+  (prevProps, nextProps) => prevProps.product.id === nextProps.product.id
+);
+```
+
+### useMemo — Cache expensive computations
+
+```javascript
+function Dashboard({ orders }) {
+  // ❌ Bad: recalculates on every render
+  const summary = orders.reduce((acc, order) => ({
+    total: acc.total + order.amount,
+    count: acc.count + 1,
+  }), { total: 0, count: 0 });
+
+  // ✅ Good: recalculates only when orders changes
+  const summary = useMemo(() =>
+    orders.reduce((acc, order) => ({
+      total: acc.total + order.amount,
+      count: acc.count + 1,
+    }), { total: 0, count: 0 }),
+    [orders]
+  );
+}
+```
+
+### useCallback — Stable function references for memoized children
+
+```javascript
+function ParentList({ items }) {
+  // ❌ Bad: new function on every render → breaks React.memo on children
+  const handleDelete = (id) => deleteItem(id);
+
+  // ✅ Good: stable reference → React.memo on children can skip re-renders
+  const handleDelete = useCallback((id) => deleteItem(id), []);
+
+  return items.map(item => (
+    <MemoizedItem key={item.id} item={item} onDelete={handleDelete} />
+  ));
+}
+```
+
+### Virtualization — Only render visible items
+
+```jsx
+import { FixedSizeList } from 'react-window';
+
+// ❌ Bad: renders all 10,000 rows in the DOM
+function SlowList({ items }) {
+  return items.map(item => <div key={item.id}>{item.name}</div>);
+}
+
+// ✅ Good: renders only ~15 visible rows at a time
+function FastList({ items }) {
+  return (
+    <FixedSizeList
+      height={600}
+      itemCount={items.length}
+      itemSize={50}
+      width="100%"
+    >
+      {({ index, style }) => (
+        <div style={style}>{items[index].name}</div>
+      )}
+    </FixedSizeList>
+  );
+}
+```
+
+### React 18 Concurrent Features
+
+```javascript
+import { useTransition, useDeferredValue } from 'react';
+
+// useTransition: Mark updates as non-urgent
+function SearchBar() {
+  const [query, setQuery] = useState('');
+  const [isPending, startTransition] = useTransition();
+
+  const handleChange = (e) => {
+    setQuery(e.target.value); // urgent: update input immediately
+    startTransition(() => {
+      setSearchResults(search(e.target.value)); // non-urgent: can be interrupted
+    });
+  };
+
+  return (
+    <>
+      <input value={query} onChange={handleChange} />
+      {isPending && <Spinner />}
+    </>
+  );
+}
+
+// useDeferredValue: Defer expensive renders
+function ProductList({ query }) {
+  const deferredQuery = useDeferredValue(query);
+  const products = useFilteredProducts(deferredQuery);
+  return products.map(p => <ProductCard key={p.id} product={p} />);
+}
+```
+
+### When to use each
+
+| Hook | Use when | Avoid when |
+|------|----------|------------|
+| `React.memo` | Pure component with expensive render, stable props | Simple/cheap renders, props change frequently |
+| `useMemo` | Expensive computation, referential equality needed | Cheap calculations (adds overhead) |
+| `useCallback` | Function passed to memoized child | No memoized children (overhead without benefit) |
+
+### Resources
+- [React Performance](https://react.dev/learn/render-and-commit)
+- [useMemo](https://react.dev/reference/react/useMemo)
+
+---
+
+_Content from [maurya-sachin/Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/07-performance)_

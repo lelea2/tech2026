@@ -1,0 +1,128 @@
+---
+title: Virtual DOM & Reconciliation
+sidebar_position: 9
+---
+
+# Virtual DOM and Reconciliation
+
+## Virtual DOM
+
+The Virtual DOM is a **lightweight JavaScript representation of the actual DOM** that React maintains in memory. Instead of immediately updating the DOM on every state change, React:
+
+1. Creates a new Virtual DOM tree
+2. **Diffs** it against the previous tree (reconciliation)
+3. Applies only the necessary changes to the real DOM (commit)
+
+This batching reduces expensive DOM operations by 70–90% compared to direct manipulation.
+
+## Reconciliation Algorithm
+
+React's diffing achieves **O(n) complexity** through three heuristics:
+
+### 1. Element type determines subtree identity
+
+```jsx
+// ❌ Changing type: React destroys old tree and rebuilds
+<div><Counter /></div>  →  <span><Counter /></span>
+// Counter unmounts and remounts (state lost)
+```
+
+### 2. Keys enable stable list identification
+
+```jsx
+// ❌ No keys: React can't tell which item moved
+{items.map(item => <Item text={item.text} />)}
+
+// ✅ With stable keys: React matches items across renders
+{items.map(item => <Item key={item.id} text={item.text} />)}
+```
+
+Without keys, inserting at the beginning forces React to update every item. With stable keys, React identifies which item was added.
+
+### 3. Never use index as key for reorderable lists
+
+```jsx
+// ❌ Index key: breaks when list reorders or filters
+{items.map((item, index) => <Item key={index} text={item.text} />)}
+
+// ✅ Stable ID key
+{items.map(item => <Item key={item.id} text={item.text} />)}
+```
+
+Index keys cause state mismatches — React thinks item at index 0 is the same component even after the list is sorted.
+
+## Render and Commit Phases
+
+**Render phase** (interruptible in concurrent mode):
+- Component functions execute
+- React calculates what changed
+- Creates fiber work
+
+**Commit phase** (synchronous — never interrupted):
+- Applies all DOM changes at once
+- Fires effects (`useLayoutEffect` then `useEffect`)
+- Always completes once started
+
+## Fiber: Incremental Rendering
+
+React Fiber (React 16+) splits rendering work into interruptible chunks:
+
+```
+Stack reconciler (before 16):  Synchronous — must finish entire tree
+                                   ↓
+Fiber reconciler (16+):         Interruptible — yields to browser every 5ms
+```
+
+This enables:
+- **Time-slicing** — browser can handle user input between render chunks
+- **Priority lanes** — urgent updates (typing) interrupt background work (data loading)
+- **Suspense** — pause rendering until data is ready
+
+## React 18: Concurrent Features
+
+```jsx
+// useTransition: mark non-urgent updates
+const [isPending, startTransition] = useTransition();
+
+const handleSearch = (query) => {
+  setInputValue(query); // Urgent: update input immediately
+  startTransition(() => {
+    setSearchResults(filter(data, query)); // Non-urgent: can be deferred
+  });
+};
+
+// useDeferredValue: deferred copy of a prop/state
+function SearchResults({ query }) {
+  const deferredQuery = useDeferredValue(query);
+  const results = useMemo(() => filter(data, deferredQuery), [deferredQuery]);
+  return <ResultList items={results} />;
+}
+```
+
+## Automatic Batching (React 18)
+
+React 18 batches all state updates into a single re-render — including in promises, `setTimeout`, and native event listeners:
+
+```javascript
+// React 17: Two renders
+setTimeout(() => {
+  setCount(c => c + 1); // Render 1
+  setFlag(f => !f);     // Render 2
+}, 1000);
+
+// React 18: One render (automatic batching)
+setTimeout(() => {
+  setCount(c => c + 1); // Batched
+  setFlag(f => !f);     // Batched → single render
+}, 1000);
+```
+
+## Performance Impact
+
+- Correct keys: 70% fewer DOM operations on list reorder
+- Without concurrent features: 500ms input delay on large list filter
+- With `useDeferredValue`: 0ms input delay (typing stays responsive)
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [03-react](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/03-react)_

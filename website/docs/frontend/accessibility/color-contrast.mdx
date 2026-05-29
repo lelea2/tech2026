@@ -1,0 +1,251 @@
+---
+title: Color Contrast
+sidebar_position: 6
+---
+
+# Color Contrast and Visual Accessibility
+
+> **Master WCAG color contrast requirements — AA/AAA ratios, contrast calculations, and visual accessibility patterns**
+
+## Question: What are WCAG color contrast requirements?
+
+**Difficulty:** 🟡 Medium | **Frequency:** ⭐⭐⭐⭐⭐ | **Companies:** Google, Meta, Amazon, Microsoft, Apple
+
+Explain WCAG color contrast ratios (AA 4.5:1, AAA 7:1). How do you calculate contrast ratios? What are the requirements for different text sizes and UI components?
+
+## Answer
+
+Color contrast ensures text and interactive elements are distinguishable for users with low vision or color blindness.
+
+### WCAG Contrast Requirements (Level AA — Standard)
+
+- **Normal text (&lt; 18pt / 24px):** 4.5:1 minimum
+- **Large text (≥ 18pt or bold 14pt):** 3:1 minimum
+- **UI components & graphics:** 3:1 minimum
+- **Incidental text (disabled, decorative):** No requirement
+
+### WCAG Contrast Requirements (Level AAA — Enhanced)
+
+- **Normal text:** 7:1 minimum
+- **Large text:** 4.5:1 minimum
+
+### Contrast Ratio Calculation
+
+Formula: `(L1 + 0.05) / (L2 + 0.05)` where L1 and L2 are relative luminances.
+
+Range: 1:1 (identical colors) to 21:1 (black on white).
+
+### Color Independence
+
+Don't rely on color alone to convey information. Add icons, patterns, text labels, or underlines.
+
+## Code Examples
+
+```css
+/* ❌ Bad: Insufficient contrast (2.8:1) */
+.low-contrast {
+  color: #888;
+  background: #fff;
+}
+
+/* ✅ Good: AA compliant (4.54:1) */
+.aa-compliant {
+  color: #595959;
+  background: #fff;
+}
+
+/* ✅ Good: AAA compliant (7.0:1) */
+.aaa-compliant {
+  color: #333;
+  background: #fff;
+}
+
+/* ✅ Good: Large text AA (3.1:1) */
+.large-text-aa {
+  font-size: 24px; /* 18pt */
+  color: #767676;
+  background: #fff;
+}
+
+/* UI component border: 3:1 minimum */
+button {
+  border: 2px solid #767676; /* 3.1:1 - PASS AA */
+}
+
+/* Focus indicator: must be visible */
+button:focus-visible {
+  outline: 3px solid #0078d4; /* 4.54:1 - PASS AA */
+  outline-offset: 2px;
+}
+```
+
+### Color Independence in Practice
+
+```html
+<!-- ❌ Bad: Color only indicates error -->
+<input type="email" class="error-input">
+<!-- Color-blind users can't tell this is an error -->
+
+<!-- ✅ Good: Icon + color + text + ARIA -->
+<div>
+  <label for="email">Email</label>
+  <input
+    type="email"
+    id="email"
+    class="error-field"
+    aria-invalid="true"
+    aria-describedby="email-error"
+  >
+  <span id="email-error" role="alert" class="error-message">
+    <span aria-hidden="true">⚠️</span>
+    <span>Invalid email address</span>
+  </span>
+</div>
+```
+
+### Dark Mode: Maintain Contrast in Both Themes
+
+```css
+:root {
+  --text-primary: #000;
+  --bg-primary: #fff;
+  --border-color: #767676;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-primary: #fff;
+    --bg-primary: #121212;
+    --border-color: #8a8a8a;
+  }
+}
+
+body {
+  color: var(--text-primary);
+  background: var(--bg-primary);
+}
+```
+
+### Contrast Checker Utility
+
+```javascript
+function getLuminance(r, g, b) {
+  const [rs, gs, bs] = [r, g, b].map(c => {
+    c = c / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+function getContrastRatio(rgb1, rgb2) {
+  const lum1 = getLuminance(...rgb1);
+  const lum2 = getLuminance(...rgb2);
+  const lighter = Math.max(lum1, lum2);
+  const darker = Math.min(lum1, lum2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function checkContrast(foreground, background, fontSize, isBold) {
+  const ratio = getContrastRatio(foreground, background);
+  const isLargeText = fontSize >= 24 || (isBold && fontSize >= 18.5);
+  const aaThreshold = isLargeText ? 3 : 4.5;
+  const aaaThreshold = isLargeText ? 4.5 : 7;
+  return {
+    ratio: ratio.toFixed(2),
+    passAA: ratio >= aaThreshold,
+    passAAA: ratio >= aaaThreshold,
+    level: ratio >= aaaThreshold ? 'AAA' : ratio >= aaThreshold ? 'AA' : 'Fail'
+  };
+}
+
+// Example: #595959 on white
+checkContrast([89, 89, 89], [255, 255, 255], 16, false);
+// { ratio: "4.54", passAA: true, passAAA: false, level: "AA" }
+```
+
+## Common Mistakes
+
+```css
+/* ❌ Insufficient contrast */
+.text { color: #999; background: #fff; } /* 2.85:1 - FAIL */
+
+/* ✅ AA compliant */
+.text { color: #595959; background: #fff; } /* 4.54:1 - PASS */
+```
+
+```css
+/* ❌ Link color only - color-blind users can't identify links */
+a { color: blue; text-decoration: none; }
+
+/* ✅ Always underline links */
+a { color: blue; text-decoration: underline; }
+```
+
+## Deep Dive: Why 4.5:1 for AA?
+
+These ratios are based on research into visual acuity:
+
+- **4.5:1 (Level AA):** Readable by people with 20/40 vision (moderate low vision) — covers ~80% of vision disabilities
+- **7:1 (Level AAA):** Readable by people with 20/80 vision (severe low vision) — covers ~95% of vision disabilities
+- **3:1 for Large Text:** Larger text is inherently more readable, so lower contrast is acceptable
+
+### Common Reference Ratios
+
+```
+Black (#000) on White (#fff):         21:1  (AAA — Perfect)
+Dark Gray (#333) on White:           12.6:1  (AAA)
+Medium Gray (#595959) on White:       4.54:1 (AA)
+Light Gray (#767676) on White:        3.1:1  (Large text only)
+Very Light Gray (#999) on White:      2.85:1 (FAIL)
+
+Blue (#0066cc) on White:              7.01:1 (AAA)
+Red (#d32f2f) on White:               4.58:1 (AA)
+White (#fff) on Blue (#0078d4):       4.54:1 (AA)
+```
+
+## Real-World Scenario: Design System Contrast Failure
+
+A company redesigned their system using modern gray text (`#888` on white = 2.85:1 contrast). The result:
+
+- 847 contrast violations across the platform
+- 10% of users reported text "hard to read"
+- 25% of users over 50 complained
+- Potential ADA lawsuit risk
+
+**After fix** (switching to `#595959` = 4.54:1):
+- 0 violations
+- Readability complaints dropped 92%
+- WCAG AA compliance achieved
+
+## Design vs. Accessibility Trade-off
+
+| Color | Ratio | Status | Notes |
+|-------|-------|--------|-------|
+| `#888888` | 2.85:1 | ❌ FAIL | "Modern" gray, but inaccessible |
+| `#595959` | 4.54:1 | ✅ AA | Slightly darker, compliant |
+| `#333333` | 12.6:1 | ✅ AAA | Highest contrast, most accessible |
+
+## Testing Tools
+
+- **Chrome DevTools** — Inspect element → click color swatch → see AA/AAA indicator
+- **axe DevTools** — Automated scanning
+- **WebAIM Contrast Checker** — Manual ratio checking
+- **Lighthouse** — Automated audit
+
+```javascript
+// Jest + axe-core: catch contrast issues in CI
+import { render } from '@testing-library/react';
+import { axe, toHaveNoViolations } from 'jest-axe';
+
+expect.extend(toHaveNoViolations);
+
+test('Button has sufficient contrast', async () => {
+  const { container } = render(<Button>Click me</Button>);
+  const results = await axe(container);
+  expect(results).toHaveNoViolations();
+});
+```
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_

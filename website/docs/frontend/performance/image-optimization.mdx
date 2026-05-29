@@ -1,0 +1,276 @@
+---
+title: Image Optimization
+sidebar_position: 2
+---
+
+# Image Optimization
+
+> Image formats, lazy loading, responsive images, WebP, next/image, and performance best practices.
+
+---
+
+## Question 1: Image Optimization Techniques
+
+**Difficulty:** 🟡 Medium
+**Frequency:** ⭐⭐⭐⭐
+**Time:** 8 minutes
+**Companies:** Google, Meta
+
+### Question
+
+What are the best practices for optimizing images in web applications?
+
+### Answer
+
+**Five core strategies:**
+
+1. Modern formats (WebP, AVIF)
+2. Lazy loading
+3. Responsive images
+4. CDN delivery
+5. Compression
+
+```html
+<!-- Responsive images with modern formats -->
+<picture>
+  <source srcset="image.avif" type="image/avif" />
+  <source srcset="image.webp" type="image/webp" />
+  <img src="image.jpg" alt="Description" loading="lazy" />
+</picture>
+
+<!-- Srcset for resolution switching -->
+<img
+  srcset="small.jpg 480w, medium.jpg 800w, large.jpg 1200w"
+  sizes="(max-width: 600px) 480px, (max-width: 900px) 800px, 1200px"
+  src="medium.jpg"
+  alt="Responsive image"
+  loading="lazy"
+/>
+```
+
+```jsx
+// Next.js Image optimization
+import Image from 'next/image';
+
+<Image
+  src="/photo.jpg"
+  alt="Photo"
+  width={800}
+  height={600}
+  quality={85}
+  placeholder="blur"
+  loading="lazy"
+/>
+```
+
+### Resources
+- [Image Optimization](https://web.dev/fast/#optimize-your-images)
+
+---
+
+## Deep Dive: Image Optimization Under the Hood
+
+### Modern Image Format Comparison
+
+| Format | Size vs JPEG | Browser Support | Best For |
+|--------|-------------|-----------------|----------|
+| **AVIF** | ~50% smaller | 85%+ | Modern apps |
+| **WebP** | ~30% smaller | 96%+ | Default choice |
+| **JPEG** | Baseline | 100% | Legacy fallback |
+| **PNG** | 3–5× larger | 100% | Transparency, logos |
+| **SVG** | Varies | 100% | Icons, illustrations |
+
+**Decision matrix:**
+
+```javascript
+function chooseFormat(imageType, targetAudience) {
+  if (imageType === 'icon' || imageType === 'logo') return 'SVG';
+  if (needsTransparency && !isPhoto) return 'PNG';
+
+  if (targetAudience.modernBrowsers > 0.95) {
+    return 'AVIF with WebP fallback';
+  }
+  if (targetAudience.modernBrowsers > 0.85) {
+    return 'WebP with JPEG fallback';
+  }
+  return 'JPEG with progressive encoding';
+}
+```
+
+### How `loading="lazy"` Works
+
+```javascript
+// Browser's lazy loading algorithm
+// 1. Calculate viewport + threshold (typically 1-2 screens ahead)
+// 2. Check if image intersection ratio > 0 within threshold
+// 3. If yes, start loading image (uses Intersection Observer internally)
+
+// Polyfill / custom implementation
+const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+const imageObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const img = entry.target;
+      img.src = img.dataset.src;
+      imageObserver.unobserve(img);
+    }
+  });
+}, {
+  rootMargin: '50px', // Load 50px before entering viewport
+});
+
+lazyImages.forEach(img => imageObserver.observe(img));
+```
+
+### Next.js Image Component
+
+Next.js Image automatically:
+1. Detects format (serves WebP/AVIF to supporting browsers)
+2. Generates multiple sizes on-demand
+3. Creates blur placeholder from a tiny base64 version
+4. Preloads priority images
+5. Uses Vercel's image CDN
+
+```jsx
+// Generate blur placeholders at build time
+import sharp from 'sharp';
+
+async function generateBlurDataURL(imagePath) {
+  const buffer = await sharp(imagePath)
+    .resize(10, 10, { fit: 'inside' })
+    .webp({ quality: 20 })
+    .toBuffer();
+  return `data:image/webp;base64,${buffer.toString('base64')}`;
+}
+```
+
+### Responsive Images: How the Browser Picks a Source
+
+```javascript
+// Browser's srcset selection algorithm
+function selectImage(srcset, sizes, viewportWidth, devicePixelRatio) {
+  const candidates = parseSrcset(srcset);
+  const targetWidth = evaluateSizes(sizes, viewportWidth);
+  const effectiveWidth = targetWidth * devicePixelRatio;
+
+  // Select closest width without going under
+  const selected = candidates
+    .filter(c => c.width >= effectiveWidth)
+    .sort((a, b) => a.width - b.width)[0]
+    || candidates[candidates.length - 1]; // Fallback to largest
+
+  return selected.url;
+}
+
+// iPhone 14 Pro (390px viewport, 3× DPR):
+// sizes="(max-width: 600px) 100vw"
+// Evaluates to: 390 × 1.0 × 3 = 1170px
+// Selects: 1200w image
+```
+
+### Compression Quality Trade-offs
+
+| Quality | Visual | File Size | Use |
+|---------|--------|-----------|-----|
+| 100 | Lossless | 100% | Never (wasteful) |
+| **85** | **Imperceptible** | **45%** | **Default** |
+| 75 | Slight softness | 35% | Thumbnails |
+| 60 | Noticeable blur | 25% | Tiny previews only |
+
+---
+
+## Real-World Scenario: E-commerce Product Gallery
+
+**Problem:** E-commerce site with 50 product images per page.
+- LCP: 8.2s (target: &lt; 2.5s), page weight: 25 MB, bounce rate: 67%
+
+**Root causes:**
+1. Original 4K images served to all devices
+2. JPEG only (no WebP/AVIF)
+3. All 50 images load immediately (no lazy loading)
+4. No responsive images
+5. Hero image at bottom of HTML (render-blocking)
+
+**Solution:**
+
+```jsx
+import Image from 'next/image';
+
+function ProductGallery({ products }) {
+  return (
+    <div className="gallery">
+      {products.map((product, index) => (
+        <Image
+          key={product.id}
+          src={`/images/${product.id}.jpg`}
+          alt={product.name}
+          width={600}
+          height={400}
+          quality={85}
+          placeholder="blur"
+          blurDataURL={product.blurDataURL}
+          loading={index < 6 ? 'eager' : 'lazy'} // First 6 eager, rest lazy
+          priority={index === 0} // Preload hero
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+**Results:**
+
+| Metric | Before | After | Improvement |
+|--------|--------|-------|-------------|
+| LCP | 8.2s | 1.8s | −78% |
+| Page weight (images) | 25 MB | 3.2 MB | −87% |
+| Initial images loaded | 50 | 6 | −88% |
+| Bounce rate | 67% | 31% | −54% |
+
+---
+
+## Trade-offs: Lazy Loading Strategies
+
+| Strategy | Speed | Control | Use Case |
+|----------|-------|---------|----------|
+| **Native `loading="lazy"`** | Fastest (browser decides) | Low | General use, blog posts |
+| **Intersection Observer** | Fast | High | Galleries, infinite scroll |
+| **Eager loading** | Instant | N/A | Hero images, above-fold only |
+
+**Decision: How many images to load eagerly?**
+
+```javascript
+// First 3–6 images eager, rest lazy
+// Rationale: Balance LCP vs total page weight
+
+function OptimizedGallery({ images }) {
+  return images.map((img, i) => (
+    <img
+      src={img.src}
+      loading={i < 6 ? 'eager' : 'lazy'}
+      // Trade-off: 6 eager = ~600KB initial vs 50 images = 10MB
+    />
+  ));
+}
+```
+
+---
+
+## Explain Like I'm Five: Image Optimization
+
+**The Buffet Analogy:**
+
+Unoptimized sites send the entire buffet (50 dishes) before you sit down. Optimized sites:
+1. Only bring dishes you can see (lazy loading)
+2. Give kids a small portion, adults a large portion (responsive images)
+3. Use a compressed photo instead of the original negative (WebP/AVIF)
+4. Show a blurry placeholder while the real photo arrives (blur placeholder)
+
+**Interview Answer Template:**
+
+> "I use four strategies: lazy loading with `loading='lazy'`—only loading images in viewport—responsive images with `srcset` to serve device-appropriate sizes, modern formats (WebP/AVIF) that are 30–50% smaller, and quality 85 compression. In Next.js I use the Image component which handles all of this automatically. This reduced our e-commerce LCP from 8s to 1.8s and cut the bounce rate in half."
+
+---
+
+_Content from [maurya-sachin/Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/07-performance)_

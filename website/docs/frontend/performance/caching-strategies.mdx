@@ -1,0 +1,275 @@
+---
+title: Caching Strategies
+sidebar_position: 3
+---
+
+# Caching Strategies
+
+> Browser caching, service workers, CDN caching, cache invalidation, and performance optimization.
+
+---
+
+## Question 1: Browser Caching Strategies
+
+**Difficulty:** 🟡 Medium
+**Frequency:** ⭐⭐⭐⭐
+**Time:** 10 minutes
+**Companies:** Google, Meta, Netflix
+
+### Question
+
+Explain browser caching strategies. How do Cache-Control headers work?
+
+### Answer
+
+**Cache-Control directives:**
+
+| Directive | Meaning |
+|-----------|---------|
+| `no-cache` | Revalidate with server before using cached copy |
+| `no-store` | Never cache this resource |
+| `public` | Any cache (CDN, proxy, browser) can store |
+| `private` | Browser-only (not CDN or proxies) |
+| `max-age=3600` | Cache for 3600 seconds (1 hour) |
+| `immutable` | Content never changes (use with hashed filenames) |
+| `stale-while-revalidate` | Serve stale while fetching fresh in background |
+
+```javascript
+// HTTP Headers examples
+res.setHeader('Cache-Control', 'public, max-age=31536000, immutable'); // static assets
+
+// Service Worker: Cache-First strategy
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open('v1').then((cache) =>
+      cache.addAll(['/css/style.css', '/js/app.js'])
+    )
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) =>
+      response || fetch(event.request)
+    )
+  );
+});
+```
+
+**Three main strategies:**
+
+1. **Cache-First** — Check cache first, fallback to network (best for static assets)
+2. **Network-First** — Try network, fallback to cache (best for frequently changing content)
+3. **Stale-While-Revalidate** — Serve cached immediately, update in background (best for most sites)
+
+### Resources
+- [HTTP Caching](https://web.dev/http-cache/)
+
+---
+
+## Deep Dive: Caching Mechanisms Under the Hood
+
+### HTTP Cache Hierarchy
+
+```
+Browser Request Flow:
+1. Check Memory Cache (fastest, ~50ms)
+   ↓ miss
+2. Check Disk Cache (fast, ~100–200ms)
+   ↓ miss
+3. Check Service Worker Cache (~50–150ms)
+   ↓ miss
+4. Check CDN Edge Cache (~200–500ms)
+   ↓ miss
+5. Check CDN Origin Shield (~500–1000ms)
+   ↓ miss
+6. Fetch from Origin Server (slowest, ~1000–3000ms)
+```
+
+### Cache-Control Deep Dive
+
+```javascript
+// 1. Immutable assets (hashed filenames: app.a3f8b2.js)
+'Cache-Control: public, max-age=31536000, immutable'
+// Cache for 1 year, never revalidate. Hash changes = new URL = cache bust.
+
+// 2. API responses (frequently changing data)
+'Cache-Control: private, no-cache, must-revalidate'
+// Browser-only, always revalidate (304 Not Modified saves bandwidth).
+
+// 3. Semi-static content (blog posts, product pages)
+'Cache-Control: public, max-age=3600, stale-while-revalidate=86400'
+// Cache for 1h, serve stale for 24h while fetching fresh in background.
+
+// 4. Never cache (user-specific sensitive data)
+'Cache-Control: no-store, no-cache, must-revalidate, max-age=0'
+```
+
+### ETag Validation (304 Not Modified)
+
+```javascript
+// First request
+// Client:  GET /api/products
+// Server:  200 OK, ETag: "v1.2.3-abc123", [4KB JSON]
+
+// Second request (cache expired or no-cache)
+// Client:  GET /api/products, If-None-Match: "v1.2.3-abc123"
+// Server:  304 Not Modified, [0 bytes — use cached version]
+// Saves:   4KB → 0KB, 2000ms → 200ms
+
+function generateETag(content) {
+  return `"${crypto.createHash('md5').update(content).digest('hex')}"`;
+}
+```
+
+### Service Worker Strategies
+
+```javascript
+// Cache-First (static assets: CSS, JS, fonts)
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      return cached || fetch(event.request).then((response) => {
+        caches.open('v1').then((cache) => cache.put(event.request, response.clone()));
+        return response;
+      });
+    })
+  );
+});
+
+// Network-First (API, frequently changing)
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        caches.open('v1').then((cache) => cache.put(event.request, response.clone()));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
+  );
+});
+
+// Stale-While-Revalidate (best of both worlds)
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.open('v1').then((cache) => {
+      return cache.match(event.request).then((cached) => {
+        const fetchPromise = fetch(event.request).then((response) => {
+          cache.put(event.request, response.clone());
+          return response;
+        });
+        return cached || fetchPromise; // Immediate + always updating
+      });
+    })
+  );
+});
+```
+
+### Cache Invalidation Strategies
+
+| Strategy | Speed | Complexity | Best For |
+|----------|-------|------------|----------|
+| **Time-based (max-age)** | Instant | Low | Most content |
+| **Cache busting (hashing)** | Instant | Medium (build step) | Static assets |
+| **Manual purge** | ~30s | Medium | Breaking news |
+| **ETag validation** | ~200ms | Low | Dynamic API data |
+
+```javascript
+// Cache busting: change filename when content changes
+// before: app.js → after: app.a3f8b2c4.js
+// CDN purge via Cloudflare API
+await fetch('https://api.cloudflare.com/client/v4/zones/{zone}/purge_cache', {
+  method: 'POST',
+  headers: { 'Authorization': `Bearer ${TOKEN}` },
+  body: JSON.stringify({ files: ['https://example.com/article/123'] }),
+});
+```
+
+---
+
+## Real-World Scenario: News Site Caching Fix
+
+**Problem:** High-traffic news site with $18K/month server costs.
+- CDN hit rate: 34% (should be 90%+)
+- Every article page served with `Cache-Control: no-cache, no-store`
+- Breaking news took 4–6 hours to appear for users
+
+**Root cause:** A legacy security policy was applied to ALL responses, including static article pages.
+
+**Solution:**
+
+```javascript
+// Next.js middleware: differentiated cache policies
+export function middleware(request) {
+  const response = NextResponse.next();
+  const url = request.nextUrl.pathname;
+
+  if (/\.(js|css|woff2|png|jpg|webp)$/.test(url)) {
+    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+  } else if (url.startsWith('/api/')) {
+    response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=3600');
+  } else if (url.startsWith('/article/')) {
+    response.headers.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=86400');
+  }
+
+  return response;
+}
+```
+
+**Results:**
+
+| Metric | Before | After |
+|--------|--------|-------|
+| CDN hit rate | 34% | 92% |
+| Origin requests/day | 2.4M | 192K |
+| Server costs | $18K/mo | $2.1K/mo |
+| TTFB (cached) | 1,200ms | 80ms |
+| Breaking news delay | 4–6 hrs | 5 min |
+
+---
+
+## Trade-offs: Cache Duration
+
+| Duration | Freshness | Bandwidth | Use Case |
+|----------|-----------|-----------|----------|
+| **No cache** | Always fresh | High | User-specific data |
+| **1 minute** | Very fresh | Medium | API responses |
+| **1 hour** | Fresh enough | Low | Blog posts |
+| **1 year + immutable** | Never updates | Minimal | Hashed static assets |
+
+**Public vs Private:**
+
+| Directive | CDN | Browser | Use |
+|-----------|-----|---------|-----|
+| `public` | ✅ | ✅ | Static pages, public API |
+| `private` | ❌ | ✅ | User-specific data |
+| `no-store` | ❌ | ❌ | Passwords, tokens |
+
+**Security gotcha:** Never cache user-specific data as `public` — everyone would see the same CDN-cached response!
+
+---
+
+## Explain Like I'm Five: Caching
+
+**The Library Book Analogy:**
+
+- Without caching: Walk to library every day (25 min round trip).
+- With caching: Borrow the book, keep it at home. Instant access for 30 days.
+- After `max-age` expires: Return book, borrow updated edition if available.
+
+```javascript
+// Cache-Control as storage instructions:
+
+'max-age=3600'     // "This milk is good for 1 hour"
+'no-cache'         // "Call me before drinking this milk (I'll say if it's still fresh)"
+'no-store'         // "Don't keep this in your fridge at all"
+'immutable'        // "This never expires — it's sealed whiskey"
+```
+
+**Interview Answer Template:**
+
+> "Browser caching uses `Cache-Control` headers to tell browsers how long to keep resources. Static assets with hashed filenames get `max-age=31536000, immutable` — cache for a year, never revalidate. API responses get `max-age=60, stale-while-revalidate=3600` — fresh for 1 minute, serve stale for an hour while fetching fresh in the background. Service Workers add a programmable layer: Cache-First for static assets, Network-First for APIs, and Stale-While-Revalidate for the best user experience. This approach reduced our news site's server costs from $18K to $2K/month while cutting TTFB from 1200ms to 80ms."
+
+---
+
+_Content from [maurya-sachin/Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/07-performance)_

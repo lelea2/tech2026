@@ -1,0 +1,10 @@
+{
+  "label": "Performance",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "title": "Frontend Performance",
+    "description": "Frontend performance optimization: Core Web Vitals, image optimization, caching, lazy loading, and monitoring.",
+    "slug": "/frontend/performance"
+  }
+}

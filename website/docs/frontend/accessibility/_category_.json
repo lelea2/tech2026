@@ -1,0 +1,10 @@
+{
+  "label": "Accessibility",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "title": "Accessibility",
+    "description": "Web accessibility interview preparation — WCAG, ARIA, keyboard navigation, screen readers, and testing.",
+    "slug": "/frontend/accessibility"
+  }
+}

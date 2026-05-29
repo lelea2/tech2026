@@ -1,0 +1,254 @@
+---
+title: Testing Accessibility
+sidebar_position: 16
+---
+
+# Testing Accessibility
+
+> Automated testing, manual testing, axe-core, Lighthouse, and accessibility testing strategies.
+
+## Question: How do you test accessibility in frontend applications?
+
+**Difficulty:** 🟡 Medium | **Frequency:** ⭐⭐⭐⭐ | **Companies:** Google, Airbnb
+
+## Testing Strategy
+
+Automated tools catch approximately **30% of accessibility issues**. The rest require manual testing and real user validation.
+
+| Layer | Tools | Catches |
+|-------|-------|---------|
+| Unit/Component | jest-axe, @testing-library/react | Missing labels, role issues |
+| Integration | cypress-axe | Page-level contrast, structure |
+| Browser | axe DevTools, WAVE | All automated checks |
+| Manual | Keyboard + screen reader | Focus management, announcements |
+
+## Automated Testing
+
+### jest-axe (Component Tests)
+
+```javascript
+import { render } from '@testing-library/react';
+import { axe, toHaveNoViolations } from 'jest-axe';
+
+expect.extend(toHaveNoViolations);
+
+test('should have no accessibility violations', async () => {
+  const { container } = render(<Button>Click me</Button>);
+  const results = await axe(container);
+  expect(results).toHaveNoViolations();
+});
+
+test('form is accessible', async () => {
+  const { container } = render(<LoginForm />);
+  const results = await axe(container);
+  expect(results).toHaveNoViolations();
+});
+```
+
+### @testing-library Accessible Queries
+
+Testing Library encourages accessible queries that mirror how screen readers discover elements:
+
+```javascript
+import { render, screen } from '@testing-library/react';
+
+test('login form is accessible', () => {
+  render(<LoginForm />);
+
+  // Find by label (screen-reader friendly)
+  const emailInput = screen.getByLabelText(/email/i);
+  const passwordInput = screen.getByLabelText(/password/i);
+  const submitButton = screen.getByRole('button', { name: /sign in/i });
+
+  expect(emailInput).toBeInTheDocument();
+  expect(passwordInput).toBeInTheDocument();
+  expect(submitButton).toBeInTheDocument();
+});
+
+// Query priority (most to least accessible):
+// getByRole → getByLabelText → getByPlaceholderText → getByText → getByTestId
+```
+
+### cypress-axe (E2E Tests)
+
+```javascript
+// cypress/support/commands.js
+import 'cypress-axe';
+
+describe('Home page', () => {
+  it('has no accessibility violations', () => {
+    cy.visit('/');
+    cy.injectAxe();
+    cy.checkA11y(); // Checks entire page
+  });
+
+  it('modal has no violations', () => {
+    cy.visit('/');
+    cy.injectAxe();
+    cy.get('[data-cy="open-modal"]').click();
+    cy.checkA11y('[role="dialog"]'); // Check only the modal
+  });
+});
+```
+
+### Storybook a11y Addon
+
+```javascript
+// .storybook/main.js
+module.exports = {
+  addons: ['@storybook/addon-a11y']
+};
+
+// Automatically checks all stories — see violations in Accessibility tab
+```
+
+## Browser-Based Tools
+
+### axe DevTools (Browser Extension)
+
+1. Install from Chrome Web Store
+2. Open DevTools → axe DevTools tab
+3. Click "Scan ALL of my page"
+4. Review violations with issue descriptions and fix suggestions
+
+Catches: missing labels, insufficient contrast, missing landmarks, ARIA misuse, keyboard traps.
+
+### WAVE (Web Accessibility Evaluation Tool)
+
+```
+https://wave.webaim.org/
+```
+Or install the browser extension. Provides visual overlay showing:
+- Structural elements (headings, landmarks)
+- ARIA attributes
+- Color contrast
+- Errors and alerts
+
+### Lighthouse (Chrome DevTools)
+
+1. Open DevTools → Lighthouse tab
+2. Check "Accessibility" category
+3. Click "Generate report"
+4. Scores 0–100, shows specific failures with WCAG references
+
+## Manual Testing Checklist
+
+### Keyboard Navigation
+
+```
+□ Tab moves forward through all interactive elements
+□ Shift+Tab moves backward
+□ Enter activates links and buttons
+□ Space activates buttons
+□ Escape closes modals and dropdowns
+□ Arrow keys work within widgets (tabs, menus, grids)
+□ Focus indicator is visible at all times
+□ No keyboard traps (can always Tab away)
+□ Skip link appears on first Tab press
+```
+
+### Screen Reader Testing
+
+```
+□ Page title announced on load
+□ Images have appropriate alt text
+□ Form labels announced with inputs
+□ Error messages announced immediately
+□ Modal announces title when opened
+□ Dynamic updates announced via live regions
+□ Navigation landmarks work (D key in NVDA)
+□ Headings form logical hierarchy (H key in NVDA)
+□ Custom widgets announce state changes
+```
+
+### Visual Checks
+
+```
+□ Color contrast meets AA (4.5:1 normal, 3:1 large text)
+□ Links underlined or distinguishable without color
+□ Focus indicator visible on all elements
+□ Error states use more than just color
+□ Text scales to 200% without loss of content
+□ No content lost on small screens (320px width)
+```
+
+## How axe-core Works
+
+axe-core analyzes the DOM + accessibility tree and applies WCAG rules:
+
+```javascript
+// Simplified concept of what axe-core does
+class AccessibilityAuditor {
+  audit(element) {
+    const tree = buildAccessibilityTree(element);
+    const violations = [];
+
+    // Rule: images must have alt text
+    tree.images.forEach(img => {
+      if (!img.alt && !img.ariaLabel && !img.ariaLabelledBy) {
+        violations.push({
+          id: 'image-alt',
+          impact: 'critical',
+          help: 'Images must have alternate text',
+          nodes: [img]
+        });
+      }
+    });
+
+    // Rule: color contrast
+    tree.textElements.forEach(el => {
+      const ratio = calculateContrastRatio(el.color, el.backgroundColor);
+      if (ratio < 4.5 && el.fontSize < 24) {
+        violations.push({
+          id: 'color-contrast',
+          impact: 'serious',
+          help: 'Elements must have sufficient color contrast',
+          nodes: [el]
+        });
+      }
+    });
+
+    return violations;
+  }
+}
+```
+
+## CI/CD Integration
+
+```yaml
+# GitHub Actions: run accessibility checks on every PR
+name: Accessibility
+on: [pull_request]
+
+jobs:
+  a11y:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm install
+      - run: npm test -- --testPathPattern="a11y|accessibility"
+      - name: Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v9
+        with:
+          urls: http://localhost:3000
+          budgetPath: ./lighthouse-budget.json
+```
+
+## Automated vs. Manual Coverage
+
+| Issue Type | Automated | Manual Required |
+|---|---|---|
+| Missing alt text | ✅ | |
+| Missing form labels | ✅ | |
+| Color contrast | ✅ | |
+| Missing landmarks | ✅ | |
+| Keyboard trap | ❌ | ✅ |
+| Focus management | ❌ | ✅ |
+| Screen reader announcements | ❌ | ✅ |
+| Confusing UX for AT users | ❌ | ✅ |
+
+Always combine automated and manual testing — automated tools are a starting point, not a guarantee.
+
+---
+
+_Content from [Frontend-Master-Prep-Series](https://github.com/maurya-sachin/Frontend-Master-Prep-Series) — [08-accessibility](https://github.com/maurya-sachin/Frontend-Master-Prep-Series/tree/main/08-accessibility)_
