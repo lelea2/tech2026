@@ -12,22 +12,19 @@ import TabItem from '@theme/TabItem';
 
 ~~~python
 def is_palindrome(s):
-    left, right = 0, len(s) - 1
-    while left < right:
-
-        while left < right and not s[left].isalnum():
-            left += 1
-
-        while left < right and not s[right].isalnum():
-            right -= 1
-
-        if s[left].lower() != s[right].lower():
-            return False
-
-        left += 1
+  left, right = 0, len(s) - 1
+  while left < right:
+    while left < right and not s[left].isalnum():
+      left += 1
+    while left < right and not s[right].isalnum():
         right -= 1
+    if s[left].lower() != s[right].lower():
+      return False
 
-    return True
+    left += 1
+    right -= 1
+
+  return True
     
 ~~~
 
@@ -35,12 +32,20 @@ def is_palindrome(s):
   <TabItem value="javascript" label="JavaScript">
 
 ~~~javascript
-// O(n) time, O(1) space
-export default function isPalindrome(string) {
+// O(n) time
+// O(1) space
+/**
+ * @param {string} str
+ * @return {boolean}
+ */
+export default function isStringPalindrome(str) {
   let leftIdx = 0;
-  let rightIdx = string.length - 1;
+  const result = str
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .toLowerCase();
+  let rightIdx = result.length - 1;
   while (leftIdx < rightIdx) {
-    if (string[leftIdx] !== string[rightIdx]) {
+    if (result[leftIdx] !== result[rightIdx]) {
       return false;
     }
     leftIdx++;
@@ -48,7 +53,6 @@ export default function isPalindrome(string) {
   }
   return true;
 }
-
 ~~~
 
   </TabItem>

@@ -1,0 +1,127 @@
+---
+title: lowestCommonAncestor
+---
+
+# lowestCommonAncestor
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="python" label="Python">
+
+~~~python
+# =========================================================
+# Lowest Common Ancestor in a Binary Search Tree
+# =========================================================
+#
+# Data Structure:
+# - Binary Search Tree (BST)
+#
+# BST Property:
+# - left subtree values < root.val
+# - right subtree values > root.val
+#
+# =========================================================
+# Core Idea
+# =========================================================
+#
+# The LCA is the first node where:
+# - one node is on the left
+# - the other node is on the right
+#
+# OR:
+# - current node equals p or q
+#
+# Since BST is ordered:
+#
+# 1. If both p and q are smaller than root:
+#    move left
+#
+# 2. If both p and q are greater than root:
+#    move right
+#
+# 3. Otherwise:
+#    current node is the split point => LCA
+#
+# =========================================================
+# Time Complexity
+# =========================================================
+# O(h)
+#
+# h = height of tree
+#
+# =========================================================
+# Space Complexity
+# =========================================================
+# O(1)
+#
+# Iterative solution.
+# =========================================================
+
+class Solution:
+  def lowestCommonAncestor(self, root, p, q):
+    while root:
+      # Both nodes are in left subtree.
+      if p.val < root.val and q.val < root.val:
+        root = root.left
+
+      # Both nodes are in right subtree.
+      elif p.val > root.val and q.val > root.val:
+        root = root.right
+      # Split point found.
+      else:
+        return root
+~~~
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+~~~javascript
+// Given a binary search tree (BST), find the lowest common ancestor (LCA) of two given nodes in the BST.
+// According to the definition of LCA on Wikipedia: 
+// “The lowest common ancestor is defined between two nodes v and w as the lowest node in 
+// T that has both v and w as descendants (where we allow a node to be a descendant of itself).”
+//       _6_
+//     /    \
+//    2      8
+//   / \    / \
+//  0   4  7   9
+//     / \
+//    3   5
+
+// For example, the lowest common ancestor (LCA) of nodes 2 and 8 is 6. 
+// Another example is LCA of nodes 2 and 4 is 2, 
+// since a node can be a descendant of itself according to the LCA definition.
+
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val) {
+ *     this.val = val;
+ *     this.left = this.right = null;
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @param {TreeNode} p
+ * @param {TreeNode} q
+ * @return {TreeNode}
+ */
+var lowestCommonAncestor = function(root, p, q) {
+  var count = 0;
+
+  while(true) {
+    var value = root.val;
+    if (p.val >= value && value >= q.val || p.val <= value && value <= q.val) {
+      return root;
+    } else if(p.val > value && q.val > value){
+      root =  root.right;
+    } else {
+      root =  root.left;
+    }
+  }
+};
+~~~
+
+  </TabItem>
+</Tabs>

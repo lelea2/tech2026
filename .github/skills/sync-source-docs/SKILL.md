@@ -182,6 +182,7 @@ The sync command prints a summary in this format:
 
 - Every synced source file is rendered as an MDX page with a code block.
 - Backend markdown sources (`.md`/`.mdx`) are also emitted into MDX output pages and included in backend folder navigation.
+- Algorithm files are never skipped when only one language variant exists: a lone `.js` or `.py` file still becomes its own MDX page and appears in navigation.
 - If both `.py` and `.js` files share the same relative basename (for example `kRowPascalTriangle.py` + `kRowPascalTriangle.js`), they are merged into one MDX page with language tabs so readers can compare side-by-side in a single page.
 - Output filenames strip the source extension: `useBoolean.js` → `useBoolean.mdx` (never `useBoolean.js.mdx`).
 - Titles and headings also use the base name without extension (e.g. `useBoolean`, not `useBoolean.js`).

@@ -248,6 +248,10 @@
       "hash": "55fd34c67dc748ac51cd1deaed397ce61d6e24385f411716202c418bf1d3cf50",
       "docRelative": "frontend/jsfunction/difference.mdx"
     },
+    "frontend/jsfunction/domTreeTraverse.js": {
+      "hash": "7f1a41180d58011e42fe4b73b9a50842e70fadc234b324589eb4e5ae27050778",
+      "docRelative": "frontend/jsfunction/domTreeTraverse.mdx"
+    },
     "frontend/jsfunction/functionLength.js": {
       "hash": "25411e85d0879f673e278dd1f7ef4675a040d863032602bf99e106f2c3b33611",
       "docRelative": "frontend/jsfunction/functionLength.mdx"
@@ -532,6 +536,10 @@
       "hash": "fac80201185dd2051ce2d1243bc2818fc3c10cd4c1c091bdb7b289b7347478f2",
       "docRelative": "frontend/jsfunction/middleWares.mdx"
     },
+    "frontend/jsfunction/monthCalendar.js": {
+      "hash": "17eaffaab040753854d874d1475d25f56507d4a893135241e6bb119c506a6a91",
+      "docRelative": "frontend/jsfunction/monthCalendar.mdx"
+    },
     "frontend/jsfunction/nodeRegistry.js": {
       "hash": "e8e39e618d567cb5c513f7bc3145bf8b3dd4db11c01e361eafe98ad8392b34d0",
       "docRelative": "frontend/jsfunction/nodeRegistry.mdx"
@@ -752,6 +760,10 @@
       "hash": "8756d325f3f83de73a6802aee712cbfa3b0f6d2f14852b625748aab110102af6",
       "docRelative": "backend/quizzes/rest-vs-graphql-vs-gRPC.mdx"
     },
+    "algorithm/array/duplicateArray.js": {
+      "hash": "623449b6718bc8df16a1dc45b10edfb8aee9cec49fb4aa723b069923e45470f7",
+      "docRelative": "algorithm/array/duplicateArray.mdx"
+    },
     "algorithm/array/kRowPascalTriangle.py": {
       "hash": "c3594094add1189a12c514811274cc91ff579752522c1753b82f155d71b54528",
       "docRelative": "algorithm/array/kRowPascalTriangle.mdx"
@@ -759,6 +771,10 @@
     "algorithm/array/kRowPascalTriangle.js": {
       "hash": "c3594094add1189a12c514811274cc91ff579752522c1753b82f155d71b54528",
       "docRelative": "algorithm/array/kRowPascalTriangle.mdx"
+    },
+    "algorithm/array/maxProfit.js": {
+      "hash": "da8b054841c9b18ebee723f9611289b19c914b1f9c4fd9165a328e3307c34734",
+      "docRelative": "algorithm/array/maxProfit.mdx"
     },
     "algorithm/array/maxSubArray.py": {
       "hash": "4b3e1240c0fa07ee647b825d05bfb8b02f71df68fc18648a99bba3400a6bdc63",
@@ -772,9 +788,29 @@
       "hash": "5848556bbb4b81728b72c6a1830cae302d6bdd560bd4a0168a56f17ee69aa6e3",
       "docRelative": "algorithm/countIslandOnGrid.mdx"
     },
+    "algorithm/countOnesBitInBinary.js": {
+      "hash": "48563d65e85bd87d6eb76f4ec441a2f192827c34ba19fe2f29752d4be0da4057",
+      "docRelative": "algorithm/countOnesBitInBinary.mdx"
+    },
+    "algorithm/isMeetingCalendarValid.js": {
+      "hash": "b3a80867fa572b9fee1e8d626595d28a471aa891ff9db12156eaf37526611d58",
+      "docRelative": "algorithm/isMeetingCalendarValid.mdx"
+    },
     "algorithm/mostCommonElement.js": {
       "hash": "15384cd6478e3aaeaa2ba9a8ec1f81f0366d27d5a207c092e1f619ebf97ca3a1",
       "docRelative": "algorithm/mostCommonElement.mdx"
+    },
+    "algorithm/stack/Stack.js": {
+      "hash": "1a3ef6a4f579a9568a17735b541711fad4e4cfa4a0595b4025f0d9060675bc58",
+      "docRelative": "algorithm/stack/Stack.mdx"
+    },
+    "algorithm/stack/isBalanceBracket.py": {
+      "hash": "44c528bec9dbfaee65664297d8a1112ba387d59b81cd196c4f1e6535019cbff2",
+      "docRelative": "algorithm/stack/isBalanceBracket.mdx"
+    },
+    "algorithm/stack/isBalanceBracket.js": {
+      "hash": "44c528bec9dbfaee65664297d8a1112ba387d59b81cd196c4f1e6535019cbff2",
+      "docRelative": "algorithm/stack/isBalanceBracket.mdx"
     },
     "algorithm/tree/lowestCommonAncestor.py": {
       "hash": "2169570a13f0a9ef1a5ab86e88c3093f9d244ecad41965ec6fdfeee731dbdf7e",
@@ -793,28 +829,32 @@
       "docRelative": "algorithm/two-pointers/3Sum.mdx"
     },
     "algorithm/two-pointers/isPalindrome.py": {
-      "hash": "b589b9708bde13add20e7fe04dcfc7932c32dd7eba605e1853d9356d638e20ae",
+      "hash": "edb8c580c8a52a52a26f2ecbbc4be69605b204165cf3b7f59a5090d50cb82c39",
       "docRelative": "algorithm/two-pointers/isPalindrome.mdx"
     },
     "algorithm/two-pointers/isPalindrome.js": {
-      "hash": "b589b9708bde13add20e7fe04dcfc7932c32dd7eba605e1853d9356d638e20ae",
+      "hash": "edb8c580c8a52a52a26f2ecbbc4be69605b204165cf3b7f59a5090d50cb82c39",
       "docRelative": "algorithm/two-pointers/isPalindrome.mdx"
     },
     "algorithm/two-pointers/isPalindrome_Pair.py": {
-      "hash": "a453c5808099d9a9434be5719c40772a361e3fe06be75a378b1ca9a97b0bab72",
+      "hash": "915f1922472eaf1a5a9249769bb0293657db1ccd4318f03b4dea5eb4f7e767f7",
       "docRelative": "algorithm/two-pointers/isPalindrome_Pair.mdx"
     },
     "algorithm/two-pointers/isPalindrome_Pair.js": {
-      "hash": "a453c5808099d9a9434be5719c40772a361e3fe06be75a378b1ca9a97b0bab72",
+      "hash": "915f1922472eaf1a5a9249769bb0293657db1ccd4318f03b4dea5eb4f7e767f7",
       "docRelative": "algorithm/two-pointers/isPalindrome_Pair.mdx"
     },
     "__nav__:algorithm": {
-      "hash": "a6d9097b1480a7612137e88e02d3885d78f3740a85acd56e45c4c832f7919f12",
+      "hash": "5904d45d70cff4f47aed9b6f0577518090b5fe466119389a1d0fd145fcb80d52",
       "docRelative": "algorithm/_index.mdx"
     },
     "__nav__:algorithm/array": {
-      "hash": "e070906d02a9322a98cce61cf3b78fd969f3e094c9d24d170e7269cf30b3c72b",
+      "hash": "b4d4bca03441134838685c62589b3af9c0b3a62ed525e45826b1e1656cd84984",
       "docRelative": "algorithm/array/_index.mdx"
+    },
+    "__nav__:algorithm/stack": {
+      "hash": "186bea4d7bded95ef3eac86e9937ce91197e8fe8c12ecccb265a81e81af92311",
+      "docRelative": "algorithm/stack/_index.mdx"
     },
     "__nav__:algorithm/tree": {
       "hash": "803f46c7b0f48f2fbf10243d950c87b286337c80574eb042731696141fabe036",
@@ -837,7 +877,7 @@
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
-      "hash": "1a83dfd8937565910fe026ba4da7d89db13cc21e20c94054d32b7ad0c2e5c11c",
+      "hash": "5f24bbaeace87d8b6dbcf428aaa78132df9c63c358ec301eb7a48c052f1e52a3",
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/2d-readingOrder": {
@@ -853,7 +893,7 @@
       "docRelative": "frontend/jsfunction/Emitter/_index.mdx"
     },
     "__nav__:frontend/jsfunction/UndoableDatabase": {
-      "hash": "5a768079b696b5525c58b135efb1c8cbdcaa6edf843165f4b94afce8f718125f",
+      "hash": "c0b2fc45dad974da003d9ca05ad0962bb61e3404ada8f85e961c37b73a755bbf",
       "docRelative": "frontend/jsfunction/UndoableDatabase/_index.mdx"
     },
     "__nav__:frontend/jsfunction/array": {
@@ -861,15 +901,15 @@
       "docRelative": "frontend/jsfunction/array/_index.mdx"
     },
     "__nav__:frontend/jsfunction/curry": {
-      "hash": "38e86ab0314faaffd07705e08da4ae9a85bd98c8a529662c707ecaaed03df3d8",
+      "hash": "a05591bcc9536628095f643263a661cb11ee549d58952bbad62de3ea5f8e8099",
       "docRelative": "frontend/jsfunction/curry/_index.mdx"
     },
     "__nav__:frontend/jsfunction/debounce": {
-      "hash": "e4914f18fd7dcf31b44c1534eb3c677d64836a38c74d2442e95bbb03bfff18e6",
+      "hash": "4e6a9bdefd00b61bd53fee544b23ee1b1dd641169f2477f825f49b727c72cd43",
       "docRelative": "frontend/jsfunction/debounce/_index.mdx"
     },
     "__nav__:frontend/jsfunction/deepClone": {
-      "hash": "5540761f8c8368f9eb040a06ddb53d6b10e7703183cfe13e87de7038a230b91d",
+      "hash": "f4c3bb1bf487584cda05358a208913781d1b472d450abc63346ec6a762016a40",
       "docRelative": "frontend/jsfunction/deepClone/_index.mdx"
     },
     "__nav__:frontend/jsfunction/getElementBy": {
@@ -893,7 +933,7 @@
       "docRelative": "frontend/jsfunction/jsonStringify/_index.mdx"
     },
     "__nav__:frontend/jsfunction/makeCounter": {
-      "hash": "5633773ab825136a7958d7b4770b0dce70c763425bd6e500dd2a80303e2832fd",
+      "hash": "9cf0d7333b8da5452e52efad330604f608b42fce2c86c6b9eaafad841fa0a65e",
       "docRelative": "frontend/jsfunction/makeCounter/_index.mdx"
     },
     "__nav__:frontend/jsfunction/map": {
@@ -901,7 +941,7 @@
       "docRelative": "frontend/jsfunction/map/_index.mdx"
     },
     "__nav__:frontend/jsfunction/memoize": {
-      "hash": "bfa5e5525b4d3a5cd16ad00b916c58e67fee93cd1fb8d71b18077aae981a33ea",
+      "hash": "1f6330c21a9131ba1d16bca3284390cd5f7cb16f47e306813960423d0dc8106f",
       "docRelative": "frontend/jsfunction/memoize/_index.mdx"
     },
     "__nav__:frontend/jsfunction/object": {
@@ -913,15 +953,15 @@
       "docRelative": "frontend/jsfunction/prismaORM/_index.mdx"
     },
     "__nav__:frontend/jsfunction/promise": {
-      "hash": "84a79c6e07a4db2d87383dff0d9ebb4a969d9ed9dac64f2dc82c09d835909023",
+      "hash": "1c0737c1465f15e05a6016eb6546be763bedad341dfe01c3c7783e17894d384a",
       "docRelative": "frontend/jsfunction/promise/_index.mdx"
     },
     "__nav__:frontend/jsfunction/range": {
-      "hash": "d6dfe80f32a738eb96c08cfee2b9a40993df6d5eee154e8d2601860b5b8970a9",
+      "hash": "307fb27037470591f9c3973d39ed137e54da4b559d7d09874d1a0031f7298ecf",
       "docRelative": "frontend/jsfunction/range/_index.mdx"
     },
     "__nav__:frontend/jsfunction/schemaValidator": {
-      "hash": "4d2271f634a53ca821c63689249c51bad54c9936ae70f4836758fe842cdd92fd",
+      "hash": "cd99e83255b0f2607c77758be3b256083aa20a98ce15312a8dfd63e32811ba1d",
       "docRelative": "frontend/jsfunction/schemaValidator/_index.mdx"
     },
     "__nav__:frontend/jsfunction/spreadSheet": {
@@ -929,19 +969,19 @@
       "docRelative": "frontend/jsfunction/spreadSheet/_index.mdx"
     },
     "__nav__:frontend/jsfunction/styledTextRange": {
-      "hash": "b163df56d0c4e832859c147e854847ed4c9982f55cd2f80efe1f1ae284f3ba4d",
+      "hash": "7bbfffb66a42b55d3c32ff6acfd4b5ff20399b84734c91c3e809fb63fbffd4a9",
       "docRelative": "frontend/jsfunction/styledTextRange/_index.mdx"
     },
     "__nav__:frontend/jsfunction/testRunner": {
-      "hash": "946ed57a2d9a50d02259f4350dd70641021104bb88cad5d70d305ddb54dc19aa",
+      "hash": "135bea93c7be842513713f10c0f2db48876cf3966e82c3aff506774e392554de",
       "docRelative": "frontend/jsfunction/testRunner/_index.mdx"
     },
     "__nav__:frontend/jsfunction/textSearch": {
-      "hash": "5d2bf779df92e7216cec41ec8a824f500b64a457f801c059df76e1e2849db525",
+      "hash": "29ed3c23e1fdf72db9e2bcba0f3d48feeb0d39a561134a95bbd116cbf36912e8",
       "docRelative": "frontend/jsfunction/textSearch/_index.mdx"
     },
     "__nav__:frontend/jsfunction/undoRedoManager": {
-      "hash": "f8a225eb80e55bb0c095b26691f00e9255720f4e52236eac71ab4d719b58a4e1",
+      "hash": "281e9ddbd2a9c9632d8687b4f41db3e7e27c846f7ddcbe2df776e8afe9f511c7",
       "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
     },
     "__nav__:frontend/uicoding": {

@@ -1,5 +1,9 @@
 {
   "files": {
+    "algorithm/array/duplicateArray.js": {
+      "hash": "623449b6718bc8df16a1dc45b10edfb8aee9cec49fb4aa723b069923e45470f7",
+      "docRelative": "array/duplicateArray.mdx"
+    },
     "algorithm/array/kRowPascalTriangle.py": {
       "hash": "c3594094add1189a12c514811274cc91ff579752522c1753b82f155d71b54528",
       "docRelative": "array/kRowPascalTriangle.mdx"
@@ -7,6 +11,10 @@
     "algorithm/array/kRowPascalTriangle.js": {
       "hash": "c3594094add1189a12c514811274cc91ff579752522c1753b82f155d71b54528",
       "docRelative": "array/kRowPascalTriangle.mdx"
+    },
+    "algorithm/array/maxProfit.js": {
+      "hash": "da8b054841c9b18ebee723f9611289b19c914b1f9c4fd9165a328e3307c34734",
+      "docRelative": "array/maxProfit.mdx"
     },
     "algorithm/array/maxSubArray.py": {
       "hash": "4b3e1240c0fa07ee647b825d05bfb8b02f71df68fc18648a99bba3400a6bdc63",
@@ -20,9 +28,37 @@
       "hash": "5848556bbb4b81728b72c6a1830cae302d6bdd560bd4a0168a56f17ee69aa6e3",
       "docRelative": "countIslandOnGrid.mdx"
     },
+    "algorithm/countOnesBitInBinary.js": {
+      "hash": "48563d65e85bd87d6eb76f4ec441a2f192827c34ba19fe2f29752d4be0da4057",
+      "docRelative": "countOnesBitInBinary.mdx"
+    },
+    "algorithm/isMeetingCalendarValid.js": {
+      "hash": "b3a80867fa572b9fee1e8d626595d28a471aa891ff9db12156eaf37526611d58",
+      "docRelative": "isMeetingCalendarValid.mdx"
+    },
     "algorithm/mostCommonElement.js": {
       "hash": "15384cd6478e3aaeaa2ba9a8ec1f81f0366d27d5a207c092e1f619ebf97ca3a1",
       "docRelative": "mostCommonElement.mdx"
+    },
+    "algorithm/stack/Stack.js": {
+      "hash": "1a3ef6a4f579a9568a17735b541711fad4e4cfa4a0595b4025f0d9060675bc58",
+      "docRelative": "stack/Stack.mdx"
+    },
+    "algorithm/stack/isBalanceBracket.py": {
+      "hash": "44c528bec9dbfaee65664297d8a1112ba387d59b81cd196c4f1e6535019cbff2",
+      "docRelative": "stack/isBalanceBracket.mdx"
+    },
+    "algorithm/stack/isBalanceBracket.js": {
+      "hash": "44c528bec9dbfaee65664297d8a1112ba387d59b81cd196c4f1e6535019cbff2",
+      "docRelative": "stack/isBalanceBracket.mdx"
+    },
+    "algorithm/tree/lowestCommonAncestor.py": {
+      "hash": "2169570a13f0a9ef1a5ab86e88c3093f9d244ecad41965ec6fdfeee731dbdf7e",
+      "docRelative": "tree/lowestCommonAncestor.mdx"
+    },
+    "algorithm/tree/lowestCommonAncestor.js": {
+      "hash": "2169570a13f0a9ef1a5ab86e88c3093f9d244ecad41965ec6fdfeee731dbdf7e",
+      "docRelative": "tree/lowestCommonAncestor.mdx"
     },
     "algorithm/two-pointers/3Sum.py": {
       "hash": "7de9cb63fe93154c24c46cd744a75b7c07b9f6d4ac399db434300471b23668a3",
@@ -33,24 +69,32 @@
       "docRelative": "two-pointers/3Sum.mdx"
     },
     "algorithm/two-pointers/isPalindrome.py": {
-      "hash": "deef9391463d62bb7822b516dac78e49b14ee20abd3483fcd01044465411114b",
+      "hash": "edb8c580c8a52a52a26f2ecbbc4be69605b204165cf3b7f59a5090d50cb82c39",
       "docRelative": "two-pointers/isPalindrome.mdx"
     },
     "algorithm/two-pointers/isPalindrome.js": {
-      "hash": "deef9391463d62bb7822b516dac78e49b14ee20abd3483fcd01044465411114b",
+      "hash": "edb8c580c8a52a52a26f2ecbbc4be69605b204165cf3b7f59a5090d50cb82c39",
       "docRelative": "two-pointers/isPalindrome.mdx"
     },
     "algorithm/two-pointers/isPalindrome_Pair.py": {
-      "hash": "a453c5808099d9a9434be5719c40772a361e3fe06be75a378b1ca9a97b0bab72",
+      "hash": "915f1922472eaf1a5a9249769bb0293657db1ccd4318f03b4dea5eb4f7e767f7",
       "docRelative": "two-pointers/isPalindrome_Pair.mdx"
     },
     "algorithm/two-pointers/isPalindrome_Pair.js": {
-      "hash": "a453c5808099d9a9434be5719c40772a361e3fe06be75a378b1ca9a97b0bab72",
+      "hash": "915f1922472eaf1a5a9249769bb0293657db1ccd4318f03b4dea5eb4f7e767f7",
       "docRelative": "two-pointers/isPalindrome_Pair.mdx"
     },
     "__nav__:array": {
-      "hash": "e070906d02a9322a98cce61cf3b78fd969f3e094c9d24d170e7269cf30b3c72b",
+      "hash": "b4d4bca03441134838685c62589b3af9c0b3a62ed525e45826b1e1656cd84984",
       "docRelative": "array/_index.mdx"
+    },
+    "__nav__:stack": {
+      "hash": "186bea4d7bded95ef3eac86e9937ce91197e8fe8c12ecccb265a81e81af92311",
+      "docRelative": "stack/_index.mdx"
+    },
+    "__nav__:tree": {
+      "hash": "803f46c7b0f48f2fbf10243d950c87b286337c80574eb042731696141fabe036",
+      "docRelative": "tree/_index.mdx"
     },
     "__nav__:two-pointers": {
       "hash": "f058dd483415f41dffc493974a2b2425cddb8492b87c35cde073022b6a4b4ad7",

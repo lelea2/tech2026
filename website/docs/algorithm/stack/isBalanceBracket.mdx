@@ -1,0 +1,90 @@
+---
+title: isBalanceBracket
+---
+
+# isBalanceBracket
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="python" label="Python">
+
+~~~python
+# O(n) time
+# O(n) space
+
+def is_balanced_brackets(s: str) -> bool:
+  opening_brackets = "([{"
+  closing_brackets = ")]}"
+
+  matching_brackets = {
+    ")": "(",
+    "]": "[",
+    "}": "{",
+  }
+
+  # Use a stack to track opening brackets
+  stack = []
+
+  for char in s:
+    # Push opening brackets onto stack
+    if char in opening_brackets:
+      stack.append(char)
+    # Process closing brackets
+    elif char in closing_brackets:
+      # No matching opening bracket
+      if len(stack) == 0:
+        return False
+
+      # Top of stack matches expected opening bracket
+      if stack[-1] == matching_brackets[char]:
+        stack.pop()
+      else:
+        return False
+
+  # Valid if no unmatched opening brackets remain
+  return len(stack) == 0
+~~~
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+~~~javascript
+// O(n) time
+// O(n) space
+
+/**
+ * @param {string} str
+ * @return {boolean}
+ */
+export default function isBalancedBrackets(str) {
+  const openingBrackets = '([{';
+  const closingBrackets = ')]}';
+  const matchingBrackets = {
+    ')': '(',
+    ']': '[',
+    '}': '{'
+  };
+  // create a stack and pop out when we see matching open and close bracket
+  const stack = [];
+  for (const char of str) {
+    if (openingBrackets.includes(char)) {
+      stack.push(char);
+    } else if (closingBrackets.includes(char)) {
+      if (stack.length === 0) {
+        return false;
+      } 
+      if (stack[stack.length - 1] === matchingBrackets[char]) {
+        stack.pop();
+      } else {
+        return false;
+      }
+    }
+  }
+  return stack.length === 0;
+}
+~~~
+
+  </TabItem>
+</Tabs>
