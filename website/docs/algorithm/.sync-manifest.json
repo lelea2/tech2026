@@ -5,11 +5,11 @@
       "docRelative": "array/duplicateArray.mdx"
     },
     "algorithm/array/kRowPascalTriangle.py": {
-      "hash": "c3594094add1189a12c514811274cc91ff579752522c1753b82f155d71b54528",
+      "hash": "407b4510e411999fd8245c034e7b0641275a147da8156d3773c9890df2cf5b06",
       "docRelative": "array/kRowPascalTriangle.mdx"
     },
     "algorithm/array/kRowPascalTriangle.js": {
-      "hash": "c3594094add1189a12c514811274cc91ff579752522c1753b82f155d71b54528",
+      "hash": "407b4510e411999fd8245c034e7b0641275a147da8156d3773c9890df2cf5b06",
       "docRelative": "array/kRowPascalTriangle.mdx"
     },
     "algorithm/array/maxProfit.js": {
@@ -25,7 +25,7 @@
       "docRelative": "array/maxSubArray.mdx"
     },
     "algorithm/countIslandOnGrid.js": {
-      "hash": "5848556bbb4b81728b72c6a1830cae302d6bdd560bd4a0168a56f17ee69aa6e3",
+      "hash": "37d46421bdfc2f60272c89554a459396df05270512017a6059b52fd3aaacddcc",
       "docRelative": "countIslandOnGrid.mdx"
     },
     "algorithm/countOnesBitInBinary.js": {
@@ -84,6 +84,14 @@
       "hash": "7de9cb63fe93154c24c46cd744a75b7c07b9f6d4ac399db434300471b23668a3",
       "docRelative": "two-pointers/3Sum.mdx"
     },
+    "algorithm/two-pointers/checkSubArraySum.js": {
+      "hash": "beb67de9e87fe90e0ef15f005a01cdba8610b5c921616f3c876e16c9dc0b3876",
+      "docRelative": "two-pointers/checkSubArraySum.mdx"
+    },
+    "algorithm/two-pointers/dutchFlagSorting.js": {
+      "hash": "3d9542507cd16d8a4b9fc3f1c23700acba5d68092753f2f74a1930412c3be27b",
+      "docRelative": "two-pointers/dutchFlagSorting.mdx"
+    },
     "algorithm/two-pointers/isPalindrome.py": {
       "hash": "edb8c580c8a52a52a26f2ecbbc4be69605b204165cf3b7f59a5090d50cb82c39",
       "docRelative": "two-pointers/isPalindrome.mdx"
@@ -99,6 +107,18 @@
     "algorithm/two-pointers/isPalindrome_Pair.js": {
       "hash": "915f1922472eaf1a5a9249769bb0293657db1ccd4318f03b4dea5eb4f7e767f7",
       "docRelative": "two-pointers/isPalindrome_Pair.mdx"
+    },
+    "algorithm/two-pointers/minimumMoveToMakePalindrome.js": {
+      "hash": "a628c14d13608f1b33b573c628495766952943085d04c61658e5037c31b0276d",
+      "docRelative": "two-pointers/minimumMoveToMakePalindrome.mdx"
+    },
+    "algorithm/two-pointers/removeNthLasNode.js": {
+      "hash": "b2d96f711771e16164236093439634b2f4e13575d493346f3c7e72e23973069d",
+      "docRelative": "two-pointers/removeNthLasNode.mdx"
+    },
+    "algorithm/two-pointers/reverseWords.js": {
+      "hash": "ce8c118da5f1eaabc3207d888bf67a04c69daf71378ff24091c516a5d421ec1d",
+      "docRelative": "two-pointers/reverseWords.mdx"
     },
     "__nav__:array": {
       "hash": "b4d4bca03441134838685c62589b3af9c0b3a62ed525e45826b1e1656cd84984",
@@ -121,7 +141,7 @@
       "docRelative": "tree/_index.mdx"
     },
     "__nav__:two-pointers": {
-      "hash": "f058dd483415f41dffc493974a2b2425cddb8492b87c35cde073022b6a4b4ad7",
+      "hash": "ebd1b904988f3eab3bffef4bd230d6406809d033ae6efaa74bedef870e1df2ab",
       "docRelative": "two-pointers/_index.mdx"
     }
   }
