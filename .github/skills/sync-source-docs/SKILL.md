@@ -31,6 +31,13 @@ Keep documentation in sync when files change under frontend, backend, or algorit
 5. Verify docs update summary.
 6. Run docs build to validate output.
 
+### Navigation refresh rule (required)
+
+- Always run `npm run sync:source-docs` (not `pm run`) after adding files or folders in mapped source paths.
+- Added file behavior: a new `.mdx` page is generated and the parent folder `_index.mdx` navigation page is updated.
+- Added folder behavior: a new folder `_index.mdx` is generated and parent folder navigation is updated to include the new subfolder.
+- If navigation does not update, the run likely used a narrow mapping; rerun with stable parent mappings for that docs subdir.
+
 ### Mapping stability rule (required)
 
 - Do not generate mappings from only the currently changed files.
@@ -50,6 +57,7 @@ Keep documentation in sync when files change under frontend, backend, or algorit
   - `.../deepClone/_index.mdx` + one page per file
 - These nav pages are generated automatically and tracked in the sync manifest.
 - If a source folder disappears, the corresponding generated nav page is removed on the next sync.
+- If a new source file appears in an existing folder, that folder's `_index.mdx` is regenerated to include the new doc link.
 
 ## Commands
 
@@ -159,6 +167,16 @@ Mapping format rules:
   - `website/docs/frontend/jsfunction/spreadSheet/_index.mdx`
   - `website/docs/frontend/jsfunction/textSearch/_index.mdx`
   - `website/docs/frontend/jsfunction/deepClone/_index.mdx`
+
+## Troubleshooting: New file not visible in navigation
+
+- Confirm the source file extension is supported (`.js`, `.py`, `.md`, `.mdx`, etc.).
+- Confirm the file path is inside a mapped parent path included in the same sync command.
+- Rerun with stable parent mapping for the docs subdir:
+  - FrontEnd: `--docs-subdir frontend --format "frontend/jsfunction=jsfunction"`
+  - BackEnd: `--docs-subdir backend --format "backend=."`
+  - Algorithm: `--docs-subdir algorithm --format "algorithm=."`
+- Check that parent `_index.mdx` was regenerated and now contains the new file link.
 
 ## Troubleshooting: Backend markdown/mdx or quizzes docs missing
 

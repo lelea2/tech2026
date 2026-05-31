@@ -1,0 +1,79 @@
+---
+title: isCircularLinkedList
+---
+
+# isCircularLinkedList
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="python" label="Python">
+
+~~~python
+# A Circular Linked List is a linked list where the last node points back to an earlier node (usually the head) instead of null.
+# Detect the start of a cycle in a circular linked list.
+class Node:
+  def __init__(self, value):
+    self.value = value
+    self.next = None
+
+def has_cycle(head):
+  if not head or not head.next:
+    return False
+
+  slow = fast = head
+
+  while fast and fast.next:
+    slow = slow.next
+    fast = fast.next.next
+
+    if slow == fast:
+      return True
+
+  return False
+~~~
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+~~~javascript
+class Node {
+  constructor(val) {
+    this.val = val;
+    this.next = null;
+  }
+}
+
+/**
+ * Detects if a linked list has a cycle. 
+ * Detecting a cycle in a linked list involves using two pointers,
+ * one moving at a slower pace than the other. 
+ * If there is a cycle, the faster pointer will eventually catch up 
+ * to the slower pointer.
+ * @param {*} head 
+ * @returns 
+ */
+export default function hasCycle(head) {
+  if (!head || !head.next) {
+    return false;
+  }
+
+  let slow = head;
+  let fast = head;
+
+  while (fast && fast.next) {
+    slow = slow.next;
+    fast = fast.next.next;
+
+    if (slow === fast) {
+      return true;
+    }
+  }
+
+  return false;
+}
+~~~
+
+  </TabItem>
+</Tabs>

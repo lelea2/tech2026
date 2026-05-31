@@ -796,12 +796,28 @@
       "hash": "b3a80867fa572b9fee1e8d626595d28a471aa891ff9db12156eaf37526611d58",
       "docRelative": "algorithm/isMeetingCalendarValid.mdx"
     },
+    "algorithm/linkedlist/isCircularLinkedList.py": {
+      "hash": "0ca623b831b8ff5dda21ab59984ab9eade2c41cf5f534cd3c6b2c8cd0faa59f7",
+      "docRelative": "algorithm/linkedlist/isCircularLinkedList.mdx"
+    },
+    "algorithm/linkedlist/isCircularLinkedList.js": {
+      "hash": "0ca623b831b8ff5dda21ab59984ab9eade2c41cf5f534cd3c6b2c8cd0faa59f7",
+      "docRelative": "algorithm/linkedlist/isCircularLinkedList.mdx"
+    },
+    "algorithm/lru/lru.js": {
+      "hash": "b86dc84c920ea5c4a02c7ccecb598aea72e16c416d5d2b0fd33562398b158294",
+      "docRelative": "algorithm/lru/lru.mdx"
+    },
     "algorithm/mostCommonElement.js": {
       "hash": "15384cd6478e3aaeaa2ba9a8ec1f81f0366d27d5a207c092e1f619ebf97ca3a1",
       "docRelative": "algorithm/mostCommonElement.mdx"
     },
+    "algorithm/stack/Queue.js": {
+      "hash": "5eb7fe54d0f571fbe32c7540f31de38f64a79d28e98a90ea9cd7a5c03b9fc21c",
+      "docRelative": "algorithm/stack/Queue.mdx"
+    },
     "algorithm/stack/Stack.js": {
-      "hash": "1a3ef6a4f579a9568a17735b541711fad4e4cfa4a0595b4025f0d9060675bc58",
+      "hash": "b633d6d7d320c5df3cebea2d55016b0253e6f04f548552a63304015b5af402b3",
       "docRelative": "algorithm/stack/Stack.mdx"
     },
     "algorithm/stack/isBalanceBracket.py": {
@@ -845,15 +861,23 @@
       "docRelative": "algorithm/two-pointers/isPalindrome_Pair.mdx"
     },
     "__nav__:algorithm": {
-      "hash": "5904d45d70cff4f47aed9b6f0577518090b5fe466119389a1d0fd145fcb80d52",
+      "hash": "c4632698bac9646c8b6e997546e79ecb096b39ddb2f608f6b4fe68b6caf8004e",
       "docRelative": "algorithm/_index.mdx"
     },
     "__nav__:algorithm/array": {
       "hash": "b4d4bca03441134838685c62589b3af9c0b3a62ed525e45826b1e1656cd84984",
       "docRelative": "algorithm/array/_index.mdx"
     },
+    "__nav__:algorithm/linkedlist": {
+      "hash": "252429a72d551def28a59db5d8dbb91a73e4d66bf75d23dd84d6fe61b3c02091",
+      "docRelative": "algorithm/linkedlist/_index.mdx"
+    },
+    "__nav__:algorithm/lru": {
+      "hash": "d51ce63c70cd1310d1f09e356d4aa24b1ce4fbdc2fc54a21883329de4c97b758",
+      "docRelative": "algorithm/lru/_index.mdx"
+    },
     "__nav__:algorithm/stack": {
-      "hash": "186bea4d7bded95ef3eac86e9937ce91197e8fe8c12ecccb265a81e81af92311",
+      "hash": "e3caa644ca5cb3eb73573701d079af50f69800dc4cae55ab426968ad1ed37de2",
       "docRelative": "algorithm/stack/_index.mdx"
     },
     "__nav__:algorithm/tree": {
