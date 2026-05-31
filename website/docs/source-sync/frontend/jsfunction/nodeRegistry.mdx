@@ -25,46 +25,46 @@ title: nodeRegistry
  */
 
 export default class NodeRegistry {
-	constructor() {
-		this._store = new WeakMap();
-	}
+  constructor() {
+    this._store = new WeakMap();
+  }
 
-	/**
+  /**
 	 * @param {object} node
 	 * @param {*} value
 	 * @returns {void}
 	 */
-	set(node, value) {
-		this._store.set(node, value);
-	}
+  set(node, value) {
+    this._store.set(node, value);
+  }
 
-	/**
+  /**
 	 * @param {object} node
 	 * @returns {*}
 	 */
-	get(node) {
-		return this._store.get(node);
-	}
+  get(node) {
+    return this._store.get(node);
+  }
 
-	/**
+  /**
 	 * @param {object} node
 	 * @returns {boolean}
 	 */
-	has(node) {
-		return this._store.has(node);
-	}
+  has(node) {
+    return this._store.has(node);
+  }
 
-	/**
+  /**
 	 * @param {object} node
 	 * @returns {boolean}
 	 */
-	delete(node) {
-		return this._store.delete(node);
-	}
+  delete(node) {
+    return this._store.delete(node);
+  }
 
-	clear() {
-		this._store = new WeakMap();
-	}
+  clear() {
+    this._store = new WeakMap();
+  }
 }
 
 // Example usage:

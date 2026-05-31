@@ -16,23 +16,23 @@ title: Function.prototype.call
  * @returns {unknown}
  */
 Function.prototype.myCall = function (thisArg, ...argArray) {
-	if (typeof this !== 'function') {
-		throw new TypeError('myCall must be called on a function');
-	}
+  if (typeof this !== 'function') {
+    throw new TypeError('myCall must be called on a function');
+  }
 
-	// Match call/apply behavior: null/undefined default to global object;
-	// primitives are boxed.
-	const context =
+  // Match call/apply behavior: null/undefined default to global object;
+  // primitives are boxed.
+  const context =
 		thisArg === null || thisArg === undefined ? globalThis : Object(thisArg);
 
-	const tempKey = Symbol('myCall');
-	context[tempKey] = this;
+  const tempKey = Symbol('myCall');
+  context[tempKey] = this;
 
-	try {
-		return context[tempKey](...argArray);
-	} finally {
-		delete context[tempKey];
-	}
+  try {
+    return context[tempKey](...argArray);
+  } finally {
+    delete context[tempKey];
+  }
 };
 
 /**

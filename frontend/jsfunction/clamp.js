@@ -7,7 +7,7 @@
  * @returns {number}
  */
 export default function clamp(value, lower, upper) {
-	return Math.min(Math.max(value, lower), upper);
+  return Math.min(Math.max(value, lower), upper);
 }
 
 // Examples:

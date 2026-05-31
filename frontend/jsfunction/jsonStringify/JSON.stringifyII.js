@@ -9,7 +9,7 @@
  * @returns {string | undefined}
  */
 export default function jsonStringify(value) {
-	return serialize(value, [], '', false);
+  return serialize(value, [], '', false);
 }
 
 /**
@@ -20,73 +20,73 @@ export default function jsonStringify(value) {
  * @returns {string | undefined}
  */
 function serialize(value, ancestors, key, inArray) {
-	// Apply toJSON first when present, similar to JSON.stringify.
-	if (value !== null && typeof value === 'object' && typeof value.toJSON === 'function') {
-		value = value.toJSON(key);
-	}
+  // Apply toJSON first when present, similar to JSON.stringify.
+  if (value !== null && typeof value === 'object' && typeof value.toJSON === 'function') {
+    value = value.toJSON(key);
+  }
 
-	const valueType = typeof value;
+  const valueType = typeof value;
 
-	if (valueType === 'bigint') {
-		throw new TypeError('Do not know how to serialize a BigInt');
-	}
+  if (valueType === 'bigint') {
+    throw new TypeError('Do not know how to serialize a BigInt');
+  }
 
-	if (valueType === 'string') {
-		return quoteString(value);
-	}
+  if (valueType === 'string') {
+    return quoteString(value);
+  }
 
-	if (valueType === 'number') {
-		return Number.isFinite(value) ? String(value) : 'null';
-	}
+  if (valueType === 'number') {
+    return Number.isFinite(value) ? String(value) : 'null';
+  }
 
-	if (valueType === 'boolean') {
-		return value ? 'true' : 'false';
-	}
+  if (valueType === 'boolean') {
+    return value ? 'true' : 'false';
+  }
 
-	// For object properties these are omitted; for array slots they become null.
-	if (valueType === 'undefined' || valueType === 'function' || valueType === 'symbol') {
-		return inArray ? 'null' : undefined;
-	}
+  // For object properties these are omitted; for array slots they become null.
+  if (valueType === 'undefined' || valueType === 'function' || valueType === 'symbol') {
+    return inArray ? 'null' : undefined;
+  }
 
-	if (value === null) {
-		return 'null';
-	}
+  if (value === null) {
+    return 'null';
+  }
 
-	// Unbox wrapper objects to match native behavior.
-	if (value instanceof Number || value instanceof String || value instanceof Boolean) {
-		return serialize(value.valueOf(), ancestors, key, inArray);
-	}
+  // Unbox wrapper objects to match native behavior.
+  if (value instanceof Number || value instanceof String || value instanceof Boolean) {
+    return serialize(value.valueOf(), ancestors, key, inArray);
+  }
 
-	if (ancestors.includes(value)) {
-		throw new TypeError('Converting circular structure to JSON');
-	}
+  if (ancestors.includes(value)) {
+    throw new TypeError('Converting circular structure to JSON');
+  }
 
-	ancestors.push(value);
+  ancestors.push(value);
 
-	if (Array.isArray(value)) {
-		const items = [];
+  if (Array.isArray(value)) {
+    const items = [];
 
-		for (let i = 0; i < value.length; i++) {
-			const item = serialize(value[i], ancestors, String(i), true);
-			items.push(item === undefined ? 'null' : item);
-		}
+    for (let i = 0; i < value.length; i++) {
+      const item = serialize(value[i], ancestors, String(i), true);
+      items.push(item === undefined ? 'null' : item);
+    }
 
-		ancestors.pop();
-		return `[${items.join(',')}]`;
-	}
+    ancestors.pop();
+    return `[${items.join(',')}]`;
+  }
 
-	const pairs = [];
-	const keys = Object.keys(value);
+  const pairs = [];
+  const keys = Object.keys(value);
 
-	for (const objectKey of keys) {
-		const serialized = serialize(value[objectKey], ancestors, objectKey, false);
-		if (serialized !== undefined) {
-			pairs.push(`${quoteString(objectKey)}:${serialized}`);
-		}
-	}
+  for (const objectKey of keys) {
+    const serialized = serialize(value[objectKey], ancestors, objectKey, false);
+    if (serialized !== undefined) {
+      pairs.push(`${quoteString(objectKey)}:${serialized}`);
+    }
+  }
 
-	ancestors.pop();
-	return `{${pairs.join(',')}}`;
+  ancestors.pop();
+  return `{${pairs.join(',')}}`;
 }
 
 /**
@@ -94,26 +94,26 @@ function serialize(value, ancestors, key, inArray) {
  * @returns {string}
  */
 function quoteString(value) {
-	return `"${value.replace(/[\\"\u0000-\u001f]/g, (char) => {
-		switch (char) {
-			case '"':
-				return '\\"';
-			case '\\':
-				return '\\\\';
-			case '\b':
-				return '\\b';
-			case '\f':
-				return '\\f';
-			case '\n':
-				return '\\n';
-			case '\r':
-				return '\\r';
-			case '\t':
-				return '\\t';
-			default:
-				return `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`;
-		}
-	})}"`;
+  return `"${value.replace(/[\\"\u0000-\u001f]/g, (char) => {
+    switch (char) {
+      case '"':
+        return '\\"';
+      case '\\':
+        return '\\\\';
+      case '\b':
+        return '\\b';
+      case '\f':
+        return '\\f';
+      case '\n':
+        return '\\n';
+      case '\r':
+        return '\\r';
+      case '\t':
+        return '\\t';
+      default:
+        return `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`;
+    }
+  })}"`;
 }
 
 

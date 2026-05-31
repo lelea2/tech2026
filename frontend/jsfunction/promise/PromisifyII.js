@@ -12,34 +12,34 @@ const legacyCustomPromisifySymbol = Symbol.for('util.promisify.custom');
  * @returns {Function} A promisified version of `func`
  */
 function promisify(func) {
-	if (typeof func !== 'function') {
-		throw new TypeError('The "func" argument must be of type function.');
-	}
+  if (typeof func !== 'function') {
+    throw new TypeError('The "func" argument must be of type function.');
+  }
 
-	const custom =
+  const custom =
 		func[customPromisifySymbol] !== undefined
-			? func[customPromisifySymbol]
-			: func[legacyCustomPromisifySymbol];
-	if (custom !== undefined) {
-		if (typeof custom !== 'function') {
-			throw new TypeError('The "util.promisify.custom" argument must be of type function.');
-		}
-		// Respect explicit custom promisification logic for legacy/non-standard APIs.
-		return custom;
-	}
+		  ? func[customPromisifySymbol]
+		  : func[legacyCustomPromisifySymbol];
+  if (custom !== undefined) {
+    if (typeof custom !== 'function') {
+      throw new TypeError('The "util.promisify.custom" argument must be of type function.');
+    }
+    // Respect explicit custom promisification logic for legacy/non-standard APIs.
+    return custom;
+  }
 
-	// Default path: wraps Node-style callback-last `(err, value)` functions.
-	return function (...args) {
-		return new Promise((resolve, reject) => {
-			func.call(this, ...args, (err, value) => {
-				if (err) {
-					reject(err);
-				} else {
-					resolve(value);
-				}
-			});
-		});
-	};
+  // Default path: wraps Node-style callback-last `(err, value)` functions.
+  return function (...args) {
+    return new Promise((resolve, reject) => {
+      func.call(this, ...args, (err, value) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(value);
+        }
+      });
+    });
+  };
 }
 
 promisify.custom = customPromisifySymbol;

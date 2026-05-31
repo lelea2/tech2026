@@ -12,19 +12,19 @@
  * }}
  */
 export default function promiseWithResolvers() {
-	/** @type {(value?: unknown) => void} */
-	let resolve;
-	/** @type {(reason?: unknown) => void} */
-	let reject;
+  /** @type {(value?: unknown) => void} */
+  let resolve;
+  /** @type {(reason?: unknown) => void} */
+  let reject;
 
-	const promise = new Promise((res, rej) => {
-		resolve = res;
-		reject = rej;
-	});
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
 
-	return {
-		promise,
-		resolve,
-		reject,
-	};
+  return {
+    promise,
+    resolve,
+    reject,
+  };
 }

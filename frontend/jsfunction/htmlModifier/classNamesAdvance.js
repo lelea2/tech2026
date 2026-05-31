@@ -55,8 +55,8 @@ export default function classNames(...args) {
     }
     // function 
     if (typeof value === 'function') {
-        process(value());
-        return;
+      process(value());
+      return;
     }
 
     // object

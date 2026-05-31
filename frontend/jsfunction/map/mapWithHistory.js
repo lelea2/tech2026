@@ -8,57 +8,57 @@
  * Timestamps for the same key are guaranteed strictly increasing.
  */
 export default class MapWithHistory {
-	constructor() {
-		/** @type {Map<string, Array<{timestamp: number, value: string}>>} */
-		this.store = new Map();
-	}
+  constructor() {
+    /** @type {Map<string, Array<{timestamp: number, value: string}>>} */
+    this.store = new Map();
+  }
 
-	/**
+  /**
 	 * @param {string} key
 	 * @param {string} value
 	 * @param {number} timestamp
 	 * @returns {void}
 	 */
-	set(key, value, timestamp) {
-		if (!this.store.has(key)) {
-			this.store.set(key, []);
-		}
+  set(key, value, timestamp) {
+    if (!this.store.has(key)) {
+      this.store.set(key, []);
+    }
 
-		// Strictly increasing timestamps per key means append is valid.
-		this.store.get(key).push({ timestamp, value });
-	}
+    // Strictly increasing timestamps per key means append is valid.
+    this.store.get(key).push({ timestamp, value });
+  }
 
-	/**
+  /**
 	 * @param {string} key
 	 * @param {number} timestamp
 	 * @returns {string}
 	 */
-	get(key, timestamp) {
-		const history = this.store.get(key);
+  get(key, timestamp) {
+    const history = this.store.get(key);
 
-		if (!history || history.length === 0) {
-			return '';
-		}
+    if (!history || history.length === 0) {
+      return '';
+    }
 
-		// Binary search for rightmost entry with entry.timestamp <= timestamp.
-		let left = 0;
-		let right = history.length - 1;
-		let bestIndex = -1;
+    // Binary search for rightmost entry with entry.timestamp <= timestamp.
+    let left = 0;
+    let right = history.length - 1;
+    let bestIndex = -1;
 
-		while (left <= right) {
-			const mid = left + Math.floor((right - left) / 2);
-			const midTimestamp = history[mid].timestamp;
+    while (left <= right) {
+      const mid = left + Math.floor((right - left) / 2);
+      const midTimestamp = history[mid].timestamp;
 
-			if (midTimestamp <= timestamp) {
-				bestIndex = mid;
-				left = mid + 1;
-			} else {
-				right = mid - 1;
-			}
-		}
+      if (midTimestamp <= timestamp) {
+        bestIndex = mid;
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
+    }
 
-		return bestIndex === -1 ? '' : history[bestIndex].value;
-	}
+    return bestIndex === -1 ? '' : history[bestIndex].value;
+  }
 }
 
 /** 

@@ -1,0 +1,11 @@
+{
+  "name": "tech2026",
+  "private": true,
+  "scripts": {
+    "lint:js": "eslint .",
+    "lint:js:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "eslint": "^9.28.0"
+  }
+}

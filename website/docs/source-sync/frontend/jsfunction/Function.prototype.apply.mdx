@@ -16,34 +16,34 @@ title: Function.prototype.apply
  * @returns {unknown}
  */
 Function.prototype.myApply = function (thisArg, argsArray) {
-	if (typeof this !== 'function') {
-		throw new TypeError('myApply must be called on a function');
-	}
+  if (typeof this !== 'function') {
+    throw new TypeError('myApply must be called on a function');
+  }
 
-	const context =
+  const context =
 		thisArg === null || thisArg === undefined ? globalThis : Object(thisArg);
 
-	const tempKey = Symbol('myApply');
-	context[tempKey] = this;
+  const tempKey = Symbol('myApply');
+  context[tempKey] = this;
 
-	try {
-		if (argsArray === null || argsArray === undefined) {
-			return context[tempKey]();
-		}
+  try {
+    if (argsArray === null || argsArray === undefined) {
+      return context[tempKey]();
+    }
 
-		// Support array-like input, not only real arrays.
-		const listObject = Object(argsArray);
-		const length = Number(listObject.length) >>> 0;
-		const args = new Array(length);
+    // Support array-like input, not only real arrays.
+    const listObject = Object(argsArray);
+    const length = Number(listObject.length) >>> 0;
+    const args = new Array(length);
 
-		for (let i = 0; i < length; i++) {
-			args[i] = listObject[i];
-		}
+    for (let i = 0; i < length; i++) {
+      args[i] = listObject[i];
+    }
 
-		return context[tempKey](...args);
-	} finally {
-		delete context[tempKey];
-	}
+    return context[tempKey](...args);
+  } finally {
+    delete context[tempKey];
+  }
 };
 
 /**

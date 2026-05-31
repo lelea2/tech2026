@@ -29,7 +29,7 @@ function pascalLines(n) {
   function getPascalLine(prevLine) {
     const res = [1]; //start array with 1
     for (let i = 0; i < prevLine.length - 1; i++) {
-        es.push(prevLine[i] + prevLine[i+1]);
+      es.push(prevLine[i] + prevLine[i+1]);
     }
     res.push(1); //always end array with 1
     return res;

@@ -4,27 +4,27 @@
  * @returns {string}
  */
 export default function listFormat(items, options = {}) {
-	const { sorted = false, length, unique = false } = options;
+  const { sorted = false, length, unique = false } = options;
 
-	let values = items.filter((item) => item !== '');
+  let values = items.filter((item) => item !== '');
 
-	if (unique) {
-		values = [...new Set(values)];
-	}
+  if (unique) {
+    values = [...new Set(values)];
+  }
 
-	if (sorted) {
-		values = [...values].sort((a, b) => a.localeCompare(b));
-	}
+  if (sorted) {
+    values = [...values].sort((a, b) => a.localeCompare(b));
+  }
 
-	const hasValidLength = Number.isInteger(length) && length > 0;
-	if (hasValidLength && values.length > length) {
-		const visible = values.slice(0, length);
-		const remaining = values.length - length;
-		const suffix = `${remaining} ${remaining === 1 ? 'other' : 'others'}`;
-		return joinWithAnd([...visible, suffix]);
-	}
+  const hasValidLength = Number.isInteger(length) && length > 0;
+  if (hasValidLength && values.length > length) {
+    const visible = values.slice(0, length);
+    const remaining = values.length - length;
+    const suffix = `${remaining} ${remaining === 1 ? 'other' : 'others'}`;
+    return joinWithAnd([...visible, suffix]);
+  }
 
-	return joinWithAnd(values);
+  return joinWithAnd(values);
 }
 
 /**
@@ -32,17 +32,17 @@ export default function listFormat(items, options = {}) {
  * @returns {string}
  */
 function joinWithAnd(values) {
-	if (values.length === 0) {
-		return '';
-	}
+  if (values.length === 0) {
+    return '';
+  }
 
-	if (values.length === 1) {
-		return values[0];
-	}
+  if (values.length === 1) {
+    return values[0];
+  }
 
-	if (values.length === 2) {
-		return `${values[0]} and ${values[1]}`;
-	}
+  if (values.length === 2) {
+    return `${values[0]} and ${values[1]}`;
+  }
 
-	return `${values.slice(0, -1).join(', ')} and ${values[values.length - 1]}`;
+  return `${values.slice(0, -1).join(', ')} and ${values[values.length - 1]}`;
 }

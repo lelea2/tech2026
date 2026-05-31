@@ -101,6 +101,13 @@ This creates/updates:
 
 - website/docs/algorithm
 
+Algorithm post-sync verification (required when adding files/folders):
+
+- If you add `algorithm/stack/Queue.js`, verify `website/docs/algorithm/stack/_index.mdx` includes `Queue`.
+- If you add a new folder such as `algorithm/linkedlist/`, verify `website/docs/algorithm/linkedlist/_index.mdx` exists.
+- If missing, rerun sync with `--docs-subdir algorithm --format "algorithm=."`.
+- Validate source path spelling (`linkedlist` vs `linkedilist`) before rerunning.
+
 Algorithm root-file entry rule (important):
 
 - Use `algorithm=.` (not `algorithm=algorithm`) so files directly under `algorithm/` are generated directly under `website/docs/algorithm/`.
@@ -160,10 +167,12 @@ Mapping format rules:
   - Risky: mapping only selected leaves (new siblings will be missed)
 - Re-run sync; post-hook should generate `/_index.mdx` pages for new folders automatically.
 - If files were moved across folders, run sync again with the same stable parent mapping; stale old pages should be removed.
+- Confirm the source folder name is spelled correctly; a typo in source path/folder name will prevent expected nav entries.
 - Verify generated path exists under docs, for example:
   - `website/docs/algorithm/mostCommonElement.mdx`
   - `website/docs/algorithm/countIslandOnGrid.mdx`
   - `website/docs/algorithm/two-pointers/_index.mdx`
+  - `website/docs/algorithm/linkedlist/_index.mdx`
   - `website/docs/frontend/jsfunction/spreadSheet/_index.mdx`
   - `website/docs/frontend/jsfunction/textSearch/_index.mdx`
   - `website/docs/frontend/jsfunction/deepClone/_index.mdx`

@@ -5,11 +5,11 @@
  * @returns {number}
  */
 export default function functionLength(fn) {
-	if (typeof fn !== 'function') {
-		throw new TypeError('Expected a function');
-	}
+  if (typeof fn !== 'function') {
+    throw new TypeError('Expected a function');
+  }
 
-	return fn.length;
+  return fn.length;
 }
 
 // Examples:

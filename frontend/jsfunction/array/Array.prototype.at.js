@@ -4,27 +4,27 @@
  * @returns {T | undefined}
  */
 Array.prototype.myAt = function (index) {
-	const length = this.length >>> 0;
+  const length = this.length >>> 0;
 
-	// Convert index to integer (truncate toward zero), similar to ToIntegerOrInfinity.
-	const numericIndex = Number(index);
-	let integerIndex;
+  // Convert index to integer (truncate toward zero), similar to ToIntegerOrInfinity.
+  const numericIndex = Number(index);
+  let integerIndex;
 
-	if (Number.isNaN(numericIndex) || numericIndex === 0) {
-		integerIndex = 0;
-	} else if (!Number.isFinite(numericIndex)) {
-		integerIndex = numericIndex;
-	} else {
-		integerIndex = numericIndex < 0 ? Math.ceil(numericIndex) : Math.floor(numericIndex);
-	}
+  if (Number.isNaN(numericIndex) || numericIndex === 0) {
+    integerIndex = 0;
+  } else if (!Number.isFinite(numericIndex)) {
+    integerIndex = numericIndex;
+  } else {
+    integerIndex = numericIndex < 0 ? Math.ceil(numericIndex) : Math.floor(numericIndex);
+  }
 
-	const normalizedIndex = integerIndex >= 0 ? integerIndex : length + integerIndex;
+  const normalizedIndex = integerIndex >= 0 ? integerIndex : length + integerIndex;
 
-	if (normalizedIndex < 0 || normalizedIndex >= length) {
-		return undefined;
-	}
+  if (normalizedIndex < 0 || normalizedIndex >= length) {
+    return undefined;
+  }
 
-	return this[normalizedIndex];
+  return this[normalizedIndex];
 };
 
 /**

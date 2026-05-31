@@ -5,10 +5,10 @@
  * @returns {{ css: (property: string, value?: string) => string | undefined | { css: Function } }}
  */
 export default function $(selector) {
-	const element = document.querySelector(selector);
+  const element = document.querySelector(selector);
 
-	const api = {
-		/**
+  const api = {
+    /**
 		 * Getter:
 		 *   css(property) -> computed style value
 		 * Setter:
@@ -18,24 +18,24 @@ export default function $(selector) {
 		 * @param {string} [value]
 		 * @returns {string | undefined | typeof api}
 		 */
-		css(property, value) {
-			if (value === undefined) {
-				if (!element) {
-					return undefined;
-				}
-				const computed = window.getComputedStyle(element)[property];
-				return computed === '' ? undefined : computed;
-			}
+    css(property, value) {
+      if (value === undefined) {
+        if (!element) {
+          return undefined;
+        }
+        const computed = window.getComputedStyle(element)[property];
+        return computed === '' ? undefined : computed;
+      }
 
-			if (element) {
-				element.style[property] = value;
-			}
+      if (element) {
+        element.style[property] = value;
+      }
 
-			return api;
-		},
-	};
+      return api;
+    },
+  };
 
-	return api;
+  return api;
 }
 
 /**

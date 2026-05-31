@@ -8,13 +8,13 @@
  * @returns {() => number}
  */
 export default function makeCounter(initialValue = 0) {
-	let current = initialValue;
+  let current = initialValue;
 
-	return function() {
-		const valueToReturn = current;
-		current += 1;
-		return valueToReturn;
-	};
+  return function() {
+    const valueToReturn = current;
+    current += 1;
+    return valueToReturn;
+  };
 }
 
 // Example:

@@ -5,129 +5,129 @@
  * If a cell is in a cycle, or depends on a cycle, getCell returns '#CYCLE!'.
  */
 export default class Spreadsheet {
-	constructor() {
-		// Stores raw inputs (number or formula string) by cell id.
-		this.cells = new Map();
-	}
+  constructor() {
+    // Stores raw inputs (number or formula string) by cell id.
+    this.cells = new Map();
+  }
 
-	/**
+  /**
 	 * @param {string} cellId
 	 * @param {number | string} input
 	 * @returns {void}
 	 */
-	setCell(cellId, input) {
-		this.cells.set(cellId, input);
-	}
+  setCell(cellId, input) {
+    this.cells.set(cellId, input);
+  }
 
-	/**
+  /**
 	 * @param {string} cellId
 	 * @returns {number | '#CYCLE!'}
 	 */
-	getCell(cellId) {
-		// Each read uses fresh memo/path so evaluation reflects current sheet state.
-		return this.#evaluateCell(cellId, new Map(), new Set());
-	}
+  getCell(cellId) {
+    // Each read uses fresh memo/path so evaluation reflects current sheet state.
+    return this.#evaluateCell(cellId, new Map(), new Set());
+  }
 
-	/**
+  /**
 	 * @param {string} cellId
 	 * @param {Map<string, number | '#CYCLE!'>} memo
 	 * @param {Set<string>} activePath
 	 * @returns {number | '#CYCLE!'}
 	 */
-	#evaluateCell(cellId, memo, activePath) {
-		// Reuse already-computed result in this evaluation pass.
-		if (memo.has(cellId)) {
-			return memo.get(cellId);
-		}
+  #evaluateCell(cellId, memo, activePath) {
+    // Reuse already-computed result in this evaluation pass.
+    if (memo.has(cellId)) {
+      return memo.get(cellId);
+    }
 
-		// Visiting the same cell again on current DFS path means a cycle.
-		if (activePath.has(cellId)) {
-			memo.set(cellId, '#CYCLE!');
-			return '#CYCLE!';
-		}
+    // Visiting the same cell again on current DFS path means a cycle.
+    if (activePath.has(cellId)) {
+      memo.set(cellId, '#CYCLE!');
+      return '#CYCLE!';
+    }
 
-		// Mark cell as currently being evaluated.
-		activePath.add(cellId);
+    // Mark cell as currently being evaluated.
+    activePath.add(cellId);
 
-		const raw = this.cells.get(cellId);
+    const raw = this.cells.get(cellId);
 
-		if (raw === undefined) {
-			// Unset cells behave as 0.
-			memo.set(cellId, 0);
-			activePath.delete(cellId);
-			return 0;
-		}
+    if (raw === undefined) {
+      // Unset cells behave as 0.
+      memo.set(cellId, 0);
+      activePath.delete(cellId);
+      return 0;
+    }
 
-		if (typeof raw === 'number') {
-			memo.set(cellId, raw);
-			activePath.delete(cellId);
-			return raw;
-		}
+    if (typeof raw === 'number') {
+      memo.set(cellId, raw);
+      activePath.delete(cellId);
+      return raw;
+    }
 
-		if (!raw.startsWith('=')) {
-			// Fallback for non-formula strings; question guarantees valid inputs.
-			const parsed = Number(raw);
-			const value = Number.isNaN(parsed) ? 0 : parsed;
-			memo.set(cellId, value);
-			activePath.delete(cellId);
-			return value;
-		}
+    if (!raw.startsWith('=')) {
+      // Fallback for non-formula strings; question guarantees valid inputs.
+      const parsed = Number(raw);
+      const value = Number.isNaN(parsed) ? 0 : parsed;
+      memo.set(cellId, value);
+      activePath.delete(cellId);
+      return value;
+    }
 
-		// Tokenize formula and evaluate strictly left-to-right.
-		const expression = raw.slice(1).replace(/\s+/g, '');
-		const tokens = expression.match(/[A-Z]+\d+|\d+(?:\.\d+)?|[+\-*/]/g) || [];
+    // Tokenize formula and evaluate strictly left-to-right.
+    const expression = raw.slice(1).replace(/\s+/g, '');
+    const tokens = expression.match(/[A-Z]+\d+|\d+(?:\.\d+)?|[+\-*/]/g) || [];
 
-		let result = this.#resolveOperand(tokens[0], memo, activePath);
+    let result = this.#resolveOperand(tokens[0], memo, activePath);
 
-		if (result === '#CYCLE!') {
-			// Any cycle dependency makes the current cell a cycle result too.
-			memo.set(cellId, '#CYCLE!');
-			activePath.delete(cellId);
-			return '#CYCLE!';
-		}
+    if (result === '#CYCLE!') {
+      // Any cycle dependency makes the current cell a cycle result too.
+      memo.set(cellId, '#CYCLE!');
+      activePath.delete(cellId);
+      return '#CYCLE!';
+    }
 
-		for (let i = 1; i < tokens.length; i += 2) {
-			const operator = tokens[i];
-			const rightValue = this.#resolveOperand(tokens[i + 1], memo, activePath);
+    for (let i = 1; i < tokens.length; i += 2) {
+      const operator = tokens[i];
+      const rightValue = this.#resolveOperand(tokens[i + 1], memo, activePath);
 
-			if (rightValue === '#CYCLE!') {
-				// Propagate cycle through dependent formulas.
-				memo.set(cellId, '#CYCLE!');
-				activePath.delete(cellId);
-				return '#CYCLE!';
-			}
+      if (rightValue === '#CYCLE!') {
+        // Propagate cycle through dependent formulas.
+        memo.set(cellId, '#CYCLE!');
+        activePath.delete(cellId);
+        return '#CYCLE!';
+      }
 
-			if (operator === '+') {
-				result += rightValue;
-			} else if (operator === '-') {
-				result -= rightValue;
-			} else if (operator === '*') {
-				result *= rightValue;
-			} else {
-				result /= rightValue;
-			}
-		}
+      if (operator === '+') {
+        result += rightValue;
+      } else if (operator === '-') {
+        result -= rightValue;
+      } else if (operator === '*') {
+        result *= rightValue;
+      } else {
+        result /= rightValue;
+      }
+    }
 
-		memo.set(cellId, result);
-		// Done evaluating this branch.
-		activePath.delete(cellId);
-		return result;
-	}
+    memo.set(cellId, result);
+    // Done evaluating this branch.
+    activePath.delete(cellId);
+    return result;
+  }
 
-	/**
+  /**
 	 * @param {string} token
 	 * @param {Map<string, number | '#CYCLE!'>} memo
 	 * @param {Set<string>} activePath
 	 * @returns {number | '#CYCLE!'}
 	 */
-	#resolveOperand(token, memo, activePath) {
-		// Operands are either numeric literals or cell references.
-		if (/^\d+(?:\.\d+)?$/.test(token)) {
-			return Number(token);
-		}
+  #resolveOperand(token, memo, activePath) {
+    // Operands are either numeric literals or cell references.
+    if (/^\d+(?:\.\d+)?$/.test(token)) {
+      return Number(token);
+    }
 
-		return this.#evaluateCell(token, memo, activePath);
-	}
+    return this.#evaluateCell(token, memo, activePath);
+  }
 }
 
 /**

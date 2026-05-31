@@ -3,5 +3,5 @@
  * @returns {number}
  */
 export default function numberOfArguments(...args) {
-	return args.length;
+  return args.length;
 }

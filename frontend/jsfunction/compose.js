@@ -9,12 +9,12 @@
  * @returns {(input: unknown) => unknown}
  */
 export default function compose(...functions) {
-	if (functions.length === 0) {
-		return (input) => input;
-	}
+  if (functions.length === 0) {
+    return (input) => input;
+  }
 
-	return (input) =>
-		functions.reduceRight((accumulator, fn) => fn(accumulator), input);
+  return (input) =>
+    functions.reduceRight((accumulator, fn) => fn(accumulator), input);
 }
 
 /**

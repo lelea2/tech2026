@@ -8,75 +8,75 @@
  * - delete({ where }) using exact top-level equality
  */
 export default class MiniORM {
-	/**
+  /**
 	 * @param {Record<string, Array<Record<string, unknown>>>} data
 	 */
-	constructor(data) {
-		/** @type {Record<string, Array<Record<string, unknown>>>} */
-		this._store = {};
+  constructor(data) {
+    /** @type {Record<string, Array<Record<string, unknown>>>} */
+    this._store = {};
 
-		for (const [modelName, records] of Object.entries(data || {})) {
-			// Clone initial rows to isolate internal state from outside mutations.
-			this._store[modelName] = records.map((record) => ({ ...record }));
-			this[modelName] = this._createDelegate(modelName);
-		}
-	}
+    for (const [modelName, records] of Object.entries(data || {})) {
+      // Clone initial rows to isolate internal state from outside mutations.
+      this._store[modelName] = records.map((record) => ({ ...record }));
+      this[modelName] = this._createDelegate(modelName);
+    }
+  }
 
-	/**
+  /**
 	 * @param {string} modelName
 	 */
-	_createDelegate(modelName) {
-		return {
-			findMany: (args = {}) => {
-				const table = this._store[modelName];
-				const where = args.where;
-				const orderBy = args.orderBy;
+  _createDelegate(modelName) {
+    return {
+      findMany: (args = {}) => {
+        const table = this._store[modelName];
+        const where = args.where;
+        const orderBy = args.orderBy;
 
-				let results = table;
+        let results = table;
 
-				if (where) {
-					results = results.filter((record) => matchesWhereEnhanced(record, where));
-				}
+        if (where) {
+          results = results.filter((record) => matchesWhereEnhanced(record, where));
+        }
 
-				if (orderBy) {
-					const [field, direction] = Object.entries(orderBy)[0];
-					const sortFactor = direction === 'asc' ? 1 : -1;
+        if (orderBy) {
+          const [field, direction] = Object.entries(orderBy)[0];
+          const sortFactor = direction === 'asc' ? 1 : -1;
 
-					// Sort after filtering. Clone first so storage order is not mutated.
-					results = [...results].sort((a, b) => {
-						if (a[field] === b[field]) {
-							return 0;
-						}
-						return a[field] < b[field] ? -1 * sortFactor : 1 * sortFactor;
-					});
-				}
+          // Sort after filtering. Clone first so storage order is not mutated.
+          results = [...results].sort((a, b) => {
+            if (a[field] === b[field]) {
+              return 0;
+            }
+            return a[field] < b[field] ? -1 * sortFactor : 1 * sortFactor;
+          });
+        }
 
-				return results.map((record) => ({ ...record }));
-			},
+        return results.map((record) => ({ ...record }));
+      },
 
-			create: ({ data }) => {
-				const table = this._store[modelName];
-				const created = { ...data };
-				table.push(created);
-				return { ...created };
-			},
+      create: ({ data }) => {
+        const table = this._store[modelName];
+        const created = { ...data };
+        table.push(created);
+        return { ...created };
+      },
 
-			update: ({ where, data }) => {
-				const table = this._store[modelName];
-				const index = table.findIndex((record) => matchesWhereExact(record, where));
-				const updated = { ...table[index], ...data };
-				table[index] = updated;
-				return { ...updated };
-			},
+      update: ({ where, data }) => {
+        const table = this._store[modelName];
+        const index = table.findIndex((record) => matchesWhereExact(record, where));
+        const updated = { ...table[index], ...data };
+        table[index] = updated;
+        return { ...updated };
+      },
 
-			delete: ({ where }) => {
-				const table = this._store[modelName];
-				const index = table.findIndex((record) => matchesWhereExact(record, where));
-				const [deleted] = table.splice(index, 1);
-				return { ...deleted };
-			},
-		};
-	}
+      delete: ({ where }) => {
+        const table = this._store[modelName];
+        const index = table.findIndex((record) => matchesWhereExact(record, where));
+        const [deleted] = table.splice(index, 1);
+        return { ...deleted };
+      },
+    };
+  }
 }
 
 /**
@@ -87,13 +87,13 @@ export default class MiniORM {
  * @returns {boolean}
  */
 function matchesWhereExact(record, where) {
-	for (const [key, value] of Object.entries(where)) {
-		if (record[key] !== value) {
-			return false;
-		}
-	}
+  for (const [key, value] of Object.entries(where)) {
+    if (record[key] !== value) {
+      return false;
+    }
+  }
 
-	return true;
+  return true;
 }
 
 /**
@@ -113,54 +113,54 @@ function matchesWhereExact(record, where) {
  * @returns {boolean}
  */
 function matchesWhereEnhanced(record, where) {
-	for (const [field, condition] of Object.entries(where)) {
-		const fieldValue = record[field];
+  for (const [field, condition] of Object.entries(where)) {
+    const fieldValue = record[field];
 
-		if (!isOperatorObject(condition)) {
-			if (fieldValue !== condition) {
-				return false;
-			}
-			continue;
-		}
+    if (!isOperatorObject(condition)) {
+      if (fieldValue !== condition) {
+        return false;
+      }
+      continue;
+    }
 
-		if (Object.prototype.hasOwnProperty.call(condition, 'in')) {
-			if (!condition.in.includes(fieldValue)) {
-				return false;
-			}
-		}
+    if (Object.prototype.hasOwnProperty.call(condition, 'in')) {
+      if (!condition.in.includes(fieldValue)) {
+        return false;
+      }
+    }
 
-		if (Object.prototype.hasOwnProperty.call(condition, 'gt')) {
-			if (!(fieldValue > condition.gt)) {
-				return false;
-			}
-		}
+    if (Object.prototype.hasOwnProperty.call(condition, 'gt')) {
+      if (!(fieldValue > condition.gt)) {
+        return false;
+      }
+    }
 
-		if (Object.prototype.hasOwnProperty.call(condition, 'gte')) {
-			if (!(fieldValue >= condition.gte)) {
-				return false;
-			}
-		}
+    if (Object.prototype.hasOwnProperty.call(condition, 'gte')) {
+      if (!(fieldValue >= condition.gte)) {
+        return false;
+      }
+    }
 
-		if (Object.prototype.hasOwnProperty.call(condition, 'lt')) {
-			if (!(fieldValue < condition.lt)) {
-				return false;
-			}
-		}
+    if (Object.prototype.hasOwnProperty.call(condition, 'lt')) {
+      if (!(fieldValue < condition.lt)) {
+        return false;
+      }
+    }
 
-		if (Object.prototype.hasOwnProperty.call(condition, 'lte')) {
-			if (!(fieldValue <= condition.lte)) {
-				return false;
-			}
-		}
+    if (Object.prototype.hasOwnProperty.call(condition, 'lte')) {
+      if (!(fieldValue <= condition.lte)) {
+        return false;
+      }
+    }
 
-		if (Object.prototype.hasOwnProperty.call(condition, 'contains')) {
-			if (typeof fieldValue !== 'string' || !fieldValue.includes(condition.contains)) {
-				return false;
-			}
-		}
-	}
+    if (Object.prototype.hasOwnProperty.call(condition, 'contains')) {
+      if (typeof fieldValue !== 'string' || !fieldValue.includes(condition.contains)) {
+        return false;
+      }
+    }
+  }
 
-	return true;
+  return true;
 }
 
 /**
@@ -175,18 +175,18 @@ function matchesWhereEnhanced(record, where) {
  * }}
  */
 function isOperatorObject(value) {
-	if (value === null || typeof value !== 'object' || Array.isArray(value)) {
-		return false;
-	}
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
 
-	const operatorKeys = new Set(['in', 'gt', 'gte', 'lt', 'lte', 'contains']);
-	const keys = Object.keys(value);
+  const operatorKeys = new Set(['in', 'gt', 'gte', 'lt', 'lte', 'contains']);
+  const keys = Object.keys(value);
 
-	if (keys.length === 0) {
-		return false;
-	}
+  if (keys.length === 0) {
+    return false;
+  }
 
-	return keys.some((key) => operatorKeys.has(key));
+  return keys.some((key) => operatorKeys.has(key));
 }
 
 /**

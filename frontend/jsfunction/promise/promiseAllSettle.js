@@ -11,31 +11,31 @@
  * @return {Promise<Array<{status: 'fulfilled', value: unknown} | {status: 'rejected', reason: unknown}>>}
  */
 export default function promiseAllSettled(iterable) {
-	if (iterable.length === 0) {
-		return Promise.resolve([]);
-	}
+  if (iterable.length === 0) {
+    return Promise.resolve([]);
+  }
 
-	return new Promise((resolve) => {
-		const outcomes = new Array(iterable.length);
-		let settledCount = 0;
+  return new Promise((resolve) => {
+    const outcomes = new Array(iterable.length);
+    let settledCount = 0;
 
-		iterable.forEach((item, index) => {
-			Promise.resolve(item)
-				.then((value) => {
-					outcomes[index] = { status: 'fulfilled', value };
-				})
-				.catch((reason) => {
-					outcomes[index] = { status: 'rejected', reason };
-				})
-				.finally(() => {
-					settledCount++;
+    iterable.forEach((item, index) => {
+      Promise.resolve(item)
+        .then((value) => {
+          outcomes[index] = { status: 'fulfilled', value };
+        })
+        .catch((reason) => {
+          outcomes[index] = { status: 'rejected', reason };
+        })
+        .finally(() => {
+          settledCount++;
 
-					if (settledCount === iterable.length) {
-						resolve(outcomes);
-					}
-				});
-		});
-	});
+          if (settledCount === iterable.length) {
+            resolve(outcomes);
+          }
+        });
+    });
+  });
 }
 
 /**

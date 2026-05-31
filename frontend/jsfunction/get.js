@@ -29,27 +29,27 @@
  * @returns {*}
  */
 export default function get(object, path, defaultValue) {
-	const hasDefaultValue = arguments.length >= 3;
-	const keys = Array.isArray(path) ? path : String(path).split('.');
+  const hasDefaultValue = arguments.length >= 3;
+  const keys = Array.isArray(path) ? path : String(path).split('.');
 
-	let current = object;
+  let current = object;
 
-	for (const key of keys) {
-		if (current == null) {
-			return hasDefaultValue ? defaultValue : undefined;
-		}
+  for (const key of keys) {
+    if (current == null) {
+      return hasDefaultValue ? defaultValue : undefined;
+    }
 
-		const currentType = typeof current;
-		if (currentType !== 'object' && currentType !== 'function') {
-			return hasDefaultValue ? defaultValue : undefined;
-		}
+    const currentType = typeof current;
+    if (currentType !== 'object' && currentType !== 'function') {
+      return hasDefaultValue ? defaultValue : undefined;
+    }
 
-		current = current[key];
-	}
+    current = current[key];
+  }
 
-	if (current === undefined) {
-		return hasDefaultValue ? defaultValue : undefined;
-	}
+  if (current === undefined) {
+    return hasDefaultValue ? defaultValue : undefined;
+  }
 
-	return current;
+  return current;
 }

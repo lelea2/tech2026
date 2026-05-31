@@ -13,8 +13,8 @@
  * @returns {() => void}
  */
 export default function setCancellableTimeout(callback, delay, ...args) {
-	const timer = setTimeout(callback, delay, ...args);
-	return () => clearTimeout(timer);
+  const timer = setTimeout(callback, delay, ...args);
+  return () => clearTimeout(timer);
 }
 
 // Example:

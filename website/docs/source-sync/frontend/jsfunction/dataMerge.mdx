@@ -18,35 +18,35 @@ title: dataMerge
  * @returns {Array<{user: number, duration: number, equipment: Array<string>}>>}
  */
 export default function mergeData(sessions) {
-	const mergedByUser = new Map();
+  const mergedByUser = new Map();
 
-	for (let i = 0; i < sessions.length; i++) {
-		const session = sessions[i];
-		const existing = mergedByUser.get(session.user);
+  for (let i = 0; i < sessions.length; i++) {
+    const session = sessions[i];
+    const existing = mergedByUser.get(session.user);
 
-		if (!existing) {
-			mergedByUser.set(session.user, {
-				user: session.user,
-				duration: session.duration,
-				equipmentSet: new Set(session.equipment),
-				firstIndex: i,
-			});
-			continue;
-		}
+    if (!existing) {
+      mergedByUser.set(session.user, {
+        user: session.user,
+        duration: session.duration,
+        equipmentSet: new Set(session.equipment),
+        firstIndex: i,
+      });
+      continue;
+    }
 
-		existing.duration += session.duration;
-		for (const item of session.equipment) {
-			existing.equipmentSet.add(item);
-		}
-	}
+    existing.duration += session.duration;
+    for (const item of session.equipment) {
+      existing.equipmentSet.add(item);
+    }
+  }
 
-	return Array.from(mergedByUser.values())
-		.sort((a, b) => a.firstIndex - b.firstIndex)
-		.map((row) => ({
-			user: row.user,
-			duration: row.duration,
-			equipment: Array.from(row.equipmentSet).sort(),
-		}));
+  return Array.from(mergedByUser.values())
+    .sort((a, b) => a.firstIndex - b.firstIndex)
+    .map((row) => ({
+      user: row.user,
+      duration: row.duration,
+      equipment: Array.from(row.equipmentSet).sort(),
+    }));
 }
 
 // Example:

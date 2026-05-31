@@ -11,6 +11,6 @@
 */
 
 export default function setCancellableInteral(callback, delay, ...args) {
-	const timer = setInterval(callback, delay, ...args);
-	return () => clearInterval(timer);
+  const timer = setInterval(callback, delay, ...args);
+  return () => clearInterval(timer);
 };

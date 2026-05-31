@@ -24,26 +24,26 @@
  * @returns {(context: object) => Promise<void>}
  */
 export default function middlewares(...fns) {
-	return function composed(context) {
-		let index = -1;
+  return function composed(context) {
+    let index = -1;
 
-		function dispatch(i) {
-			if (i <= index) {
-				return Promise.reject(new Error('next() called multiple times'));
-			}
+    function dispatch(i) {
+      if (i <= index) {
+        return Promise.reject(new Error('next() called multiple times'));
+      }
 
-			index = i;
-			const fn = fns[i];
+      index = i;
+      const fn = fns[i];
 
-			if (!fn) {
-				return Promise.resolve();
-			}
+      if (!fn) {
+        return Promise.resolve();
+      }
 
-			return Promise.resolve(fn(context, () => dispatch(i + 1)));
-		}
+      return Promise.resolve(fn(context, () => dispatch(i + 1)));
+    }
 
-		return dispatch(0);
-	};
+    return dispatch(0);
+  };
 }
 
 // Example usage:

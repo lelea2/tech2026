@@ -3,13 +3,13 @@
  * @returns {boolean}
  */
 function isPlainObject(value) {
-	// Accept only plain object literals (or objects with null prototype).
-	if (value === null || typeof value !== 'object' || Array.isArray(value)) {
-		return false;
-	}
+  // Accept only plain object literals (or objects with null prototype).
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
 
-	const proto = Object.getPrototypeOf(value);
-	return proto === Object.prototype || proto === null;
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
 }
 
 /**
@@ -18,29 +18,29 @@ function isPlainObject(value) {
  * @returns {Promise<unknown>}
  */
 export default function promiseMerge(promiseA, promiseB) {
-	// Wait for both promises; if either rejects, Promise.all propagates that rejection reason.
-	return Promise.all([promiseA, promiseB]).then(([valueA, valueB]) => {
-		// Same-type numbers: add.
-		if (typeof valueA === 'number' && typeof valueB === 'number') {
-			return valueA + valueB;
-		}
+  // Wait for both promises; if either rejects, Promise.all propagates that rejection reason.
+  return Promise.all([promiseA, promiseB]).then(([valueA, valueB]) => {
+    // Same-type numbers: add.
+    if (typeof valueA === 'number' && typeof valueB === 'number') {
+      return valueA + valueB;
+    }
 
-		// Same-type strings: concatenate in input order.
-		if (typeof valueA === 'string' && typeof valueB === 'string') {
-			return valueA + valueB;
-		}
+    // Same-type strings: concatenate in input order.
+    if (typeof valueA === 'string' && typeof valueB === 'string') {
+      return valueA + valueB;
+    }
 
-		// Same-type arrays: combine into one array in input order.
-		if (Array.isArray(valueA) && Array.isArray(valueB)) {
-			return [...valueA, ...valueB];
-		}
+    // Same-type arrays: combine into one array in input order.
+    if (Array.isArray(valueA) && Array.isArray(valueB)) {
+      return [...valueA, ...valueB];
+    }
 
-		// Same-type plain objects: shallow-merge with valueB overriding matching keys.
-		if (isPlainObject(valueA) && isPlainObject(valueB)) {
-			return {...valueA, ...valueB};
-		}
+    // Same-type plain objects: shallow-merge with valueB overriding matching keys.
+    if (isPlainObject(valueA) && isPlainObject(valueB)) {
+      return {...valueA, ...valueB};
+    }
 
-		// Any other combination is unsupported by this utility.
-		throw 'Unsupported data types';
-	});
+    // Any other combination is unsupported by this utility.
+    throw 'Unsupported data types';
+  });
 }

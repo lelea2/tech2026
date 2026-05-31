@@ -5,29 +5,29 @@
  */
 Function.prototype.myBind = function (thisArg, ...boundArgs) {
   if (typeof this !== 'function') {
-		throw new TypeError('myBind must be called on a function');
-	}
+    throw new TypeError('myBind must be called on a function');
+  }
 
-	const targetFn = this;
+  const targetFn = this;
 
-	function boundFn(...argArray) {
-		const isCalledWithNew = this instanceof boundFn;
-		const context = isCalledWithNew
-			? this
-			: thisArg === null || thisArg === undefined
-				? globalThis
-				: Object(thisArg);
+  function boundFn(...argArray) {
+    const isCalledWithNew = this instanceof boundFn;
+    const context = isCalledWithNew
+      ? this
+      : thisArg === null || thisArg === undefined
+        ? globalThis
+        : Object(thisArg);
 
-		return Reflect.apply(targetFn, context, [...boundArgs, ...argArray]);
-	}
+    return Reflect.apply(targetFn, context, [...boundArgs, ...argArray]);
+  }
 
-	// Preserve prototype chain behavior for constructor calls: new (fn.bind(...))().
-	if (targetFn.prototype) {
-		boundFn.prototype = Object.create(targetFn.prototype);
-		boundFn.prototype.constructor = boundFn;
-	}
+  // Preserve prototype chain behavior for constructor calls: new (fn.bind(...))().
+  if (targetFn.prototype) {
+    boundFn.prototype = Object.create(targetFn.prototype);
+    boundFn.prototype.constructor = boundFn;
+  }
 
-	return boundFn;
+  return boundFn;
 };
 
 

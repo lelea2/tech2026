@@ -30,41 +30,41 @@ title: countIslandOnGrid
  * @returns {number}
  */
 export default function countIslandOnGrid(grid) {
-	const rows = grid.length;
-	if (rows === 0) {
-		return 0;
-	}
+  const rows = grid.length;
+  if (rows === 0) {
+    return 0;
+  }
 
-	const cols = grid[0].length;
-	const visited = Array.from({ length: rows }, () => Array(cols).fill(false));
-	let islands = 0;
+  const cols = grid[0].length;
+  const visited = Array.from({ length: rows }, () => Array(cols).fill(false));
+  let islands = 0;
 
-	function dfs(r, c) {
-		if (r < 0 || r >= rows || c < 0 || c >= cols) {
-			return;
-		}
+  function dfs(r, c) {
+    if (r < 0 || r >= rows || c < 0 || c >= cols) {
+      return;
+    }
 
-		if (visited[r][c] || grid[r][c] !== 1) {
-			return;
-		}
+    if (visited[r][c] || grid[r][c] !== 1) {
+      return;
+    }
 
-		visited[r][c] = true;
-		dfs(r + 1, c);
-		dfs(r - 1, c);
-		dfs(r, c + 1);
-		dfs(r, c - 1);
-	}
+    visited[r][c] = true;
+    dfs(r + 1, c);
+    dfs(r - 1, c);
+    dfs(r, c + 1);
+    dfs(r, c - 1);
+  }
 
-	for (let r = 0; r < rows; r += 1) {
-		for (let c = 0; c < cols; c += 1) {
-			if (grid[r][c] === 1 && !visited[r][c]) {
-				islands += 1;
-				dfs(r, c);
-			}
-		}
-	}
+  for (let r = 0; r < rows; r += 1) {
+    for (let c = 0; c < cols; c += 1) {
+      if (grid[r][c] === 1 && !visited[r][c]) {
+        islands += 1;
+        dfs(r, c);
+      }
+    }
+  }
 
-	return islands;
+  return islands;
 }
 
 // Example usage:

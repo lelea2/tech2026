@@ -33,15 +33,15 @@
       "docRelative": "frontend/jsfunction/Emitter/EventEmitterII.mdx"
     },
     "frontend/jsfunction/Function.prototype.apply.js": {
-      "hash": "3cda639dbf6e76f6082616b629fea342a146342609a33a63f1eb618a198e7bd8",
+      "hash": "010679bcc64e3f6ca05b5aaec215f423c5ad9afbc37aaed74f68f95f2ed0e3ec",
       "docRelative": "frontend/jsfunction/Function.prototype.apply.mdx"
     },
     "frontend/jsfunction/Function.prototype.bind.js": {
-      "hash": "f0b33b8be4a6b5a1e098c8e54cec447d745c46cc1a29d7936f1750e80672b737",
+      "hash": "2ad278d3fd6817ddd8da4e872d3425c6e0e1372d61ee37af8b5a154cf4ed58a5",
       "docRelative": "frontend/jsfunction/Function.prototype.bind.mdx"
     },
     "frontend/jsfunction/Function.prototype.call.js": {
-      "hash": "b598a55a8eb2d18b7d16ba33896af1906edead859078d277fb60490ea0c64905",
+      "hash": "704404aa3fed4951a0cefb3bd14dc36cbb3a10f72a9a348d6cc94a8b20e8ef77",
       "docRelative": "frontend/jsfunction/Function.prototype.call.mdx"
     },
     "frontend/jsfunction/UndoableDatabase/UndoableDatabase.js": {
@@ -53,7 +53,7 @@
       "docRelative": "frontend/jsfunction/UndoableDatabase/UndoableDatabaseII.mdx"
     },
     "frontend/jsfunction/array/Array.prototype.at.js": {
-      "hash": "db446548c8ed4c701c5d90718ebe0a1b4b7ba2493177e89136f04470d8ae1c3c",
+      "hash": "fbd741d810796e5bcf56fbdf27384b0030f309c900cc63ec49d005ce2799b97a",
       "docRelative": "frontend/jsfunction/array/Array.prototype.at.mdx"
     },
     "frontend/jsfunction/array/Array.prototype.concat.js": {
@@ -89,7 +89,7 @@
       "docRelative": "frontend/jsfunction/array/countBy.mdx"
     },
     "frontend/jsfunction/array/dropRightWhile.js": {
-      "hash": "3bd6e55bef82d6ca3034008c66a914a184a9f4aa44d1a106fcacadeff6d63af2",
+      "hash": "cef89ebf43ea553ea425fb8a0a2b85e2296ec6783ab3e1abe6b48e55ce890679",
       "docRelative": "frontend/jsfunction/array/dropRightWhile.mdx"
     },
     "frontend/jsfunction/array/dropWhile.js": {
@@ -161,11 +161,11 @@
       "docRelative": "frontend/jsfunction/camelCaseKey.mdx"
     },
     "frontend/jsfunction/cancellableInterval.js": {
-      "hash": "1278a2e8236b8cac2abbe7498b5f8c93f6fd6d3638fa61d41af0de6490513f57",
+      "hash": "b48ccc7e304f8a828127e0b504c564b90a73b7d47f471ab4e8cf8b09c07366a5",
       "docRelative": "frontend/jsfunction/cancellableInterval.mdx"
     },
     "frontend/jsfunction/cancellableTimeout.js": {
-      "hash": "e87974b1cdd566369b470d28f2429472f6c577734f7641d96e4cd68047072a3f",
+      "hash": "9bcad90eef84ab97259540e4a46bba602907ed0de8e2fa3201ec47d6aab31f7e",
       "docRelative": "frontend/jsfunction/cancellableTimeout.mdx"
     },
     "frontend/jsfunction/chunk.js": {
@@ -173,15 +173,15 @@
       "docRelative": "frontend/jsfunction/chunk.mdx"
     },
     "frontend/jsfunction/clamp.js": {
-      "hash": "666d9bfd7bb82a3e5fe523dcf8f1e0057d2948d40d1d71ea7f6d89d4adc0c905",
+      "hash": "c521e099af3aeb0e49a38365a68836f975b9a95ed6a4214f1a56af695861f08d",
       "docRelative": "frontend/jsfunction/clamp.mdx"
     },
     "frontend/jsfunction/compose.js": {
-      "hash": "1e7ccab4f5e4cb08e89523b7749de3adc953559870b90d2ad899fdaa09c801b6",
+      "hash": "a6c5cd93189d3f8e4e8b4f3b07bd8899fde2dd0869d983349a5e67e8981f1167",
       "docRelative": "frontend/jsfunction/compose.mdx"
     },
     "frontend/jsfunction/consoleLogHistory.js": {
-      "hash": "d15f81cf2c2ccda68f89070724aedad2955f3a60c72c20c4ab91f50be5d8c1bc",
+      "hash": "3d5023fed1dee9b185a65034bd0205da3cf8eb34b5a73bd3082d169a15fb6927",
       "docRelative": "frontend/jsfunction/consoleLogHistory.mdx"
     },
     "frontend/jsfunction/createResumableInterval.js": {
@@ -189,7 +189,7 @@
       "docRelative": "frontend/jsfunction/createResumableInterval.mdx"
     },
     "frontend/jsfunction/curry/curry.js": {
-      "hash": "e15ccc80a47238c0995932be85c636b4b9a23500240e03c513cb043b939a4ead",
+      "hash": "2ffaf65ee0871ecea6b0ffc94e3bc63906dce47be09c91eb81702491226c18e6",
       "docRelative": "frontend/jsfunction/curry/curry.mdx"
     },
     "frontend/jsfunction/curry/curryII.js": {
@@ -209,7 +209,7 @@
       "docRelative": "frontend/jsfunction/cyclicJSON.mdx"
     },
     "frontend/jsfunction/dataMerge.js": {
-      "hash": "1bf24e525b354a15f804cc58180a667213e4351d6895b9f7ad3d3c2fe20f9d02",
+      "hash": "a719012d8b7ff4c80c294eabf3b96bf43a1ae37ac33cd5880d16088f75d5a407",
       "docRelative": "frontend/jsfunction/dataMerge.mdx"
     },
     "frontend/jsfunction/dataSelection.js": {
@@ -229,7 +229,7 @@
       "docRelative": "frontend/jsfunction/deepClone/deepClone.mdx"
     },
     "frontend/jsfunction/deepClone/deepCloneII.js": {
-      "hash": "db4f8cb19555bb9bae885ff9f474005ce643a53a814c461fc90175b17adad6a9",
+      "hash": "691f2d5da83bec0122775c469ae8b5886a06b95d71f4f447ec6218d4957a33e5",
       "docRelative": "frontend/jsfunction/deepClone/deepCloneII.mdx"
     },
     "frontend/jsfunction/deepClone/deepEqual.js": {
@@ -253,11 +253,11 @@
       "docRelative": "frontend/jsfunction/domTreeTraverse.mdx"
     },
     "frontend/jsfunction/functionLength.js": {
-      "hash": "25411e85d0879f673e278dd1f7ef4675a040d863032602bf99e106f2c3b33611",
+      "hash": "51532fdff9507be94eaeb283f478829e623191c90906ca01f06d1f85743cb119",
       "docRelative": "frontend/jsfunction/functionLength.mdx"
     },
     "frontend/jsfunction/get.js": {
-      "hash": "53a7c0aa15fb843e95ec1fdaf4f840741c7b6f745c031f9b0cb722daef940c5c",
+      "hash": "1ea48ab8b6579f9a50ee6847c5c318322d4f5e010d85bab31ab3b122478d18a8",
       "docRelative": "frontend/jsfunction/get.mdx"
     },
     "frontend/jsfunction/getElementBy/getElementByClassName.js": {
@@ -269,11 +269,11 @@
       "docRelative": "frontend/jsfunction/getElementBy/getElementByStyles.mdx"
     },
     "frontend/jsfunction/getElementBy/getElementByTagName.js": {
-      "hash": "9a15e3956e3131eec9c1b0826c591c6d3fc648fad0a133320aa8ec20c7a809bb",
+      "hash": "e4bb0ca96ae4944f8801e00e6107e5786cfb4a6ae8c3a08e85f014b46532c0b3",
       "docRelative": "frontend/jsfunction/getElementBy/getElementByTagName.mdx"
     },
     "frontend/jsfunction/getElementBy/getElementByTagNameHiearchy.js": {
-      "hash": "e55837cf59d37c57b01cca3eff28c7b7344fc7452d2744cbd2bd429bc550e0ba",
+      "hash": "bd89e7d2b801799939c476b64075d766c0abf658f177d339076413633f2be408",
       "docRelative": "frontend/jsfunction/getElementBy/getElementByTagNameHiearchy.mdx"
     },
     "frontend/jsfunction/hooks/useArray.js": {
@@ -409,7 +409,7 @@
       "docRelative": "frontend/jsfunction/htmlModifier/classNames.mdx"
     },
     "frontend/jsfunction/htmlModifier/classNamesAdvance.js": {
-      "hash": "60a161a385ef139b81b29796f232fc088dc95984818799365d228bb484b4390e",
+      "hash": "22740a6567f50c174ad7b0c04aba132e9fd245cfa91f0796bddb5c718a7b0975",
       "docRelative": "frontend/jsfunction/htmlModifier/classNamesAdvance.mdx"
     },
     "frontend/jsfunction/htmlModifier/classVarianceAuthority.js": {
@@ -461,23 +461,23 @@
       "docRelative": "frontend/jsfunction/jQuery-manipulator/jQuery.class.mdx"
     },
     "frontend/jsfunction/jQuery-manipulator/jQuery.css.js": {
-      "hash": "ac6930b5a26c851c726d7d46aca58a3e99f03f8d6a5484f8a19184d1847b073b",
+      "hash": "25be9b114abf38982595e851b8bd95a29263f9c3311c4496429ac18e16d8f095",
       "docRelative": "frontend/jsfunction/jQuery-manipulator/jQuery.css.mdx"
     },
     "frontend/jsfunction/jsonStringify/JSON.stringify.js": {
-      "hash": "428ce409c590649fb202e43cf83c8054f68b9157efb66e92b773b18bc40de464",
+      "hash": "91598a768d962e9b9df55054592d03b972dd10a95bb4e517465377cb522be843",
       "docRelative": "frontend/jsfunction/jsonStringify/JSON.stringify.mdx"
     },
     "frontend/jsfunction/jsonStringify/JSON.stringifyII.js": {
-      "hash": "8dc4c15e16224cc490c29fbb4f756b5d221b12ad94efd0f34e64436f1e8863e4",
+      "hash": "de3253756c8778987d11bbecec78fa5e8fe4ce91a60ccaeb8e62334e76b0c378",
       "docRelative": "frontend/jsfunction/jsonStringify/JSON.stringifyII.mdx"
     },
     "frontend/jsfunction/jsonStringify/superJSON.js": {
-      "hash": "3e200badd08e753f81aab3cf3a93fa29cec8c30f08371cc1e420c713a34c8225",
+      "hash": "e95cf3a02d8d6026be1e000a67ca473ef3a3ca27d72cbcf6fca63ad6e0439d01",
       "docRelative": "frontend/jsfunction/jsonStringify/superJSON.mdx"
     },
     "frontend/jsfunction/jsonStringify/superJSONAdvance.js": {
-      "hash": "f0da253c138c093cbdfa67ddf57ae49eb7e5fd49683bc10b2940f32ad76eba39",
+      "hash": "021b8ad98ba6856992ea9d67e8cde370dd0e953692596da71de964123cd60142",
       "docRelative": "frontend/jsfunction/jsonStringify/superJSONAdvance.mdx"
     },
     "frontend/jsfunction/limits.js": {
@@ -485,7 +485,7 @@
       "docRelative": "frontend/jsfunction/limits.mdx"
     },
     "frontend/jsfunction/listFormat.js": {
-      "hash": "21a5358c25483ca4364b64a977497b28ac6bc0c314f1a5ab3f7801faa5a7fc5c",
+      "hash": "8a92b582a7d263eba96f5244241bd6dcbc5023d45898667db13f0b425529ce4f",
       "docRelative": "frontend/jsfunction/listFormat.mdx"
     },
     "frontend/jsfunction/localStorageWithExpiry.js": {
@@ -493,7 +493,7 @@
       "docRelative": "frontend/jsfunction/localStorageWithExpiry.mdx"
     },
     "frontend/jsfunction/makeCounter/makeCounter.js": {
-      "hash": "65291c5ad55c53861d413b9d6c7df94656605632904469444760a87edbbec7c7",
+      "hash": "7cd44a96d196351faa828e9189cf465d7c34ed657513cf91e8c3d61da673ea84",
       "docRelative": "frontend/jsfunction/makeCounter/makeCounter.mdx"
     },
     "frontend/jsfunction/makeCounter/makeCounterII.js": {
@@ -513,27 +513,27 @@
       "docRelative": "frontend/jsfunction/map/mapAsyncWithRateLimit.mdx"
     },
     "frontend/jsfunction/map/mapWithHistory.js": {
-      "hash": "f9d69b0bfe7b64767608033e6391a1973b567af7ffd5f24371c9325c403711e8",
+      "hash": "ec5da63b0679a06a7f08e19c7dd57545f039491acec497ae1d10f88b2975a5b4",
       "docRelative": "frontend/jsfunction/map/mapWithHistory.mdx"
     },
     "frontend/jsfunction/map/weakMap.js": {
-      "hash": "4ca6726dcb1ef14395fa83cf9bb39279f1752e0501da73d65a64683c888080d6",
+      "hash": "b6ca295625b1bc7d64950e2fbf94e52d574b048658ce1953d937435b21b45c08",
       "docRelative": "frontend/jsfunction/map/weakMap.mdx"
     },
     "frontend/jsfunction/mean.js": {
-      "hash": "17cce513111445693552314d6bb8b9843e05dd6668bd7c7564a0e761830f6498",
+      "hash": "8914beba41be40d68fb11765c36d65c97092a9885d092d103476b0f980229d52",
       "docRelative": "frontend/jsfunction/mean.mdx"
     },
     "frontend/jsfunction/memoize/memoize.js": {
-      "hash": "9fce5e526eebdab411ddb279d111a63897d7e4508f231caae5e5ad57a4b0e0cf",
+      "hash": "f0c4105e2de4fbf2e06ec6ffe31d1f0b285637533b132be69b7a7a1f1b3b0d80",
       "docRelative": "frontend/jsfunction/memoize/memoize.mdx"
     },
     "frontend/jsfunction/memoize/memoizeII.js": {
-      "hash": "707b79cf4dc904951ea0fd95fb889f4f7536daa5f892d8f430d9f99c1eaee4c8",
+      "hash": "cfbb06d3df4ec081dc3ad0830b471d54b5d9e53e536154e613d18efa03989113",
       "docRelative": "frontend/jsfunction/memoize/memoizeII.mdx"
     },
     "frontend/jsfunction/middleWares.js": {
-      "hash": "fac80201185dd2051ce2d1243bc2818fc3c10cd4c1c091bdb7b289b7347478f2",
+      "hash": "b99dd1c22c359ad8c047d62ea711c56e639ddcef17642b330ad96d61602e33b5",
       "docRelative": "frontend/jsfunction/middleWares.mdx"
     },
     "frontend/jsfunction/monthCalendar.js": {
@@ -541,11 +541,11 @@
       "docRelative": "frontend/jsfunction/monthCalendar.mdx"
     },
     "frontend/jsfunction/nodeRegistry.js": {
-      "hash": "e8e39e618d567cb5c513f7bc3145bf8b3dd4db11c01e361eafe98ad8392b34d0",
+      "hash": "40a3810b9fdc92fd63ac28dc709a6d4898d2b833fdfdbd9a5b525abbd416e93f",
       "docRelative": "frontend/jsfunction/nodeRegistry.mdx"
     },
     "frontend/jsfunction/numArguments.js": {
-      "hash": "e4d26b1226938e3ce46331c299839cd0d31330ecaa8e67dfb067c51d187e8c3b",
+      "hash": "68efc8e4e89f787d30620eb53c3c849c1f9b3ae88e91f811842959b7d269bdac",
       "docRelative": "frontend/jsfunction/numArguments.mdx"
     },
     "frontend/jsfunction/object/conformTo.js": {
@@ -569,23 +569,23 @@
       "docRelative": "frontend/jsfunction/object/unsquashObject.mdx"
     },
     "frontend/jsfunction/prismaORM/miniORM.js": {
-      "hash": "618fa65741acd95646ea158845cc07154c0f44f30606eac0612767d1cc1ba234",
+      "hash": "e09d28b77f512820a0f5e532ebeaa2b149d2540b2903c9d1b642bc510784a14f",
       "docRelative": "frontend/jsfunction/prismaORM/miniORM.mdx"
     },
     "frontend/jsfunction/prismaORM/miniORMII.js": {
-      "hash": "005176fd5b7171d5baf564bd0c78e589e79d4c6f6cb3988bfc6055dc2f8beaa4",
+      "hash": "b1f5499b012ac35273786ba2f47d208c5d959f23cb4369d9a7662a24b5497dac",
       "docRelative": "frontend/jsfunction/prismaORM/miniORMII.mdx"
     },
     "frontend/jsfunction/prismaORM/miniORMIII.js": {
-      "hash": "1ea7dafe0b24d0066fdea4e2862680c915c63a420ca12a9d26641b17a6122342",
+      "hash": "a6ab91d3975235cce3bd791d18741f8c88680bf317338c62286d932cdf5a7ad7",
       "docRelative": "frontend/jsfunction/prismaORM/miniORMIII.mdx"
     },
     "frontend/jsfunction/promise/Promise.js": {
-      "hash": "6c68c82292965c8a18c3cee15c37f9787cf5b4dd57c3e2c5eb56f98557f1e133",
+      "hash": "b0336771ff972a9608bb09932cbc83adff04dc7e1eebb49bd140ff1f51717b15",
       "docRelative": "frontend/jsfunction/promise/Promise.mdx"
     },
     "frontend/jsfunction/promise/PromiseMerge.js": {
-      "hash": "83ae09ed13cdfbd76d70e4b79d7473554acd63f81cb5032f0712bfeacb365eed",
+      "hash": "847f7d7968beaa3d75240279653b43cb4ab3a9f65c51da00b2ba4b4380bc41ab",
       "docRelative": "frontend/jsfunction/promise/PromiseMerge.mdx"
     },
     "frontend/jsfunction/promise/Promisify.js": {
@@ -593,7 +593,7 @@
       "docRelative": "frontend/jsfunction/promise/Promisify.mdx"
     },
     "frontend/jsfunction/promise/PromisifyII.js": {
-      "hash": "61c816a97d21d53648f518d539b274017f58230f081ea90febe408d31eb9c4b5",
+      "hash": "cab3619354bd6bc879bdc0da1847e0b6c5dc4feb35d2705fee44824ea0360ef0",
       "docRelative": "frontend/jsfunction/promise/PromisifyII.mdx"
     },
     "frontend/jsfunction/promise/promiseAll.js": {
@@ -601,7 +601,7 @@
       "docRelative": "frontend/jsfunction/promise/promiseAll.mdx"
     },
     "frontend/jsfunction/promise/promiseAllSettle.js": {
-      "hash": "7d23c9f4bab8c4de5e9b81d14d4f6248e3e41229a52fc24e3d78ffb1f5ccc24a",
+      "hash": "26822922a7d86d17e954b3cc971a8f5b691289e8cc17870900442f4b74c7b854",
       "docRelative": "frontend/jsfunction/promise/promiseAllSettle.mdx"
     },
     "frontend/jsfunction/promise/promiseAny.js": {
@@ -621,7 +621,7 @@
       "docRelative": "frontend/jsfunction/promise/promiseReject.mdx"
     },
     "frontend/jsfunction/promise/promiseResolve.js": {
-      "hash": "2d6aa056f4111da42b2b074f4dff7e3e8abcd118e914b2674054c8d15780b81e",
+      "hash": "56b15f03a1286c8eb91243185d6147985655d12f067240a43ef4297de4043163",
       "docRelative": "frontend/jsfunction/promise/promiseResolve.mdx"
     },
     "frontend/jsfunction/promise/promiseSerial.js": {
@@ -633,7 +633,7 @@
       "docRelative": "frontend/jsfunction/promise/promiseTimeout.mdx"
     },
     "frontend/jsfunction/promise/promiseWithResolvers.js": {
-      "hash": "e0df6becc1a9001820ed77faceba0d55fab7f05ef4d3dac47cf729ffff251d89",
+      "hash": "9de9d080ba7337023c6b67d299292b5d28f23390ba64ec763b05b9349bab8dcc",
       "docRelative": "frontend/jsfunction/promise/promiseWithResolvers.mdx"
     },
     "frontend/jsfunction/range/range.js": {
@@ -645,7 +645,7 @@
       "docRelative": "frontend/jsfunction/range/rangeRight.mdx"
     },
     "frontend/jsfunction/rateLimiter.js": {
-      "hash": "6753f24c3bb9939dd46fb087b1679ff051d3f03eba4634adc0cd27e24c7e849f",
+      "hash": "b11222980497b5ff5e5b87d30db19f683a4073b096a7f83b8bdab957ff881e66",
       "docRelative": "frontend/jsfunction/rateLimiter.mdx"
     },
     "frontend/jsfunction/schemaValidator/schemaValidator.js": {
@@ -669,19 +669,19 @@
       "docRelative": "frontend/jsfunction/size.mdx"
     },
     "frontend/jsfunction/sleep.js": {
-      "hash": "1c133a5e439f8412cf79933c4f033a4194183139204bffae9a0b1b36b1e25c5d",
+      "hash": "25a576101dedd599c9f7d75e252ddcd51fec8a960fa9d4fd1ea1368dd8086e6f",
       "docRelative": "frontend/jsfunction/sleep.mdx"
     },
     "frontend/jsfunction/spreadSheet/spreadSheetI.js": {
-      "hash": "3bfbb6866df0046cb556de4821bf25df7d6ddcb1bae7450fa959a24ffe92874b",
+      "hash": "90af703b85d78a9d23b3fee5def885a7868b733fda3926650be011d352f65906",
       "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetI.mdx"
     },
     "frontend/jsfunction/spreadSheet/spreadSheetII.js": {
-      "hash": "b8d225be0e3a64408c41f12c5670511a91505db2bd6c280accef83da3483a68b",
+      "hash": "46c9bbbac28b88047f96bbe7fdb8f8c8179cdf9d52a94b1e2a5599c8e1e1da77",
       "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetII.mdx"
     },
     "frontend/jsfunction/spreadSheet/spreadSheetIII.js": {
-      "hash": "1a2cd88fe88b8e41e748b5c50bb30374d95915960d0f9734c6bf89938b540b94",
+      "hash": "fc0b9fc9755d7bd5f5b30afce5a48d554b0d3efaa9d52c7a4fd97f7e68b84a70",
       "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetIII.mdx"
     },
     "frontend/jsfunction/styledTextRange/styledTextRange.js": {
@@ -725,11 +725,11 @@
       "docRelative": "frontend/jsfunction/testRunner/testRunnerIV_Promise.mdx"
     },
     "frontend/jsfunction/textSearch/textSearch.js": {
-      "hash": "2dec27133076b8a19af06048afdd51b0d26ff2b5f30e86c4bc89a43349a9a928",
+      "hash": "7067c0bfeda3be9e18ecf0f1daa12d51c6f02194de40f9e23a829d1c7e282eb2",
       "docRelative": "frontend/jsfunction/textSearch/textSearch.mdx"
     },
     "frontend/jsfunction/textSearch/textSearchII.js": {
-      "hash": "6fad96540773bf78e20c6934ae8b73e6ce2ed08b13bf25b7a3f7d5da32c01f6a",
+      "hash": "644c8f58351ecabed7acd3761303331db88498752a8811f8a451fca88f64e611",
       "docRelative": "frontend/jsfunction/textSearch/textSearchII.mdx"
     },
     "frontend/jsfunction/throttle.js": {
@@ -765,11 +765,11 @@
       "docRelative": "algorithm/array/duplicateArray.mdx"
     },
     "algorithm/array/kRowPascalTriangle.py": {
-      "hash": "c3594094add1189a12c514811274cc91ff579752522c1753b82f155d71b54528",
+      "hash": "407b4510e411999fd8245c034e7b0641275a147da8156d3773c9890df2cf5b06",
       "docRelative": "algorithm/array/kRowPascalTriangle.mdx"
     },
     "algorithm/array/kRowPascalTriangle.js": {
-      "hash": "c3594094add1189a12c514811274cc91ff579752522c1753b82f155d71b54528",
+      "hash": "407b4510e411999fd8245c034e7b0641275a147da8156d3773c9890df2cf5b06",
       "docRelative": "algorithm/array/kRowPascalTriangle.mdx"
     },
     "algorithm/array/maxProfit.js": {
@@ -785,7 +785,7 @@
       "docRelative": "algorithm/array/maxSubArray.mdx"
     },
     "algorithm/countIslandOnGrid.js": {
-      "hash": "5848556bbb4b81728b72c6a1830cae302d6bdd560bd4a0168a56f17ee69aa6e3",
+      "hash": "37d46421bdfc2f60272c89554a459396df05270512017a6059b52fd3aaacddcc",
       "docRelative": "algorithm/countIslandOnGrid.mdx"
     },
     "algorithm/countOnesBitInBinary.js": {
@@ -844,6 +844,14 @@
       "hash": "7de9cb63fe93154c24c46cd744a75b7c07b9f6d4ac399db434300471b23668a3",
       "docRelative": "algorithm/two-pointers/3Sum.mdx"
     },
+    "algorithm/two-pointers/checkSubArraySum.js": {
+      "hash": "beb67de9e87fe90e0ef15f005a01cdba8610b5c921616f3c876e16c9dc0b3876",
+      "docRelative": "algorithm/two-pointers/checkSubArraySum.mdx"
+    },
+    "algorithm/two-pointers/dutchFlagSorting.js": {
+      "hash": "3d9542507cd16d8a4b9fc3f1c23700acba5d68092753f2f74a1930412c3be27b",
+      "docRelative": "algorithm/two-pointers/dutchFlagSorting.mdx"
+    },
     "algorithm/two-pointers/isPalindrome.py": {
       "hash": "edb8c580c8a52a52a26f2ecbbc4be69605b204165cf3b7f59a5090d50cb82c39",
       "docRelative": "algorithm/two-pointers/isPalindrome.mdx"
@@ -859,6 +867,18 @@
     "algorithm/two-pointers/isPalindrome_Pair.js": {
       "hash": "915f1922472eaf1a5a9249769bb0293657db1ccd4318f03b4dea5eb4f7e767f7",
       "docRelative": "algorithm/two-pointers/isPalindrome_Pair.mdx"
+    },
+    "algorithm/two-pointers/minimumMoveToMakePalindrome.js": {
+      "hash": "a628c14d13608f1b33b573c628495766952943085d04c61658e5037c31b0276d",
+      "docRelative": "algorithm/two-pointers/minimumMoveToMakePalindrome.mdx"
+    },
+    "algorithm/two-pointers/removeNthLasNode.js": {
+      "hash": "b2d96f711771e16164236093439634b2f4e13575d493346f3c7e72e23973069d",
+      "docRelative": "algorithm/two-pointers/removeNthLasNode.mdx"
+    },
+    "algorithm/two-pointers/reverseWords.js": {
+      "hash": "ce8c118da5f1eaabc3207d888bf67a04c69daf71378ff24091c516a5d421ec1d",
+      "docRelative": "algorithm/two-pointers/reverseWords.mdx"
     },
     "__nav__:algorithm": {
       "hash": "c4632698bac9646c8b6e997546e79ecb096b39ddb2f608f6b4fe68b6caf8004e",
@@ -885,7 +905,7 @@
       "docRelative": "algorithm/tree/_index.mdx"
     },
     "__nav__:algorithm/two-pointers": {
-      "hash": "f058dd483415f41dffc493974a2b2425cddb8492b87c35cde073022b6a4b4ad7",
+      "hash": "ebd1b904988f3eab3bffef4bd230d6406809d033ae6efaa74bedef870e1df2ab",
       "docRelative": "algorithm/two-pointers/_index.mdx"
     },
     "__nav__:backend": {
