@@ -3,8 +3,8 @@
   "position": 4,
   "link": {
     "type": "generated-index",
-    "title": "React Interview Preparation",
-    "description": "React hooks, component patterns, performance, state management, forms, testing, and internals.",
+    "title": "React",
+    "description": "React interview preparation — hooks, patterns, state management, rendering, testing, and more.",
     "slug": "/frontend/react"
   }
 }
