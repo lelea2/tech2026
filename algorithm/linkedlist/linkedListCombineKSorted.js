@@ -1,0 +1,140 @@
+// Min Heap (Priority Queue)
+/**
+ * @param {(Node | null)[]} lists
+ * @returns Node | null
+ */
+/**
+10 -> 20 -> 30
+5 -> 15 -> 25
+2 -> 12 -> 22
+====> 2 -> 5 -> 10 -> 12 -> 15 -> 20 -> 22 -> 25 -> 30
+ */
+// Patterns Multiple sorted inputs ===> Need globally smallest element repeatedly ===> Min Hea
+// Brute force: Time: O(N log N), Space: O(N)
+// ---- Put all nodes into array
+// ---- Sort array
+// ---- Build linked list
+// Better Approach
+// Since each list is individually sorted, 
+// the smallest remaining element must always be one of the current list heads. 
+// I can place all heads into a min heap and repeatedly extract the smallest node. 
+// After removing a node, I push its next node into the heap. 
+// This guarantees that the heap always contains the smallest available candidate from each list.
+class MinHeap {
+  constructor() {
+    this.heap = [];
+  }
+
+  size() {
+    return this.heap.length;
+  }
+
+  insert(node) {
+    this.heap.push(node);
+    this.bubbleUp();
+  }
+
+  bubbleUp() {
+    let idx = this.heap.length - 1;
+
+    while (idx > 0) {
+      let parent = Math.floor((idx - 1) / 2);
+
+      if (this.heap[parent].val <= this.heap[idx].val) {
+        break;
+      }
+
+      [this.heap[parent], this.heap[idx]] =
+        [this.heap[idx], this.heap[parent]];
+
+      idx = parent;
+    }
+  }
+
+  extractMin() {
+    if (this.heap.length === 0) return null;
+
+    if (this.heap.length === 1) {
+      return this.heap.pop();
+    }
+
+    const min = this.heap[0];
+
+    this.heap[0] = this.heap.pop();
+
+    this.bubbleDown();
+
+    return min;
+  }
+
+  bubbleDown() {
+    let idx = 0;
+
+    while (true) {
+      let smallest = idx;
+
+      let left = idx * 2 + 1;
+      let right = idx * 2 + 2;
+
+      if (
+        left < this.heap.length &&
+        this.heap[left].val < this.heap[smallest].val
+      ) {
+        smallest = left;
+      }
+
+      if (
+        right < this.heap.length &&
+        this.heap[right].val < this.heap[smallest].val
+      ) {
+        smallest = right;
+      }
+
+      if (smallest === idx) break;
+
+      [this.heap[idx], this.heap[smallest]] =
+        [this.heap[smallest], this.heap[idx]];
+
+      idx = smallest;
+    }
+  }
+}
+
+export default function linkedListCombineKSorted(lists) {
+  if (!lists || lists.length === 0) {
+    return null;
+  }
+
+  const heap = new MinHeap();
+
+  /**
+   * Put the head of each list into heap.
+   */
+  for (const head of lists) {
+    if (head) {
+      heap.insert(head);
+    }
+  }
+
+  const dummy = { val: 0, next: null };
+  let tail = dummy;
+
+  /**
+   * Repeatedly take smallest node.
+   */
+  while (heap.size() > 0) {
+    const node = heap.extractMin();
+
+    tail.next = node;
+    tail = tail.next;
+
+    /**
+     * Add next node from same list.
+     */
+    if (node.next) {
+      heap.insert(node.next);
+    }
+  }
+
+  return dummy.next;
+}
