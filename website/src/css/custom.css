@@ -28,3 +28,21 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+/* Keep code in fixed-width font and avoid horizontal scrolling by wrapping long lines. */
+.theme-code-block,
+.theme-code-block pre,
+.theme-code-block code,
+pre,
+code {
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.theme-code-block,
+.theme-code-block pre,
+pre {
+  overflow-x: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}

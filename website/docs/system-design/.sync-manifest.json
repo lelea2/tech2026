@@ -1,0 +1,20 @@
+{
+  "files": {
+    "system-designs/backend/Tournament.md": {
+      "hash": "1dc5c71338c201fd7a9e219126d61349c12ce2ce8cc9ac25ddcae79826a247d2",
+      "docRelative": "backend/Tournament.mdx"
+    },
+    "system-designs/frontend/chat-app.mdx": {
+      "hash": "4ccea376f8d26aaa59ceff1df7d4c515f7a764bf0f410b4bb9ef56a91165c08f",
+      "docRelative": "frontend/chat-app.mdx"
+    },
+    "__nav__:backend": {
+      "hash": "bdb540b3ed9f014c20ec38a2e180f911a98f7ad7ecb5b9a069bf69768af653df",
+      "docRelative": "backend/_index.mdx"
+    },
+    "__nav__:frontend": {
+      "hash": "ca34ec2dd160107127b9f4b59a68941cd8dcb172767e5a662f1e26f935ab70bb",
+      "docRelative": "frontend/_index.mdx"
+    }
+  }
+}

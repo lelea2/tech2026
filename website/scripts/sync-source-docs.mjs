@@ -8,6 +8,7 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '../..');
 const defaultDocsSubdir = 'source-sync';
 const defaultFormat = 'frontend=frontend;backend=backend;algorithm=algorithm';
+const renderVersion = '4';
 
 const allowedExtensions = new Set([
   '.js',
@@ -146,9 +147,133 @@ function labelForExt(ext) {
   return (languageByExt[ext] || ext.replace('.', '') || 'Code').toUpperCase();
 }
 
+function splitFrontmatter(source) {
+  const normalized = source.replace(/\r\n/g, '\n');
+
+  if (!normalized.startsWith('---\n')) {
+    return {
+      hasFrontmatter: false,
+      frontmatter: '',
+      body: normalized,
+    };
+  }
+
+  const closing = normalized.indexOf('\n---\n', 4);
+  if (closing === -1) {
+    return {
+      hasFrontmatter: false,
+      frontmatter: '',
+      body: normalized,
+    };
+  }
+
+  const end = closing + '\n---\n'.length;
+  return {
+    hasFrontmatter: true,
+    frontmatter: normalized.slice(0, end).trimEnd(),
+    body: normalized.slice(end).replace(/^\n+/, ''),
+  };
+}
+
+function escapeMdxBracesOutsideCodeFences(markdown) {
+  const lines = markdown.split('\n');
+  let activeFence = null;
+
+  const escaped = lines.map((line) => {
+    const trimmed = line.trim();
+    const fenceMatch = trimmed.match(/^(```|~~~)/);
+
+    if (fenceMatch) {
+      const marker = fenceMatch[1];
+      if (!activeFence) {
+        activeFence = marker;
+      } else if (activeFence === marker) {
+        activeFence = null;
+      }
+      return line;
+    }
+
+    if (activeFence) {
+      return line;
+    }
+
+    return line.replace(/[{}]/g, (char) => `\\${char}`);
+  });
+
+  return escaped.join('\n');
+}
+
+function convertTaggedLinesToCodeFences(markdown) {
+  const lines = markdown.split('\n');
+  const output = [];
+  let activeFence = null;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    const fenceMatch = trimmed.match(/^(```|~~~)/);
+
+    if (fenceMatch) {
+      const marker = fenceMatch[1];
+      if (!activeFence) {
+        activeFence = marker;
+      } else if (activeFence === marker) {
+        activeFence = null;
+      }
+
+      output.push(line);
+      continue;
+    }
+
+    if (activeFence) {
+      output.push(line);
+      continue;
+    }
+
+    const taggedMatch = line.match(/^(sql|ts|http|text)\s+(.+)$/);
+    if (!taggedMatch) {
+      output.push(line);
+      continue;
+    }
+
+    const lang = taggedMatch[1].toLowerCase();
+    const content = taggedMatch[2];
+
+    output.push(`~~~${lang}`);
+    output.push(content);
+    output.push('~~~');
+  }
+
+  return output.join('\n');
+}
+
+function mdxForMarkdownSource(baseName, source) {
+  const trimmed = source.replace(/\r\n/g, '\n').trimEnd();
+  const {hasFrontmatter, frontmatter, body} = splitFrontmatter(trimmed);
+  const normalizedBody = convertTaggedLinesToCodeFences(body);
+  const escapedBody = escapeMdxBracesOutsideCodeFences(normalizedBody);
+
+  if (hasFrontmatter) {
+    if (!escapedBody) {
+      return `${frontmatter}\n`;
+    }
+    return `${frontmatter}\n\n${escapedBody}\n`;
+  }
+
+  if (!escapedBody) {
+    return `---\ntitle: ${baseName}\n---\n\n# ${baseName}\n\nContent coming soon.\n`;
+  }
+
+  return `---\ntitle: ${baseName}\n---\n\n${escapedBody}\n`;
+}
+
 function mdxForSources(baseName, variants) {
   if (variants.length === 1) {
     const [only] = variants;
+
+    if (only.language === 'markdown' || only.language === 'mdx') {
+      return mdxForMarkdownSource(baseName, only.source);
+    }
+
     return `---\ntitle: ${baseName}\n---\n\n# ${baseName}\n\n~~~${only.language}\n${only.source}\n~~~\n`;
   }
 
@@ -443,7 +568,7 @@ async function main() {
       });
 
       const docHash = hashContent(
-        variants.map((variant) => `${variant.relativePath}:${variant.sourceHash}`).join('|'),
+        `${renderVersion}|${variants.map((variant) => `${variant.relativePath}:${variant.sourceHash}`).join('|')}`,
       );
 
       for (const variant of variants) {

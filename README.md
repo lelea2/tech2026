@@ -1,4 +1,5 @@
 # tech2026
+
 Interview prep for 2026
 
 ## Docusaurus GitHub Pages
@@ -25,6 +26,7 @@ Use this skill when `frontend`, `backend`, or `algorithm` changes and you want d
 - `website/docs/frontend`
 - `website/docs/backend`
 - `website/docs/algorithm`
+- `website/docs/system-design`
 - `website/docs/source-sync` (optional catch-all)
 
 ### How To Run `sync-source-docs`
@@ -36,6 +38,7 @@ From repository root:
    - `npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"`
    - `npm run sync:source-docs -- --docs-subdir backend --format "backend=."`
    - `npm run sync:source-docs -- --docs-subdir algorithm --format "algorithm=."`
+   - `npm run sync:source-docs -- --docs-subdir system-design --format "system-designs=."`
 3. `npm run build`
 
 Optional: use catch-all output folder.

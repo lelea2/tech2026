@@ -118,6 +118,11 @@ const config = {
             label: 'ML',
           },
           {
+            to: '/docs/system-design',
+            position: 'left',
+            label: 'System Design',
+          },
+          {
             href: 'https://github.com/lelea2/tech2026',
             label: 'GitHub',
             position: 'right',

@@ -1,0 +1,1265 @@
+# Tourney Copilot: Staff-Level End-to-End System Design
+
+## Goal
+
+Build **Tourney Copilot**, an AI-assisted tournament operations platform that helps club operators create, manage, schedule, and optimize pickleball round-robin tournaments.
+
+The system should allow operators to:
+
+- Create tournaments
+- Manage player rosters
+- Generate round-robin schedules
+- Detect operational issues automatically
+- Receive AI-powered recommendations
+- Handle player dropouts and schedule changes safely
+
+---
+
+# 1. High-Level Architecture
+
+```text
+Frontend Web App
+ ├── Event Setup UI
+ ├── Player Manager
+ ├── Schedule View
+ ├── Warning Center
+ └── AI Copilot Panel
+
+                ↓ REST API
+
+Backend API
+ ├── Event Service
+ ├── Player Service
+ ├── Schedule Service
+ ├── Warning Service
+ ├── Copilot Service
+ └── Audit Service
+
+                ↓
+
+Postgres
+ ├── clubs
+ ├── events
+ ├── players
+ ├── event_players
+ ├── courts
+ ├── rounds
+ ├── matches
+ ├── match_players
+ ├── warnings
+ └── copilot_messages
+```
+
+---
+
+# 2. Architecture Philosophy
+
+This is primarily an **operational workflow system**, not an AI product.
+
+AI should help operators make decisions, but AI should never become the source of truth.
+
+Core principles:
+
+```text
+Database = Source of Truth
+Backend Services = Business Logic
+AI = Advisor
+Frontend = Workflow Layer
+```
+
+The system must guarantee:
+
+- No duplicate players
+- No duplicate matches
+- No court conflicts
+- No player double-booking
+- Safe handling of player dropouts
+- Auditable schedule changes
+
+---
+
+# 3. Service Architecture
+
+## Event Service
+
+Responsible for tournament lifecycle management.
+
+### Responsibilities
+
+- Create event
+- Update settings
+- Validate event readiness
+- Manage event status transitions
+
+### Lifecycle
+
+```text
+Draft
+  ↓
+Scheduled
+  ↓
+Active
+  ↓
+Completed
+  ↓
+Archived
+```
+
+---
+
+## Player Service
+
+Manages player registration and roster operations.
+
+### Responsibilities
+
+- Add player
+- Remove player
+- Manage waitlist
+- Handle player dropout
+- Prevent duplicate registration
+
+---
+
+## Schedule Service
+
+Responsible for generating tournament schedules.
+
+### Responsibilities
+
+- Generate round-robin schedule
+- Regenerate schedules
+- Simulate schedule modifications
+- Court assignment
+- Bye allocation
+
+### Important Principle
+
+The schedule engine should be deterministic.
+
+```text
+AI may recommend schedule changes.
+
+AI should never generate final schedules directly.
+```
+
+---
+
+## Warning Service
+
+Responsible for identifying operational issues.
+
+### Example Warnings
+
+```text
+Odd number of players
+Too few courts
+Duplicate matchup
+Court conflict
+Player scheduled twice in same round
+Uneven bye distribution
+Dropped player still assigned
+Missing scores
+```
+
+Warnings should be deterministic and testable.
+
+---
+
+## Copilot Service
+
+Provides AI-powered recommendations.
+
+### Example Questions
+
+```text
+How can I make this schedule fairer?
+
+What should I do if one player drops out?
+
+Which players have the most byes?
+
+Do I have enough courts?
+```
+
+### Tool-Based Architecture
+
+The LLM receives tournament state through tools.
+
+```text
+getEventSummary()
+getSchedule()
+getWarnings()
+analyzeFairness()
+simulateDropout()
+```
+
+The AI never queries the database directly.
+
+---
+
+# 4. Database Design
+
+## clubs
+
+```sql
+CREATE TABLE clubs (
+  id UUID PRIMARY KEY,
+  name TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL
+);
+```
+
+---
+
+## events
+
+```sql
+CREATE TABLE events (
+  id UUID PRIMARY KEY,
+  club_id UUID REFERENCES clubs(id),
+  name TEXT NOT NULL,
+  format TEXT NOT NULL,
+  status TEXT NOT NULL,
+  start_time TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL
+);
+```
+
+---
+
+## event_settings
+
+```sql
+CREATE TABLE event_settings (
+  event_id UUID PRIMARY KEY REFERENCES events(id),
+  court_count INT NOT NULL,
+  games_per_match INT NOT NULL,
+  max_players INT,
+  scoring_format TEXT
+);
+```
+
+---
+
+## players
+
+```sql
+CREATE TABLE players (
+  id UUID PRIMARY KEY,
+  club_id UUID REFERENCES clubs(id),
+  name TEXT NOT NULL,
+  email TEXT,
+  skill_level TEXT,
+  created_at TIMESTAMPTZ NOT NULL
+);
+```
+
+---
+
+## event_players
+
+```sql
+CREATE TABLE event_players (
+  id UUID PRIMARY KEY,
+  event_id UUID REFERENCES events(id),
+  player_id UUID REFERENCES players(id),
+  status TEXT NOT NULL,
+  seed INT,
+  created_at TIMESTAMPTZ NOT NULL,
+
+  UNIQUE(event_id, player_id)
+);
+```
+
+---
+
+## courts
+
+```sql
+CREATE TABLE courts (
+  id UUID PRIMARY KEY,
+  event_id UUID REFERENCES events(id),
+  name TEXT NOT NULL
+);
+```
+
+---
+
+## rounds
+
+```sql
+CREATE TABLE rounds (
+  id UUID PRIMARY KEY,
+  event_id UUID REFERENCES events(id),
+  round_number INT NOT NULL,
+
+  UNIQUE(event_id, round_number)
+);
+```
+
+---
+
+## matches
+
+```sql
+CREATE TABLE matches (
+  id UUID PRIMARY KEY,
+  event_id UUID REFERENCES events(id),
+  round_id UUID REFERENCES rounds(id),
+  court_id UUID REFERENCES courts(id),
+  scheduled_order INT NOT NULL,
+  status TEXT NOT NULL
+);
+```
+
+---
+
+## match_players
+
+```sql
+CREATE TABLE match_players (
+  id UUID PRIMARY KEY,
+  match_id UUID REFERENCES matches(id),
+  player_id UUID REFERENCES players(id),
+  side TEXT NOT NULL,
+
+  UNIQUE(match_id, player_id)
+);
+```
+
+---
+
+## warnings
+
+```sql
+CREATE TABLE warnings (
+  id UUID PRIMARY KEY,
+  event_id UUID REFERENCES events(id),
+  type TEXT NOT NULL,
+  severity TEXT NOT NULL,
+  message TEXT NOT NULL,
+  context JSONB,
+  resolved_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL
+);
+```
+
+---
+
+## copilot_messages
+
+```sql
+CREATE TABLE copilot_messages (
+  id UUID PRIMARY KEY,
+  event_id UUID REFERENCES events(id),
+  role TEXT NOT NULL,
+  content TEXT NOT NULL,
+  tool_name TEXT,
+  tool_result JSONB,
+  created_at TIMESTAMPTZ NOT NULL
+);
+```
+
+---
+
+# 5. Why SQL Instead of Document Database
+
+## SQL Strengths
+
+Tournament systems are highly relational.
+
+```text
+Event
+ ├── Players
+ ├── Courts
+ ├── Rounds
+ └── Matches
+       ├── Players
+       └── Scores
+```
+
+Common queries:
+
+- Find all matches for a player
+- Detect duplicate matchups
+- Count player byes
+- Identify court utilization
+- Analyze fairness metrics
+
+SQL excels at these operations.
+
+---
+
+## Transaction Safety
+
+Schedule generation requires atomicity.
+
+```text
+Create Rounds
+Create Matches
+Assign Courts
+Assign Players
+Generate Warnings
+```
+
+Either all succeed or all fail.
+
+```sql
+BEGIN;
+...
+COMMIT;
+```
+
+Document databases generally require additional complexity for this level of consistency.
+
+---
+
+## Future Analytics
+
+The product will eventually need:
+
+```text
+Player participation trends
+Court utilization
+Win rates
+Fairness metrics
+Tournament statistics
+```
+
+SQL is significantly better suited for analytical workloads.
+
+---
+
+## Recommended Hybrid Approach
+
+Use relational tables for operational data.
+
+Use JSONB for flexible AI metadata.
+
+```sql
+warnings.context JSONB
+copilot_messages.tool_result JSONB
+events.metadata JSONB
+```
+
+This provides both structure and flexibility.
+
+---
+
+# 6. API Design
+
+## Event APIs
+
+### Create Event
+
+```http
+POST /api/events
+```
+
+### Get Event
+
+```http
+GET /api/events/:eventId
+```
+
+### Update Event
+
+```http
+PATCH /api/events/:eventId
+```
+
+---
+
+## Player APIs
+
+### Add Player
+
+```http
+POST /api/events/:eventId/players
+```
+
+### Remove Player
+
+```http
+DELETE /api/events/:eventId/players/:playerId
+```
+
+### Update Player Status
+
+```http
+PATCH /api/events/:eventId/players/:playerId/status
+```
+
+---
+
+## Schedule APIs
+
+### Generate Schedule
+
+```http
+POST /api/events/:eventId/schedule/generate
+```
+
+### Get Schedule
+
+```http
+GET /api/events/:eventId/schedule
+```
+
+### Regenerate Schedule
+
+```http
+POST /api/events/:eventId/schedule/regenerate
+```
+
+### Simulate Dropout
+
+```http
+POST /api/events/:eventId/schedule/simulate-dropout
+```
+
+---
+
+## Warning APIs
+
+```http
+GET /api/events/:eventId/warnings
+```
+
+```http
+POST /api/events/:eventId/warnings/recalculate
+```
+
+---
+
+## Copilot APIs
+
+```http
+POST /api/events/:eventId/copilot/messages
+```
+
+```http
+GET /api/events/:eventId/copilot/messages
+```
+
+---
+
+# 7. Schedule Generation Flow
+
+```text
+User clicks Generate Schedule
+        ↓
+Load event settings
+        ↓
+Load active players
+        ↓
+Validate inputs
+        ↓
+Generate round-robin schedule
+        ↓
+Save rounds
+        ↓
+Save matches
+        ↓
+Generate warnings
+        ↓
+Return schedule
+```
+
+All steps occur inside a transaction.
+
+---
+
+# 8. Round-Robin Scheduling Algorithm
+
+## Circle Method
+
+When player count is odd:
+
+```text
+Add BYE placeholder
+```
+
+Example:
+
+```text
+P1
+P2
+P3
+P4
+P5
+BYE
+```
+
+For each round:
+
+```text
+Pair first half with second half
+Rotate players
+Assign courts
+Repeat
+```
+
+Complexity:
+
+```text
+O(n²)
+```
+
+which is acceptable for club-sized tournaments.
+
+---
+
+# 9. Warning Engine
+
+Warnings should be rule-based.
+
+```ts
+type WarningRule = {
+  type: string;
+  severity: 'info' | 'warning' | 'critical';
+  evaluate(state: TournamentState): Warning[];
+};
+```
+
+Example rules:
+
+```text
+OddPlayerCountRule
+TooFewCourtsRule
+DuplicateMatchupRule
+CourtConflictRule
+PlayerDoubleBookedRule
+ByeBalanceRule
+DropoutImpactRule
+```
+
+Benefits:
+
+- Deterministic
+- Explainable
+- Testable
+- Reliable
+
+---
+
+# 10. AI Copilot Architecture
+
+```text
+Copilot UI
+      ↓
+Copilot API
+      ↓
+LLM Orchestrator
+      ↓
+Tool Layer
+      ↓
+Event Service
+Schedule Service
+Warning Service
+```
+
+---
+
+## Example Interaction
+
+User:
+
+```text
+How can I make this schedule fairer?
+```
+
+Tool calls:
+
+```text
+getEventSummary()
+getSchedule()
+analyzeFairness()
+```
+
+Response:
+
+```text
+Player A has two byes while others have one.
+
+Recommendation:
+- Add one additional player
+- Regenerate schedule
+```
+
+---
+
+# 11. Frontend Architecture
+
+## Pages
+
+```text
+/events/:eventId
+```
+
+---
+
+## Components
+
+```text
+EventSettingsForm
+PlayerManager
+ScheduleTable
+WarningPanel
+CopilotPanel
+SuggestedActions
+```
+
+---
+
+## State Management
+
+### Server State
+
+```text
+TanStack Query
+```
+
+Used for:
+
+- Event data
+- Schedule
+- Players
+- Warnings
+
+---
+
+### Local State
+
+Used for:
+
+- Form inputs
+- Draft edits
+- Copilot prompt input
+
+---
+
+## Layout
+
+```text
+--------------------------------------------------
+Event Header
+--------------------------------------------------
+
+Left Column
+ ├── Event Settings
+ ├── Players
+ └── Warnings
+
+Right Column
+ ├── Schedule
+ └── AI Copilot
+--------------------------------------------------
+```
+
+---
+
+# 12. Reliability & Safety
+
+## Transactions
+
+Use transactions for:
+
+```text
+Schedule generation
+Schedule regeneration
+Player dropout workflows
+```
+
+---
+
+## Audit Logs
+
+```sql
+CREATE TABLE audit_logs (
+  id UUID PRIMARY KEY,
+  event_id UUID,
+  actor_id UUID,
+  action TEXT,
+  before_state JSONB,
+  after_state JSONB,
+  created_at TIMESTAMPTZ
+);
+```
+
+Track:
+
+```text
+Schedule regeneration
+Player removal
+Court changes
+AI-approved actions
+```
+
+---
+
+## AI Safety
+
+Never allow:
+
+```text
+LLM → Database
+```
+
+Always require:
+
+```text
+LLM Suggestion
+       ↓
+User Approval
+       ↓
+Backend API
+       ↓
+Database Update
+```
+
+---
+
+# 13. Observability
+
+Track business metrics.
+
+### Events
+
+```text
+event_created
+player_added
+schedule_generated
+schedule_regenerated
+warning_created
+copilot_message_sent
+copilot_action_accepted
+```
+
+---
+
+### System Metrics
+
+```text
+Schedule generation latency
+Copilot response latency
+Warning count
+Regeneration rate
+Player dropout frequency
+```
+
+---
+
+# 14. MVP Roadmap
+
+## Phase 1
+
+```text
+Create event
+Manage players
+Generate schedule
+Show warnings
+```
+
+---
+
+## Phase 2
+
+```text
+AI copilot
+Dropout simulation
+Suggested actions
+Audit logs
+```
+
+---
+
+## Phase 3
+
+```text
+Doubles support
+Manual schedule editing
+Skill balancing
+Notifications
+Live scoring
+```
+
+---
+
+# Final Recommendation
+
+Build as a **modular monolith** initially:
+
+```text
+Frontend:
+  Next.js + React
+
+Backend:
+  Node.js / NestJS
+
+Database:
+  PostgreSQL
+
+AI:
+  LLM + Tool Calling
+
+Infrastructure:
+  Docker + Kubernetes (optional initially)
+```
+
+### Core Principles
+
+```text
+Postgres is the source of truth.
+
+Scheduling is deterministic.
+
+Warnings are rule-based.
+
+AI provides recommendations only.
+
+All mutations go through audited APIs.
+```
+
+This architecture optimizes for:
+
+- Fast MVP delivery
+- Operational correctness
+- Future AI expansion
+- Maintainability
+- Scalability
+- Auditability
+
+### React round-robin example
+
+```js
+import { useMemo, useState } from "react";
+import styles from "./styles.module.css";
+
+type Player = {
+  id: string;
+  name: string;
+};
+
+type EventSettings = {
+  name: string;
+  courts: number;
+  gamesPerMatch: number;
+};
+
+type Match = {
+  id: string;
+  round: number;
+  court: number;
+  playerA: Player | null;
+  playerB: Player | null;
+};
+
+const uid = () => crypto.randomUUID();
+
+function generateRoundRobin(players: Player[], courts: number): Match[] {
+  if (players.length < 2) return [];
+
+  const list: Array<Player | null> =
+    players.length % 2 === 0 ? [...players] : [...players, null];
+
+  const rounds = list.length - 1;
+  const matchesPerRound = list.length / 2;
+  const schedule: Match[] = [];
+
+  let rotating = [...list];
+
+  for (let round = 1; round <= rounds; round++) {
+    for (let i = 0; i < matchesPerRound; i++) {
+      const playerA = rotating[i];
+      const playerB = rotating[rotating.length - 1 - i];
+
+      schedule.push({
+        id: `${round}-${i}`,
+        round,
+        court: (i % Math.max(courts, 1)) + 1,
+        playerA,
+        playerB,
+      });
+    }
+
+    rotating = [
+      rotating[0],
+      rotating[rotating.length - 1],
+      ...rotating.slice(1, rotating.length - 1),
+    ];
+  }
+
+  return schedule;
+}
+
+function getWarnings(
+  players: Player[],
+  settings: EventSettings,
+  schedule: Match[]
+): string[] {
+  const warnings: string[] = [];
+
+  if (!settings.name.trim()) {
+    warnings.push("Event name is missing.");
+  }
+
+  if (players.length < 4) {
+    warnings.push("Round robin works better with at least 4 players.");
+  }
+
+  if (players.length % 2 !== 0) {
+    warnings.push("Uneven player count: one player will receive a bye each round.");
+  }
+
+  const maxMatchesPerRound = Math.ceil(players.length / 2);
+
+  if (settings.courts < maxMatchesPerRound) {
+    warnings.push(
+      `Too few courts: ${maxMatchesPerRound} matches may be needed per round, but only ${settings.courts} court(s) available.`
+    );
+  }
+
+  const pairSet = new Set<string>();
+
+  for (const match of schedule) {
+    if (!match.playerA || !match.playerB) continue;
+
+    const pair = [match.playerA.id, match.playerB.id].sort().join("-");
+    if (pairSet.has(pair)) {
+      warnings.push(
+        `Duplicate matchup detected: ${match.playerA.name} vs ${match.playerB.name}.`
+      );
+    }
+
+    pairSet.add(pair);
+  }
+
+  return [...new Set(warnings)];
+}
+
+function getCopilotResponse(
+  question: string,
+  players: Player[],
+  settings: EventSettings,
+  warnings: string[]
+): string {
+  const lower = question.toLowerCase();
+
+  if (!question.trim()) {
+    return "Ask me about fairness, court usage, player dropouts, or schedule risks.";
+  }
+
+  if (lower.includes("fair")) {
+    return [
+      "To make this schedule fairer:",
+      players.length % 2 !== 0
+        ? "- Add one more player or create a rotating bye so no player sits too often."
+        : "- Player count is even, so no bye is needed.",
+      settings.courts < Math.ceil(players.length / 2)
+        ? "- Add more courts or split each round into time waves."
+        : "- Court count looks reasonable.",
+      "- Track rest time between matches if this becomes a longer event.",
+    ].join("\n");
+  }
+
+  if (lower.includes("drop")) {
+    return [
+      "If one player drops out:",
+      "- Remove the player from the roster.",
+      "- Regenerate the schedule.",
+      "- If player count becomes odd, expect one bye per round.",
+      "- Notify affected players whose matchups changed.",
+    ].join("\n");
+  }
+
+  if (lower.includes("warning") || lower.includes("issue")) {
+    return warnings.length
+      ? `Current issues:\n${warnings.map((w) => `- ${w}`).join("\n")}`
+      : "No major operational issues detected.";
+  }
+
+  return [
+    "Suggested ops checklist:",
+    "- Confirm player count.",
+    "- Confirm number of courts.",
+    "- Generate schedule.",
+    "- Review warnings.",
+    "- Share round assignments with players.",
+  ].join("\n");
+}
+
+export default function TourneyCopilot() {
+  const [settings, setSettings] = useState<EventSettings>({
+    name: "Saturday Pickleball Round Robin",
+    courts: 2,
+    gamesPerMatch: 1,
+  });
+
+  const [players, setPlayers] = useState<Player[]>([
+    { id: uid(), name: "Alex" },
+    { id: uid(), name: "Sam" },
+    { id: uid(), name: "Taylor" },
+    { id: uid(), name: "Jordan" },
+    { id: uid(), name: "Casey" },
+  ]);
+
+  const [playerName, setPlayerName] = useState("");
+  const [question, setQuestion] = useState("");
+  const [copilotAnswer, setCopilotAnswer] = useState("");
+
+  const schedule = useMemo(
+    () => generateRoundRobin(players, settings.courts),
+    [players, settings.courts]
+  );
+
+  const warnings = useMemo(
+    () => getWarnings(players, settings, schedule),
+    [players, settings, schedule]
+  );
+
+  const addPlayer = () => {
+    const name = playerName.trim();
+    if (!name) return;
+
+    setPlayers((prev) => [...prev, { id: uid(), name }]);
+    setPlayerName("");
+  };
+
+  const removePlayer = (id: string) => {
+    setPlayers((prev) => prev.filter((player) => player.id !== id));
+  };
+
+  const askCopilot = () => {
+    setCopilotAnswer(getCopilotResponse(question, players, settings, warnings));
+  };
+
+  const rounds = schedule.reduce<Record<number, Match[]>>((acc, match) => {
+    acc[match.round] ??= [];
+    acc[match.round].push(match);
+    return acc;
+  }, {});
+
+  return (
+    <main className={styles.page}>
+      <section className={styles.panel}>
+        <h1>Tourney Ops Copilot</h1>
+
+        <label>
+          Event name
+          <input
+            value={settings.name}
+            onChange={(e) =>
+              setSettings((prev) => ({ ...prev, name: e.target.value }))
+            }
+          />
+        </label>
+
+        <label>
+          Courts
+          <input
+            type="number"
+            min={1}
+            value={settings.courts}
+            onChange={(e) =>
+              setSettings((prev) => ({
+                ...prev,
+                courts: Number(e.target.value),
+              }))
+            }
+          />
+        </label>
+
+        <label>
+          Games per match
+          <input
+            type="number"
+            min={1}
+            value={settings.gamesPerMatch}
+            onChange={(e) =>
+              setSettings((prev) => ({
+                ...prev,
+                gamesPerMatch: Number(e.target.value),
+              }))
+            }
+          />
+        </label>
+      </section>
+
+      <section className={styles.panel}>
+        <h2>Players</h2>
+
+        <div className={styles.row}>
+          <input
+            placeholder="Player name"
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") addPlayer();
+            }}
+          />
+          <button onClick={addPlayer}>Add</button>
+        </div>
+
+        <ul>
+          {players.map((player) => (
+            <li key={player.id} className={styles.player}>
+              {player.name}
+              <button onClick={() => removePlayer(player.id)}>Remove</button>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className={styles.panel}>
+        <h2>Warnings</h2>
+
+        {warnings.length === 0 ? (
+          <p>No operational issues detected.</p>
+        ) : (
+          <ul className={styles.warningList}>
+            {warnings.map((warning) => (
+              <li key={warning}>{warning}</li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className={styles.panel}>
+        <h2>Schedule</h2>
+
+        {Object.entries(rounds).map(([round, matches]) => (
+          <div key={round} className={styles.round}>
+            <h3>Round {round}</h3>
+
+            {matches.map((match) => (
+              <div key={match.id} className={styles.match}>
+                <span>Court {match.court}</span>
+                <strong>
+                  {match.playerA?.name ?? "Bye"} vs{" "}
+                  {match.playerB?.name ?? "Bye"}
+                </strong>
+              </div>
+            ))}
+          </div>
+        ))}
+      </section>
+
+      <section className={styles.panel}>
+        <h2>AI Copilot</h2>
+
+        <textarea
+          placeholder="Ask: How can I make this schedule fairer?"
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+        />
+
+        <button onClick={askCopilot}>Ask Copilot</button>
+
+        {copilotAnswer && <pre className={styles.answer}>{copilotAnswer}</pre>}
+      </section>
+    </main>
+  );
+}
+```

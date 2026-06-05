@@ -6,7 +6,7 @@ function generateGrid(rows, cols) {
   let num = 1;
 
   for (let col = 0; col < cols; col++) {
-    if (col % 2 === 0) { // left to right, evem column
+    if (col % 2 === 0) { // left to right, even column
       // top -> bottom
       for (let row = 0; row < rows; row++) {
         grid[row][col] = num++; 
