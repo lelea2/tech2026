@@ -1,13 +1,13 @@
 ---
 name: sync-source-docs
-description: Use when frontend, backend, or algorithm source files changed and docs need to be synced into website docs automatically. Also use when a custom folder format/path mapping is provided and document paths must be generated accordingly, including frontend/jsfunction, frontend/array, backend/quizzes, backend markdown/mdx content, and separate algorithm navigation. Trigger phrases: sync docs, update documentation, refresh source docs, frontend changed, backend changed, algorithm changed, folder format mapping, jsfunction docs sync, backend quizzes sync, backend md sync, algorithm docs sync, py js compare docs.
+description: Use when frontend, backend, algorithm, or system-designs source files changed and docs need to be synced into website docs automatically. Also use when a custom folder format/path mapping is provided and document paths must be generated accordingly, including frontend/jsfunction, frontend/array, backend/quizzes, backend markdown/mdx content, system-designs markdown/mdx content, and separate algorithm navigation. Trigger phrases: sync docs, update documentation, refresh source docs, frontend changed, backend changed, algorithm changed, system design changed, folder format mapping, jsfunction docs sync, backend quizzes sync, backend md sync, algorithm docs sync, system-design docs sync, py js compare docs.
 ---
 
 # Sync Source Docs
 
 ## Purpose
 
-Keep documentation in sync when files change under frontend, backend, or algorithm-related folders outside website.
+Keep documentation in sync when files change under frontend, backend, algorithm, or system-designs folders outside website.
 
 ## Scope
 
@@ -15,9 +15,14 @@ Keep documentation in sync when files change under frontend, backend, or algorit
   - frontend
   - backend
   - algorithm
+  - system-designs
 - Ignore website as a source of truth
 - Write auto-generated docs to:
   - website/docs/source-sync
+  - website/docs/system-designs (when using `--docs-subdir system-designs`)
+- Source-of-truth rule for System Designs docs:
+  - `website/docs/system-designs/**` must come only from root `system-designs/**`
+  - Do not map `backend/**`, `frontend/**`, or other folders into `--docs-subdir system-designs`
 - Support custom source-to-doc path mapping format
 - If mapped docs folder path does not exist, create it under website/docs first
 - Folder names should map to navigation names automatically
@@ -45,6 +50,7 @@ Keep documentation in sync when files change under frontend, backend, or algorit
 - If any file under `frontend/jsfunction/**` is in scope, include `frontend/jsfunction=jsfunction`.
 - If any file under `backend/**` is in scope (including `backend/quizzes/**` and backend `.md`/`.mdx`), include `backend=.` for backend docs.
 - If any file under `algorithm/**` is in scope, include `algorithm=.` for algorithm docs.
+- If any file under `system-designs/**` is in scope, include `system-designs=.` for system design docs.
 - This guarantees new sibling folders and moved files are reflected correctly on the next sync.
 
 ### Post-hook behavior (new)
@@ -68,7 +74,7 @@ From repository root:
 
 With custom mapping format:
 
-- cd website && npm run sync:source-docs -- --format "frontend/jsfunction=frontend/jsfunction;backend/system-design=backend/system-design"
+- cd website && npm run sync:source-docs -- --format "frontend/jsfunction=frontend/jsfunction;backend=backend"
 
 Preferred pattern for ongoing maintenance (map parent folders, not only leaf folders):
 
@@ -85,7 +91,7 @@ Canonical FrontEnd sync command (includes folders like `getElementBy`, `hooks`, 
 
 - cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"
 
-Sync backend docs as a separate navigation section (includes `backend/quizzes/**`, `backend/system-design/**`, and backend root `.md`/`.mdx` files):
+Sync backend docs as a separate navigation section (includes `backend/quizzes/**` and backend root `.md`/`.mdx` files):
 
 - cd website && npm run sync:source-docs -- --docs-subdir backend --format "backend=."
 
@@ -126,6 +132,19 @@ Run FrontEnd + Algorithm sync as two commands (separate docs subdirs):
 Run Backend sync as a separate command (recommended):
 
 - cd website && npm run sync:source-docs -- --docs-subdir backend --format "backend=."
+
+Run System Design sync as a separate command (recommended):
+
+- cd website && npm run sync:source-docs -- --docs-subdir system-designs --format "system-designs=."
+
+Mandatory rule for this docs subdir:
+
+- Use only `system-designs=.` in the mapping for `--docs-subdir system-designs`.
+- Do not include additional mappings in that command.
+
+This creates/updates:
+
+- website/docs/system-designs
 
 Avoid narrow leaf-only mapping for main sync runs:
 
@@ -197,6 +216,16 @@ Mapping format rules:
 - Folder navigation pages (`_index.mdx`) are generated for backend subfolders on sync.
 - If files were moved, rerun with the same mapping so stale old paths are removed.
 
+## Troubleshooting: system-designs markdown/mdx docs missing
+
+- Use stable parent mapping for system-design docs: `--docs-subdir system-designs --format "system-designs=."`.
+- This includes:
+  - `system-designs/**/*.md`
+  - `system-designs/**/*.mdx`
+- Source system design markdown and mdx files are emitted into `website/docs/system-designs/**`.
+- Folder navigation pages (`_index.mdx`) are generated for nested folders on sync.
+- If files were moved, rerun with the same mapping so stale old paths are removed.
+
 ## Expected Output
 
 The sync command prints a summary in this format:
@@ -207,8 +236,9 @@ The sync command prints a summary in this format:
 
 ## Notes
 
-- Every synced source file is rendered as an MDX page with a code block.
-- Backend markdown sources (`.md`/`.mdx`) are also emitted into MDX output pages and included in backend folder navigation.
+- Code sources (`.js`, `.py`, etc.) are rendered as MDX pages with fenced code blocks.
+- Markdown sources (`.md`/`.mdx`) are emitted as content-native MDX pages (not wrapped as one giant code block).
+- Backend and system-design markdown/mdx sources are emitted into their docs subdirs and included in folder navigation.
 - Algorithm files are never skipped when only one language variant exists: a lone `.js` or `.py` file still becomes its own MDX page and appears in navigation.
 - If both `.py` and `.js` files share the same relative basename (for example `kRowPascalTriangle.py` + `kRowPascalTriangle.js`), they are merged into one MDX page with language tabs so readers can compare side-by-side in a single page.
 - Output filenames strip the source extension: `useBoolean.js` → `useBoolean.mdx` (never `useBoolean.js.mdx`).

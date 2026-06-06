@@ -1,0 +1,28 @@
+{
+  "files": {
+    "system-designs/backend/Tournament.mdx": {
+      "hash": "74ec41cb62387fb27cd8c9d7612c76792e569f25f24c701edc0713669d9d4746",
+      "docRelative": "backend/Tournament.mdx"
+    },
+    "system-designs/frontend/autocomplete.mdx": {
+      "hash": "bcd28d9aa956df9f98e1d244debb2e0c639002a37463904893deb92872f8bdf5",
+      "docRelative": "frontend/autocomplete.mdx"
+    },
+    "system-designs/frontend/chat-app.mdx": {
+      "hash": "114f9df881835309939e3ac88cc11f319a05355e26618f6fb69dbc38f4f30f39",
+      "docRelative": "frontend/chat-app.mdx"
+    },
+    "system-designs/frontend/theme-design.mdx": {
+      "hash": "d8d7f9d65e4361859b63815103421313a9f4ab03844b5daa339fad8fa807ec3c",
+      "docRelative": "frontend/theme-design.mdx"
+    },
+    "__nav__:backend": {
+      "hash": "bdb540b3ed9f014c20ec38a2e180f911a98f7ad7ecb5b9a069bf69768af653df",
+      "docRelative": "backend/_index.mdx"
+    },
+    "__nav__:frontend": {
+      "hash": "2b6d5d8f800565d463869d252025d044b2983ddfff5f442e4902ae86da84138d",
+      "docRelative": "frontend/_index.mdx"
+    }
+  }
+}

@@ -118,7 +118,7 @@ const config = {
             label: 'ML',
           },
           {
-            to: '/docs/system-design',
+            to: '/docs/system-designs',
             position: 'left',
             label: 'System Design',
           },
