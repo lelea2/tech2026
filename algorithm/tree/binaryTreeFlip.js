@@ -1,0 +1,27 @@
+// interface TreeNode {
+//   val: number;
+//   left: TreeNode | null;
+//   right: TreeNode | null;
+// }
+/**
+ * @param {TreeNode | null} root
+ * @return {TreeNode | null}
+ */
+export default function binaryTreeFlip(root) {
+  if (root === null) {
+    return null;
+  }
+
+  // Swap left and right children
+
+  [root.left, root.right] = [root.right, root.left];
+  // Recursively invert subtrees
+  binaryTreeFlip(root.left);
+  binaryTreeFlip(root.right);
+
+  return root;
+}
+
+// Input: root = [2,1,3]
+// Output: [2,3,1]
+// Explanation: The left and right children are swapped.
