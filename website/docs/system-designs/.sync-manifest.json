@@ -1,23 +1,31 @@
 {
   "files": {
+    "system-designs/backend/assets/ml_lifecycle_feedback_loop_chart.png": {
+      "hash": "b080d3e5fb2d1eab6830a319f1b0ce464e122d830e3fbb215d59884fbe064f1d",
+      "docRelative": "backend/assets/ml_lifecycle_feedback_loop_chart.png"
+    },
     "system-designs/backend/Tournament.mdx": {
-      "hash": "74ec41cb62387fb27cd8c9d7612c76792e569f25f24c701edc0713669d9d4746",
+      "hash": "80aa534caa8f0c51c2767ce294439c8f98bea2d40a684b047d31e8a9268e216b",
       "docRelative": "backend/Tournament.mdx"
     },
+    "system-designs/backend/model_eval_training_llm_design.mdx": {
+      "hash": "c3bf716f6941a1250d95e4c9ebb40ec6a94cb491c16aba71917828aada20e920",
+      "docRelative": "backend/model_eval_training_llm_design.mdx"
+    },
     "system-designs/frontend/autocomplete.mdx": {
-      "hash": "bcd28d9aa956df9f98e1d244debb2e0c639002a37463904893deb92872f8bdf5",
+      "hash": "411ba851cb7282284afc03684b6d5bc9f54e45bd989f782883dab594fda0f30f",
       "docRelative": "frontend/autocomplete.mdx"
     },
     "system-designs/frontend/chat-app.mdx": {
-      "hash": "114f9df881835309939e3ac88cc11f319a05355e26618f6fb69dbc38f4f30f39",
+      "hash": "19d6aa6609e77b061e05bc2138684ce47a3b36a4f403b00602f5033637dd0d85",
       "docRelative": "frontend/chat-app.mdx"
     },
     "system-designs/frontend/theme-design.mdx": {
-      "hash": "d8d7f9d65e4361859b63815103421313a9f4ab03844b5daa339fad8fa807ec3c",
+      "hash": "1c6f3e12b107433c05b71de1e4033ebcce2edc15e45dfdc87172187f1d422c4f",
       "docRelative": "frontend/theme-design.mdx"
     },
     "__nav__:backend": {
-      "hash": "bdb540b3ed9f014c20ec38a2e180f911a98f7ad7ecb5b9a069bf69768af653df",
+      "hash": "c32fc7092a72610fe66b94aaa6bc4f611689919d4499907575e0b13e6dd8a384",
       "docRelative": "backend/_index.mdx"
     },
     "__nav__:frontend": {

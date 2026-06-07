@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '../..');
 const defaultDocsSubdir = 'source-sync';
 const defaultFormat = 'frontend=frontend;backend=backend;algorithm=algorithm';
-const renderVersion = '4';
+const renderVersion = '6';
 
 const allowedExtensions = new Set([
   '.js',
@@ -30,6 +30,21 @@ const allowedExtensions = new Set([
   '.sh',
   '.yml',
   '.yaml',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.webp',
+  '.svg',
+]);
+
+const passthroughAssetExtensions = new Set([
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.webp',
+  '.svg',
 ]);
 
 const skippedDirs = new Set([
@@ -246,10 +261,15 @@ function convertTaggedLinesToCodeFences(markdown) {
   return output.join('\n');
 }
 
+function normalizeMarkdownAssetImagePaths(markdown) {
+  return markdown.replace(/(!\[[^\]]*\]\()\/assets\//g, '$1./assets/');
+}
+
 function mdxForMarkdownSource(baseName, source) {
   const trimmed = source.replace(/\r\n/g, '\n').trimEnd();
   const {hasFrontmatter, frontmatter, body} = splitFrontmatter(trimmed);
-  const normalizedBody = convertTaggedLinesToCodeFences(body);
+  const taggedBody = convertTaggedLinesToCodeFences(body);
+  const normalizedBody = normalizeMarkdownAssetImagePaths(taggedBody);
   const escapedBody = escapeMdxBracesOutsideCodeFences(normalizedBody);
 
   if (hasFrontmatter) {
@@ -336,7 +356,13 @@ async function runPostHookCreateFolderNavDocs({docsRoot, next, previous}) {
   const generatedDocRelatives = new Set(
     Object.values(next.files)
       .map((meta) => meta?.docRelative)
-      .filter((value) => value && !value.endsWith('/_index.mdx') && !value.endsWith('_index.mdx')),
+      .filter(
+        (value) =>
+          value &&
+          value.endsWith('.mdx') &&
+          !value.endsWith('/_index.mdx') &&
+          !value.endsWith('_index.mdx'),
+      ),
   );
 
   const directorySet = new Set();
@@ -528,6 +554,32 @@ async function main() {
       const relativePath = toPosix(path.relative(repoRoot, absFile));
       const relativeFromSource = toPosix(path.relative(sourceRoot, absFile));
       const sourceExt = path.extname(relativeFromSource).toLowerCase();
+
+      if (passthroughAssetExtensions.has(sourceExt)) {
+        const sourceBuffer = await fs.readFile(absFile);
+        const sourceHash = hashContent(sourceBuffer);
+        const docRelative = toPosix(path.join(folder.docDir, relativeFromSource));
+        const outFile = path.join(docsRoot, docRelative);
+
+        next.files[relativePath] = {
+          hash: sourceHash,
+          docRelative,
+        };
+
+        const unchanged =
+          (await pathExists(outFile)) && previous.files[relativePath]?.hash === sourceHash;
+
+        if (unchanged) {
+          unchangedCount += 1;
+          continue;
+        }
+
+        await fs.mkdir(path.dirname(outFile), {recursive: true});
+        await fs.writeFile(outFile, sourceBuffer);
+        writtenCount += 1;
+        continue;
+      }
+
       const language = languageByExt[sourceExt] || '';
       const source = await fs.readFile(absFile, 'utf8');
       const sourceHash = hashContent(source);

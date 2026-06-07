@@ -1,0 +1,112 @@
+export default class BinarySearchTree {
+  constructor() {
+    this.root = null;
+  }
+
+  /**
+   * Inserts a new value into the BST while maintaining BST properties.
+   * @param {*} value The value to be inserted into the BST.
+   */
+  insert(value) {
+    const newNode = { value, left: null, right: null };
+
+    if (this.root === null) {
+      this.root = newNode;
+    } else {
+      let current = this.root;
+
+      while (true) {
+        if (value < current.value) {
+          if (current.left === null) {
+            current.left = newNode;
+            break;
+          }
+          current = current.left;
+        } else {
+          if (current.right === null) {
+            current.right = newNode;
+            break;
+          }
+          current = current.right;
+        }
+      }
+    }
+  }
+
+  /**
+   * Searches for a value in the BST. Returns true if the value exists, false otherwise.
+   * @param {*} value The value to search for.
+   * @return {boolean} True if the value is found, false otherwise.
+   */
+  search(value) {
+    let current = this.root;
+
+    while (current !== null) {
+      if (value < current.value) {
+        current = current.left;
+      } else if (value > current.value) {
+        current = current.right;
+      } else {
+        return true; // Value found
+      }
+    }
+
+    return false; // Value not found  
+  }
+
+  /**
+   * Deletes a value from the BST, if it exists, while maintaining BST properties.
+   * @param {*} value The value to be deleted from the BST.
+   */
+  delete(value) {
+    let current = this.root;
+    let parent = null;
+
+    while (current !== null) {
+      if (value < current.value) {
+        parent = current;
+        current = current.left;
+      } else if (value > current.value) {
+        parent = current;
+        current = current.right;
+      } else {
+        // Value found, delete it
+        if (current.left === null && current.right === null) {
+          // Node to delete has no children
+          if (parent === null) {
+            this.root = null;
+          } else if (parent.left === current) {
+            parent.left = null;
+          } else {
+            parent.right = null;
+          }
+        } else if (current.left === null || current.right === null) {
+          // Node to delete has one child
+          const child = current.left || current.right;
+          if (parent === null) {
+            this.root = child;
+          } else if (parent.left === current) {
+            parent.left = child;
+          } else {
+            parent.right = child;
+          }
+        } else {
+          // Node to delete has two children
+          let successorParent = current;
+          let successor = current.right;
+          while (successor.left !== null) {
+            successorParent = successor;
+            successor = successor.left;
+          }
+          current.value = successor.value;
+          if (successorParent.left === successor) {
+            successorParent.left = successor.right;
+          } else {
+            successorParent.right = successor.right;
+          }
+        }
+        return; // Value deleted
+      }
+    }
+  }
+}

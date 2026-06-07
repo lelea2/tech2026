@@ -761,7 +761,7 @@
       "docRelative": "backend/quizzes/rest-vs-graphql-vs-gRPC.mdx"
     },
     "algorithm/array/arrayProductExcludingCurrent.js": {
-      "hash": "993821523dc7347783e28425c48f7f6150e883cc4939f2770b6b4dafc25625c2",
+      "hash": "639c18dd04ebb523542ac2ab2a908da8c5c1ddc8253975fdad1c57d19ad27908",
       "docRelative": "algorithm/array/arrayProductExcludingCurrent.mdx"
     },
     "algorithm/array/duplicateArray.js": {
@@ -880,6 +880,14 @@
       "hash": "febeb169c4424267b83d32241e61effa3707001ae6accf86553fb4999f599cb5",
       "docRelative": "algorithm/stringAnagram.mdx"
     },
+    "algorithm/tree/binarySearch.js": {
+      "hash": "23d7b27f037cac5f17fc95ca87565d427da0fd71be5168f4b112765bd7b9abb0",
+      "docRelative": "algorithm/tree/binarySearch.mdx"
+    },
+    "algorithm/tree/binarySearchTree.js": {
+      "hash": "25fe72925c47ca1f30e0c2af9c850d3233901e48ca89779116bb2b82f2b7fd7b",
+      "docRelative": "algorithm/tree/binarySearchTree.mdx"
+    },
     "algorithm/tree/binaryTreeEqual.js": {
       "hash": "747c1e466b597180c85f6ae69a49128bf65851c69e795ed5abc4dad755d298e6",
       "docRelative": "algorithm/tree/binaryTreeEqual.mdx"
@@ -985,7 +993,7 @@
       "docRelative": "algorithm/stack/_index.mdx"
     },
     "__nav__:algorithm/tree": {
-      "hash": "a164137ba5a03f96f0e3c99d8c4e7dbf76784a4bc7f7c3b0b4d5c9e57a99f512",
+      "hash": "9bec88dbfca1455b3741bb658d5753608f5b5036f4461dbe60ef34a2d21051a4",
       "docRelative": "algorithm/tree/_index.mdx"
     },
     "__nav__:algorithm/trie": {
