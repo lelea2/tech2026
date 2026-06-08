@@ -1,971 +1,979 @@
 {
   "files": {
     "frontend/jsfunction/2d-readingOrder/readingOrder.js": {
-      "hash": "78ff759da20a61e7fe317f61185a5538076e9f72abb8bb84fc93cf6802bf16e7",
+      "hash": "c0a31415336781ff724825e8e895e6028a0cdae53c33c1e35135b29a455ffcca",
       "docRelative": "frontend/jsfunction/2d-readingOrder/readingOrder.mdx"
     },
     "frontend/jsfunction/2d-readingOrder/readingOrderII.js": {
-      "hash": "35545a9c85c47aa52f3f11229c9c50ca8fe7a7fafa1acd4d014d4acfaea01a90",
+      "hash": "5f79df82ce73704f931328d62ddd153243992cc308308d3109553f555fecfac9",
       "docRelative": "frontend/jsfunction/2d-readingOrder/readingOrderII.mdx"
     },
     "frontend/jsfunction/BackboneModel.js": {
-      "hash": "a28590dc81aed927996392f458a6e31c9a8b9d4e15d604d1ba466b7583290e5d",
+      "hash": "750a6e6f9e39e3d2f7bc2228eece5dddd96a988fa160822b6bab466954fc94dc",
       "docRelative": "frontend/jsfunction/BackboneModel.mdx"
     },
     "frontend/jsfunction/DrizzleORM/drizzleQuery.js": {
-      "hash": "ab623cdd0c4dbd1d8b9acac14e8556cea880b26969f5240cd5dd1a632211c5dc",
+      "hash": "bc0b7181a0b0210bcac09ca046f4d8200b7b2a6edbeaa07398e79e0705d57e80",
       "docRelative": "frontend/jsfunction/DrizzleORM/drizzleQuery.mdx"
     },
     "frontend/jsfunction/DrizzleORM/drizzleQueryII.js": {
-      "hash": "e16566e1648c269ccc5f3d5de41bf9c968ac25f36fdf708054e93874db9ef6bb",
+      "hash": "0809f20794ea15b5de41e1a2c3e29d40b65df193d489ecc3b8203ab5deeaed81",
       "docRelative": "frontend/jsfunction/DrizzleORM/drizzleQueryII.mdx"
     },
     "frontend/jsfunction/DrizzleORM/drizzleQueryIII.js": {
-      "hash": "3560d4ba07f038ed1438b81b0ee5e0733c369482d6702503aaa3c710176d1ab5",
+      "hash": "252fb541175038b2146bbc4a544f6caf838d48a85eba04049213935ddeef8911",
       "docRelative": "frontend/jsfunction/DrizzleORM/drizzleQueryIII.mdx"
     },
     "frontend/jsfunction/Emitter/EventEmitter.js": {
-      "hash": "a55aaeaa4e4495eceea07622ae1af98c5094c9a617f83428da48201f19fc1f2e",
+      "hash": "466ac976efc90c78b7732dd25e1125b5ca3408febaf73beadc2616fb0da40635",
       "docRelative": "frontend/jsfunction/Emitter/EventEmitter.mdx"
     },
     "frontend/jsfunction/Emitter/EventEmitterII.js": {
-      "hash": "719ed099e44d6cecbe88e81ab9af49f29c30bb6fc4f1e4e858287b0977939aa1",
+      "hash": "294789dafc6e07163bfd318aafa97850c4765f93ad10f614d910556e3db387bb",
       "docRelative": "frontend/jsfunction/Emitter/EventEmitterII.mdx"
     },
     "frontend/jsfunction/Function.prototype.apply.js": {
-      "hash": "bb2b73011414a837b9a026e1b462cd137209d4e6e02d53ba5aa7360971672d8f",
+      "hash": "440cceb662bd6654d5c04f64d6dafe95d1e921eb01c0fca57ff36dcef3a0595b",
       "docRelative": "frontend/jsfunction/Function.prototype.apply.mdx"
     },
     "frontend/jsfunction/Function.prototype.bind.js": {
-      "hash": "f2e5c703749c142f676c29312e577f524f6a8df733260fc212a5d7bc01ff5dcf",
+      "hash": "6ac604d1fdfbe667453e55c55d74064e059af51abb88711febde1782f61a2ead",
       "docRelative": "frontend/jsfunction/Function.prototype.bind.mdx"
     },
     "frontend/jsfunction/Function.prototype.call.js": {
-      "hash": "50eeda935193e02bf1d8ed67d6ddaceec2c6a3b1708fa38ed8387a33c05df10d",
+      "hash": "a526c775f4d33cda2b07ed7fe27e8743ecf27d3258e049800885669bac4027aa",
       "docRelative": "frontend/jsfunction/Function.prototype.call.mdx"
     },
+    "frontend/jsfunction/StoreData.js": {
+      "hash": "c56d275f655d20c6c951f3751ef79ddcbfac81322121ffc57a51d0d046985694",
+      "docRelative": "frontend/jsfunction/StoreData.mdx"
+    },
     "frontend/jsfunction/UndoableDatabase/UndoableDatabase.js": {
-      "hash": "ca41bed35df446a4df18132f32f45e124942d93aad9d869a8798c404ec22f98d",
+      "hash": "b25bf8b7886d4553724052cd7b0b7996382039cf8c3ef99ba450ffcc8e387b22",
       "docRelative": "frontend/jsfunction/UndoableDatabase/UndoableDatabase.mdx"
     },
     "frontend/jsfunction/UndoableDatabase/UndoableDatabaseII.js": {
-      "hash": "3a45bc07989d3216041724a388e8c54694d5406eedf3ae43649a669f220af289",
+      "hash": "4f1117f8f78796e2eb51ef4b28cc40cc2358fe7eefe1477d3100dc78aefd701f",
       "docRelative": "frontend/jsfunction/UndoableDatabase/UndoableDatabaseII.mdx"
     },
     "frontend/jsfunction/array/Array.prototype.at.js": {
-      "hash": "681842fea4771361926bac8b4188dc4bd995bbd2be0b3205e8af34b7b3c2a56a",
+      "hash": "37679b6c496e33d658027d33fd05127055389a0cfc825bbce30aa1c07f2d718f",
       "docRelative": "frontend/jsfunction/array/Array.prototype.at.mdx"
     },
     "frontend/jsfunction/array/Array.prototype.concat.js": {
-      "hash": "88c6e6f5ba5b0adac4192126fab9800b8e6768e5cad5387b39f911bab9bdb551",
+      "hash": "e551b7bdc68863d982f4072e88faa3b005e1d1c084e1859aa9f01c7eb43ef6bb",
       "docRelative": "frontend/jsfunction/array/Array.prototype.concat.mdx"
     },
     "frontend/jsfunction/array/Array.prototype.filter.js": {
-      "hash": "51ce001ab645d5ba9405d0a7d6b2e0377bf55abee246573a1adf59ba77248502",
+      "hash": "0137f48a4bd3dcc2cba2969ac0ab53313de15c3d2a6af1925b0be1af69d995c4",
       "docRelative": "frontend/jsfunction/array/Array.prototype.filter.mdx"
     },
     "frontend/jsfunction/array/Array.prototype.reduce.js": {
-      "hash": "0573548d539a684e848117cd360cf3bad2d43be72dadee0185276e8699aeac91",
+      "hash": "e7802439632a3732860e52d985cc8f05b315a95a51525e24bc980badb5ba41d7",
       "docRelative": "frontend/jsfunction/array/Array.prototype.reduce.mdx"
     },
     "frontend/jsfunction/array/Array.prototype.square.js": {
-      "hash": "bce31c7c1476c258926b04eca0f3ab811983913aed8834a560ddad566a062b97",
+      "hash": "eed60ecbbb568a5c0cf7c653ee8cb25157f175d85ed355d597955fbe20b4ee53",
       "docRelative": "frontend/jsfunction/array/Array.prototype.square.mdx"
     },
     "frontend/jsfunction/array/Array.ptotype.map.js": {
-      "hash": "7f135a20e0f29c8abc449572de04c75f020fa12ee7ed3341da96459bdf6f4b9b",
+      "hash": "6c9cda186270aa3b22427dff309a739fe5fde755f4741c8a2ccce653715feef5",
       "docRelative": "frontend/jsfunction/array/Array.ptotype.map.mdx"
     },
     "frontend/jsfunction/array/compact.js": {
-      "hash": "fa695a3660e84cafee6d22aad8786bf90b122c22d82f6dccc942199351b031bc",
+      "hash": "3c349dca1fa575ba6e5ebe578d727d6123670111a55095cc0135105e282b3e4e",
       "docRelative": "frontend/jsfunction/array/compact.mdx"
     },
     "frontend/jsfunction/array/compactII.js": {
-      "hash": "9c69ef9fb5530c87064a6922377bfd04205cad229f9d4b96d1a8e5d65c94e028",
+      "hash": "27abe4acddac131333cb88d74b0e46abd69f063ba7a6040e7b48bb3fd58c92b1",
       "docRelative": "frontend/jsfunction/array/compactII.mdx"
     },
     "frontend/jsfunction/array/countBy.js": {
-      "hash": "4a9fffd22c514139f40779223918bb6a33afddaf0897a5ed98299e80bad9c651",
+      "hash": "0ee6cd702a231b535f3fdb2c1bc9f6a6efa1320b0fb948b52fce6b160e1bb96d",
       "docRelative": "frontend/jsfunction/array/countBy.mdx"
     },
     "frontend/jsfunction/array/dropRightWhile.js": {
-      "hash": "2950e0046d4e98360907b91228ce2159c4c6d0171bc53685e586b85556526804",
+      "hash": "099721165ed623c0286069646b5c6e3d01e3ecf1e354a417f2c9eb1289ea9a29",
       "docRelative": "frontend/jsfunction/array/dropRightWhile.mdx"
     },
     "frontend/jsfunction/array/dropWhile.js": {
-      "hash": "f731ec918d6e575b42fda36429d172e62098729fbed9b19c1f5e32ba39ecdb21",
+      "hash": "aff48e8a213b1d5ef9ae4952fbad90aca9914953ebbe970b73417aba7ab2d20a",
       "docRelative": "frontend/jsfunction/array/dropWhile.mdx"
     },
     "frontend/jsfunction/array/fill.js": {
-      "hash": "e433ce7de9b45217d8273fb04a25059d687c94277f820475d0c278cdf1551334",
+      "hash": "6f3fbef1a17fd6b830c293a159b9485a9c284a47b5e006a5afa5bdb38a7cc9e2",
       "docRelative": "frontend/jsfunction/array/fill.mdx"
     },
     "frontend/jsfunction/array/findIndex.js": {
-      "hash": "a8931ff1b50f3b7ba47a33feb74d6d667a03d46f15b917732c6e7e2ebc34f768",
+      "hash": "cd161d4d8899028bfcae7d50bcd8098fca760891f3d5137e35594639f679b86d",
       "docRelative": "frontend/jsfunction/array/findIndex.mdx"
     },
     "frontend/jsfunction/array/findLastIndex.js": {
-      "hash": "f7eb23f5636198385e020e22945e73c43b4b9e96af75fe8a2e5f0406e4548ab7",
+      "hash": "a50726df532a236624199053f9dba05b4f54421aace1f8689c685de0d9cd607d",
       "docRelative": "frontend/jsfunction/array/findLastIndex.mdx"
     },
     "frontend/jsfunction/array/flattenArray.js": {
-      "hash": "82c6b35135a2b33cc25db80285cdb60f50f67ac026e7319c5a5506432dc64ea5",
+      "hash": "0be3a51757f8673de88d863aa202c84a641470ddb3fbafaf810e42370a0e5fc7",
       "docRelative": "frontend/jsfunction/array/flattenArray.mdx"
     },
     "frontend/jsfunction/array/groupBy.js": {
-      "hash": "13d205d6698b091912e04263890f6d6916f7a045387820fb1ede9fdfbebda471",
+      "hash": "9936034d96b23f66f97dc4fdab9b69c50e64bb2d3affcdee31f6c01548222da1",
       "docRelative": "frontend/jsfunction/array/groupBy.mdx"
     },
     "frontend/jsfunction/array/intersection.js": {
-      "hash": "0269ed4daa6e72c85cf0bb5f8b3900622b64be901c4b3d892e0ccd1cde4ad26b",
+      "hash": "b53f60e9ab8ae3255fff1ea3d8326523e97bd055acd67d926dca070d8e9622f0",
       "docRelative": "frontend/jsfunction/array/intersection.mdx"
     },
     "frontend/jsfunction/array/intersectionBy.js": {
-      "hash": "2bf0692a78ce6198f4007450f10531e6f6f260f3d236ddd4db6a2ef00bc73667",
+      "hash": "a95b5e8cffca823bd0f3ae30fa19693cc0fcc2e42f310f5d466f2dc333517683",
       "docRelative": "frontend/jsfunction/array/intersectionBy.mdx"
     },
     "frontend/jsfunction/array/intersectionWith.js": {
-      "hash": "96d02303c70ec3495f8e44452438dbf8d4322bc8b79bcee620e4695cabdf960d",
+      "hash": "bfde62e5db8d04c236bf4f4d5d489d029af9c29acc70ddb5ec1f7af912053e8b",
       "docRelative": "frontend/jsfunction/array/intersectionWith.mdx"
     },
     "frontend/jsfunction/array/kRowPascalTriangle.js": {
-      "hash": "be12bec08f0bc48852da44c70c5816de574ac4a57fa7a72c0e3c59e4bd986e41",
+      "hash": "6dc685665aed015fa1ecb2bd6cfc058f9dbf693c99be3b726cc8c701846eb382",
       "docRelative": "frontend/jsfunction/array/kRowPascalTriangle.mdx"
     },
     "frontend/jsfunction/array/maxBy.js": {
-      "hash": "cc95e5af59e877e5a78de6d0dfa9439f069c6ae8bf545a200897ea4ece52384f",
+      "hash": "1376b6b24ce0ebfa9572297012fd4570dff3b5faf6474985f986f57dd216a673",
       "docRelative": "frontend/jsfunction/array/maxBy.mdx"
     },
     "frontend/jsfunction/array/minBy.js": {
-      "hash": "d3dc4fab932787010270d5196b3f822ecbfe86d509ee16105903d7ec296105b5",
+      "hash": "8824c381b747eaa333471333ad001f5210ae9a7358ae60951c64d053e257ebb3",
       "docRelative": "frontend/jsfunction/array/minBy.mdx"
     },
     "frontend/jsfunction/array/once.js": {
-      "hash": "bd03d1993b274c84b5bc71bc68346a6e102f81f15c52b035d552d754b6173fa9",
+      "hash": "4f93a236ba99637436cf62821fef1f451a5ec2dcc44c015501ad8ba7cbe25f53",
       "docRelative": "frontend/jsfunction/array/once.mdx"
     },
     "frontend/jsfunction/array/turtle.js": {
-      "hash": "4495da9712f99be443989f656c88137a6a0ec979f2e5768ec6d48bf61a9cf815",
+      "hash": "a6e5c7fccdf44dc10d3c8a4a24750d4fd45b9d91f7303e6bc2d01acfe49d4a49",
       "docRelative": "frontend/jsfunction/array/turtle.mdx"
     },
     "frontend/jsfunction/array/unionBy.js": {
-      "hash": "b47942c80a34751c948ec8427080468ba5be11f6b8ab239b778a41e4d7523ad1",
+      "hash": "7e5ab8512a828d4c96774c75d156cd8e115559347782773dccd411e7d3d5b9ac",
       "docRelative": "frontend/jsfunction/array/unionBy.mdx"
     },
     "frontend/jsfunction/array/uniqueArray.js": {
-      "hash": "f3e6d8f2a47eb568224796fce45cb23d192098de883530f809a9d8020d77428c",
+      "hash": "356a0995c1edf9d4962b4206813dff565aeebe84a80e55c346ac681b070c698a",
       "docRelative": "frontend/jsfunction/array/uniqueArray.mdx"
     },
     "frontend/jsfunction/camelCaseKey.js": {
-      "hash": "04fba0bcadfa27b001411ad27d89403afda1fabfca5783848de1eca712f3b0d6",
+      "hash": "6ad8c44c609cb8fdea8ae23e73e1d695511c7d22a5576e7e5394ada3c916c7d1",
       "docRelative": "frontend/jsfunction/camelCaseKey.mdx"
     },
     "frontend/jsfunction/cancellableInterval.js": {
-      "hash": "d03013eeb183cfc2817b2c48623bd6a34c2f20176ecc2de51ec9d88c9b3d586a",
+      "hash": "a6c16ff10c3188c513a7d955ba9c1403c238632efbb33be3c45fa47fee69a7f8",
       "docRelative": "frontend/jsfunction/cancellableInterval.mdx"
     },
     "frontend/jsfunction/cancellableTimeout.js": {
-      "hash": "630ecde13c26acbe4940fba1a607a144e294501265de371455efd42209a97a32",
+      "hash": "700b0ba6e9912a762127525a5585cf872beb2ed98f3503f23c399555e79ec6ce",
       "docRelative": "frontend/jsfunction/cancellableTimeout.mdx"
     },
     "frontend/jsfunction/chunk.js": {
-      "hash": "d1b41b63631ea5dbb9ec2e210f4b6d45a2631856a2aaa9d16e402cb7a5ab6b02",
+      "hash": "19d96a94c3139abdb8790e81743be43e28ff1ca57f019a18df8998eef239ce95",
       "docRelative": "frontend/jsfunction/chunk.mdx"
     },
     "frontend/jsfunction/clamp.js": {
-      "hash": "c66f337cc4500683b21e211d8a58eb2eddeb5badeede587a49b35242d8605b8f",
+      "hash": "76202195ff3aa8e570a1bf0e99585be142428d410efd1b1b1013dfa74e44b467",
       "docRelative": "frontend/jsfunction/clamp.mdx"
     },
     "frontend/jsfunction/compose.js": {
-      "hash": "b7ea436fc222c1c4279f72d1a7a3c6997a3dfe24ff5795037422206328d3d87e",
+      "hash": "704b2c4a6cf8f9c125306b6425dc073394f80861877fabf31ee5ee4965e9fe1c",
       "docRelative": "frontend/jsfunction/compose.mdx"
     },
     "frontend/jsfunction/consoleLogHistory.js": {
-      "hash": "55003889908c394341e400f50ecc4f2e5c32b9d553648e7b97a59d7d796ef4e8",
+      "hash": "d3e6b72cda2fbf0236f3db331be5aa75796339384b3c335f6f9509cc7146491c",
       "docRelative": "frontend/jsfunction/consoleLogHistory.mdx"
     },
     "frontend/jsfunction/createResumableInterval.js": {
-      "hash": "3c5e04fa1930105c648c9d03b2c180c20a744c52e532de509c3503b8ffe5eec8",
+      "hash": "5e21b1a1ba017168668a046c2c294af4ebae8a848295066250c131cd50bc476c",
       "docRelative": "frontend/jsfunction/createResumableInterval.mdx"
     },
     "frontend/jsfunction/curry/curry.js": {
-      "hash": "0aaac01818647b2d0d1a399e585ee2d751749e07b97d6603f77691926c88bddb",
+      "hash": "5fe9be03928b411371055c8c0350f42641b5f6db64d0152e615d40bb046a57e2",
       "docRelative": "frontend/jsfunction/curry/curry.mdx"
     },
     "frontend/jsfunction/curry/curryII.js": {
-      "hash": "681d14d716e066746d3795cda9b52ab36f849bacedfe2fc01f3a85c21e3c4ec8",
+      "hash": "59e2b27d89bad9b049afa6f7ac30fd74ec73b898af9396fabda5f90ba6702f0a",
       "docRelative": "frontend/jsfunction/curry/curryII.mdx"
     },
     "frontend/jsfunction/curry/curryIII.js": {
-      "hash": "47ea821d58d5484840e4fa0871fdd8ef37ee7344ecfaae8b37f232588fba1367",
+      "hash": "15771d7e5e0b5adb466d26504e76f7b0a91e2a709fb780d2e88fefa199443e4b",
       "docRelative": "frontend/jsfunction/curry/curryIII.mdx"
     },
     "frontend/jsfunction/cycle.js": {
-      "hash": "d0051476ee6ac6f3a06bf8ceee7760acd6eb1c6be7ba23593f24d30233afa95c",
+      "hash": "229d19ea4bd0fc2ba1dc4d63e340333de3ef6c7bcead6ebd18aefb2e229681c3",
       "docRelative": "frontend/jsfunction/cycle.mdx"
     },
     "frontend/jsfunction/cyclicJSON.js": {
-      "hash": "2375d33478242291f238b87b4a5852623e06de0bc26f8926d9ab21bffbc6d041",
+      "hash": "9bdaca112b91a39aa6e39afe6bdacb89b6624fd4fb6534dda8a5e78853fceea9",
       "docRelative": "frontend/jsfunction/cyclicJSON.mdx"
     },
     "frontend/jsfunction/dataMerge.js": {
-      "hash": "2fcc83087099252159e80396aba3f96751078ac3fc5a0a2c3b7427e7dbeb9680",
+      "hash": "078f60a0ac8024017b0215c0faa7615ffedacc1e8825774821471dc3afcf1c54",
       "docRelative": "frontend/jsfunction/dataMerge.mdx"
     },
     "frontend/jsfunction/dataSelection.js": {
-      "hash": "5122354bdedd151f5220cef29d0343626368c77b3f7a095f5cd937a86c6a0950",
+      "hash": "cd68e3630798c9cc00708db4cda23855b409d4260a61a407e361a3cb8259d46d",
       "docRelative": "frontend/jsfunction/dataSelection.mdx"
     },
     "frontend/jsfunction/debounce/debounce.js": {
-      "hash": "74f515dd9c8c81a6f0c34087e716eec9f6b8f7c086079174b0d92687739d3c86",
+      "hash": "35580b1b5a9867dcdf829ce977b1c71ec3401d3d28dc586e663faed27b15a4ad",
       "docRelative": "frontend/jsfunction/debounce/debounce.mdx"
     },
     "frontend/jsfunction/debounce/debounceCancelFlush.js": {
-      "hash": "938ccc61eda4280d03949590dbaac35d4315667b6b2fc0e347814a194141b0f7",
+      "hash": "99b069de6904812ffda1890be66fd2b8b8a471632246e21a52335c88ec5f8711",
       "docRelative": "frontend/jsfunction/debounce/debounceCancelFlush.mdx"
     },
     "frontend/jsfunction/deepClone/deepClone.js": {
-      "hash": "86537709774bc9ced6aa818887043205fea6c808b36e8f2a106499e1aa8ec1c8",
+      "hash": "9c740df07e2fd3fce751fbba1ec5346f60fdc28f4c1c31887ff0fbe6c38c839c",
       "docRelative": "frontend/jsfunction/deepClone/deepClone.mdx"
     },
     "frontend/jsfunction/deepClone/deepCloneII.js": {
-      "hash": "592a1afd810f94d5003e1006369ff6e2ad28467b672047079a552af6c0acf74b",
+      "hash": "e7664329ff0de59f50811d120acb292383ef32dbe3c19b1c93e4aa6ae41cd373",
       "docRelative": "frontend/jsfunction/deepClone/deepCloneII.mdx"
     },
     "frontend/jsfunction/deepClone/deepEqual.js": {
-      "hash": "55019d2c3b4861e9587a283b3373a87b5104b67f3152fc276b175a2b2e60ec4f",
+      "hash": "0a220fe2c369f642a599f7159d94c36d48a344855b871ce7212abbe3025f241e",
       "docRelative": "frontend/jsfunction/deepClone/deepEqual.mdx"
     },
     "frontend/jsfunction/deepClone/deepMerge.js": {
-      "hash": "bd3dbf97b02bb2089f8eb4fdd30dd0edfdd6f2408a56c61bd9b9d759433b4763",
+      "hash": "dd285d6769d10446ee87ed07da4707487cb1c288c5e1864a35c5bb92ab006302",
       "docRelative": "frontend/jsfunction/deepClone/deepMerge.mdx"
     },
     "frontend/jsfunction/deepClone/deepOmit.js": {
-      "hash": "19f38d9cf395b60d6581804b79a866b58bd895bc5c6f825fb121a3e7e32dc231",
+      "hash": "62885f44ba1a108e10460c79d78c4eb130d435dc6f922975a0c8f5017468f5d8",
       "docRelative": "frontend/jsfunction/deepClone/deepOmit.mdx"
     },
     "frontend/jsfunction/difference.js": {
-      "hash": "29c35f3ec9259d3b0f99c84465ab6727441a5cd8fb979a38ac21700abd14b258",
+      "hash": "420e040dc43a5eddce256b0289099ee000a2fd46bc32e8fbab7bde7718fec335",
       "docRelative": "frontend/jsfunction/difference.mdx"
     },
     "frontend/jsfunction/domTreeTraverse.js": {
-      "hash": "e6b2ea548ca1aab13a201d5b9e592aec387e9f9cb436465bc797d1b7cb52134f",
+      "hash": "de46be3d50292b34ba270fcffe52087212547241089450fc6151e7296cd9a441",
       "docRelative": "frontend/jsfunction/domTreeTraverse.mdx"
     },
     "frontend/jsfunction/functionLength.js": {
-      "hash": "87fa4cb7c31b1753add1bfa582b008c93978cb2c1711d8b46f3283a1aedfcda6",
+      "hash": "458e1ce1adea2789108217536bc4107e3145c40e5c32d77258f5621b8afd78e1",
       "docRelative": "frontend/jsfunction/functionLength.mdx"
     },
     "frontend/jsfunction/get.js": {
-      "hash": "49805ba9d4a308570d54a549ba12a94b5c55bdbcc111134cb24a88d496e67247",
+      "hash": "beb45ba774080525dc3beaa97591bb81d886ade38404e3720080157bfd350488",
       "docRelative": "frontend/jsfunction/get.mdx"
     },
     "frontend/jsfunction/getElementBy/getElementByClassName.js": {
-      "hash": "6798689ed7f4ca2f6f0f3779ace05ff07203ef652c344bb929eab29ff3a6f41c",
+      "hash": "034a981e2a69d75ebec19faa717089bf70379fca1192698b4e6a9a31f27f9fa6",
       "docRelative": "frontend/jsfunction/getElementBy/getElementByClassName.mdx"
     },
     "frontend/jsfunction/getElementBy/getElementByStyles.js": {
-      "hash": "6222c567ed7b4e7ea322318a069193b61477619b8f6e52669b0249c138cd7549",
+      "hash": "7cfa106eaeb2bac8e13cfad70d7a3aec0091e4291702d6f6963bee92f24fbdf8",
       "docRelative": "frontend/jsfunction/getElementBy/getElementByStyles.mdx"
     },
     "frontend/jsfunction/getElementBy/getElementByTagName.js": {
-      "hash": "ed8497f2e2c20f24570ea950edf19f06b5fd3ab302f63791444985a716bca596",
+      "hash": "085556579c28357509ead88d1b3c6f6bff6c2932a82cd17c6c13641128d4cbc7",
       "docRelative": "frontend/jsfunction/getElementBy/getElementByTagName.mdx"
     },
     "frontend/jsfunction/getElementBy/getElementByTagNameHiearchy.js": {
-      "hash": "910017e45a607994974a1785bb401464e67d27297337babf3e0fb8d6a4587d91",
+      "hash": "a89faf5e224dc53f3731ded6a520ba978ea3236505125ac4d0dbb6136e5786fc",
       "docRelative": "frontend/jsfunction/getElementBy/getElementByTagNameHiearchy.mdx"
     },
     "frontend/jsfunction/hooks/useArray.js": {
-      "hash": "6f3ce53dfbd9065ec720a1d2b23a881db30f5072c32a8fbecd61e7ff279781b1",
+      "hash": "23ae1d172a492a1898b51197606d1075c0f2d8ad16148ce0024ddb3111130bed",
       "docRelative": "frontend/jsfunction/hooks/useArray.mdx"
     },
     "frontend/jsfunction/hooks/useBoolean.js": {
-      "hash": "1ff486c711e4a2dfe5f0fe51715efad39d29168f14cb44cdbcdf5248c40ee36b",
+      "hash": "c5a2ce040932521bca0bbdeff1f6d1a07629cde46a573e2df251b54ca483108c",
       "docRelative": "frontend/jsfunction/hooks/useBoolean.mdx"
     },
     "frontend/jsfunction/hooks/useBreakpoint.js": {
-      "hash": "e361737bec6b455e5bde79f2d590002c0f48e1781ddf1f47435e4a491cab6ade",
+      "hash": "ffb05c7b2cc5a84754d14cc7a8130a2f90e1a3110eafd19bd76416a0333cb904",
       "docRelative": "frontend/jsfunction/hooks/useBreakpoint.mdx"
     },
     "frontend/jsfunction/hooks/useClickAnywher.js": {
-      "hash": "95fa4942e8feacc6050896f5a8f6ae6cf662f26f84348c9f3310e6aa3a78e0e9",
+      "hash": "9b34ecc8718fc3fee0eb3b946ffe69c50f906d8aea012d779ac37464e08618f9",
       "docRelative": "frontend/jsfunction/hooks/useClickAnywher.mdx"
     },
     "frontend/jsfunction/hooks/useClickoutside.js": {
-      "hash": "09deed55cd9bc3757da670f239ca8eb787c50a6c0c3dad524df5a8fd3dc0afd2",
+      "hash": "375fa4202702228ad9c061dee28143b76de153b5de1a828aa3b1a06d9364de79",
       "docRelative": "frontend/jsfunction/hooks/useClickoutside.mdx"
     },
     "frontend/jsfunction/hooks/useCountdown.js": {
-      "hash": "7a79cd954fde3285eac1d423485452e0457e1b054ed1149c3b473bc6d991522b",
+      "hash": "e926bf88f6bf218d6d404b0464b92fff6e5465fff8dc5d99f069b5c030747cdf",
       "docRelative": "frontend/jsfunction/hooks/useCountdown.mdx"
     },
     "frontend/jsfunction/hooks/useCounter.js": {
-      "hash": "4955d8007a0e5361f458d143fdf3084201b76b82c6b5e36be4103c82eb2501b0",
+      "hash": "57d330bc2fc4ef3b4752e4f8c6a3c1c99f61b73cd01a6dbec05c8996d3c9808a",
       "docRelative": "frontend/jsfunction/hooks/useCounter.mdx"
     },
     "frontend/jsfunction/hooks/useCounterMemoize.js": {
-      "hash": "e6bf4b1c0b58ba5e37fbbf17b89b96ea8e39285e4f3f3b81b93935031ddbdc05",
+      "hash": "892dd4ef0c5bdc7fead751b4b5ee0ef2886ac7f291c0fe904d05f80c0af4c78c",
       "docRelative": "frontend/jsfunction/hooks/useCounterMemoize.mdx"
     },
     "frontend/jsfunction/hooks/useCycle.js": {
-      "hash": "e8a57b82608bdd0e4f2dc7828918dcec2d0a7f1114c69cecc3ae6d1def09fc44",
+      "hash": "250828feb66682c059bb2df7683f9acbf5521fa40115693d05e976b2f6f9d25b",
       "docRelative": "frontend/jsfunction/hooks/useCycle.mdx"
     },
     "frontend/jsfunction/hooks/useDebounce.js": {
-      "hash": "02a2543ee824a6acd84b9780cfda8dd35485f15c3cb3e780835e4f70895524b9",
+      "hash": "7c3b286021d89ddf80f86203a385378a17340e6d411dd7a24453d28a1251d865",
       "docRelative": "frontend/jsfunction/hooks/useDebounce.mdx"
     },
     "frontend/jsfunction/hooks/useDefault.js": {
-      "hash": "09db3ad783a3ccc0aada326df62f25bb9f5dcf459404678f62a92dc3b3f72456",
+      "hash": "a7a5b0919ac3f76cea6e7f81867670b0081c8fa0ec5fc5c0993742c47994ad80",
       "docRelative": "frontend/jsfunction/hooks/useDefault.mdx"
     },
     "frontend/jsfunction/hooks/useEffectOnce.js": {
-      "hash": "89ec4f0ae3560bb1189e6db83e98908bcde376068b9bbccc9b33b2c7497eb27b",
+      "hash": "932542c2741a0ab86e73e247131136453f7d2ba02f7b9d0d66ee2a4086dce055",
       "docRelative": "frontend/jsfunction/hooks/useEffectOnce.mdx"
     },
     "frontend/jsfunction/hooks/useEventListener.js": {
-      "hash": "cb24d20ea2e056da21c694e18a9e6ddf6bf3cc5548898d4b3aeee1c68c8eb92f",
+      "hash": "4f8226e618d33ef398bf02e4780de098cbf688266cd021536c12ef96e4f6e2c9",
       "docRelative": "frontend/jsfunction/hooks/useEventListener.mdx"
     },
     "frontend/jsfunction/hooks/useFocus.js": {
-      "hash": "dbe955880a17db0a350dce06ad3368a421b26f0550359c1c5e09458ad5694cb5",
+      "hash": "84c56834e4b9a3b03f39ae1ade13bfdc958eb47744a3d2b42171207d71eb6cb4",
       "docRelative": "frontend/jsfunction/hooks/useFocus.mdx"
     },
     "frontend/jsfunction/hooks/useHover.js": {
-      "hash": "9c54632f3f0d4a14192284c8e7d81b72009813c022c7a1d30ef828c7c5104ac4",
+      "hash": "81b20cf5e76e578d43103b68c8ddbaa0670355d1bfea488074a12e357da140cf",
       "docRelative": "frontend/jsfunction/hooks/useHover.mdx"
     },
     "frontend/jsfunction/hooks/useIdle.js": {
-      "hash": "47f7aa277073d5e1282d9c213ed06d1fcddabdf8efa43490cc2eeb42b2d54199",
+      "hash": "70a29e35780d5ccd460ee9c8dc64d6fa032b7618de4eda7b070332518903b343",
       "docRelative": "frontend/jsfunction/hooks/useIdle.mdx"
     },
     "frontend/jsfunction/hooks/useInputControl.js": {
-      "hash": "8a6fcd3f257e611d45f40e463c2592f6e87e7ef7ca288e91dfc9169a333a7d4f",
+      "hash": "7a02675a3e317d55c867a5bef05c6213ff77034c9be64b78117d6fbfad955c1b",
       "docRelative": "frontend/jsfunction/hooks/useInputControl.mdx"
     },
     "frontend/jsfunction/hooks/useInterval.js": {
-      "hash": "965e49f3b40ef9f19f06af5a9e8f964b18fa90e041eebd4aa033ca585dce0c0d",
+      "hash": "d0e0665e2c1f295e7c0d5a48e632f275c08ec1d9234c787ee178c4abb3616dda",
       "docRelative": "frontend/jsfunction/hooks/useInterval.mdx"
     },
     "frontend/jsfunction/hooks/useMap.js": {
-      "hash": "f0464cf8fd3e040bd7876f1dcb4a6970c23a15821528583c42e4d38c4ebd5d0f",
+      "hash": "f035948a0407c549435afc51b06535e13791bf87effc3f08455f42d9c9f1d3b7",
       "docRelative": "frontend/jsfunction/hooks/useMap.mdx"
     },
     "frontend/jsfunction/hooks/useMediaQuery.js": {
-      "hash": "72ea3ae7b2eae4a319bb80690ab0b00d9bd4cbfbb6c33a5511ed1043b9854fff",
+      "hash": "515ba7626224a492b4fd6288746c05f30320e2fa98e5a257dd657af85e335755",
       "docRelative": "frontend/jsfunction/hooks/useMediaQuery.mdx"
     },
     "frontend/jsfunction/hooks/useMediatedState.js": {
-      "hash": "6816bfa83a1a53271e8f5ec558febf812609b35ecb616b6df0bb8321e5912ca1",
+      "hash": "9ef73f9c075d3066ad744ceed61f8019ae440d7a1d9c44ee28d8bd8f0246840c",
       "docRelative": "frontend/jsfunction/hooks/useMediatedState.mdx"
     },
     "frontend/jsfunction/hooks/useObject.js": {
-      "hash": "fa1c3b2a65e3b7d2d8c9d097ae5200700fe63e0b9870aab37abcfb395e2fa101",
+      "hash": "d521932efe65fa4240819763ff9ac86396a11c87b5b0eb379e403d1886d94cc2",
       "docRelative": "frontend/jsfunction/hooks/useObject.mdx"
     },
     "frontend/jsfunction/hooks/usePress.js": {
-      "hash": "0d70a0abcf1fb29ef181a73d39b53648ea9362a5018adce9beecd28a71487f60",
+      "hash": "783b8c5fc3831114037f9f007c115a0ee57a76a1d8a1eae7b734c6034a45896c",
       "docRelative": "frontend/jsfunction/hooks/usePress.mdx"
     },
     "frontend/jsfunction/hooks/usePrevious.js": {
-      "hash": "ea2632791cda4ebc927053085cd9a16a618f55903e7afbf54de218ff1b26e544",
+      "hash": "55e508342bfca69b54ffcf91c05e70c3e1dc3a5111d47e5531163a1c99b05840",
       "docRelative": "frontend/jsfunction/hooks/usePrevious.mdx"
     },
     "frontend/jsfunction/hooks/useQuery.js": {
-      "hash": "44117a65d8cf6962900e444acf8e67732219343be8667673b8d9f9890333a093",
+      "hash": "0501b02b3520b1977221e943dc1d46af76aecbbb74c93e418384a8f371afcb43",
       "docRelative": "frontend/jsfunction/hooks/useQuery.mdx"
     },
     "frontend/jsfunction/hooks/useSet.js": {
-      "hash": "07aaae9498031720ec8a36c23e149bf6573e6c75dbf8ef3609f79096fa3a0c3b",
+      "hash": "14cc51c64428d39f9c9271112eb5eeddd54bec266810881789a92aa39e69d369",
       "docRelative": "frontend/jsfunction/hooks/useSet.mdx"
     },
     "frontend/jsfunction/hooks/useStateWithReset.js": {
-      "hash": "0eb448e5fb9ede246a6d3ec937ceea9aa65d8356d8fe52748f72409f7b256e76",
+      "hash": "b1c95e986584e95b79a9a8ecd99d2aac5a97c031299128c54fecc3ad170ebe3a",
       "docRelative": "frontend/jsfunction/hooks/useStateWithReset.mdx"
     },
     "frontend/jsfunction/hooks/useStep.js": {
-      "hash": "01a1a8f264fa95f46db7d2aa8b85995a90c319569bc7f739af4cd8b3d42483c4",
+      "hash": "6eb5439fcd4bd5ac7c44dbe1e931ed2b82e9c2b262757ae4fae4d2286fea97dd",
       "docRelative": "frontend/jsfunction/hooks/useStep.mdx"
     },
     "frontend/jsfunction/hooks/useThrottle.js": {
-      "hash": "ea386df0f9b22ff23b1fdbe7d7d63f1d944c11ce2a82f7d2114f4a565b08db50",
+      "hash": "c8d26a3c5487237abcc079a1fa7ee714e358c2596a7fedf7aba6a21be352a687",
       "docRelative": "frontend/jsfunction/hooks/useThrottle.mdx"
     },
     "frontend/jsfunction/hooks/useTimeout.js": {
-      "hash": "8a442b76d6923de3178bac66515c64e05b23b4bb0ec8c446c4947752b17fae27",
+      "hash": "933662d3d97404d9da79a97fe31d08e48183c1d24745822f6ab0cfb2a3119c23",
       "docRelative": "frontend/jsfunction/hooks/useTimeout.mdx"
     },
     "frontend/jsfunction/hooks/useToggle.js": {
-      "hash": "e88a97175063e4d3c13d6d812744ed752e3e1e0bcc83cfde870db979f3d53dd6",
+      "hash": "fe5c211f14fc70189523ff7ebf7a423c88b525b6908749af5158146509c3b9c6",
       "docRelative": "frontend/jsfunction/hooks/useToggle.mdx"
     },
     "frontend/jsfunction/hooks/useWindowResize.js": {
-      "hash": "c88f2e570b4f7e5d317ec47ef7b3def0bea6c7f39368ee91693dbf10b92cf8e1",
+      "hash": "75e2f1c343940a20fa68f000400b9766aff172d9c90deedf87e814158ba60b9c",
       "docRelative": "frontend/jsfunction/hooks/useWindowResize.mdx"
     },
     "frontend/jsfunction/htmlModifier/classNames.js": {
-      "hash": "117305f5e9b883e82e33ff5f2804ba5c562f999c9d74581e7a5e1173197b1e28",
+      "hash": "d2323c5296f8090dbfb71a613fd80a1a6dfe2bfe19396579d1e03e7a888a4f0a",
       "docRelative": "frontend/jsfunction/htmlModifier/classNames.mdx"
     },
     "frontend/jsfunction/htmlModifier/classNamesAdvance.js": {
-      "hash": "e0d5715d16094fd9ffaa23068abc022f8fe48086686d6b7d935d9c5de449a376",
+      "hash": "9a7ca0c87624d76d302001af93efbccb2430ea61928dc4d70c95c89b51f4e501",
       "docRelative": "frontend/jsfunction/htmlModifier/classNamesAdvance.mdx"
     },
     "frontend/jsfunction/htmlModifier/classVarianceAuthority.js": {
-      "hash": "5d6c460db8afb1a1860d1977016a8baee10aec657bd93a2ce6feabff5284df6e",
+      "hash": "871fc16ff6df6e1a365b4adc1b0326329365bb33b6a45bf50c32f44f1af487aa",
       "docRelative": "frontend/jsfunction/htmlModifier/classVarianceAuthority.mdx"
     },
     "frontend/jsfunction/htmlModifier/correspondingNode.js": {
-      "hash": "04ef77126ec91966fa6afaea9baf0bde5c74665fd0132edd607b8c81b1fefbce",
+      "hash": "0c420d16681ee6c283b1d12a54af82beca34a0d28408537812a51223dabd790e",
       "docRelative": "frontend/jsfunction/htmlModifier/correspondingNode.mdx"
     },
     "frontend/jsfunction/htmlModifier/htmlSerialize.js": {
-      "hash": "e0856ed7cdf34ce1fdf410e3cb4b74a72713f7ab102f0552157af14d8a0be5f6",
+      "hash": "36eefd9ef4f1c4e9196b0e40bc9aa07f7fdea06791ce0d045758c7e3931faa57",
       "docRelative": "frontend/jsfunction/htmlModifier/htmlSerialize.mdx"
     },
     "frontend/jsfunction/htmlModifier/identicalDOMTree.js": {
-      "hash": "54012b38743556ac4f30770160ee3560d7a0b3f1480cc72464910c59524503b6",
+      "hash": "0dd2dfcf66ab5e945b9f95d89d06a2af71f5126fe0f90d7f84e3c9ca1fac3d44",
       "docRelative": "frontend/jsfunction/htmlModifier/identicalDOMTree.mdx"
     },
     "frontend/jsfunction/htmlModifier/lowestHidingElement.js": {
-      "hash": "0510f4c4cf54c71e85ac24e06cc7a157530fa9a99150c62d2a9afb626659b366",
+      "hash": "aa83257060bcd3e9de266cd4e3118828d62fd2e1cff8d2fbfb130b1a785a8399",
       "docRelative": "frontend/jsfunction/htmlModifier/lowestHidingElement.mdx"
     },
     "frontend/jsfunction/htmlModifier/richText.js": {
-      "hash": "4499e3a08e24b1a9986d1fcfc644b02edef5ca1329d5c3bcedb14144c90048a6",
+      "hash": "7eb57e83ba409bc1f57f35923b75060671e85ba46309ad18b918bfadc3f064e3",
       "docRelative": "frontend/jsfunction/htmlModifier/richText.mdx"
     },
     "frontend/jsfunction/htmlModifier/sanitizeHTML.js": {
-      "hash": "9547ed9818a73f688b8edc62cd15b26cccb684f091c5c4f8704bc1ec5793cf1a",
+      "hash": "d46cd72b680407a2f929f275e1a79373031eff3a56a23a0a8926f8ff3aecec45",
       "docRelative": "frontend/jsfunction/htmlModifier/sanitizeHTML.mdx"
     },
     "frontend/jsfunction/htmlModifier/tableOfContent.js": {
-      "hash": "a48dd2e83f61aca29bda7ca535cd83fbf5e807188ec4f124ba1a48f7e2ce08f3",
+      "hash": "d4d67f029878612f679f9cde56bbcbde54f99e1c507825057c386231839a86c0",
       "docRelative": "frontend/jsfunction/htmlModifier/tableOfContent.mdx"
     },
     "frontend/jsfunction/htmlModifier/textBetweenNode.js": {
-      "hash": "b9593d950f6e622a528ada79a000c4fb0b5ee63cde820d3b428e5bfbd26785d2",
+      "hash": "31eb7095f3abcae7e5490ed784225de45d02a82a7da041ea56fb4908c3f4e54a",
       "docRelative": "frontend/jsfunction/htmlModifier/textBetweenNode.mdx"
     },
     "frontend/jsfunction/inRange.js": {
-      "hash": "c61bffb341fa293720ecec1f7ab97fd71e3fc94c638f8e731014f5764565f6f1",
+      "hash": "91c682495823761f78216113cf7f41bf29c936ad9d325fae1e5b30bd36d3b44f",
       "docRelative": "frontend/jsfunction/inRange.mdx"
     },
     "frontend/jsfunction/isEmpty.js": {
-      "hash": "2223be363a7bb2d605fb8fc3125d543c733d1560e5b6d87bdc6a4201fab8ce4e",
+      "hash": "2b3366e5f2aa57baa0bae4d2441c075ce434921b1c2621614de845f01ea9f53d",
       "docRelative": "frontend/jsfunction/isEmpty.mdx"
     },
     "frontend/jsfunction/jQuery-manipulator/jQuery.class.js": {
-      "hash": "4fcb185acc3cd7ecf36fc19bdebc0715eecff0edb1fe1745e48e1db86ee5633b",
+      "hash": "9a7f98d0fef113a5c871c63abca66093a3ec51106c427a67d332564ab0dabe93",
       "docRelative": "frontend/jsfunction/jQuery-manipulator/jQuery.class.mdx"
     },
     "frontend/jsfunction/jQuery-manipulator/jQuery.css.js": {
-      "hash": "6ecd380fffe377e70f02dfe25ea86e9c3a08828020855cd9d7218422b24ca552",
+      "hash": "3fd14803f0ea0f759286860011eb56a7fcadc858ed90f00f054b173c74334fb6",
       "docRelative": "frontend/jsfunction/jQuery-manipulator/jQuery.css.mdx"
     },
     "frontend/jsfunction/jsonStringify/JSON.stringify.js": {
-      "hash": "4c4d3193c60184cb9985578d1a8542c2c545cf0711e7aa8a41f259ef6ad0e23f",
+      "hash": "f52171b6324018f12fb75ff4e4e303adb39edcf8921a3a875e7faf2ca1230214",
       "docRelative": "frontend/jsfunction/jsonStringify/JSON.stringify.mdx"
     },
     "frontend/jsfunction/jsonStringify/JSON.stringifyII.js": {
-      "hash": "dc253652aa2285211efe6cc98d6cc04fdd6d5c8885f3fc83cb814734d00ff9e4",
+      "hash": "cb30773001627e3e9224d69dc3220e5e4f4bc5f6f34233f2e13f0ddd2862337f",
       "docRelative": "frontend/jsfunction/jsonStringify/JSON.stringifyII.mdx"
     },
     "frontend/jsfunction/jsonStringify/superJSON.js": {
-      "hash": "a267f9747dd1718ba6017062a5ce63c7f0104d615f579a93eda5ac3f7b7f386c",
+      "hash": "2b24193a5765638e4611bcd2343d4d171db1be9c9afe7255675c10034398f49f",
       "docRelative": "frontend/jsfunction/jsonStringify/superJSON.mdx"
     },
     "frontend/jsfunction/jsonStringify/superJSONAdvance.js": {
-      "hash": "215697b278d3ea4c2e0b98dd6057def84b697d0ee14d331992e6d7c63c37e167",
+      "hash": "8f6587a8cc21a023c119c23dd92cc03f8896d833921dd3665ed2f8fa97cf785f",
       "docRelative": "frontend/jsfunction/jsonStringify/superJSONAdvance.mdx"
     },
     "frontend/jsfunction/limits.js": {
-      "hash": "2721c0f80c9eb0f8000b34a842096fe03076caa313ee955d2ea6b70f7fd843d9",
+      "hash": "b41dceac49281fe4361a496c50462efe625cf97d1959b67c218915412992147f",
       "docRelative": "frontend/jsfunction/limits.mdx"
     },
     "frontend/jsfunction/listFormat.js": {
-      "hash": "23de6a703f550ec183e13f25604ffc33438c6b389172c7f35f33ba75a0b7a1d3",
+      "hash": "ad2c3be40343494171581afad87e0813b1ee020427a7f076a6ac46c420ce4c15",
       "docRelative": "frontend/jsfunction/listFormat.mdx"
     },
     "frontend/jsfunction/localStorageWithExpiry.js": {
-      "hash": "159567ac612fe6ad81ae640ca2b3ab7e2ec35913feb099e155f7e77c02da82bb",
+      "hash": "681d80180db7472f45c049d5176af8addf609c8dd21b028de4fdac3b7576440e",
       "docRelative": "frontend/jsfunction/localStorageWithExpiry.mdx"
     },
     "frontend/jsfunction/makeCounter/makeCounter.js": {
-      "hash": "e6282a0550e5e78ebb7f59429150a117c973574433d06871bdd404310f30264d",
+      "hash": "b11a20502c51f3773dca9a4b696778d5c202a92992ca51573aa0e0ce9ca71961",
       "docRelative": "frontend/jsfunction/makeCounter/makeCounter.mdx"
     },
     "frontend/jsfunction/makeCounter/makeCounterII.js": {
-      "hash": "93bac609ba31496fe016f88ad0723e8e38aa6108e1ebddb9055b2412058341bd",
+      "hash": "eb888f277f6da900ff0ea37c04038ed2248cce3dbe053505d563c61e3d312c6c",
       "docRelative": "frontend/jsfunction/makeCounter/makeCounterII.mdx"
     },
     "frontend/jsfunction/map/deepMap.js": {
-      "hash": "857e9d7a0c619232e0f169e12d6f6f6a2f331b14e004937d0d0c86fbe7d75d2f",
+      "hash": "b7c366bf5ef7ec458e07ef3d9ab77b2887fa5d490a892f263fa9810ba6848f50",
       "docRelative": "frontend/jsfunction/map/deepMap.mdx"
     },
     "frontend/jsfunction/map/mapAsync.js": {
-      "hash": "6afef1bcc76ceacdacf73ccdf9ce6fc276f75b4ad8d908c1e14e1aeb16328e5e",
+      "hash": "64bb4876d07b22cfd4201b5b9783a03f8a5d4a6c976167c6525ffe24fdb8e451",
       "docRelative": "frontend/jsfunction/map/mapAsync.mdx"
     },
     "frontend/jsfunction/map/mapAsyncWithRateLimit.js": {
-      "hash": "b7a0f6cdd9034e20c58df781424023595fb410ab0487401032da416e92d6a2e2",
+      "hash": "4708d90b40257fe139a1c51faf17ab006a9d9683abe53013532bc82262a994c7",
       "docRelative": "frontend/jsfunction/map/mapAsyncWithRateLimit.mdx"
     },
     "frontend/jsfunction/map/mapWithHistory.js": {
-      "hash": "de855b18498512ae31025a8134015cf84cd64248ffbe26588f14d5c7391fc0c0",
+      "hash": "d6cc451084a7f12f8b40eb8f7d4b4fd3ef2e76444dbacf6d5e11d45d79ee8300",
       "docRelative": "frontend/jsfunction/map/mapWithHistory.mdx"
     },
     "frontend/jsfunction/map/weakMap.js": {
-      "hash": "f8344532e797cee1f546df3e9b74fc41bc8f56cac7f538cca94d1a0e026f46a6",
+      "hash": "b9aac7a537c68dd694e2ed21c0985a8f093c2e8c459ae104df5d66c590cd0dd3",
       "docRelative": "frontend/jsfunction/map/weakMap.mdx"
     },
     "frontend/jsfunction/mean.js": {
-      "hash": "9c55497f1b8069efe0c229aab823b995126ce93b4254ba1dfc912c0932d1cfc1",
+      "hash": "8fe62d0e13506bceaee5fa70ab258b78bb4a8aace23be8c395e521d850e07195",
       "docRelative": "frontend/jsfunction/mean.mdx"
     },
     "frontend/jsfunction/memoize/memoize.js": {
-      "hash": "3bc321ee97d43aaa4cb87c970b06aa156f9935254cd4288b824396b89e676af6",
+      "hash": "2d4dbb08adb7b3200b1a6b025d211d8d0d7347736a4e69b843f34119e97877f5",
       "docRelative": "frontend/jsfunction/memoize/memoize.mdx"
     },
     "frontend/jsfunction/memoize/memoizeII.js": {
-      "hash": "8f0c40cb29a731e90adfe9f73665d5a0a5681c050b525b4ad081aa53dfd5fc5a",
+      "hash": "971b598ebd8c3af0abadf0975282a1ad2dc89f4537b4f94193e16b8a191c3658",
       "docRelative": "frontend/jsfunction/memoize/memoizeII.mdx"
     },
     "frontend/jsfunction/middleWares.js": {
-      "hash": "ef2d1dec192928cfc218b4fbf8a7e2d318e6408368e3064973708b7e7e821464",
+      "hash": "b1d48f5c7408f691115519db052a04f475abc40572876d83be063660c8bd1532",
       "docRelative": "frontend/jsfunction/middleWares.mdx"
     },
     "frontend/jsfunction/monthCalendar.js": {
-      "hash": "3e639a2e408de109b59c3608de1bdbfe6a659cf6351b48cba5cab33f931a81c9",
+      "hash": "4c33b1f9d63f8abd63254e029ca1642bdc2b00cca806013ae2279ba74e3673d4",
       "docRelative": "frontend/jsfunction/monthCalendar.mdx"
     },
     "frontend/jsfunction/nodeRegistry.js": {
-      "hash": "501063dbfdc5516224a931ecdaf14a8755ca88c88a73a58bccdc6c31069c3ad2",
+      "hash": "02b0e0dff8fa1d082d64ea3e203d33dac65bee35d231aaa7bff9e02015a5ae42",
       "docRelative": "frontend/jsfunction/nodeRegistry.mdx"
     },
     "frontend/jsfunction/numArguments.js": {
-      "hash": "582812fbae2c6dfc92cdb90fed6d662a0c4c842adcc6e239ae0b4cf808254392",
+      "hash": "7c0f446fc2ac6991ca9258e8716560bb6127aa6c0ae807282b323341af4bc26f",
       "docRelative": "frontend/jsfunction/numArguments.mdx"
     },
     "frontend/jsfunction/object/conformTo.js": {
-      "hash": "f2e090d222fb7fb3e62e5052be0138bd0bbf99789aa7e2a88542426da42dc21d",
+      "hash": "c1735117f95c5b8556e72b8244869dd88659804a80b70ee6aef8edad97d1ae09",
       "docRelative": "frontend/jsfunction/object/conformTo.mdx"
     },
     "frontend/jsfunction/object/fromPairs.js": {
-      "hash": "1757a93783d22599fa481176ce99bf15aadc6a761f8bc0cc37f831c1b6fbcb5f",
+      "hash": "bb3613bb92b1fd67af9305df416e1b647b0f494a56db1f356e35a63100dc0857",
       "docRelative": "frontend/jsfunction/object/fromPairs.mdx"
     },
     "frontend/jsfunction/object/objectMap.js": {
-      "hash": "f71583f0567ce5ffce819935c3cd58d9258884eb9b6f01131cd3f328be6fd5cc",
+      "hash": "de57b0d6dba97652eeeb9d27f6ee2a45b80e57e35c0e58ff0a7c89d1c835b6c1",
       "docRelative": "frontend/jsfunction/object/objectMap.mdx"
     },
     "frontend/jsfunction/object/squashObject.js": {
-      "hash": "67867c225e49f42dcde4d5986e33d102ef2ca526e16197d30c0e07f0d4afd9d7",
+      "hash": "405d60e0f1aad2c997a6c23e1ddc167d34e1d4d3e61402a2b10796bc3d6342e5",
       "docRelative": "frontend/jsfunction/object/squashObject.mdx"
     },
     "frontend/jsfunction/object/unsquashObject.js": {
-      "hash": "5f15c734bcb4939eee84841f871ef311eab996d6c9a4a761c1d85f73062458ab",
+      "hash": "ea4bb838ddc44dd7a39af826b5fb2b1e31c2795ba456058f3413ec046011f4ea",
       "docRelative": "frontend/jsfunction/object/unsquashObject.mdx"
     },
     "frontend/jsfunction/prismaORM/miniORM.js": {
-      "hash": "8ce0596bde4383cafd42d2fd6d3dc4f119855bdf451913ae1374b700b0651aa9",
+      "hash": "fc4d067256d29b848e6f356f866e27d5738d6d0ea94bd1efbd1e8305a65d8775",
       "docRelative": "frontend/jsfunction/prismaORM/miniORM.mdx"
     },
     "frontend/jsfunction/prismaORM/miniORMII.js": {
-      "hash": "feef01db4716d3d8debf2c3543d6e9cca88e55c228cc976027dd0083b01c6dda",
+      "hash": "915698cda66188a5d739a56ac7d273e17be4026d86c881e2ebec3188cb712de5",
       "docRelative": "frontend/jsfunction/prismaORM/miniORMII.mdx"
     },
     "frontend/jsfunction/prismaORM/miniORMIII.js": {
-      "hash": "ef4f4936d82f88d92be3be99032a88ec59ce7931a55276d6a5fd590921dfd1ce",
+      "hash": "8bd8d0620f16c00206a7e0b2045ac36f4a7d6775e249ca0f5df50b8a17b471a8",
       "docRelative": "frontend/jsfunction/prismaORM/miniORMIII.mdx"
     },
     "frontend/jsfunction/promise/Promise.js": {
-      "hash": "7d9061f212f18d191f91c1bef85f739d5a2283d932e236ab5cf99a084141395a",
+      "hash": "49766c1ef8b16ac901d87b20f379775eaae78623a2faf8f13e27fcd26c1c6dfc",
       "docRelative": "frontend/jsfunction/promise/Promise.mdx"
     },
     "frontend/jsfunction/promise/PromiseMerge.js": {
-      "hash": "50502313214d046b8be653ae79507fec50aa44d005e01d58f49dac04e1916a82",
+      "hash": "c5c0212f71018acdec7b8ef8f9aeef8c9e184b7b0d632fbc6630151f99625c26",
       "docRelative": "frontend/jsfunction/promise/PromiseMerge.mdx"
     },
     "frontend/jsfunction/promise/Promisify.js": {
-      "hash": "6e0e3991f8e2bb336ed8e1ed692d108a990d9426cfb78ad720b777fb40cdb0b7",
+      "hash": "f9b05fe8023c5377bf298fa5bf1a3e52a5032d203bdd5d39ae6875100ec3da6c",
       "docRelative": "frontend/jsfunction/promise/Promisify.mdx"
     },
     "frontend/jsfunction/promise/PromisifyII.js": {
-      "hash": "9b6e4ca216551d70370e299c4dd1d39683043213689b519b3708998198efb2ea",
+      "hash": "8df210a4e1b7b40690580bb0d317a5de05097e510c43f787e93de41cd59f2c66",
       "docRelative": "frontend/jsfunction/promise/PromisifyII.mdx"
     },
     "frontend/jsfunction/promise/promiseAll.js": {
-      "hash": "780b27c28a5fe3d682f89746de8cf7bdfb267d84bc10cd32b1cc49fd36e4aaaa",
+      "hash": "b3b3db76f49f2a6836a468caaf6dc74cdc863404b8e63da9709935d8eb905ae8",
       "docRelative": "frontend/jsfunction/promise/promiseAll.mdx"
     },
     "frontend/jsfunction/promise/promiseAllSettle.js": {
-      "hash": "1ec7dcb4edb6ae9abe40ecae53a52ae0c8c4b20d667aa81dd6e07dcfa155f505",
+      "hash": "dc302338d8a204c7f13ef2414fb5b725050047aaf21ea393ccb1410091ea399a",
       "docRelative": "frontend/jsfunction/promise/promiseAllSettle.mdx"
     },
     "frontend/jsfunction/promise/promiseAny.js": {
-      "hash": "63bb79044daa0476057e49c0d6ef6872b3c89eee437aa922ab846401b77faa12",
+      "hash": "1f381081bd4c3321fb20d32bca29847e9a87df6720e9c956f6eef8cbf3c5a113",
       "docRelative": "frontend/jsfunction/promise/promiseAny.mdx"
     },
     "frontend/jsfunction/promise/promiseRace.js": {
-      "hash": "ac882a1d4360eac974f72fc3a9daddee172030ba61d9d4ec3fc50672935f82f5",
+      "hash": "3ad39c3b82e7bd67d9076e8b65936881fb03c7ab5206055b76db3dbf4e82e32b",
       "docRelative": "frontend/jsfunction/promise/promiseRace.mdx"
     },
     "frontend/jsfunction/promise/promiseReduce.js": {
-      "hash": "839fdaca5ef6d1ff525910c9de8335823a34a7111e5439fc860f3c80b013628f",
+      "hash": "3cda9b72d56a7c1e3ad25b366069d0af001a3ef201d8dec8550937024bcd62c5",
       "docRelative": "frontend/jsfunction/promise/promiseReduce.mdx"
     },
     "frontend/jsfunction/promise/promiseReject.js": {
-      "hash": "c8ba1edff8ca46d023224c42fb784253efce5848b34b97bbb2cb31c02f31529d",
+      "hash": "98edb90c08ffc6898f864a9ed216a756d08ca0874699d8adeb8d0f4f406d870b",
       "docRelative": "frontend/jsfunction/promise/promiseReject.mdx"
     },
     "frontend/jsfunction/promise/promiseResolve.js": {
-      "hash": "cb26ec8d35426a19ce33062dd8c9a6fcb3697a318f2ce2f8a50d663070e280be",
+      "hash": "baf5bc8e3fc814270ee3199a4d6d3d08154d8f303f0b38e3429b62f46a9daf7d",
       "docRelative": "frontend/jsfunction/promise/promiseResolve.mdx"
     },
     "frontend/jsfunction/promise/promiseSerial.js": {
-      "hash": "7e775e9612edb1ea2fed4813f68d68b8b3b0c6f7f3b25fb3ec2c1699ea83b221",
+      "hash": "d27ae3a9a31e604c605441b4beae0d06e8d0df92697422d7e4f7dae78f66ee99",
       "docRelative": "frontend/jsfunction/promise/promiseSerial.mdx"
     },
     "frontend/jsfunction/promise/promiseTimeout.js": {
-      "hash": "00d176a839e25ffbd1da5d32e3953e6d1a29c9a9398f2a6cbcd397ee14bb71f9",
+      "hash": "8cef4bfd9ad9c50f2f65673fb87b0f7794c59380323dcced012fa1ea02e26681",
       "docRelative": "frontend/jsfunction/promise/promiseTimeout.mdx"
     },
     "frontend/jsfunction/promise/promiseWithResolvers.js": {
-      "hash": "461b85021ba83841d647db706dea52b26bbae5d65a625cb275d6e73e60b3006e",
+      "hash": "ea4ccb7492e8925563e5d26d2fd89091617bc55af0640debeff2396ef1b9f2a3",
       "docRelative": "frontend/jsfunction/promise/promiseWithResolvers.mdx"
     },
     "frontend/jsfunction/range/range.js": {
-      "hash": "fa41faec0e0542b9bc3c4b04c3c62791f0833fc428ad246e251cda345c2f3fea",
+      "hash": "10a93e91e7bb8e1637f014a5255e7d37cf3f00cfb6f5080848e6fafad1df6e16",
       "docRelative": "frontend/jsfunction/range/range.mdx"
     },
     "frontend/jsfunction/range/rangeRight.js": {
-      "hash": "1f8d2d045873bbb84632d696f2acfda8378c15bdbd15fa22b1bc67bd2233b4c0",
+      "hash": "17690d09bcd97fce5c3cab8693e1cb3cfe9d85d2bc341d3d486d9df55351aa4c",
       "docRelative": "frontend/jsfunction/range/rangeRight.mdx"
     },
     "frontend/jsfunction/rateLimiter.js": {
-      "hash": "ccdd90057677dee28945850e0e6c2332d994ba0cb36682e80f7fbab95db0ef65",
+      "hash": "52f06ab29064fa4c5b7f67a90ea6fd4bf8539a0c916755eaae033719bc367d73",
       "docRelative": "frontend/jsfunction/rateLimiter.mdx"
     },
     "frontend/jsfunction/schemaValidator/schemaValidator.js": {
-      "hash": "5713b514927f4355fb5cd08ee5497f063337182193ce1f4ddab929a9208c3e45",
+      "hash": "49c377f5ab655276b8875420c11901035479bd12f30bf0c90d06a8670d4c32e5",
       "docRelative": "frontend/jsfunction/schemaValidator/schemaValidator.mdx"
     },
     "frontend/jsfunction/schemaValidator/schemaValidatorII.js": {
-      "hash": "9bf226e89b91fe84e3107acc73f6233dac288819cb0f058165100d004bd2140f",
+      "hash": "5c454f3678261988db481c9588508665b5559601728b2c39b0c4a4bad6e11e40",
       "docRelative": "frontend/jsfunction/schemaValidator/schemaValidatorII.mdx"
     },
     "frontend/jsfunction/schemaValidator/schemaValidatorIII.js": {
-      "hash": "a24cd72eff25010b36e7ebaf8254a2a52f01cd588f172e922e43b08793a595f6",
+      "hash": "e7df8a40cdb96491c0e6faaf243eae7411be6237d5aeb858ff3106f49a0fa816",
       "docRelative": "frontend/jsfunction/schemaValidator/schemaValidatorIII.mdx"
     },
     "frontend/jsfunction/singleton.js": {
-      "hash": "857fa530cf5a4ea8653f11280f6e726d683c7042e53d56391c4df166b43df7a1",
+      "hash": "75cd22b09f2d3283e2de67173c03952b7bdc221d609b5bbcad121ee02537c425",
       "docRelative": "frontend/jsfunction/singleton.mdx"
     },
     "frontend/jsfunction/size.js": {
-      "hash": "ca0503e82987de6228975ca30186c5907c45e8f930698dc854a478bb48227fba",
+      "hash": "674e70f0e9962ee4a206b3a2add135fba4a5ab6322c7a542a0dc4c6746aa277b",
       "docRelative": "frontend/jsfunction/size.mdx"
     },
     "frontend/jsfunction/sleep.js": {
-      "hash": "f82b59d0d21451978304ce88960d507835294637bb0b435386181a2ba777c7a2",
+      "hash": "62d7dcc8db4393c18fd7d256a3ab4294ae3219fe34618fc98322d946bfbec9df",
       "docRelative": "frontend/jsfunction/sleep.mdx"
     },
     "frontend/jsfunction/spreadSheet/spreadSheetI.js": {
-      "hash": "f3d9bf377eb4c1f10628546d81ebecdae67c057b94311a140eeb209e119a8c94",
+      "hash": "d65c90ca69be9b1edecdd515b2d820dd9ade0de12d23c8432b114b1ee7819656",
       "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetI.mdx"
     },
     "frontend/jsfunction/spreadSheet/spreadSheetII.js": {
-      "hash": "a8739a88724d0e77f3bc5ab132bc2a05526fe722891eb6fbe8c9d66b700eb3be",
+      "hash": "5475182cdb4713b754fe54333cd7b23ae0986a89d22d91ecc044ccba7227988a",
       "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetII.mdx"
     },
     "frontend/jsfunction/spreadSheet/spreadSheetIII.js": {
-      "hash": "2052bb13142e5d3c6a33cca3208065c50d90e4d98d8ab6406a4b06696ea1a07c",
+      "hash": "ff65ae6a0bc4340b4b19131bce00d3b296c0ac0522944f189b3021f6161b722e",
       "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetIII.mdx"
     },
     "frontend/jsfunction/styledTextRange/styledTextRange.js": {
-      "hash": "9df543e6d25d6f2c8995d5de155aa69d7a97523a801993ecf74b06765ebbffe8",
+      "hash": "d27f864a02e23f257ff16fcaf5a661e20da1cc3a66ea026a3597ee00a21dd6da",
       "docRelative": "frontend/jsfunction/styledTextRange/styledTextRange.mdx"
     },
     "frontend/jsfunction/styledTextRange/styledTextRangeII.js": {
-      "hash": "fa887e55ba9b17bcfce69e2b522487b1eaab77c69220f8d7a56a79fef8fb0818",
+      "hash": "1aa975a91d0f626883891b279a691c66be65423a5b957da44a4231bf17c052e3",
       "docRelative": "frontend/jsfunction/styledTextRange/styledTextRangeII.mdx"
     },
     "frontend/jsfunction/styledTextRange/styledTextRangeIII.js": {
-      "hash": "ffb19ada650729c2f1f8a2ddf326939754156ef65af5d189897c110de9b5b61b",
+      "hash": "557d51e35c7f5021d1e7617d69a95c333415836a47558e27c214180750882687",
       "docRelative": "frontend/jsfunction/styledTextRange/styledTextRangeIII.mdx"
     },
     "frontend/jsfunction/styledTextRange/styledTextRangeIV.js": {
-      "hash": "993f7b426098ee4ff8ba5b74b2869fc870c5dfc909c0ab79f0c184d4097604f5",
+      "hash": "4ddb4f9f4ffdf52c914bd7185b8e7df82a9d793324d6f1eba29a9bc5080daf1e",
       "docRelative": "frontend/jsfunction/styledTextRange/styledTextRangeIV.mdx"
     },
     "frontend/jsfunction/sum.js": {
-      "hash": "22b8db0029ea44a3b0a983d2d0f44b9e00f4a1b839e7aed966da2f06a9d605b9",
+      "hash": "11fbb20d355a6de5c1a4727b4a4b2e66545cbbc91047df57e9fb26a92ee73e00",
       "docRelative": "frontend/jsfunction/sum.mdx"
     },
     "frontend/jsfunction/templateEngine.js": {
-      "hash": "9c830095d57fde3e4283fb53b432f473995043a2dd6e4c66a7ee2dc562b900c8",
+      "hash": "bdcdeba6cacc8a8f28fd292854567fa2df77599f6694b3aba6c57ab729f2410d",
       "docRelative": "frontend/jsfunction/templateEngine.mdx"
     },
     "frontend/jsfunction/testRunner/testRunner.js": {
-      "hash": "1d8ee2268e5a6354cd22df389b765cf06dbc7bb8919bb7d4c692c2a5844c4903",
+      "hash": "43bae0b4f3d10bfaaec87d09ea5f9715ff7b68d884a36e22265c6bbb625a3328",
       "docRelative": "frontend/jsfunction/testRunner/testRunner.mdx"
     },
     "frontend/jsfunction/testRunner/testRunnerII.js": {
-      "hash": "0368898bd2c41b2f24f248ec693e80a7e23a268812ec843e8f7ea72820a2d738",
+      "hash": "3ab29738be87d75d61d319874430fa587af18980580eb33bb5503eea83103a5b",
       "docRelative": "frontend/jsfunction/testRunner/testRunnerII.mdx"
     },
     "frontend/jsfunction/testRunner/testRunnerIII.js": {
-      "hash": "ec4bf7072c29321cb16594559851c9f464e09c61eade98c6c47524444dd0fdcd",
+      "hash": "bda9b3291cfe0df4996702653dc2a1d4384a4d70d9e20183c540dd415630c7fe",
       "docRelative": "frontend/jsfunction/testRunner/testRunnerIII.mdx"
     },
     "frontend/jsfunction/testRunner/testRunnerIV_Promise.js": {
-      "hash": "0b4b7d9c83660f51d5297afa664448f98080d79cdf29ecbd4617d5d276a3195b",
+      "hash": "ad411b263e2c055708cf3e7fbae29a80eb3768b92d264dd046f96a771d4e6d14",
       "docRelative": "frontend/jsfunction/testRunner/testRunnerIV_Promise.mdx"
     },
     "frontend/jsfunction/textSearch/textSearch.js": {
-      "hash": "8a7324add770992d27bc1adb0efcebcaf528622d07cceeb87a079a238d4309c8",
+      "hash": "4b35a943504702f2720ff98188c98c01af3641ad83007f4e3f0e1826adc3a092",
       "docRelative": "frontend/jsfunction/textSearch/textSearch.mdx"
     },
     "frontend/jsfunction/textSearch/textSearchII.js": {
-      "hash": "b7bd53dd888373452e310916d6d90c098b468baa05dbb755798be14ba8c13e25",
+      "hash": "883399343ac0c3a391661a5076477fb709ac16b82a9b3880ddac18e8b08e114a",
       "docRelative": "frontend/jsfunction/textSearch/textSearchII.mdx"
     },
     "frontend/jsfunction/throttle.js": {
-      "hash": "265d6a654f6a8957f9e8ffc899372145772779370799daf9ab3acbf0c8fdf4ba",
+      "hash": "bb8618ed602e242d9570669543cde1a77f1fbba5179052359af6f1720924db53",
       "docRelative": "frontend/jsfunction/throttle.mdx"
     },
     "frontend/jsfunction/typeUtilities.js": {
-      "hash": "8d63af64a2d265dcd4baf0427d71c058566273290a1fd12df134de3244bc2621",
+      "hash": "21b2c2f5c0fc28dc39b3178a38d668b1ffe231400808a4793164cde257a748ac",
       "docRelative": "frontend/jsfunction/typeUtilities.mdx"
     },
     "frontend/jsfunction/typeUtilitiesII.js": {
-      "hash": "82ca76806125071a4010c5ff803306200268a8f5e60701f57d2f83a58a37060b",
+      "hash": "178281836f0eae64b1d9c08e233ac6482e4802e81bce95f96c4081ead69d90c6",
       "docRelative": "frontend/jsfunction/typeUtilitiesII.mdx"
     },
     "frontend/jsfunction/undoRedoManager/UndoRedoManager.js": {
-      "hash": "f82311a5d59fd3870199d34d0a37eb691db0aaec5d9aaabddc290cc3a66fd295",
+      "hash": "7daf4a115f66817bcd6b089c24eab0824831077353c9d76eeba2915e301dfd69",
       "docRelative": "frontend/jsfunction/undoRedoManager/UndoRedoManager.mdx"
     },
     "frontend/jsfunction/undoRedoManager/UndoRedoManagerWithDraftCommit.js": {
-      "hash": "341738fb4ccc23e672654927d63e3306083a6b19e0b40944faeb0b8db4703955",
+      "hash": "078443895e58a2d6282df78e701f9b176a932b73638d4ac1b05765aa8ca9c84b",
       "docRelative": "frontend/jsfunction/undoRedoManager/UndoRedoManagerWithDraftCommit.mdx"
     },
     "frontend/uicoding/main.md": {
-      "hash": "24c482b1d03460e84c05d5f8ec42adf1e0195709c54967ce88b42d113ded5f61",
+      "hash": "facf6c9811037a59e9af8913bd8b81f0f1312b63bd2506d32e2fe6186c51e977",
       "docRelative": "frontend/uicoding/main.mdx"
     },
     "backend/quizzes/rest-vs-graphql-vs-gRPC.md": {
-      "hash": "c5a2b134181d13c66abc80f59f42d64e10a720b70ad6dd031e56f45db09579ed",
+      "hash": "f1b1fbce72d36362d219f21b77e5bfec5a6b07184f5a7582c124af78f4c99ce0",
       "docRelative": "backend/quizzes/rest-vs-graphql-vs-gRPC.mdx"
     },
     "algorithm/array/arrayProductExcludingCurrent.js": {
-      "hash": "639c18dd04ebb523542ac2ab2a908da8c5c1ddc8253975fdad1c57d19ad27908",
+      "hash": "4a2b14451003b8c8e5c50eb787e30c0e2dec1b4f7a864d17b24a17cc5a39f8a9",
       "docRelative": "algorithm/array/arrayProductExcludingCurrent.mdx"
     },
     "algorithm/array/duplicateArray.js": {
-      "hash": "e78ee99f853bb0664cdaf6e0b4a8b97897988be818f38b559130b94123b1e531",
+      "hash": "d8c1864360c3ffe190b2d6493ccb34622cddf78cf2b38be91980435b89504f50",
       "docRelative": "algorithm/array/duplicateArray.mdx"
     },
     "algorithm/array/findMissingNumberInSequence.js": {
-      "hash": "864c175e4d04a81a2aea4c66c55bf2663fb897cc15eb67f8fda0bd32081886f3",
+      "hash": "0714e9e0899c38627fcfc447dc85acc02470e3865a012cf28d4778b60243af43",
       "docRelative": "algorithm/array/findMissingNumberInSequence.mdx"
     },
     "algorithm/array/kRowPascalTriangle.py": {
-      "hash": "e3f75218ba3fb947b3814d32f89c45c4b2af50a4e9808bba891b66ae5773dea8",
+      "hash": "0a505a14c2cc212d82cd73bb168d6bda88b15e3554880d55fca2ff82c5ea80f6",
       "docRelative": "algorithm/array/kRowPascalTriangle.mdx"
     },
     "algorithm/array/kRowPascalTriangle.js": {
-      "hash": "e3f75218ba3fb947b3814d32f89c45c4b2af50a4e9808bba891b66ae5773dea8",
+      "hash": "0a505a14c2cc212d82cd73bb168d6bda88b15e3554880d55fca2ff82c5ea80f6",
       "docRelative": "algorithm/array/kRowPascalTriangle.mdx"
     },
     "algorithm/array/maxProfit.js": {
-      "hash": "e376ef5e449641f294be51842efb0b5a1b1d0e42927675bf7de792dc7cc22f7f",
+      "hash": "fb2e60efa96968d6861b984d44558853c897ddffb1b506dc8e61c5ada49c0007",
       "docRelative": "algorithm/array/maxProfit.mdx"
     },
     "algorithm/array/maxSubArray.py": {
-      "hash": "04d5c96db55acb55e725b7c590c3c380ba666a0178772dcfe97276883a87d223",
+      "hash": "e5a8178e5a5a7ee75aa27c0f7d272863cf6e602300b2ecb6f07ea2083f1e9afe",
       "docRelative": "algorithm/array/maxSubArray.mdx"
     },
     "algorithm/array/maxSubArray.js": {
-      "hash": "04d5c96db55acb55e725b7c590c3c380ba666a0178772dcfe97276883a87d223",
+      "hash": "e5a8178e5a5a7ee75aa27c0f7d272863cf6e602300b2ecb6f07ea2083f1e9afe",
       "docRelative": "algorithm/array/maxSubArray.mdx"
     },
     "algorithm/array/twoSum.js": {
-      "hash": "2fd629aff3cc2ce8650847efe55af7357a0d41b2886a8488ee59460089066ad2",
+      "hash": "b7d8df1c9be94957876d326204090867da21dcb5dc815b811e2ae43a8b8a9770",
       "docRelative": "algorithm/array/twoSum.mdx"
     },
     "algorithm/array/zigzag.js": {
-      "hash": "5bc5b1d7569cf22cec772be9e7133481a49702b9bf6a6f0920354c1157ba60f3",
+      "hash": "10e47e7dd89e965ed01ee349537e1545cce6ce8e66647453c28f49ed3afd808c",
       "docRelative": "algorithm/array/zigzag.mdx"
     },
     "algorithm/bit/bitCount.js": {
-      "hash": "f297d8f266be6055c584f5cd18ba951227dc45f7fac3a1ec376ae03accd04276",
+      "hash": "2aac7c558b9d794b9481ba9b680bb38f68971fcac438b63b01e4b81f494250a2",
       "docRelative": "algorithm/bit/bitCount.mdx"
     },
     "algorithm/bit/bitReversal.js": {
-      "hash": "32f492e0bbf09e5bf14b1c55de03967becc5db21f74edc90fdd65e3065816e46",
+      "hash": "9df67691c5ad7926f8945bca3970ba8bc21f97ee98f191f41fdc7bc16384ee2d",
       "docRelative": "algorithm/bit/bitReversal.mdx"
     },
     "algorithm/bit/countOnesBitInBinary.js": {
-      "hash": "5735a3dfed4b5911367624d87d505d91fc92e350f129f25675c4fc61ef505bef",
+      "hash": "ea8416e193032291a7714bd6d93bb28bfbcfdfd6e13171708f6a06c7a2931148",
       "docRelative": "algorithm/bit/countOnesBitInBinary.mdx"
     },
     "algorithm/climbingStairs.js": {
-      "hash": "0f52badb1756a526bebfa8644796f135bbe185b3af819d20b17a84ac662e0975",
+      "hash": "6ffc33431e2288df2d026e10111006d486ea32f79044350417cf3a13a16ae18f",
       "docRelative": "algorithm/climbingStairs.mdx"
     },
-    "algorithm/countIslandOnGrid.js": {
-      "hash": "21fb35ce44c535ae35e3904a6fcff4d23b62b0a33f77e88187cdbac7e635bc86",
-      "docRelative": "algorithm/countIslandOnGrid.mdx"
+    "algorithm/dfs/calculateEquation.js": {
+      "hash": "e0d96a50b462996648f5d4c92eff69a45a0a4a29488f3fce5f9a8cdf893adce0",
+      "docRelative": "algorithm/dfs/calculateEquation.mdx"
+    },
+    "algorithm/dfs/countIslandOnGrid.js": {
+      "hash": "0d2b8be42d005c0303aaa5d40c5e4e448e66845e67b233c5e96d0fb51ac2cb60",
+      "docRelative": "algorithm/dfs/countIslandOnGrid.mdx"
     },
     "algorithm/graph/aliendOrder.js": {
-      "hash": "7c495517e72ec44e0cafadd695cc638a2221a5d97e688a7d7e748051a834fbb8",
+      "hash": "eea5da97639e79f9396b3cb22524f7055a8f220c1e337991754a63079a34a5f4",
       "docRelative": "algorithm/graph/aliendOrder.mdx"
     },
     "algorithm/isMeetingCalendarValid.js": {
-      "hash": "d1f698da4eeaeb4ca0ca491fc6f15480cd13dfb3ef183f7524d79a5f49f89a47",
+      "hash": "7d35708df6828b1c83ad7d39c5b6e3895acc4e36e579274c3cb7e75776d4ca35",
       "docRelative": "algorithm/isMeetingCalendarValid.mdx"
     },
     "algorithm/linkedlist/Heap.js": {
-      "hash": "767cc0ea4ead076f275dd55154c0ba315955008619a52d58f0e1e676b5219347",
+      "hash": "42ac6d33f0a4570768a4dc663618fa82dba7bd04672c53e270d2c8c6ec997d57",
       "docRelative": "algorithm/linkedlist/Heap.mdx"
     },
     "algorithm/linkedlist/isCircularLinkedList.py": {
-      "hash": "a6dc4763a28e6cd2699fefcf8f133916386bcc2d1f5e16f33cdef10313b1f639",
+      "hash": "39d70f084a68c73c2a7072c8d5cfdb5c6d04c52a4a7fafb481121e533fb087fd",
       "docRelative": "algorithm/linkedlist/isCircularLinkedList.mdx"
     },
     "algorithm/linkedlist/isCircularLinkedList.js": {
-      "hash": "a6dc4763a28e6cd2699fefcf8f133916386bcc2d1f5e16f33cdef10313b1f639",
+      "hash": "39d70f084a68c73c2a7072c8d5cfdb5c6d04c52a4a7fafb481121e533fb087fd",
       "docRelative": "algorithm/linkedlist/isCircularLinkedList.mdx"
     },
     "algorithm/linkedlist/linkedListCombineKSorted.js": {
-      "hash": "b9c996d0362f7b319a91472c477a55ebe4facdb95011902482fe639b643d6034",
+      "hash": "317c859e9065d7dbd091c80ad8e54c4ac90a3f264c191f76c2eaaf893297de97",
       "docRelative": "algorithm/linkedlist/linkedListCombineKSorted.mdx"
     },
     "algorithm/linkedlist/linkedListCombinedSortedList.js": {
-      "hash": "eccfa8f58b8c084a6aceb6cc5c4ed802d33aad78cda5247ee7d3ba6bdde7a23a",
+      "hash": "16098c8e46c2e630932e0b701ce5538887617e0db33a95738d3c68da7c186008",
       "docRelative": "algorithm/linkedlist/linkedListCombinedSortedList.mdx"
     },
     "algorithm/linkedlist/reverseList.js": {
-      "hash": "68e9d573d2f40653ba0974a2f94a20a4d1dc10d4c0417afa5265ccb6c228df53",
+      "hash": "0ac06ec2a7bb8e8bd4fdce1917968d890ab0c9ce9f65479e4834a18ddc83d754",
       "docRelative": "algorithm/linkedlist/reverseList.mdx"
     },
     "algorithm/lru/lru.js": {
-      "hash": "158c640e8b50230847b0e4429998aea2174f2b28d0ea0c164b5f2ff64f262e72",
+      "hash": "23d7367a44f6d2084d52de9b8d372ee38d8b40f65adb30a4ef25cd59873e2762",
       "docRelative": "algorithm/lru/lru.mdx"
     },
     "algorithm/mostCommonElement.js": {
-      "hash": "1d836b0e2cbc7ff4c8dd469111a1930fb0d8b9ad37cf87f13aad3841e480a808",
+      "hash": "8cec5205685c93fd5c347d5aa8adaf9837a617e878b380ffb9586e23dc79fff9",
       "docRelative": "algorithm/mostCommonElement.mdx"
     },
     "algorithm/stack/Queue.js": {
-      "hash": "29f7c5896a7dfc9dbd8022c9750e20d8fbd57070e34aa64638334a035e9ef781",
+      "hash": "4b117f6a95d27a309d9f2d5a56151a35fbee8fd17e0351387f82769ed6d1a800",
       "docRelative": "algorithm/stack/Queue.mdx"
     },
     "algorithm/stack/Stack.js": {
-      "hash": "65eff09a05fe7d1610981dd311debecb16645ad260246274abd13146faafae8a",
+      "hash": "59a5cc7852a2f298c6701b4082913713aea95a79a679cd38b6bfc24b2e9a9e24",
       "docRelative": "algorithm/stack/Stack.mdx"
     },
     "algorithm/stack/isBalanceBracket.py": {
-      "hash": "88ceb7f3f967a21380236bd499115b6e1488f0d4a26af352efe1e2261087b132",
+      "hash": "6edb1795fd6e6df988c4767c5b65f8497accc6d67d4a33075f51183fed5d9e14",
       "docRelative": "algorithm/stack/isBalanceBracket.mdx"
     },
     "algorithm/stack/isBalanceBracket.js": {
-      "hash": "88ceb7f3f967a21380236bd499115b6e1488f0d4a26af352efe1e2261087b132",
+      "hash": "6edb1795fd6e6df988c4767c5b65f8497accc6d67d4a33075f51183fed5d9e14",
       "docRelative": "algorithm/stack/isBalanceBracket.mdx"
     },
     "algorithm/stringAnagram.js": {
-      "hash": "febeb169c4424267b83d32241e61effa3707001ae6accf86553fb4999f599cb5",
+      "hash": "0d855699717cfe62ed5df275fc9430f4778305b84b9f1de0b172fbeed86bb19a",
       "docRelative": "algorithm/stringAnagram.mdx"
     },
     "algorithm/tree/binarySearch.js": {
-      "hash": "23d7b27f037cac5f17fc95ca87565d427da0fd71be5168f4b112765bd7b9abb0",
+      "hash": "a342696cdf679e67769c5236cd6bc1fdacc8a653390de066a32b9cf4ffbac7d6",
       "docRelative": "algorithm/tree/binarySearch.mdx"
     },
     "algorithm/tree/binarySearchTree.js": {
-      "hash": "25fe72925c47ca1f30e0c2af9c850d3233901e48ca89779116bb2b82f2b7fd7b",
+      "hash": "1b85762128461fe317e4e09175f66cb1ada60bd92108364f57275f53caaa492c",
       "docRelative": "algorithm/tree/binarySearchTree.mdx"
     },
     "algorithm/tree/binaryTreeEqual.js": {
-      "hash": "747c1e466b597180c85f6ae69a49128bf65851c69e795ed5abc4dad755d298e6",
+      "hash": "deca4042bcaa58f0c27e0299adc9071fce0f2ac79878d66a36a7fd6b6995f0ac",
       "docRelative": "algorithm/tree/binaryTreeEqual.mdx"
     },
     "algorithm/tree/binaryTreeFlip.js": {
-      "hash": "7d9c0b3ee28ca1b18ae91dd952abec32399a63c3586a7f2278304dde22c3b1c6",
+      "hash": "d8096409b231619439ce7630a129e492a2f7f01ff74bf4838e6b884665a4bcb6",
       "docRelative": "algorithm/tree/binaryTreeFlip.mdx"
     },
     "algorithm/tree/binaryTreeMaximumDepth.js": {
-      "hash": "e8ed1b5eaef53f1a71af09c42b78b2fced43d49d1c001b83734e140be6fa0258",
+      "hash": "9bf4a5df17f07eb1ccaa83bdd477b7bd17f201e10046aad3237dece4bcadc940",
       "docRelative": "algorithm/tree/binaryTreeMaximumDepth.mdx"
     },
     "algorithm/tree/binaryTreeSubTree.js": {
-      "hash": "f9dcaf26b8a3ef6d1e2d52b30b72bcfe27d39b0f78014179257ff87dfd7c8934",
+      "hash": "6cac2d18e41972be30bc745121f19d37743d083f081945fa4d2b3f763c45d649",
       "docRelative": "algorithm/tree/binaryTreeSubTree.mdx"
     },
     "algorithm/tree/lowestCommonAncestor.py": {
-      "hash": "7d344eb70d7de12a6c6cbf24c1075c38500f4b7d8bb6bbc80b98b28ffe6ce910",
+      "hash": "e7e55a444405dd0cc8a360ee79794451e98545b4c315bc329062d1b027e0d99f",
       "docRelative": "algorithm/tree/lowestCommonAncestor.mdx"
     },
     "algorithm/tree/lowestCommonAncestor.js": {
-      "hash": "7d344eb70d7de12a6c6cbf24c1075c38500f4b7d8bb6bbc80b98b28ffe6ce910",
+      "hash": "e7e55a444405dd0cc8a360ee79794451e98545b4c315bc329062d1b027e0d99f",
       "docRelative": "algorithm/tree/lowestCommonAncestor.mdx"
     },
     "algorithm/trie/findWordsInGrid.js": {
-      "hash": "18488be61fe2489b4ec68d7f3661111587443dd4704ba12f4f41b699026f944a",
+      "hash": "f6ab0fc3afa18bc2c05e46398b1f0d6a72dacdede6bff1749f12f785b9f1df2d",
       "docRelative": "algorithm/trie/findWordsInGrid.mdx"
     },
     "algorithm/two-pointers/3Sum.py": {
-      "hash": "e50aba352c01c437de0b947a08bf0194a918aa6b0cee0906b1542cd50210bf72",
+      "hash": "6769853fc638c01114f2e196aba4451bae4bd9aaf1f2a4ff67bd7ea034209fac",
       "docRelative": "algorithm/two-pointers/3Sum.mdx"
     },
     "algorithm/two-pointers/3Sum.js": {
-      "hash": "e50aba352c01c437de0b947a08bf0194a918aa6b0cee0906b1542cd50210bf72",
+      "hash": "6769853fc638c01114f2e196aba4451bae4bd9aaf1f2a4ff67bd7ea034209fac",
       "docRelative": "algorithm/two-pointers/3Sum.mdx"
     },
     "algorithm/two-pointers/checkSubArraySum.js": {
-      "hash": "d446e1bee1325737594f5c7555cb0414078ff990db8f6b81adef52fbc0bd125c",
+      "hash": "d82df0b2047c4eca4ae8400cae676f9ae7b8263dfe12e34689ebe1bafe5702b6",
       "docRelative": "algorithm/two-pointers/checkSubArraySum.mdx"
     },
     "algorithm/two-pointers/dutchFlagSorting.js": {
-      "hash": "005d6b9b334010551ef7b72711b0633ccede9262668e33044a6548fb712314aa",
+      "hash": "9b88deeeb3ec79de57e00559e2980f5849e959264b83d458570c0d708a9bfd45",
       "docRelative": "algorithm/two-pointers/dutchFlagSorting.mdx"
     },
     "algorithm/two-pointers/isPalindrome.py": {
-      "hash": "9d16721ab6ed7e8d2041d3b2ca836ca178d21ccaa32d381ef7e3c42ecab8e41c",
+      "hash": "2369da5cdcc68672c9469b6e6d4aaca572a5665d96d218e908c6f489b003aeb0",
       "docRelative": "algorithm/two-pointers/isPalindrome.mdx"
     },
     "algorithm/two-pointers/isPalindrome.js": {
-      "hash": "9d16721ab6ed7e8d2041d3b2ca836ca178d21ccaa32d381ef7e3c42ecab8e41c",
+      "hash": "2369da5cdcc68672c9469b6e6d4aaca572a5665d96d218e908c6f489b003aeb0",
       "docRelative": "algorithm/two-pointers/isPalindrome.mdx"
     },
     "algorithm/two-pointers/isPalindrome_Pair.py": {
-      "hash": "2b81b716b66348716f590d8e566fe16133372b7cf63285ea64bb12b92d3e6a85",
+      "hash": "da63d48c943c76a418e66d844698813db9d20f7fa7a9ee53387dd97399603e08",
       "docRelative": "algorithm/two-pointers/isPalindrome_Pair.mdx"
     },
     "algorithm/two-pointers/isPalindrome_Pair.js": {
-      "hash": "2b81b716b66348716f590d8e566fe16133372b7cf63285ea64bb12b92d3e6a85",
+      "hash": "da63d48c943c76a418e66d844698813db9d20f7fa7a9ee53387dd97399603e08",
       "docRelative": "algorithm/two-pointers/isPalindrome_Pair.mdx"
     },
     "algorithm/two-pointers/minimumMoveToMakePalindrome.js": {
-      "hash": "aaf8578826d271ec09e20b3219e54089d23377a11fbf01dbc99753519dc60893",
+      "hash": "a62e5a6c86513ddceebdfc7bfd5611b71bbff1c4890d5f1bc67144c7d87590b3",
       "docRelative": "algorithm/two-pointers/minimumMoveToMakePalindrome.mdx"
     },
     "algorithm/two-pointers/removeNthLasNode.js": {
-      "hash": "ed1f72bd0dd13e9891e72cbedfb93c2408864e498e6eb87a90538e2cca187a59",
+      "hash": "1f98337d2e8f3a1240c36f3a5e3238c4a1e9f4a1120a89d7a11498f13afad5c2",
       "docRelative": "algorithm/two-pointers/removeNthLasNode.mdx"
     },
     "algorithm/two-pointers/reverseWords.js": {
-      "hash": "dafbb17f8a7337c56db2a0ffd9ef1c46d60e2ba84057c4f0a0544bce788d5838",
+      "hash": "638c91f79a90cde6c64bc286869dd5fe64883f88eefa078c5b41920fce625dc9",
       "docRelative": "algorithm/two-pointers/reverseWords.mdx"
     },
     "algorithm/two-pointers/shortestSubsrtingContainingCharacters.js": {
-      "hash": "86c006acc9b2c4ae542f1ac60eb4eb4c0191063da9ba8a726394775242df68c4",
+      "hash": "79530e177fe0a1cd2174cc0467feaf19da1d91984cdcc85e2a8aaa14466dc7db",
       "docRelative": "algorithm/two-pointers/shortestSubsrtingContainingCharacters.mdx"
     },
     "__nav__:algorithm": {
-      "hash": "85a0ec9732f5b5f6fc5d444e047271eefd774c6ca19a5d7b234217d3f1c0b527",
+      "hash": "08310079726e4b8934e1914a94780fb38c9a4b0083b78e963958416c1881cda2",
       "docRelative": "algorithm/_index.mdx"
     },
     "__nav__:algorithm/array": {
@@ -975,6 +983,10 @@
     "__nav__:algorithm/bit": {
       "hash": "118fa44f45ea1b9aaa2b48b8cf0f1863ee7f6240fc92f9d53a600d264f39c573",
       "docRelative": "algorithm/bit/_index.mdx"
+    },
+    "__nav__:algorithm/dfs": {
+      "hash": "5f4c11bd54c95d97dbae0e9a405bcd76d1cb51b5bcc6f2f5728f6304e7523651",
+      "docRelative": "algorithm/dfs/_index.mdx"
     },
     "__nav__:algorithm/graph": {
       "hash": "4995fd49aef8cd0bc27603cad37918c4ce5507324bf0b1346b4101d50156559b",
@@ -1017,7 +1029,7 @@
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
-      "hash": "5f24bbaeace87d8b6dbcf428aaa78132df9c63c358ec301eb7a48c052f1e52a3",
+      "hash": "398888b08353474df003228c5ba695801cff98933ba7f11df8cf14c608f26077",
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/2d-readingOrder": {
