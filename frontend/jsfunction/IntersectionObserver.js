@@ -1,0 +1,35 @@
+/**
+ * This is the callback function that will be called when the IntersectionObserver detects 
+ * a change in the intersection of the target element with the root.
+ * Instead of constantly checking scroll coordinates on the main thread, 
+ * the browser calculates intersections for you and notifies your code only when visibility changes.
+ * The Callback: 
+ * A function that runs whenever the visibility of a targeted element crosses a certain threshold.
+ * The Observer: 
+ * The instance that monitors the targets, created using new IntersectionObserver(callback, options).
+ * @param {*} entries 
+ * @param {*} observer 
+ */
+const callback = (entries, observer) => {
+  entries.forEach(entry => {
+    // Check if the target element is currently visible in the viewport
+    if (entry.isIntersecting) {
+      // Trigger your action (e.g., load image, add animation class)
+      entry.target.classList.add('visible');
+      
+      // Stop observing if you only need it to happen once
+      observer.unobserve(entry.target);
+    }
+  });
+};
+
+// Create the observer
+const observer = new IntersectionObserver(callback, {
+  root: null, // defaults to the browser viewport
+  rootMargin: '0px',
+  threshold: 0.1 // triggers when 10% of the element is visible
+});
+
+// Target an element to watch
+const targetElement = document.querySelector('.my-element');
+observer.observe(targetElement);
