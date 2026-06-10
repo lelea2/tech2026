@@ -1,6 +1,11 @@
 import {useState} from 'react';
 import {fileData} from './data';
 
+/**
+ * Sorts an array of file items, placing directories before files.
+ * @param {*} items 
+ * @returns 
+ */
 function sortItems(items) {
   return [...items].sort((a, b) => {
     const aIsDir = Array.isArray(a.children);

@@ -49,6 +49,16 @@ function checkWinner(board, row, col, player) {
   return false;
 }
 
+/**
+ * Helper function to count the number of pieces in a given direction.
+ * @param {d} board 
+ * @param {*} row 
+ * @param {*} col 
+ * @param {*} rowDir 
+ * @param {*} colDir 
+ * @param {*} player -- red or blue
+ * @returns 
+ */
 function countPieces(board, row, col, rowDir, colDir, player) {
   let count = 0;
   let nextRow = row + rowDir;
