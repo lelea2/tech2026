@@ -129,6 +129,11 @@ const config = {
             label: 'System Design',
           },
           {
+            to: '/docs/company',
+            position: 'left',
+            label: 'Company',
+          },
+          {
             href: 'https://github.com/lelea2/tech2026',
             label: 'GitHub',
             position: 'right',

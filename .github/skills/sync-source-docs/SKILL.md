@@ -1,6 +1,6 @@
 ---
 name: sync-source-docs
-description: Use when frontend, backend, algorithm, or system-designs source files changed and docs need to be synced into website docs automatically. Also use when a custom folder format/path mapping is provided and document paths must be generated accordingly, including frontend/jsfunction, frontend/array, backend/quizzes, backend markdown/mdx content, system-designs markdown/mdx content, and separate algorithm navigation. Trigger phrases: sync docs, update documentation, refresh source docs, frontend changed, backend changed, algorithm changed, system design changed, folder format mapping, jsfunction docs sync, backend quizzes sync, backend md sync, algorithm docs sync, system-design docs sync, py js compare docs.
+description: Use when frontend, backend, algorithm, system-designs, or company source files changed and docs need to be synced into website docs automatically. Also use when a custom folder format/path mapping is provided and document paths must be generated accordingly, including frontend/jsfunction, frontend/array, backend/quizzes, backend markdown/mdx content, system-designs markdown/mdx content, company subfolders, and separate algorithm navigation. Trigger phrases: sync docs, update documentation, refresh source docs, frontend changed, backend changed, algorithm changed, system design changed, company changed, company code sync, folder format mapping, jsfunction docs sync, backend quizzes sync, backend md sync, algorithm docs sync, system-design docs sync, company docs sync, py js compare docs.
 ---
 
 # Sync Source Docs
@@ -16,13 +16,18 @@ Keep documentation in sync when files change under frontend, backend, algorithm,
   - backend
   - algorithm
   - system-designs
+  - company (with subfolders: gusto, meta, splunk, etc.)
 - Ignore website as a source of truth
 - Write auto-generated docs to:
   - website/docs/source-sync
   - website/docs/system-designs (when using `--docs-subdir system-designs`)
+  - website/docs/company (when using `--docs-subdir company`)
 - Source-of-truth rule for System Designs docs:
   - `website/docs/system-designs/**` must come only from root `system-designs/**`
   - Do not map `backend/**`, `frontend/**`, or other folders into `--docs-subdir system-designs`
+- Source-of-truth rule for Company docs:
+  - `website/docs/company/**` must come only from root `company/**`
+  - Do not map `backend/**`, `frontend/**`, `algorithm/**`, or other folders into `--docs-subdir company`
 - Support custom source-to-doc path mapping format
 - If mapped docs folder path does not exist, create it under website/docs first
 - Folder names should map to navigation names automatically
@@ -51,6 +56,7 @@ Keep documentation in sync when files change under frontend, backend, algorithm,
 - If any file under `backend/**` is in scope (including `backend/quizzes/**` and backend `.md`/`.mdx`), include `backend=.` for backend docs.
 - If any file under `algorithm/**` is in scope, include `algorithm=.` for algorithm docs.
 - If any file under `system-designs/**` is in scope, include `system-designs=.` for system design docs.
+- If any file under `company/**` is in scope, include `company=.` for company docs.
 - This guarantees new sibling folders and moved files are reflected correctly on the next sync.
 
 ### Post-hook behavior (new)
@@ -129,13 +135,25 @@ Run FrontEnd + Algorithm sync as two commands (separate docs subdirs):
 - cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"
 - cd website && npm run sync:source-docs -- --docs-subdir algorithm --format "algorithm=."
 
-Run Backend sync as a separate command (recommended):
+Run BackEnd sync as a separate command (recommended):
 
 - cd website && npm run sync:source-docs -- --docs-subdir backend --format "backend=."
 
 Run System Design sync as a separate command (recommended):
 
 - cd website && npm run sync:source-docs -- --docs-subdir system-designs --format "system-designs=."
+
+Run Company sync as a separate command (recommended):
+
+- cd website && npm run sync:source-docs -- --docs-subdir company --format "company=."
+
+Run all syncs in sequence for complete documentation refresh:
+
+- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"
+- cd website && npm run sync:source-docs -- --docs-subdir algorithm --format "algorithm=."
+- cd website && npm run sync:source-docs -- --docs-subdir backend --format "backend=."
+- cd website && npm run sync:source-docs -- --docs-subdir system-designs --format "system-designs=."
+- cd website && npm run sync:source-docs -- --docs-subdir company --format "company=."
 
 Mandatory rule for this docs subdir:
 
@@ -145,6 +163,37 @@ Mandatory rule for this docs subdir:
 This creates/updates:
 
 - website/docs/system-designs
+
+Run Company sync as a separate command (recommended):
+
+- cd website && npm run sync:source-docs -- --docs-subdir company --format "company=."
+
+Mandatory rule for this docs subdir:
+
+- Use only `company=.` in the mapping for `--docs-subdir company`.
+- Do not include additional mappings in that command.
+
+This creates/updates:
+
+- website/docs/company
+
+Company folder structure and navigation:
+
+- Each company subfolder (e.g., `company/gusto`, `company/meta`, `company/splunk`) becomes its own navigation section.
+- Files in each company subfolder (`company/splunk/colorExclude.js`) become MDX pages under that company nav.
+- Example:
+  - `company/splunk/colorExclude.js` → `website/docs/company/splunk/colorExclude.mdx`
+  - `company/gusto/payrollCalculator.js` → `website/docs/company/gusto/payrollCalculator.mdx`
+- Post-hook generates `company/<company-name>/_index.mdx` for each company subfolder's navigation page.
+
+Company root-file entry rule (important):
+
+- Use `company=.` (not `company=company`) so company subfolders maintain their structure directly under `website/docs/company/`.
+- Example folder structure:
+  - `company/splunk/` → `website/docs/company/splunk/_index.mdx` + individual files
+  - `company/meta/` → `website/docs/company/meta/_index.mdx` + individual files
+  - `company/gusto/` → `website/docs/company/gusto/_index.mdx` + individual files
+- Newly added company folders or files are picked up automatically on the next sync run.
 
 Avoid narrow leaf-only mapping for main sync runs:
 
@@ -204,6 +253,8 @@ Mapping format rules:
   - FrontEnd: `--docs-subdir frontend --format "frontend/jsfunction=jsfunction"`
   - BackEnd: `--docs-subdir backend --format "backend=."`
   - Algorithm: `--docs-subdir algorithm --format "algorithm=."`
+  - System Design: `--docs-subdir system-designs --format "system-designs=."`
+  - Company: `--docs-subdir company --format "company=."`
 - Check that parent `_index.mdx` was regenerated and now contains the new file link.
 
 ## Troubleshooting: Backend markdown/mdx or quizzes docs missing
@@ -225,6 +276,18 @@ Mapping format rules:
 - Source system design markdown and mdx files are emitted into `website/docs/system-designs/**`.
 - Folder navigation pages (`_index.mdx`) are generated for nested folders on sync.
 - If files were moved, rerun with the same mapping so stale old paths are removed.
+
+## Troubleshooting: Company code docs missing
+
+- Use stable parent mapping for company docs: `--docs-subdir company --format "company=."`.
+- This includes all code files under company subfolders:
+  - `company/splunk/**`
+  - `company/meta/**`
+  - `company/gusto/**`
+  - And any other company subdirectories
+- Source code files (`.js`, `.py`, `.ts`, etc.) are generated as `.mdx` docs pages under `website/docs/company/**`.
+- Folder navigation pages (`_index.mdx`) are generated for each company subfolder on sync.
+- If files were moved or new company folders added, rerun with the same mapping so new folders are discovered and stale old paths are removed.
 
 ## Expected Output
 

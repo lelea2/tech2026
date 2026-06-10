@@ -32,17 +32,9 @@
       "hash": "294789dafc6e07163bfd318aafa97850c4765f93ad10f614d910556e3db387bb",
       "docRelative": "frontend/jsfunction/Emitter/EventEmitterII.mdx"
     },
-    "frontend/jsfunction/Function.prototype.apply.js": {
-      "hash": "440cceb662bd6654d5c04f64d6dafe95d1e921eb01c0fca57ff36dcef3a0595b",
-      "docRelative": "frontend/jsfunction/Function.prototype.apply.mdx"
-    },
-    "frontend/jsfunction/Function.prototype.bind.js": {
-      "hash": "6ac604d1fdfbe667453e55c55d74064e059af51abb88711febde1782f61a2ead",
-      "docRelative": "frontend/jsfunction/Function.prototype.bind.mdx"
-    },
-    "frontend/jsfunction/Function.prototype.call.js": {
-      "hash": "a526c775f4d33cda2b07ed7fe27e8743ecf27d3258e049800885669bac4027aa",
-      "docRelative": "frontend/jsfunction/Function.prototype.call.mdx"
+    "frontend/jsfunction/IntersectionObserver.js": {
+      "hash": "6954386cbfdc9688bf89b0c336e6be967770b1a19b50641c6598e0b2a5fc23e5",
+      "docRelative": "frontend/jsfunction/IntersectionObserver.mdx"
     },
     "frontend/jsfunction/StoreData.js": {
       "hash": "c56d275f655d20c6c951f3751ef79ddcbfac81322121ffc57a51d0d046985694",
@@ -56,29 +48,17 @@
       "hash": "4f1117f8f78796e2eb51ef4b28cc40cc2358fe7eefe1477d3100dc78aefd701f",
       "docRelative": "frontend/jsfunction/UndoableDatabase/UndoableDatabaseII.mdx"
     },
-    "frontend/jsfunction/array/Array.prototype.at.js": {
-      "hash": "37679b6c496e33d658027d33fd05127055389a0cfc825bbce30aa1c07f2d718f",
-      "docRelative": "frontend/jsfunction/array/Array.prototype.at.mdx"
+    "frontend/jsfunction/apply_call_bind/Function.prototype.apply.js": {
+      "hash": "8e078cbb54e884d9b8c90f96eeacc166982c84f077dd87f20f37fc0b70281465",
+      "docRelative": "frontend/jsfunction/apply_call_bind/Function.prototype.apply.mdx"
     },
-    "frontend/jsfunction/array/Array.prototype.concat.js": {
-      "hash": "e551b7bdc68863d982f4072e88faa3b005e1d1c084e1859aa9f01c7eb43ef6bb",
-      "docRelative": "frontend/jsfunction/array/Array.prototype.concat.mdx"
+    "frontend/jsfunction/apply_call_bind/Function.prototype.bind.js": {
+      "hash": "dd3c4f719fd8efa33877dfa2546a529d17fc9b0a083e315a8dd3d6368981162b",
+      "docRelative": "frontend/jsfunction/apply_call_bind/Function.prototype.bind.mdx"
     },
-    "frontend/jsfunction/array/Array.prototype.filter.js": {
-      "hash": "0137f48a4bd3dcc2cba2969ac0ab53313de15c3d2a6af1925b0be1af69d995c4",
-      "docRelative": "frontend/jsfunction/array/Array.prototype.filter.mdx"
-    },
-    "frontend/jsfunction/array/Array.prototype.reduce.js": {
-      "hash": "e7802439632a3732860e52d985cc8f05b315a95a51525e24bc980badb5ba41d7",
-      "docRelative": "frontend/jsfunction/array/Array.prototype.reduce.mdx"
-    },
-    "frontend/jsfunction/array/Array.prototype.square.js": {
-      "hash": "eed60ecbbb568a5c0cf7c653ee8cb25157f175d85ed355d597955fbe20b4ee53",
-      "docRelative": "frontend/jsfunction/array/Array.prototype.square.mdx"
-    },
-    "frontend/jsfunction/array/Array.ptotype.map.js": {
-      "hash": "6c9cda186270aa3b22427dff309a739fe5fde755f4741c8a2ccce653715feef5",
-      "docRelative": "frontend/jsfunction/array/Array.ptotype.map.mdx"
+    "frontend/jsfunction/apply_call_bind/Function.prototype.call.js": {
+      "hash": "85067bd3daa76a63b0464876847ed8d69e900a5a10d8d7485a2117b2316da962",
+      "docRelative": "frontend/jsfunction/apply_call_bind/Function.prototype.call.mdx"
     },
     "frontend/jsfunction/array/compact.js": {
       "hash": "3c349dca1fa575ba6e5ebe578d727d6123670111a55095cc0135105e282b3e4e",
@@ -159,6 +139,30 @@
     "frontend/jsfunction/array/uniqueArray.js": {
       "hash": "356a0995c1edf9d4962b4206813dff565aeebe84a80e55c346ac681b070c698a",
       "docRelative": "frontend/jsfunction/array/uniqueArray.mdx"
+    },
+    "frontend/jsfunction/array.prototype/Array.prototype.at.js": {
+      "hash": "44ada1ea296a7fd3922dc7107a31ab2229c4c1f5c0c103e1494b00d6e81a565f",
+      "docRelative": "frontend/jsfunction/array.prototype/Array.prototype.at.mdx"
+    },
+    "frontend/jsfunction/array.prototype/Array.prototype.concat.js": {
+      "hash": "aa6a8d6806df1bc805cf45d035bdb27c61a5ea0477f72096ff086ee12d705fae",
+      "docRelative": "frontend/jsfunction/array.prototype/Array.prototype.concat.mdx"
+    },
+    "frontend/jsfunction/array.prototype/Array.prototype.filter.js": {
+      "hash": "11e47ec05d998f7e67c072cd0fb50f7e7c1468e624a84b32a770ae31f7e11e65",
+      "docRelative": "frontend/jsfunction/array.prototype/Array.prototype.filter.mdx"
+    },
+    "frontend/jsfunction/array.prototype/Array.prototype.map.js": {
+      "hash": "0ae16e3f92c94773da31b9f3880f0d071b1454e161d9596e6137abb3adcd3c1f",
+      "docRelative": "frontend/jsfunction/array.prototype/Array.prototype.map.mdx"
+    },
+    "frontend/jsfunction/array.prototype/Array.prototype.reduce.js": {
+      "hash": "3b398d25b5a68a2cb11f0c224db59ee7ed2dd77879e2ea27519329e368a5ac40",
+      "docRelative": "frontend/jsfunction/array.prototype/Array.prototype.reduce.mdx"
+    },
+    "frontend/jsfunction/array.prototype/Array.prototype.square.js": {
+      "hash": "26b1082b1af714ab192d1d4d38a42894a7fabb5cbb2334049578a1919c1bc527",
+      "docRelative": "frontend/jsfunction/array.prototype/Array.prototype.square.mdx"
     },
     "frontend/jsfunction/camelCaseKey.js": {
       "hash": "6ad8c44c609cb8fdea8ae23e73e1d695511c7d22a5576e7e5394ada3c916c7d1",
@@ -764,9 +768,17 @@
       "hash": "f1b1fbce72d36362d219f21b77e5bfec5a6b07184f5a7582c124af78f4c99ce0",
       "docRelative": "backend/quizzes/rest-vs-graphql-vs-gRPC.mdx"
     },
+    "algorithm/array/arrayOfProduct.js": {
+      "hash": "0f205b518844d7178870a087f9084bde900e1b4817914dbc4161d5e56b44e790",
+      "docRelative": "algorithm/array/arrayOfProduct.mdx"
+    },
     "algorithm/array/arrayProductExcludingCurrent.js": {
       "hash": "4a2b14451003b8c8e5c50eb787e30c0e2dec1b4f7a864d17b24a17cc5a39f8a9",
       "docRelative": "algorithm/array/arrayProductExcludingCurrent.mdx"
+    },
+    "algorithm/array/arrayShuffle.js": {
+      "hash": "8e287e676b781dbf426d579481916fc701a7c0a2b25992969d4d62e8c35b94cc",
+      "docRelative": "algorithm/array/arrayShuffle.mdx"
     },
     "algorithm/array/duplicateArray.js": {
       "hash": "d8c1864360c3ffe190b2d6493ccb34622cddf78cf2b38be91980435b89504f50",
@@ -861,8 +873,16 @@
       "docRelative": "algorithm/linkedlist/reverseList.mdx"
     },
     "algorithm/lru/lru.js": {
-      "hash": "23d7367a44f6d2084d52de9b8d372ee38d8b40f65adb30a4ef25cd59873e2762",
+      "hash": "2ed772bf36d7c7f5e88b1356bbd26cba82455a6a3427454bf562948ab655c498",
       "docRelative": "algorithm/lru/lru.mdx"
+    },
+    "algorithm/lru/lru_O(1).js": {
+      "hash": "8faddf5a71a0cb2f7c00851ac183eb043aeefe22400158b3be5d67639e78b65b",
+      "docRelative": "algorithm/lru/lru_O(1).mdx"
+    },
+    "algorithm/lru/lru_O(n).js": {
+      "hash": "cc860c9a09c71281f536efdcdd6d91c0a8e2baaf265bc73619c308a1f6017262",
+      "docRelative": "algorithm/lru/lru_O(n).mdx"
     },
     "algorithm/mostCommonElement.js": {
       "hash": "8cec5205685c93fd5c347d5aa8adaf9837a617e878b380ffb9586e23dc79fff9",
@@ -977,7 +997,7 @@
       "docRelative": "algorithm/_index.mdx"
     },
     "__nav__:algorithm/array": {
-      "hash": "631ccc5a6b2e33b20950df65bacf60bb7fd4cd6f36931d2e0c5204c67da803ad",
+      "hash": "cdd7419156208262fd9c1394f6a4402e49febd0be428d4d918c52dff2d6c31cb",
       "docRelative": "algorithm/array/_index.mdx"
     },
     "__nav__:algorithm/bit": {
@@ -997,7 +1017,7 @@
       "docRelative": "algorithm/linkedlist/_index.mdx"
     },
     "__nav__:algorithm/lru": {
-      "hash": "d51ce63c70cd1310d1f09e356d4aa24b1ce4fbdc2fc54a21883329de4c97b758",
+      "hash": "c288be89325f3863f44fdd12ffb545630c5bae64f022ecba914dd26a95e2c0bd",
       "docRelative": "algorithm/lru/_index.mdx"
     },
     "__nav__:algorithm/stack": {
@@ -1029,7 +1049,7 @@
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
-      "hash": "398888b08353474df003228c5ba695801cff98933ba7f11df8cf14c608f26077",
+      "hash": "a6b49d7400b075be9bad60668dff343724d655d135b1d19ead9eb0a37e49ae91",
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/2d-readingOrder": {
@@ -1048,9 +1068,17 @@
       "hash": "c0b2fc45dad974da003d9ca05ad0962bb61e3404ada8f85e961c37b73a755bbf",
       "docRelative": "frontend/jsfunction/UndoableDatabase/_index.mdx"
     },
+    "__nav__:frontend/jsfunction/apply_call_bind": {
+      "hash": "43e3b0c30bc04eda2a8b2c5daf53ba216f092c6a9372e570aba10be273713224",
+      "docRelative": "frontend/jsfunction/apply_call_bind/_index.mdx"
+    },
     "__nav__:frontend/jsfunction/array": {
-      "hash": "260401672b830d6611c359710e2866ad978620ca51032484a1c25aee3699c3c5",
+      "hash": "a5e0a1f2efee1db914fccc7223dace10f22721ae3a0e5dacd427213d17eed3dd",
       "docRelative": "frontend/jsfunction/array/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/array.prototype": {
+      "hash": "fa566fd9f88c77693ea21ca2eeb3d3daeb070072870e10cdb0e2fb33d841b558",
+      "docRelative": "frontend/jsfunction/array.prototype/_index.mdx"
     },
     "__nav__:frontend/jsfunction/curry": {
       "hash": "a05591bcc9536628095f643263a661cb11ee549d58952bbad62de3ea5f8e8099",

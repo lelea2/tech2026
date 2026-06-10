@@ -37,6 +37,7 @@ From repository root:
 2. Run one or more targeted sync commands:
    - `npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"`
    - `npm run sync:source-docs -- --docs-subdir backend --format "backend=."`
+   - `npm run sync:source-docs -- --docs-subdir company --format "company=."`
    - `npm run sync:source-docs -- --docs-subdir algorithm --format "algorithm=."`
    - `npm run sync:source-docs -- --docs-subdir system-designs --format "system-designs=."`
 3. `npm run build`

@@ -1,0 +1,44 @@
+{
+  "files": {
+    "company/coursera/textAdjustification.js": {
+      "hash": "3235e6e218ca1ab0eb01d1f96ae5674799b4841dcc8d28ca057fee020a8e4e8b",
+      "docRelative": "coursera/textAdjustification.mdx"
+    },
+    "company/gusto/Benefit.js": {
+      "hash": "1089452dc8e10b362cbea3d1da72aacfd8f52a0e7fb096c2b25e847d81318ea4",
+      "docRelative": "gusto/Benefit.mdx"
+    },
+    "company/gusto/BracketCalculator.js": {
+      "hash": "2a9e755f597e736fffccda44d3b46c7c2c4d722d6d959d6539d3f598a1ccef1c",
+      "docRelative": "gusto/BracketCalculator.mdx"
+    },
+    "company/gusto/getPeopleAlive.js": {
+      "hash": "0d662941532c3a0ac37989a63d74f90193286406b356907c92136162977dae60",
+      "docRelative": "gusto/getPeopleAlive.mdx"
+    },
+    "company/meta/htmlText.js": {
+      "hash": "998b63eed4b9381dbfefdecc3622b46633b557ee185fb6ded810b681fa83acbb",
+      "docRelative": "meta/htmlText.mdx"
+    },
+    "company/splunk/colorExclude.js": {
+      "hash": "286f8bfa5be39d19f636d75a71eee180046e17335bedc706fed0e04341ca3b4d",
+      "docRelative": "splunk/colorExclude.mdx"
+    },
+    "__nav__:coursera": {
+      "hash": "8e5f71503e6af05d1d6e3f9ccde194ca9e1f571d27756c3ea4a15a3f03723e98",
+      "docRelative": "coursera/_index.mdx"
+    },
+    "__nav__:gusto": {
+      "hash": "0f2672fed94ef92b4265120273ee067a24136a24960e98404c820fd5bae4acf7",
+      "docRelative": "gusto/_index.mdx"
+    },
+    "__nav__:meta": {
+      "hash": "a166b72158fd6912f7eb91bbece9f0ceda391bfdf6250f0f1e2d597c321ea655",
+      "docRelative": "meta/_index.mdx"
+    },
+    "__nav__:splunk": {
+      "hash": "a40829cfb6c305c8d481214df29c6880f54d4f7b14319ea36bf302c3ac1949e2",
+      "docRelative": "splunk/_index.mdx"
+    }
+  }
+}
