@@ -48,6 +48,10 @@
       "hash": "4f1117f8f78796e2eb51ef4b28cc40cc2358fe7eefe1477d3100dc78aefd701f",
       "docRelative": "frontend/jsfunction/UndoableDatabase/UndoableDatabaseII.mdx"
     },
+    "frontend/jsfunction/VirtualList.js": {
+      "hash": "351587b94e4054ca12d3b34557af778052771c37b3424016d8efc068b72e550b",
+      "docRelative": "frontend/jsfunction/VirtualList.mdx"
+    },
     "frontend/jsfunction/apply_call_bind/Function.prototype.apply.js": {
       "hash": "8e078cbb54e884d9b8c90f96eeacc166982c84f077dd87f20f37fc0b70281465",
       "docRelative": "frontend/jsfunction/apply_call_bind/Function.prototype.apply.mdx"
@@ -321,7 +325,7 @@
       "docRelative": "frontend/jsfunction/hooks/useCycle.mdx"
     },
     "frontend/jsfunction/hooks/useDebounce.js": {
-      "hash": "7c3b286021d89ddf80f86203a385378a17340e6d411dd7a24453d28a1251d865",
+      "hash": "c65048bc0d3a3bc19f219a3e6c045d37e64cce8dfb247ec922d378d3e5b28db1",
       "docRelative": "frontend/jsfunction/hooks/useDebounce.mdx"
     },
     "frontend/jsfunction/hooks/useDefault.js": {
@@ -936,6 +940,10 @@
       "hash": "6cac2d18e41972be30bc745121f19d37743d083f081945fa4d2b3f763c45d649",
       "docRelative": "algorithm/tree/binaryTreeSubTree.mdx"
     },
+    "algorithm/tree/isSymetricTree.js": {
+      "hash": "9339191a867c7b47fdf9d080d580a7aa424bf16d2c55cf1a56d595b68452b22f",
+      "docRelative": "algorithm/tree/isSymetricTree.mdx"
+    },
     "algorithm/tree/lowestCommonAncestor.py": {
       "hash": "e7e55a444405dd0cc8a360ee79794451e98545b4c315bc329062d1b027e0d99f",
       "docRelative": "algorithm/tree/lowestCommonAncestor.mdx"
@@ -1029,7 +1037,7 @@
       "docRelative": "algorithm/stack/_index.mdx"
     },
     "__nav__:algorithm/tree": {
-      "hash": "9bec88dbfca1455b3741bb658d5753608f5b5036f4461dbe60ef34a2d21051a4",
+      "hash": "4c70de173dafbdce4b7c11a67367006897dc9c49cdb93e7ef5ee4d6ba5fb310a",
       "docRelative": "algorithm/tree/_index.mdx"
     },
     "__nav__:algorithm/trie": {
@@ -1053,7 +1061,7 @@
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
-      "hash": "a6b49d7400b075be9bad60668dff343724d655d135b1d19ead9eb0a37e49ae91",
+      "hash": "d7de7034e94eab353861d6c91c08c6ae061fae1cb530aacaa6b9bccadd4a4446",
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/2d-readingOrder": {

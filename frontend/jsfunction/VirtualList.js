@@ -1,0 +1,189 @@
+//Referenced from: https://github.com/sergi/virtual-list
+//Read the library virtual list
+//Purpose is to create a big rendered list in DOM
+
+'use strict';
+
+/**
+ * Interview-style question:
+ *
+ * Build a Virtual List that can render very large datasets without creating
+ * all DOM nodes at once.
+ *
+ * Requirements:
+ * 1. Only render a small visible window + buffer.
+ * 2. Keep total scroll height correct so native scroll behaves naturally.
+ * 3. Re-render chunk when user scrolls far enough.
+ * 4. Reuse/remove obsolete rows to avoid DOM growth.
+ *
+ * Core algorithm:
+ * - Keep an invisible scroller element with full height:
+ *   totalHeight = itemHeight * totalRows
+ * - On scroll, map pixel offset to row index:
+ *   firstVisible = floor(scrollTop / itemHeight)
+ * - Render [firstVisible - screenItemsLen, firstVisible - screenItemsLen + cachedItemsLen)
+ *   clamped to valid bounds.
+ * - Mark old nodes for deletion and remove them asynchronously when scrolling
+ *   settles.
+ *
+ * Why this is efficient:
+ * - DOM size stays near O(visibleRows) instead of O(totalRows).
+ * - Scroll remains smooth because fewer nodes are laid out/painted.
+ *
+ * Complexity:
+ * - Per render chunk: O(k), where k = cachedItemsLen.
+ * - Space in DOM: O(k) active row elements (plus tiny constant overhead).
+ */
+class VirtualList {
+  /**
+   * @param {object} config
+   * @param {number} config.h viewport height in px
+   * @param {number} [config.w] viewport width in px
+   * @param {number} config.itemHeight fixed row height in px
+   * @param {Array<Node|string>} [config.items] optional data-backed rows
+   * @param {(index:number)=>Node} [config.generatorFn] custom row generator
+   * @param {number} [config.totalRows] explicit row count (fallback: items.length)
+   */
+  constructor(config) {
+    const width = (config && config.w + 'px') || '100%';
+    const height = (config && config.h + 'px') || '100%';
+    const itemHeight = this.itemHeight = config.itemHeight;
+
+    this.items = config.items;
+    this.generatorFn = config.generatorFn;
+    this.totalRows = config.totalRows || (config.items && config.items.length);
+
+    const scroller = VirtualList.createScroller(itemHeight * this.totalRows);
+    this.container = VirtualList.createContainer(width, height);
+    this.container.appendChild(scroller);
+
+    // Number of rows that fit in viewport.
+    const screenItemsLen = Math.ceil(config.h / itemHeight);
+    // Keep a buffer larger than viewport to reduce repaint frequency.
+    this.cachedItemsLen = screenItemsLen * 3;
+    this._renderChunk(this.container, 0);
+
+    this.lastRepaintY = undefined;
+    this.maxBuffer = screenItemsLen * itemHeight;
+    this.lastScrolled = 0;
+
+    // Periodically clean rows marked for removal after scroll settles.
+    this.rmNodeInterval = setInterval(() => {
+      if (Date.now() - this.lastScrolled > 100) {
+        const badNodes = document.querySelectorAll('[data-rm="1"]');
+        for (let i = 0, l = badNodes.length; i < l; i++) {
+          this.container.removeChild(badNodes[i]);
+        }
+      }
+    }, 300);
+
+    this.onScroll = this.onScroll.bind(this);
+    this.container.addEventListener('scroll', this.onScroll);
+  }
+
+  /**
+   * Creates one row node at index i.
+   *
+   * Return:
+   * - a positioned row DOM node whose top is i * itemHeight.
+   */
+  createRow(i) {
+    let item;
+    if (this.generatorFn) {
+      item = this.generatorFn(i);
+    } else if (this.items) {
+      if (typeof this.items[i] === 'string') {
+        const itemText = document.createTextNode(this.items[i]);
+        item = document.createElement('div');
+        item.style.height = this.itemHeight + 'px';
+        item.appendChild(itemText);
+      } else {
+        item = this.items[i];
+      }
+    }
+
+    item.classList.add('vrow');
+    item.style.position = 'absolute';
+    item.style.top = (i * this.itemHeight) + 'px';
+    return item;
+  }
+
+  /**
+   * Scroll handler.
+   *
+   * Algorithm step:
+   * - Convert scrollTop to first row index.
+   * - Re-render only when movement exceeds maxBuffer to avoid excessive work.
+   */
+  onScroll(e) {
+    const scrollTop = e.target.scrollTop; // Triggers reflow
+    if (!this.lastRepaintY || Math.abs(scrollTop - this.lastRepaintY) > this.maxBuffer) {
+      const first = parseInt(scrollTop / this.itemHeight, 10) - Math.ceil(this.maxBuffer / this.itemHeight);
+      this._renderChunk(this.container, first < 0 ? 0 : first);
+      this.lastRepaintY = scrollTop;
+    }
+
+    this.lastScrolled = Date.now();
+    e.preventDefault && e.preventDefault();
+  }
+
+  /**
+   * Optional cleanup helper for integration points.
+   * Call when unmounting to avoid leaked listeners/intervals.
+   */
+  destroy() {
+    clearInterval(this.rmNodeInterval);
+    this.container.removeEventListener('scroll', this.onScroll);
+  }
+
+  /**
+   * Renders a particular, consecutive chunk of the total rows in the list. To
+   * keep acceleration while scrolling, we mark the nodes that are candidate for
+   * deletion instead of deleting them right away, which would suddenly stop the
+   * acceleration. We delete them once scrolling has finished.
+   *
+   * @param {Node} node Parent node where we want to append the children chunk.
+   * @param {Number} from Starting position, i.e. first children index.
+   * @return {void}
+   */
+  _renderChunk(node, from) {
+    let finalItem = from + this.cachedItemsLen;
+    if (finalItem > this.totalRows)
+      finalItem = this.totalRows;
+
+    // Append new rows in a fragment to reduce layout/reflow cost.
+    const fragment = document.createDocumentFragment();
+    for (let i = from; i < finalItem; i++) {
+      fragment.appendChild(this.createRow(i));
+    }
+
+    // Hide and mark obsolete nodes for deletion.
+    for (let j = 1, l = node.childNodes.length; j < l; j++) {
+      node.childNodes[j].style.display = 'none';
+      node.childNodes[j].setAttribute('data-rm', '1');
+    }
+    node.appendChild(fragment);
+  }
+
+  static createContainer(w, h) {
+    const c = document.createElement('div');
+    c.style.width = w;
+    c.style.height = h;
+    c.style.overflow = 'auto';
+    c.style.position = 'relative';
+    c.style.padding = 0;
+    c.style.border = '1px solid black';
+    return c;
+  }
+
+  static createScroller(h) {
+    const scroller = document.createElement('div');
+    scroller.style.opacity = 0;
+    scroller.style.position = 'absolute';
+    scroller.style.top = 0;
+    scroller.style.left = 0;
+    scroller.style.width = '1px';
+    scroller.style.height = h + 'px';
+    return scroller;
+  }
+}
