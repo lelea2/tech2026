@@ -5,7 +5,7 @@
       "docRelative": "coursera/textAdjustification.mdx"
     },
     "company/gusto/Benefit.js": {
-      "hash": "1089452dc8e10b362cbea3d1da72aacfd8f52a0e7fb096c2b25e847d81318ea4",
+      "hash": "93eaa38f59f47942e69f0347cda1bc178993cb8936793cf457f9a65dafa7694c",
       "docRelative": "gusto/Benefit.mdx"
     },
     "company/gusto/BracketCalculator.js": {
@@ -15,6 +15,14 @@
     "company/gusto/getPeopleAlive.js": {
       "hash": "0d662941532c3a0ac37989a63d74f90193286406b356907c92136162977dae60",
       "docRelative": "gusto/getPeopleAlive.mdx"
+    },
+    "company/harvey/retry.js": {
+      "hash": "bdd28af810aed7f24f090093b7a1efc1f07cbf5775f9aa0313ee9f27b6351b8c",
+      "docRelative": "harvey/retry.mdx"
+    },
+    "company/harvey/wordCount.js": {
+      "hash": "52a11c78f1cab454b7e149f954a3e5adf4b0f6a496294ffe6990c4ce3d211d22",
+      "docRelative": "harvey/wordCount.mdx"
     },
     "company/meta/htmlText.js": {
       "hash": "998b63eed4b9381dbfefdecc3622b46633b557ee185fb6ded810b681fa83acbb",
@@ -31,6 +39,10 @@
     "__nav__:gusto": {
       "hash": "0f2672fed94ef92b4265120273ee067a24136a24960e98404c820fd5bae4acf7",
       "docRelative": "gusto/_index.mdx"
+    },
+    "__nav__:harvey": {
+      "hash": "cd2f7789b547b90c25318a14ec73a431a60615a63ff039cc1bc5568eda96c211",
+      "docRelative": "harvey/_index.mdx"
     },
     "__nav__:meta": {
       "hash": "a166b72158fd6912f7eb91bbece9f0ceda391bfdf6250f0f1e2d597c321ea655",
