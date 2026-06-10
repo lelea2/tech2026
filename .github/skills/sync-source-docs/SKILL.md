@@ -1,6 +1,6 @@
 ---
 name: sync-source-docs
-description: Use when frontend, backend, algorithm, system-designs, or company source files changed and docs need to be synced into website docs automatically. Also use when a custom folder format/path mapping is provided and document paths must be generated accordingly, including frontend/jsfunction, frontend/array, backend/quizzes, backend markdown/mdx content, system-designs markdown/mdx content, company subfolders, and separate algorithm navigation. Trigger phrases: sync docs, update documentation, refresh source docs, frontend changed, backend changed, algorithm changed, system design changed, company changed, company code sync, folder format mapping, jsfunction docs sync, backend quizzes sync, backend md sync, algorithm docs sync, system-design docs sync, company docs sync, py js compare docs.
+description: Use when frontend, backend, algorithm, system-designs, or company source files changed and docs need to be synced into website docs automatically. Also use when a custom folder format/path mapping is provided and document paths must be generated accordingly, including frontend/jsfunction, frontend/uicoding/ui-prototype-js, frontend/array, backend/quizzes, backend markdown/mdx content, system-designs markdown/mdx content, company subfolders, and separate algorithm navigation. Trigger phrases: sync docs, update documentation, refresh source docs, frontend changed, backend changed, algorithm changed, system design changed, company changed, company code sync, folder format mapping, jsfunction docs sync, ui prototype docs sync, uicoding docs sync, backend quizzes sync, backend md sync, algorithm docs sync, system-design docs sync, company docs sync, py js compare docs.
 ---
 
 # Sync Source Docs
@@ -53,6 +53,7 @@ Keep documentation in sync when files change under frontend, backend, algorithm,
 - Do not generate mappings from only the currently changed files.
 - Do not map only selected child folders when a stable parent exists.
 - If any file under `frontend/jsfunction/**` is in scope, include `frontend/jsfunction=jsfunction`.
+- If any file under `frontend/uicoding/**` is in scope, include `frontend/uicoding=uicoding` so `ui-prototype-js` and every challenge subfolder become navigable docs.
 - If any file under `backend/**` is in scope (including `backend/quizzes/**` and backend `.md`/`.mdx`), include `backend=.` for backend docs.
 - If any file under `algorithm/**` is in scope, include `algorithm=.` for algorithm docs.
 - If any file under `system-designs/**` is in scope, include `system-designs=.` for system design docs.
@@ -84,18 +85,18 @@ With custom mapping format:
 
 Preferred pattern for ongoing maintenance (map parent folders, not only leaf folders):
 
-- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"
+- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction;frontend/uicoding=uicoding"
 
-This ensures newly added files under `frontend/jsfunction/**` are synced automatically in the next run.
+This ensures newly added files under `frontend/jsfunction/**` and `frontend/uicoding/**` are synced automatically in the next run.
 
 Moved-file safety (same docs subdir):
 
 - Keep using the same stable parent mapping(s) on each run.
 - The script removes stale docs from old locations and writes docs at the new locations.
 
-Canonical FrontEnd sync command (includes folders like `getElementBy`, `hooks`, `promise`, `array` automatically):
+Canonical FrontEnd sync command (includes folders like `getElementBy`, `hooks`, `promise`, `array`, and `uicoding/ui-prototype-js` automatically):
 
-- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"
+- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction;frontend/uicoding=uicoding"
 
 Sync backend docs as a separate navigation section (includes `backend/quizzes/**` and backend root `.md`/`.mdx` files):
 
@@ -132,7 +133,7 @@ Algorithm root-file entry rule (important):
 
 Run FrontEnd + Algorithm sync as two commands (separate docs subdirs):
 
-- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"
+- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction;frontend/uicoding=uicoding"
 - cd website && npm run sync:source-docs -- --docs-subdir algorithm --format "algorithm=."
 
 Run BackEnd sync as a separate command (recommended):
@@ -149,7 +150,7 @@ Run Company sync as a separate command (recommended):
 
 Run all syncs in sequence for complete documentation refresh:
 
-- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction"
+- cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction;frontend/uicoding=uicoding"
 - cd website && npm run sync:source-docs -- --docs-subdir algorithm --format "algorithm=."
 - cd website && npm run sync:source-docs -- --docs-subdir backend --format "backend=."
 - cd website && npm run sync:source-docs -- --docs-subdir system-designs --format "system-designs=."
@@ -232,6 +233,7 @@ Mapping format rules:
   - Good: `algorithm=.`
   - Good: `backend=.`
   - Good: `frontend/jsfunction=jsfunction`
+  - Good: `frontend/uicoding=uicoding`
   - Risky: mapping only selected leaves (new siblings will be missed)
 - Re-run sync; post-hook should generate `/_index.mdx` pages for new folders automatically.
 - If files were moved across folders, run sync again with the same stable parent mapping; stale old pages should be removed.
@@ -244,13 +246,15 @@ Mapping format rules:
   - `website/docs/frontend/jsfunction/spreadSheet/_index.mdx`
   - `website/docs/frontend/jsfunction/textSearch/_index.mdx`
   - `website/docs/frontend/jsfunction/deepClone/_index.mdx`
+  - `website/docs/frontend/uicoding/ui-prototype-js/_index.mdx`
+  - `website/docs/frontend/uicoding/ui-prototype-js/accordion/_index.mdx`
 
 ## Troubleshooting: New file not visible in navigation
 
 - Confirm the source file extension is supported (`.js`, `.py`, `.md`, `.mdx`, etc.).
 - Confirm the file path is inside a mapped parent path included in the same sync command.
 - Rerun with stable parent mapping for the docs subdir:
-  - FrontEnd: `--docs-subdir frontend --format "frontend/jsfunction=jsfunction"`
+  - FrontEnd: `--docs-subdir frontend --format "frontend/jsfunction=jsfunction;frontend/uicoding=uicoding"`
   - BackEnd: `--docs-subdir backend --format "backend=."`
   - Algorithm: `--docs-subdir algorithm --format "algorithm=."`
   - System Design: `--docs-subdir system-designs --format "system-designs=."`
@@ -300,12 +304,15 @@ The sync command prints a summary in this format:
 ## Notes
 
 - Code sources (`.js`, `.py`, etc.) are rendered as MDX pages with fenced code blocks.
+- Frontend UI prototype sources under `frontend/uicoding/ui-prototype-js/**` should render both `.js` and `.css` files, and each challenge subfolder should have its own generated `_index.mdx` subnavigation page.
 - Markdown sources (`.md`/`.mdx`) are emitted as content-native MDX pages (not wrapped as one giant code block).
 - Backend and system-design markdown/mdx sources are emitted into their docs subdirs and included in folder navigation.
 - Algorithm files are never skipped when only one language variant exists: a lone `.js` or `.py` file still becomes its own MDX page and appears in navigation.
 - If both `.py` and `.js` files share the same relative basename (for example `kRowPascalTriangle.py` + `kRowPascalTriangle.js`), they are merged into one MDX page with language tabs so readers can compare side-by-side in a single page.
-- Output filenames strip the source extension: `useBoolean.js` → `useBoolean.mdx` (never `useBoolean.js.mdx`).
-- Titles and headings also use the base name without extension (e.g. `useBoolean`, not `useBoolean.js`).
+- If non-comparable source files share the same relative basename (for example `PixelArt.js` + `PixelArt.css`), render them as separate pages such as `PixelArt.js.mdx` and `PixelArt.css.mdx`.
+- Output filenames normally strip the source extension: `useBoolean.js` → `useBoolean.mdx`.
+- When extensions are needed to avoid non-comparable collisions, keep them in the generated filename: `PixelArt.js` → `PixelArt.js.mdx`.
+- Titles and headings normally use the base name without extension (e.g. `useBoolean`, not `useBoolean.js`), except for collision-split pages where the extension clarifies the file.
 - Removed source files are also removed from generated docs.
 - Docs that are no longer represented by current mappings can be removed from the same docs subdir.
 - Generated docs are deterministic and can be committed.

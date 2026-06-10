@@ -1,0 +1,27 @@
+.container {
+  font-family: sans-serif;
+  padding: 24px;
+}
+
+.list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding-left: 24px;
+}
+
+.item {
+  margin: 8px 0;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.label input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}

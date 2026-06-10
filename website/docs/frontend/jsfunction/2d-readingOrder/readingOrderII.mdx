@@ -1,0 +1,61 @@
+---
+title: readingOrderII
+---
+
+# readingOrderII
+
+~~~javascript
+/**
+ * Sort canvas rectangles into reading order.
+ *
+ * Idea:
+ * 1. Sort elements top-to-bottom first.
+ * 2. Build rows by vertical-span overlap.
+ * 3. Expand row span when adding an element.
+ * 4. Sort each row left-to-right.
+ *
+ * Vertical span is half-open: [y, y + height)
+ * Overlap must be positive height:
+ * max(topA, topB) < min(bottomA, bottomB)
+ *
+ * @param {{id:string,x:number,y:number,width:number,height:number}[]} elements
+ * @returns {string[]}
+ */
+export default function readingOrder(elements) {
+  const unread = [...elements].sort((a, b) => a.y - b.y || a.x - b.x);
+  const rows = [];
+
+  for (const element of unread) {
+    let placed = false;
+
+    for (const row of rows) {
+      if (overlaps(row.top, row.bottom, element.y, element.y + element.height)) {
+        row.elements.push(element);
+        row.top = Math.min(row.top, element.y);
+        row.bottom = Math.max(row.bottom, element.y + element.height);
+        placed = true;
+        break;
+      }
+    }
+
+    if (!placed) {
+      rows.push({
+        top: element.y,
+        bottom: element.y + element.height,
+        elements: [element],
+      });
+    }
+  }
+
+  return rows.flatMap((row) =>
+    row.elements
+      .slice()
+      .sort((a, b) => a.x - b.x)
+      .map((element) => element.id),
+  );
+}
+
+function overlaps(topA, bottomA, topB, bottomB) {
+  return Math.max(topA, topB) < Math.min(bottomA, bottomB);
+}
+~~~

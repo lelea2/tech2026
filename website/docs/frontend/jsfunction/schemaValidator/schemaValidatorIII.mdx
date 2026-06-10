@@ -1,0 +1,584 @@
+---
+title: schemaValidatorIII
+---
+
+# schemaValidatorIII
+
+~~~javascript
+/**
+ * @typedef {string | number} PathSegment
+ *
+ * @typedef {{
+ *   path: PathSegment[],
+ *   message: string,
+ * }} ValidationError
+ *
+ * @typedef {{
+ *   success: true,
+ *   data: unknown,
+ * } | {
+ *   success: false,
+ *   errors: ValidationError[],
+ * }} ParseResult
+ *
+ * @typedef {{
+ *   safeParse(value: unknown): ParseResult,
+ *   optional(): Schema,
+ * }} Schema
+ *
+ * @typedef {Schema & {
+ *   min(length: number): StringSchema,
+ *   max(length: number): StringSchema,
+ *   optional(): StringSchema,
+ * }} StringSchema
+ *
+ * @typedef {Schema & {
+ *   min(value: number): NumberSchema,
+ *   max(value: number): NumberSchema,
+ *   optional(): NumberSchema,
+ * }} NumberSchema
+ */
+/**
+ * =========================================================
+ * Mini Recursive Schema Validator
+ * =========================================================
+ *
+ * Supported:
+ * - string / number / boolean
+ * - object(shape)
+ * - array(itemSchema)
+ * - optional()
+ * - chainable min/max rules
+ *
+ * =========================================================
+ * Data Structures
+ * =========================================================
+ *
+ * 1. Schema objects
+ *    Each schema exposes:
+ *    - _parse(value, path)
+ *    - safeParse(value)
+ *
+ * 2. Recursive tree composition
+ *    Objects and arrays recursively contain schemas.
+ *
+ * 3. Rules array
+ *    Primitive schemas store ordered validation rules.
+ *
+ * =========================================================
+ * Core Design
+ * =========================================================
+ *
+ * Every schema internally uses:
+ *
+ *   _parse(value, path)
+ *
+ * path keeps track of nested validation location:
+ *
+ * Example:
+ * ['users', 1, 'name']
+ *
+ * Object schemas append property names.
+ * Array schemas append indexes.
+ *
+ * =========================================================
+ * Why _parse instead of only safeParse?
+ * =========================================================
+ *
+ * safeParse() is the public API.
+ *
+ * _parse() is the internal recursive engine used by:
+ * - nested objects
+ * - arrays
+ * - optional wrappers
+ *
+ * =========================================================
+ * Immutability
+ * =========================================================
+ *
+ * All builder methods:
+ * - min()
+ * - max()
+ * - optional()
+ *
+ * return NEW schema objects.
+ *
+ * Existing schemas are never mutated.
+ */
+
+/**
+ * Wrap schema with optional support.
+ *
+ * optional():
+ * - allows undefined
+ * - otherwise delegates validation
+ *
+ * @param {Object} schema
+ * @returns {Object}
+ */
+function withOptional(schema) {
+  return {
+    ...schema,
+
+    /**
+     * optional().optional() remains optional.
+     */
+    optional() {
+      return this;
+    },
+
+    /**
+     * Internal recursive validator.
+     *
+     * @param {*} value
+     * @param {Array<string | number>} path
+     */
+    _parse(value, path) {
+      // undefined is valid for optional schemas.
+      if (value === undefined) {
+        return {
+          success: true,
+          data: value,
+        };
+      }
+
+      return schema._parse(value, path);
+    },
+
+    /**
+     * Public API entry point.
+     */
+    safeParse(value) {
+      return this._parse(value, []);
+    },
+  };
+}
+
+/**
+ * =========================================================
+ * STRING SCHEMA
+ * =========================================================
+ */
+function createStringSchema(rules = []) {
+  const schema = {
+    /**
+     * Add minimum length rule.
+     *
+     * Returns NEW schema (immutable).
+     */
+    min(length) {
+      return createStringSchema([
+        ...rules,
+        {
+          check: (value) => value.length >= length,
+          message: `Expected at least ${length} characters`,
+        },
+      ]);
+    },
+
+    /**
+     * Add maximum length rule.
+     */
+    max(length) {
+      return createStringSchema([
+        ...rules,
+        {
+          check: (value) => value.length <= length,
+          message: `Expected at most ${length} characters`,
+        },
+      ]);
+    },
+
+    /**
+     * Make schema optional.
+     */
+    optional() {
+      return withOptional(this);
+    },
+
+    /**
+     * Internal validator.
+     */
+    _parse(value, path) {
+      // Type check always happens first.
+      if (typeof value !== 'string') {
+        return {
+          success: false,
+          errors: [
+            {
+              path,
+              message: 'Expected string',
+            },
+          ],
+        };
+      }
+
+      const errors = [];
+
+      // Preserve chained rule order.
+      for (const rule of rules) {
+        if (!rule.check(value)) {
+          errors.push({
+            path,
+            message: rule.message,
+          });
+        }
+      }
+
+      if (errors.length > 0) {
+        return {
+          success: false,
+          errors,
+        };
+      }
+
+      return {
+        success: true,
+        data: value,
+      };
+    },
+
+    /**
+     * Public API.
+     */
+    safeParse(value) {
+      return this._parse(value, []);
+    },
+  };
+
+  return schema;
+}
+
+/**
+ * =========================================================
+ * NUMBER SCHEMA
+ * =========================================================
+ */
+function createNumberSchema(rules = []) {
+  const schema = {
+    min(minValue) {
+      return createNumberSchema([
+        ...rules,
+        {
+          check: (value) => value >= minValue,
+          message: `Expected number >= ${minValue}`,
+        },
+      ]);
+    },
+
+    max(maxValue) {
+      return createNumberSchema([
+        ...rules,
+        {
+          check: (value) => value <= maxValue,
+          message: `Expected number <= ${maxValue}`,
+        },
+      ]);
+    },
+
+    optional() {
+      return withOptional(this);
+    },
+
+    _parse(value, path) {
+      if (typeof value !== 'number') {
+        return {
+          success: false,
+          errors: [
+            {
+              path,
+              message: 'Expected number',
+            },
+          ],
+        };
+      }
+
+      const errors = [];
+
+      for (const rule of rules) {
+        if (!rule.check(value)) {
+          errors.push({
+            path,
+            message: rule.message,
+          });
+        }
+      }
+
+      if (errors.length > 0) {
+        return {
+          success: false,
+          errors,
+        };
+      }
+
+      return {
+        success: true,
+        data: value,
+      };
+    },
+
+    safeParse(value) {
+      return this._parse(value, []);
+    },
+  };
+
+  return schema;
+}
+
+/**
+ * =========================================================
+ * BOOLEAN SCHEMA
+ * =========================================================
+ */
+function createBooleanSchema() {
+  const schema = {
+    optional() {
+      return withOptional(this);
+    },
+
+    _parse(value, path) {
+      if (typeof value !== 'boolean') {
+        return {
+          success: false,
+          errors: [
+            {
+              path,
+              message: 'Expected boolean',
+            },
+          ],
+        };
+      }
+
+      return {
+        success: true,
+        data: value,
+      };
+    },
+
+    safeParse(value) {
+      return this._parse(value, []);
+    },
+  };
+
+  return schema;
+}
+
+/**
+ * =========================================================
+ * ARRAY SCHEMA
+ * =========================================================
+ */
+function createArraySchema(itemSchema) {
+  const schema = {
+    optional() {
+      return withOptional(this);
+    },
+
+    _parse(value, path) {
+      if (!Array.isArray(value)) {
+        return {
+          success: false,
+          errors: [
+            {
+              path,
+              message: 'Expected array',
+            },
+          ],
+        };
+      }
+
+      const errors = [];
+
+      /**
+       * Recursively validate every item.
+       *
+       * Path example:
+       * ['users', 1]
+       */
+      for (let i = 0; i < value.length; i++) {
+        const result = itemSchema._parse(
+          value[i],
+          [...path, i],
+        );
+
+        if (!result.success) {
+          errors.push(...result.errors);
+        }
+      }
+
+      if (errors.length > 0) {
+        return {
+          success: false,
+          errors,
+        };
+      }
+
+      return {
+        success: true,
+        data: value.slice(),
+      };
+    },
+
+    safeParse(value) {
+      return this._parse(value, []);
+    },
+  };
+
+  return schema;
+}
+
+/**
+ * =========================================================
+ * OBJECT SCHEMA
+ * =========================================================
+ */
+function createObjectSchema(shape) {
+  const schema = {
+    optional() {
+      return withOptional(this);
+    },
+
+    _parse(value, path) {
+      // Reject arrays/null.
+      if (
+        value === null ||
+        typeof value !== 'object' ||
+        Array.isArray(value)
+      ) {
+        return {
+          success: false,
+          errors: [
+            {
+              path,
+              message: 'Expected object',
+            },
+          ],
+        };
+      }
+
+      const errors = [];
+
+      /**
+       * Validate schema fields in declaration order.
+       */
+      for (const key of Object.keys(shape)) {
+        const fieldSchema = shape[key];
+        const fieldValue = value[key];
+
+        /**
+         * Build nested path.
+         *
+         * Example:
+         * ['users', 0, 'name']
+         */
+        const fieldPath = [...path, key];
+
+        /**
+         * Missing required field.
+         */
+        if (fieldValue === undefined) {
+          const result = fieldSchema._parse(
+            undefined,
+            fieldPath,
+          );
+
+          // Optional schemas succeed here.
+          if (!result.success) {
+            errors.push({
+              path: fieldPath,
+              message: 'Required',
+            });
+          }
+
+          continue;
+        }
+
+        /**
+         * Recursively validate nested schema.
+         */
+        const result = fieldSchema._parse(
+          fieldValue,
+          fieldPath,
+        );
+
+        if (!result.success) {
+          errors.push(...result.errors);
+        }
+      }
+
+      if (errors.length > 0) {
+        return {
+          success: false,
+          errors,
+        };
+      }
+
+      // Preserve unknown keys.
+      return {
+        success: true,
+        data: { ...value },
+      };
+    },
+
+    safeParse(value) {
+      return this._parse(value, []);
+    },
+  };
+
+  return schema;
+}
+
+/**
+ * =========================================================
+ * PUBLIC FACTORY API
+ * =========================================================
+ */
+const v = {
+  string() {
+    return createStringSchema();
+  },
+
+  number() {
+    return createNumberSchema();
+  },
+
+  boolean() {
+    return createBooleanSchema();
+  },
+
+  object(shape) {
+    return createObjectSchema(shape);
+  },
+
+  array(itemSchema) {
+    return createArraySchema(itemSchema);
+  },
+};
+
+export default v;
+
+/**
+const UserList = v.object({
+  users: v.array(
+    v.object({
+      name: v.string(),
+      age: v.number().min(18),
+    }),
+  ),
+});
+
+UserList.safeParse({
+  users: [
+    { name: 'Alice', age: 30 },
+    { name: 123, age: 16 },
+  ],
+});
+// {
+//   success: false,
+//   errors: [
+//     { path: ['users', 1, 'name'], message: 'Expected string' },
+//     { path: ['users', 1, 'age'], message: 'Expected number >= 18' },
+//   ],
+// }
+ */
+~~~

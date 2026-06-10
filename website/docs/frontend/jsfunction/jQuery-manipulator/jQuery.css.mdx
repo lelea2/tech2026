@@ -1,0 +1,59 @@
+---
+title: jQuery.css
+---
+
+# jQuery.css
+
+~~~javascript
+/**
+ * Minimal jQuery-like selector function supporting only css().
+ *
+ * @param {string} selector
+ * @returns {{ css: (property: string, value?: string) => string | undefined | { css: Function } }}
+ */
+export default function $(selector) {
+  const element = document.querySelector(selector);
+
+  const api = {
+    /**
+		 * Getter:
+		 *   css(property) -> computed style value
+		 * Setter:
+		 *   css(property, value) -> chainable API object
+		 *
+		 * @param {string} property
+		 * @param {string} [value]
+		 * @returns {string | undefined | typeof api}
+		 */
+    css(property, value) {
+      if (value === undefined) {
+        if (!element) {
+          return undefined;
+        }
+        const computed = window.getComputedStyle(element)[property];
+        return computed === '' ? undefined : computed;
+      }
+
+      if (element) {
+        element.style[property] = value;
+      }
+
+      return api;
+    },
+  };
+
+  return api;
+}
+
+/**
+Example:
+
+$('button')
+	.css('color', 'red')
+	.css('backgroundColor', 'tomato')
+	.css('fontSize', '16px');
+
+$('button').css('color');
+*/
+
+~~~

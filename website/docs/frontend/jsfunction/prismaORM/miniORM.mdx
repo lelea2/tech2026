@@ -15,21 +15,21 @@ title: miniORM
  * - delete({ where })
  */
 export default class MiniORM {
-	/**
+  /**
 	 * @param {Record<string, Array<Record<string, unknown>>>} data
 	 */
-	constructor(data) {
-		/** @type {Record<string, Array<Record<string, unknown>>>} */
-		this._store = {};
+  constructor(data) {
+    /** @type {Record<string, Array<Record<string, unknown>>>} */
+    this._store = {};
 
-		for (const [modelName, records] of Object.entries(data || {})) {
-			// Clone initial records so external mutations do not affect ORM state.
-			this._store[modelName] = records.map((record) => ({ ...record }));
-			this[modelName] = this._createDelegate(modelName);
-		}
-	}
+    for (const [modelName, records] of Object.entries(data || {})) {
+      // Clone initial records so external mutations do not affect ORM state.
+      this._store[modelName] = records.map((record) => ({ ...record }));
+      this[modelName] = this._createDelegate(modelName);
+    }
+  }
 
-	/**
+  /**
 	 * @param {string} modelName
 	 * @returns {{
 	 *   findMany: (args?: { where?: Record<string, unknown> }) => Array<Record<string, unknown>>,
@@ -38,44 +38,44 @@ export default class MiniORM {
 	 *   delete: (args: { where: Record<string, unknown> }) => Record<string, unknown>
 	 * }}
 	 */
-	_createDelegate(modelName) {
-		return {
-			findMany: (args = {}) => {
-				const table = this._store[modelName];
-				const where = args.where;
+  _createDelegate(modelName) {
+    return {
+      findMany: (args = {}) => {
+        const table = this._store[modelName];
+        const where = args.where;
 
-				if (!where) {
-					return table.map((record) => ({ ...record }));
-				}
+        if (!where) {
+          return table.map((record) => ({ ...record }));
+        }
 
-				return table
-					.filter((record) => matchesWhere(record, where))
-					.map((record) => ({ ...record }));
-			},
+        return table
+          .filter((record) => matchesWhere(record, where))
+          .map((record) => ({ ...record }));
+      },
 
-			create: ({ data }) => {
-				const table = this._store[modelName];
-				const created = { ...data };
-				table.push(created);
-				return { ...created };
-			},
+      create: ({ data }) => {
+        const table = this._store[modelName];
+        const created = { ...data };
+        table.push(created);
+        return { ...created };
+      },
 
-			update: ({ where, data }) => {
-				const table = this._store[modelName];
-				const index = table.findIndex((record) => matchesWhere(record, where));
-				const updated = { ...table[index], ...data };
-				table[index] = updated;
-				return { ...updated };
-			},
+      update: ({ where, data }) => {
+        const table = this._store[modelName];
+        const index = table.findIndex((record) => matchesWhere(record, where));
+        const updated = { ...table[index], ...data };
+        table[index] = updated;
+        return { ...updated };
+      },
 
-			delete: ({ where }) => {
-				const table = this._store[modelName];
-				const index = table.findIndex((record) => matchesWhere(record, where));
-				const [deleted] = table.splice(index, 1);
-				return { ...deleted };
-			},
-		};
-	}
+      delete: ({ where }) => {
+        const table = this._store[modelName];
+        const index = table.findIndex((record) => matchesWhere(record, where));
+        const [deleted] = table.splice(index, 1);
+        return { ...deleted };
+      },
+    };
+  }
 }
 
 /**
@@ -86,13 +86,13 @@ export default class MiniORM {
  * @returns {boolean}
  */
 function matchesWhere(record, where) {
-	for (const [key, value] of Object.entries(where)) {
-		if (record[key] !== value) {
-			return false;
-		}
-	}
+  for (const [key, value] of Object.entries(where)) {
+    if (record[key] !== value) {
+      return false;
+    }
+  }
 
-	return true;
+  return true;
 }
 
 /**

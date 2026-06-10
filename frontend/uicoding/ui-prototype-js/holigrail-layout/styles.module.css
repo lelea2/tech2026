@@ -1,0 +1,41 @@
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  height: 60px;
+  flex-shrink: 0;
+  background: #f4b400;
+}
+
+.columns {
+  flex: 1;
+  display: flex;
+}
+
+.left,
+.right {
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.left {
+  background: #d7ecff;
+}
+
+.content {
+  flex: 1;
+  background: #fff;
+}
+
+.right {
+  background: #f8d7da;
+}
+
+.footer {
+  height: 100px;
+  flex-shrink: 0;
+  background: #c8e6c9;
+}

@@ -1,0 +1,72 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  font-family: system-ui, sans-serif;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.score {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(15, 28px);
+  grid-template-rows: repeat(15, 28px);
+  gap: 2px;
+  padding: 8px;
+  background: #222;
+  border-radius: 8px;
+}
+
+.cell {
+  width: 28px;
+  height: 28px;
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.snakeHead {
+  background: #15803d;
+}
+
+.snakeBody {
+  background: #22c55e;
+}
+
+.apple {
+  background: #ef4444;
+  border-radius: 50%;
+}
+
+.gameOver {
+  color: #dc2626;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.restartButton {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: #2563eb;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.restartButton:hover {
+  background: #1d4ed8;
+}
+
+.instructions {
+  color: #475569;
+}

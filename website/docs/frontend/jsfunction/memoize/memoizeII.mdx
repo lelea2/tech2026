@@ -1,0 +1,58 @@
+---
+title: memoizeII
+---
+
+# memoizeII
+
+~~~javascript
+/**
+ * Memoize a function that accepts string/number arguments.
+ *
+ * @param {(...args: Array<string | number>) => unknown} func
+ * @returns {(...args: Array<string | number>) => unknown}
+ */
+export default function memoize(func) {
+  const cache = new Map();
+
+  return function(...args) {
+    const key = buildCacheKey(args);
+
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+
+    const result = func.apply(this, args);
+    cache.set(key, result);
+    return result;
+  };
+}
+
+/**
+ * Build a deterministic, type-safe key so 1 and '1' differ.
+ *
+ * @param {Array<string | number>} args
+ * @returns {string}
+ */
+function buildCacheKey(args) {
+  return args
+    .map((arg) => `${typeof arg}:${String(arg).length}:${String(arg)}`)
+    .join('|');
+}
+
+/**
+Example:
+
+function expensiveMul(a, b) {
+	console.log('Computing...');
+	return a * b;
+}
+
+const memoizedExpensiveMul = memoize(expensiveMul);
+
+console.log(memoizedExpensiveMul(3, 7)); // Computing... 21
+console.log(memoizedExpensiveMul(3, 7)); // 21
+console.log(memoizedExpensiveMul(5, 8)); // Computing... 40
+console.log(memoizedExpensiveMul(5, 8)); // 40
+*/
+
+~~~

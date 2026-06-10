@@ -1,0 +1,79 @@
+.carousel {
+  position: relative;
+  width: min(100%, 600px);
+  height: 400px;
+  margin: 0 auto;
+  background: black;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.navButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  font-size: 32px;
+  line-height: 1;
+}
+
+.navButton:hover {
+  background: white;
+}
+
+.leftButton {
+  left: 12px;
+}
+
+.rightButton {
+  right: 12px;
+}
+
+.pageButtons {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  gap: 8px;
+}
+
+.pageButton {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.activePageButton {
+  background: white;
+  outline: 2px solid #333;
+}
+
+@media (max-width: 600px) {
+  .carousel {
+    height: 66.67vw;
+    max-height: 400px;
+  }
+}

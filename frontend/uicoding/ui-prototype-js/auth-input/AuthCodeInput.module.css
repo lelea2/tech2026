@@ -1,0 +1,50 @@
+/* AuthCodeInput.module.css */
+
+.form {
+  max-width: 360px;
+  margin: 40px auto;
+  text-align: center;
+  font-family: sans-serif;
+}
+
+.title {
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+
+.inputs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.input {
+  width: 44px;
+  height: 52px;
+  text-align: center;
+  font-size: 24px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.input:focus {
+  outline: 2px solid #2563eb;
+  border-color: #2563eb;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.button {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

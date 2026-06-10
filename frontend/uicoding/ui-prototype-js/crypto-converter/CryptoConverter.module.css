@@ -1,0 +1,90 @@
+/* Centered card — max-width keeps the form readable on wide screens. */
+.container {
+  max-width: 480px;
+  margin: 48px auto;
+  padding: 24px;
+  font-family: system-ui, sans-serif;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+}
+
+.title {
+  margin: 0 0 24px;
+  font-size: 24px;
+}
+
+/* grid gap is cleaner than margin-bottom on children — no collapsing-margin edge cases. */
+.form {
+  display: grid;
+  gap: 16px;
+}
+
+/* display:grid on the label so the text and control stack vertically and align naturally. */
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.labelText {
+  font-weight: 600;
+}
+
+/* Shared token — input and select intentionally look identical so the form feels cohesive. */
+.input,
+.select {
+  padding: 10px 12px;
+  font-size: 16px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+}
+
+.result {
+  margin-top: 24px;
+}
+
+/* Muted color signals transient/secondary state without alarming the user. */
+.loading {
+  color: #666;
+}
+
+/* Large weight + size makes the converted value the visual anchor of the card. */
+.converted {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* Rate is secondary info — muted so it doesn't compete with the converted amount. */
+.rate {
+  margin-top: 8px;
+  color: #666;
+}
+
+.error {
+  color: red;
+  font-weight: 600;
+}
+
+/*
+  Grouped first so shared properties (margin-left, font-weight) are declared once.
+  Then each variant overrides only the color — follows the open/closed principle for CSS.
+*/
+.priceChangeUp,
+.priceChangeDown,
+.priceChangeNeutral {
+  margin-left: 8px;
+  font-weight: 700;
+}
+
+/* Convention: green/red for price direction matches every trading UI the user has seen. */
+.priceChangeUp {
+  color: green;
+}
+
+.priceChangeDown {
+  color: red;
+}
+
+.priceChangeNeutral {
+  color: #777;
+}

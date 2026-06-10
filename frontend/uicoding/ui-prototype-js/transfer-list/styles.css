@@ -1,0 +1,33 @@
+.transfer-list {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.list {
+  width: 180px;
+  min-height: 180px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  list-style: none;
+}
+
+.list li {
+  margin-bottom: 8px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+button {
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

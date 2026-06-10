@@ -1,0 +1,30 @@
+.app {
+  text-align: center;
+  font-family: sans-serif;
+  border: 1px solid #ccc;
+  padding: 20px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 80px);
+  gap: 8px;
+  justify-content: center;
+  margin: 24px 0;
+}
+
+.cell {
+  width: 80px;
+  height: 80px;
+  font-size: 32px;
+  font-weight: bold;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+.reset {
+  padding: 8px 16px;
+  cursor: pointer;
+}

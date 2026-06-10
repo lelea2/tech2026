@@ -1,0 +1,54 @@
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #eceff1;
+}
+
+.trafficLight {
+  background: #1f2937;
+  padding: 20px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+.light {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #444;
+  transition: all 0.3s ease;
+}
+
+.redOn {
+  background: #ff3b30;
+  box-shadow:
+    0 0 20px #ff3b30,
+    0 0 40px #ff3b30;
+}
+
+.yellowOn {
+  background: #ffd60a;
+  box-shadow:
+    0 0 20px #ffd60a,
+    0 0 40px #ffd60a;
+}
+
+.greenOn {
+  background: #34c759;
+  box-shadow:
+    0 0 20px #34c759,
+    0 0 40px #34c759;
+}
+
+.label {
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}

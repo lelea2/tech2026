@@ -1,0 +1,44 @@
+.progress-bars {
+  margin-top: 16px;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.controls button {
+  padding: 6px 16px;
+  font-size: 14px;
+  border: 1px solid #666;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 150ms, color 150ms;
+}
+
+.controls button:hover {
+  border-color: #ccc;
+  color: #fff;
+}
+
+.progress {
+  width: 300px;
+  height: 16px;
+  border: 1px solid #999;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: green;
+  transition: width 2000ms linear;
+}
+
+.progress-fill.filled {
+  width: 100%;
+}

@@ -1,0 +1,74 @@
+.app {
+  min-height: 100vh;
+  padding: 32px;
+  text-align: center;
+  font-family: system-ui, sans-serif;
+  background: #f6f8ff;
+  color: #111827;
+}
+
+.status {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #111827;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(7, 72px);
+  gap: 10px;
+  width: max-content;
+  margin: 0 auto;
+  padding: 16px;
+  background: #1c61f2;
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+}
+
+.cell {
+  width: 72px;
+  height: 72px;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  background: #0f45bf;
+  cursor: pointer;
+}
+
+.cell:hover {
+  background: #123fb0;
+}
+
+.disc {
+  display: block;
+  width: 58px;
+  height: 58px;
+  margin: auto;
+  border-radius: 50%;
+  background: #f6f8ff;
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+.red {
+  background: #d9313d;
+}
+
+.yellow {
+  background: #fdc601;
+}
+
+.resetButton {
+  margin-top: 24px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  background: #111827;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.resetButton:hover {
+  background: #374151;
+}

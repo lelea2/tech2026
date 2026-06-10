@@ -1,0 +1,118 @@
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Base toggle button */
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  border-radius: 999px;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+
+/* Remove default button appearance */
+.toggle {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* Small size */
+.small {
+  width: 36px;
+  height: 20px;
+}
+
+/* Medium size */
+.medium {
+  width: 44px;
+  height: 24px;
+}
+
+/* Inactive state */
+.unchecked {
+  background-color: #d1d5db;
+}
+
+/* Active state */
+.checked {
+  background-color: #2563eb;
+}
+
+/* Toggle thumb */
+.thumb {
+  position: absolute;
+  left: 2px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.16),
+    0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: transform 160ms ease;
+}
+
+/* Thumb sizing */
+.small .thumb {
+  width: 16px;
+  height: 16px;
+}
+
+.medium .thumb {
+  width: 20px;
+  height: 20px;
+}
+
+/* Thumb movement */
+.small.checked .thumb {
+  transform: translateX(16px);
+}
+
+.medium.checked .thumb {
+  transform: translateX(20px);
+}
+
+/* Hover state */
+.toggle:hover:not(:disabled).unchecked {
+  background-color: #9ca3af;
+}
+
+.toggle:hover:not(:disabled).checked {
+  background-color: #1d4ed8;
+}
+
+/* Focus state */
+.toggle:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px #ffffff,
+    0 0 0 4px #2563eb;
+}
+
+/* Disabled state */
+.toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Visible label */
+.label {
+  color: #111827;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+/* Disabled label styling when wrapper contains disabled toggle */
+.wrapper:has(.toggle:disabled) .label {
+  cursor: not-allowed;
+  color: #9ca3af;
+}

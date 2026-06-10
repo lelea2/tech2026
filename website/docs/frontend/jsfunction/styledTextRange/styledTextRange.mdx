@@ -1,0 +1,56 @@
+---
+title: styledTextRange
+---
+
+# styledTextRange
+
+~~~javascript
+/**
+ * Slice styled text while preserving style ranges.
+ *
+ * Idea:
+ * - Slice the raw text normally.
+ * - For each style range, keep only the part that overlaps [start, end).
+ * - Shift kept ranges left by `start` so offsets are relative to new text.
+ *
+ * @param {{
+ *   text: string,
+ *   ranges: { start: number, end: number, style: string }[],
+ * }} node
+ * @param {number} start
+ * @param {number} end
+ * @returns {{
+ *   text: string,
+ *   ranges: { start: number, end: number, style: string }[],
+ * }}
+ */
+export default function sliceStyledText(node, start, end) {
+  if (start === end) {
+    return {
+      text: '',
+      ranges: [],
+    };
+  }
+
+  const ranges = [];
+
+  for (const range of node.ranges) {
+    const overlapStart = Math.max(range.start, start);
+    const overlapEnd = Math.min(range.end, end);
+
+    // Positive overlap only.
+    if (overlapStart < overlapEnd) {
+      ranges.push({
+        start: overlapStart - start,
+        end: overlapEnd - start,
+        style: range.style,
+      });
+    }
+  }
+
+  return {
+    text: node.text.slice(start, end),
+    ranges,
+  };
+}
+~~~

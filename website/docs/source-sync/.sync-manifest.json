@@ -772,6 +772,362 @@
       "hash": "facf6c9811037a59e9af8913bd8b81f0f1312b63bd2506d32e2fe6186c51e977",
       "docRelative": "frontend/uicoding/main.mdx"
     },
+    "frontend/uicoding/ui-prototype-js/accordion/Accordion.js": {
+      "hash": "d1e96f8598094e7170c7883a23992bd71cc9a526e27b86503724101cf8f30042",
+      "docRelative": "frontend/uicoding/ui-prototype-js/accordion/Accordion.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/analog-clock/AnologClock.js": {
+      "hash": "d236024cdfa13acb66bfa03db0763e65f870f0888374403b4d600b762672973c",
+      "docRelative": "frontend/uicoding/ui-prototype-js/analog-clock/AnologClock.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/analog-clock/Clock.module.css": {
+      "hash": "0c80fdacfac84d75a53b93e91c6e62e27ec1e8338762a53729f6a7ad28f77822",
+      "docRelative": "frontend/uicoding/ui-prototype-js/analog-clock/Clock.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/analog-clock/DigitalClock.js": {
+      "hash": "0d4a5626fab823c851eba74120043070384a024ee4e3a4d72507de4eda265e8c",
+      "docRelative": "frontend/uicoding/ui-prototype-js/analog-clock/DigitalClock.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/analog-clock/styles.module.css": {
+      "hash": "5c24b28f036e7939ba5d401fb1cd1dbd0980812a03dfa0be18961342c93c69fc",
+      "docRelative": "frontend/uicoding/ui-prototype-js/analog-clock/styles.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/auth-input/AuthCodeInput.module.css": {
+      "hash": "d3af3304d4f5c8ccb9bc8b29919c9d23560097e6bd9bb71fa8d604028f6a94d6",
+      "docRelative": "frontend/uicoding/ui-prototype-js/auth-input/AuthCodeInput.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/auth-input/AuthInput.js": {
+      "hash": "2cf2fa89d93b99a31b17bb65b4dda958e395acabec75408979f27a1a7e962a27",
+      "docRelative": "frontend/uicoding/ui-prototype-js/auth-input/AuthInput.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/birthyear-histogram/BirthYearHistogram.js": {
+      "hash": "30b14f8c624ef8eb2645a687edf279069726184cd4b06c03b44faf8b64c6606a",
+      "docRelative": "frontend/uicoding/ui-prototype-js/birthyear-histogram/BirthYearHistogram.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/birthyear-histogram/styles.css": {
+      "hash": "71156876a197c4299652ebb1d1055bf8bdd086b6916899ba535d8ef9b4d9101f",
+      "docRelative": "frontend/uicoding/ui-prototype-js/birthyear-histogram/styles.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/book-flight/BookFlight.js": {
+      "hash": "cd499ec1a55c60225923cb7644e540c2164db18f9f07c0631a3eeb7c8dd9045b",
+      "docRelative": "frontend/uicoding/ui-prototype-js/book-flight/BookFlight.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/carousel/Carousel.js": {
+      "hash": "3e36296d1fd92dd141ba217541409fdf44d4031c9b5cb522207b443c97d0be71",
+      "docRelative": "frontend/uicoding/ui-prototype-js/carousel/Carousel.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/carousel/CarouselII.js": {
+      "hash": "b2a4574234c9666fd93e3ba4b1ef656a461053397295265c44c98cfe017c47bf",
+      "docRelative": "frontend/uicoding/ui-prototype-js/carousel/CarouselII.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/carousel/DogCarousel.js": {
+      "hash": "839c7276da788a7541595062e79166d7074e54cc21b974e866f1614d9f6d81d5",
+      "docRelative": "frontend/uicoding/ui-prototype-js/carousel/DogCarousel.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/carousel/DogCarousel.module.css": {
+      "hash": "a796f9b65c06b55be03f776ed3b1c876315bf3a51630dfc7ea4edc67f37d2121",
+      "docRelative": "frontend/uicoding/ui-prototype-js/carousel/DogCarousel.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/carousel/ImageCarousel.module.css": {
+      "hash": "88e65879b587750fb8978a7b06d931c3dc18e1ed2f6bdce6cfaa886d002d8449",
+      "docRelative": "frontend/uicoding/ui-prototype-js/carousel/ImageCarousel.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/carousel/ImageCarouselII.module.css": {
+      "hash": "671247b400bcc59dafec6f491524a1fae9e6deb89d24f85ffc57a48425df1194",
+      "docRelative": "frontend/uicoding/ui-prototype-js/carousel/ImageCarouselII.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/claude-clone-chat/ClaudeChat.js": {
+      "hash": "a8557467b585e2e6f884265d6e0ae1e5bc4b6a8de050851a4fe52d1207c4f3f6",
+      "docRelative": "frontend/uicoding/ui-prototype-js/claude-clone-chat/ClaudeChat.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/claude-clone-chat/icon.js": {
+      "hash": "086131229059d24995b04b16515b5898447f561b8859c3fec18a36c8d77d3b30",
+      "docRelative": "frontend/uicoding/ui-prototype-js/claude-clone-chat/icon.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/connect-four/ConnectFour.js": {
+      "hash": "c2f78920fa61bd7054f1c15740df2deb5fb67d4e31407ddb5ea410c6285e936a",
+      "docRelative": "frontend/uicoding/ui-prototype-js/connect-four/ConnectFour.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/connect-four/styles.module.css": {
+      "hash": "16a69adb800dde20d36e9a99e16d65ef71521cb85c622f09fbd793c1cab5bd42",
+      "docRelative": "frontend/uicoding/ui-prototype-js/connect-four/styles.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/counter/Counter.js": {
+      "hash": "3037cfc43b3a6abf383dd35cecc9fa01b911310de13494deb63ba34573f94729",
+      "docRelative": "frontend/uicoding/ui-prototype-js/counter/Counter.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/crypto-converter/CryptoConverter.js": {
+      "hash": "de6aa9c5bef1660fbbd80161479fd24294aecdc9ae3a39eda2d8873c12833022",
+      "docRelative": "frontend/uicoding/ui-prototype-js/crypto-converter/CryptoConverter.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/crypto-converter/CryptoConverter.module.css": {
+      "hash": "1df70d2d31faa8fe875dc9f99a3669910e65ad1b7b830b9433c314a3dc593f7f",
+      "docRelative": "frontend/uicoding/ui-prototype-js/crypto-converter/CryptoConverter.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/data-table/App.js": {
+      "hash": "3377cd5f74506ee256f5ada7d9390c995f22885f44bb205238bf75261e497f5a",
+      "docRelative": "frontend/uicoding/ui-prototype-js/data-table/App.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/data-table/DataTable.js": {
+      "hash": "d294069a7aad34f3c707bc2fc819788386da3953ff142313824a722eacba3ca9",
+      "docRelative": "frontend/uicoding/ui-prototype-js/data-table/DataTable.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/data-table/DataTable.module.css": {
+      "hash": "759e7ca85a70741260f7ecf29d122279e1d74337f90d6f8899b897904fb5b3fd",
+      "docRelative": "frontend/uicoding/ui-prototype-js/data-table/DataTable.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/draggable-cell/DraggableCell.js": {
+      "hash": "1ca83743b714cddb059b48fed0e4c19e8f5d938f9bc26dcb8d67edbe91a48889",
+      "docRelative": "frontend/uicoding/ui-prototype-js/draggable-cell/DraggableCell.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/draggable-cell/styles.module.css": {
+      "hash": "04028068fb35cda5e912552689719fcd0539a357a0cb6b52d0e4f63806606a0c",
+      "docRelative": "frontend/uicoding/ui-prototype-js/draggable-cell/styles.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/file-explorer/FileExplorer.js": {
+      "hash": "6921fee23f0c2a8121fc583e6a9d98d6f7773277f4045db02761fe5be93161ba",
+      "docRelative": "frontend/uicoding/ui-prototype-js/file-explorer/FileExplorer.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/generate-table/GenerateTable.js": {
+      "hash": "341a3ce8446558ce3a1c709007dba0f33417638f514eb4cf81f0139f997bead9",
+      "docRelative": "frontend/uicoding/ui-prototype-js/generate-table/GenerateTable.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/grid-light/GridLight.js": {
+      "hash": "66afb2550c9ba28e64e4c29ff321c7913293c737018afb0abffc4a2a89dba0ed",
+      "docRelative": "frontend/uicoding/ui-prototype-js/grid-light/GridLight.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/grid-light/styles.module.css": {
+      "hash": "e571495e0ebfa3820e119038f9276eaff8b81ee104e84551321934773a9b69c8",
+      "docRelative": "frontend/uicoding/ui-prototype-js/grid-light/styles.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/hacker-news/HackerNews.js": {
+      "hash": "61cefe37316e3e40e782433f8e1f54641923f8d474f34f65f579371dbbe00d1d",
+      "docRelative": "frontend/uicoding/ui-prototype-js/hacker-news/HackerNews.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/hacker-news/InfiniteScroll.css": {
+      "hash": "e5595ac285162dc942f315458beb4c1643b256f38509c16b2b17ed0eb67cb136",
+      "docRelative": "frontend/uicoding/ui-prototype-js/hacker-news/InfiniteScroll.css.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/hacker-news/InfiniteScroll.js": {
+      "hash": "7ae38a364d27dc58b9005e53e290f5eec6f3bfeba7e94327e3e9b4f23709b86b",
+      "docRelative": "frontend/uicoding/ui-prototype-js/hacker-news/InfiniteScroll.js.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/hacker-news/JobBoard.js": {
+      "hash": "cf01923c1fb7f5a9b61bbbbebac35cc297caf80724d6c9f5138f8884c2d764dd",
+      "docRelative": "frontend/uicoding/ui-prototype-js/hacker-news/JobBoard.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/hacker-news/JobBoard.module.css": {
+      "hash": "0744d894a6bdc7a1715283cd660b6a389418ecd3ba99b4ddff0e4308611ed526",
+      "docRelative": "frontend/uicoding/ui-prototype-js/hacker-news/JobBoard.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/holigrail-layout/HoligrailLayout.js": {
+      "hash": "9548ec64511b5d2ed23bc0f77b92290898efac859ec75d017bec45d37382f844",
+      "docRelative": "frontend/uicoding/ui-prototype-js/holigrail-layout/HoligrailLayout.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/holigrail-layout/styles.module.css": {
+      "hash": "4d9c8890fbe3f3e2471e0e647d8a81b1723e4249650697108e1a52c04437ddba",
+      "docRelative": "frontend/uicoding/ui-prototype-js/holigrail-layout/styles.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/like-button/LikeButton.js": {
+      "hash": "4171c99580865e756732198b1b25a88dbdebc5c9b0330c9dd8ab50b7faaeedfb",
+      "docRelative": "frontend/uicoding/ui-prototype-js/like-button/LikeButton.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/like-button/icons.js": {
+      "hash": "ec7cbbb7c4a2a3dcc8ff532385bfc27c767db8d40a97b044da086a9ec22f69de",
+      "docRelative": "frontend/uicoding/ui-prototype-js/like-button/icons.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/like-button/styles.css": {
+      "hash": "f25ce288ecc8de48d46b03decd7545f8ddd85541a209e329f8b6f0d8ce8ccb66",
+      "docRelative": "frontend/uicoding/ui-prototype-js/like-button/styles.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/memory-game/MemoryGame.js": {
+      "hash": "3a4a4959a2cfc060c8b1284099e356c019eab5be1e6df3914835bc86d6c2de2a",
+      "docRelative": "frontend/uicoding/ui-prototype-js/memory-game/MemoryGame.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/memory-game/styles.css": {
+      "hash": "c9ae58011176daf4755f3a086436ca7037a759583e8df70340610ae0cbb8de24",
+      "docRelative": "frontend/uicoding/ui-prototype-js/memory-game/styles.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/modal-dialog/AppModalDialog.js": {
+      "hash": "80d303671db834f60c4d421985c86c55d7d9f5ba6ab51717d45d7854beedceb0",
+      "docRelative": "frontend/uicoding/ui-prototype-js/modal-dialog/AppModalDialog.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/modal-dialog/ModalDialog.js": {
+      "hash": "e971537cc906319aa90aaf3866635eeafdc802dda11fc1ac115f4aae49aa291c",
+      "docRelative": "frontend/uicoding/ui-prototype-js/modal-dialog/ModalDialog.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/modal-dialog/styles.module.css": {
+      "hash": "494ed2c66afa873066190bc83e900425718abe2a4e3c7542ae11b293c63adead",
+      "docRelative": "frontend/uicoding/ui-prototype-js/modal-dialog/styles.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/mortgage-calculator/MortgageCalculator.js": {
+      "hash": "9f69a2092a0ba95718aaf987e4e3a897ed0c2b394b49ba7d81cd0da514859f1d",
+      "docRelative": "frontend/uicoding/ui-prototype-js/mortgage-calculator/MortgageCalculator.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/nested-checkbox/NestedCheckbox.js": {
+      "hash": "e1f9c333138120b53153ad3fccea18b1c2fb8cff31bb540e080e4dd695ed8802",
+      "docRelative": "frontend/uicoding/ui-prototype-js/nested-checkbox/NestedCheckbox.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/nested-checkbox/NestedCheckbox.module.css": {
+      "hash": "50f56bcf2238c4d9e683908ba3ca9d0de03ca7be0397423fa7ceb6cdaec4baa6",
+      "docRelative": "frontend/uicoding/ui-prototype-js/nested-checkbox/NestedCheckbox.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/pixel-art/PixelArt.css": {
+      "hash": "3a264d17ba4ae5bc3650054649a93c62ce5b733b100516194210d6950757508a",
+      "docRelative": "frontend/uicoding/ui-prototype-js/pixel-art/PixelArt.css.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/pixel-art/PixelArt.js": {
+      "hash": "f9fddd5cc86ff7255c901c24931cb69640e4f44d100dd760877ed2f13a660a65",
+      "docRelative": "frontend/uicoding/ui-prototype-js/pixel-art/PixelArt.js.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBar.css": {
+      "hash": "57e74c027772979ab4e320a53a9a2d3856dc7583cdcdb66d3ccb4248803cc205",
+      "docRelative": "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBar.css.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBar.js": {
+      "hash": "f37c93073a7020ec6a6b0476e92ec9654871e06b139b75b745398f02671943f8",
+      "docRelative": "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBar.js.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarII.js": {
+      "hash": "06314cb86aa731b05122c8e1693c4c28cc6c1e86bf7edb740c2fe03d9589f580",
+      "docRelative": "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarII.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarIII.js": {
+      "hash": "395660b510d8237dbfbc3be2839b989d07a6c7a05f3bfd5d299888c71f845f99",
+      "docRelative": "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarIII.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarIV.css": {
+      "hash": "889a73d14c761455dece79a263582cb4021c71425ae536bd84a86e932984a017",
+      "docRelative": "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarIV.css.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarIV.js": {
+      "hash": "2b53534347b2c4de0e43041905653b420402fed0722dfdc8ccc9e3671459abc3",
+      "docRelative": "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarIV.js.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/roll-dice/App.module.css": {
+      "hash": "d96e3eac9c63948f2ef0dcc4750985bdfffa459b2fb6c921fcfb903692ce18e2",
+      "docRelative": "frontend/uicoding/ui-prototype-js/roll-dice/App.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/roll-dice/RollDice.js": {
+      "hash": "3ad9ead5f7fa14b94610dff28f1c92d411fa17fac95fe42df713c4e548a95da0",
+      "docRelative": "frontend/uicoding/ui-prototype-js/roll-dice/RollDice.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/signup-form/SignupForm.js": {
+      "hash": "3fb967b62cca0d683d418d7a802fa4f00953d56fb780e933dd5110528cbe1744",
+      "docRelative": "frontend/uicoding/ui-prototype-js/signup-form/SignupForm.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/snake-game/SnakeGame.js": {
+      "hash": "e7b0db78cbe8992c91a70498698b99bfd73a2f592dbe9091982b85886abb8f4f",
+      "docRelative": "frontend/uicoding/ui-prototype-js/snake-game/SnakeGame.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/snake-game/SnakeGame.module.css": {
+      "hash": "e9caed61c114dcdfbc789d63e929d42e5faa3880c385c58e82288a220acf6341",
+      "docRelative": "frontend/uicoding/ui-prototype-js/snake-game/SnakeGame.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/star-rating/StarRating.css": {
+      "hash": "2865f182d9d9469999cbd28dd935744fbe216377a01680bacb17efe299aa7a6b",
+      "docRelative": "frontend/uicoding/ui-prototype-js/star-rating/StarRating.css.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/star-rating/StarRating.js": {
+      "hash": "37e77d6c153741205f1294f6cd3057bcc26530c3b45efa22ecdc7b62db56f2bb",
+      "docRelative": "frontend/uicoding/ui-prototype-js/star-rating/StarRating.js.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/stop-watch/StopWatch.js": {
+      "hash": "101a3f0416b3fefb216d2514d5217025b5057aff564c4ca5fedd0224d74aabbf",
+      "docRelative": "frontend/uicoding/ui-prototype-js/stop-watch/StopWatch.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/stop-watch/StopWatchI.js": {
+      "hash": "8813032754be0f6cb24d128b68bb355a0e1fa234cf76c8e9834c90de7b0327ba",
+      "docRelative": "frontend/uicoding/ui-prototype-js/stop-watch/StopWatchI.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/stop-watch/Stopwatch.css": {
+      "hash": "f4d99da7928ca6cdb22014e7a835ee9ac22b176e83209c8e03e5fc3d84d31f9e",
+      "docRelative": "frontend/uicoding/ui-prototype-js/stop-watch/Stopwatch.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/tab/Tab.js": {
+      "hash": "c7e64bcd350a4673cf0f84c4353a4cf3cb965267e56bf40fbd8cc33a5d604d15",
+      "docRelative": "frontend/uicoding/ui-prototype-js/tab/Tab.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/tic-tac-toe/Tictactoe.js": {
+      "hash": "6e6bc84d27509e5e1a29e651e08e97dad125eab279f620bda68acdbec6c6f7f5",
+      "docRelative": "frontend/uicoding/ui-prototype-js/tic-tac-toe/Tictactoe.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/tic-tac-toe/Tictactoe_dynamic.js": {
+      "hash": "bcb4303c8deeb929319c2020f529cd09efc16081ef8c339887f3e48c602d9db8",
+      "docRelative": "frontend/uicoding/ui-prototype-js/tic-tac-toe/Tictactoe_dynamic.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/tic-tac-toe/styles.css": {
+      "hash": "68e914fabf37cf5622749e6174f22838db850a3567987a063500a9359cad44be",
+      "docRelative": "frontend/uicoding/ui-prototype-js/tic-tac-toe/styles.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/todo/TodoList.js": {
+      "hash": "f77174a4846bc6aaabe7f34089939aedbe9afac6bef9e6d403a9ebaac7473cb2",
+      "docRelative": "frontend/uicoding/ui-prototype-js/todo/TodoList.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/toggle/App.js": {
+      "hash": "35f7ea0fe6665d09cbc4d722dc1f1b9dc4cd883cc748fc2ec6d525a62c764483",
+      "docRelative": "frontend/uicoding/ui-prototype-js/toggle/App.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/toggle/Toggle.js": {
+      "hash": "fe978e9d39bc084a52a240c9fc53263eac3f28bd7fe09a4aaa33fc662a00c17f",
+      "docRelative": "frontend/uicoding/ui-prototype-js/toggle/Toggle.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/toggle/Toggle.module.css": {
+      "hash": "11b687c0f1fc581cae4ea11ab11dcb85fe094e37faceddf75f6e1788d508e5d4",
+      "docRelative": "frontend/uicoding/ui-prototype-js/toggle/Toggle.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/traffic-light/App.module.css": {
+      "hash": "994e9d0502b5f073b21d18d4c19d8c99d7ab6513ed886dc8db84bc9eadb0955b",
+      "docRelative": "frontend/uicoding/ui-prototype-js/traffic-light/App.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/traffic-light/TrafficLight.js": {
+      "hash": "0d12c6c88233a3dea638bbc9b3bc9dc8493f07493f4eec6929410382916673b6",
+      "docRelative": "frontend/uicoding/ui-prototype-js/traffic-light/TrafficLight.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/transfer-list/TransferList.js": {
+      "hash": "78fce5eeb81cb78d07cd2036ad4da293a4cfe1fe28a8d35fdfedcceae6bb372a",
+      "docRelative": "frontend/uicoding/ui-prototype-js/transfer-list/TransferList.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/transfer-list/TransferListII.js": {
+      "hash": "85a6b3a0a847081f02acd9d8e66e816f1fd960d0929878a652aa9abf32c6258e",
+      "docRelative": "frontend/uicoding/ui-prototype-js/transfer-list/TransferListII.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/transfer-list/styles.css": {
+      "hash": "a3ad4f382f9f18263b9fd54d93b33a97097f211e1bd51d24cd04e903fd35a49f",
+      "docRelative": "frontend/uicoding/ui-prototype-js/transfer-list/styles.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/undo-counter/UndoCounter.js": {
+      "hash": "c9171cfe01863db5b62bff14607a1be078043ffe7b5662bf092cdd4ecdb037ef",
+      "docRelative": "frontend/uicoding/ui-prototype-js/undo-counter/UndoCounter.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/undo-counter/UndoableCounter.module.css": {
+      "hash": "4f0b7e405c45beb4118c87315cb1518379e2dd366ee68a479043c33ac1780559",
+      "docRelative": "frontend/uicoding/ui-prototype-js/undo-counter/UndoableCounter.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/user-database/App.module.css": {
+      "hash": "8e4e594e7eb7355a7275e1095a80df07b7b306a505f4088cba15020b43f1e813",
+      "docRelative": "frontend/uicoding/ui-prototype-js/user-database/App.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/user-database/UserDatabase.js": {
+      "hash": "053ab5e6ba624a22bbc7cceb4ec0cb64c48a97e8528b3fa44ff17b1bbe3914c7",
+      "docRelative": "frontend/uicoding/ui-prototype-js/user-database/UserDatabase.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/whack-a-mole/WhackAMole.js": {
+      "hash": "b10c5dd904e31cfda222eb537a6fe0e983d5824c9a3ac72302c06ff6730839d5",
+      "docRelative": "frontend/uicoding/ui-prototype-js/whack-a-mole/WhackAMole.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/whack-a-mole/styles.module.css": {
+      "hash": "8dc0c4c287fc12dfc78536398a1ce0ce282c74a1b68568421b3bab7249ac71b6",
+      "docRelative": "frontend/uicoding/ui-prototype-js/whack-a-mole/styles.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/wordle/Wordle.js": {
+      "hash": "77d68bd1efe7c9b4d92c07dc9d740793859bd900a25d9901049430e79e964395",
+      "docRelative": "frontend/uicoding/ui-prototype-js/wordle/Wordle.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/wordle/styles.module.css": {
+      "hash": "0a10a93fd720be269e665bf2f93da85408e2f040e4d2637582a3befcf3ea7a5d",
+      "docRelative": "frontend/uicoding/ui-prototype-js/wordle/styles.module.mdx"
+    },
     "backend/quizzes/rest-vs-graphql-vs-gRPC.md": {
       "hash": "f1b1fbce72d36362d219f21b77e5bfec5a6b07184f5a7582c124af78f4c99ce0",
       "docRelative": "backend/quizzes/rest-vs-graphql-vs-gRPC.mdx"
@@ -973,11 +1329,11 @@
       "docRelative": "algorithm/two-pointers/dutchFlagSorting.mdx"
     },
     "algorithm/two-pointers/isPalindrome.py": {
-      "hash": "2369da5cdcc68672c9469b6e6d4aaca572a5665d96d218e908c6f489b003aeb0",
+      "hash": "ebee735913e2e0857b4371e8cfb06350dfb772a03e53b1ae0a4d3aa29cd9d634",
       "docRelative": "algorithm/two-pointers/isPalindrome.mdx"
     },
     "algorithm/two-pointers/isPalindrome.js": {
-      "hash": "2369da5cdcc68672c9469b6e6d4aaca572a5665d96d218e908c6f489b003aeb0",
+      "hash": "ebee735913e2e0857b4371e8cfb06350dfb772a03e53b1ae0a4d3aa29cd9d634",
       "docRelative": "algorithm/two-pointers/isPalindrome.mdx"
     },
     "algorithm/two-pointers/isPalindrome_Pair.py": {
@@ -1177,8 +1533,168 @@
       "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
     },
     "__nav__:frontend/uicoding": {
-      "hash": "d8009c2833215f5552411ba4d5c7c0f979efc0a23cce21cde49f2ffe9921e1e1",
+      "hash": "7ea76ce4b289bc5db134857157c4a12b44375f098d85d786a335c0b31bdf9f1c",
       "docRelative": "frontend/uicoding/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js": {
+      "hash": "de508628c7f9a96451cdc04823858502caba5d46238c357010c6b4d4bf527db9",
+      "docRelative": "frontend/uicoding/ui-prototype-js/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/accordion": {
+      "hash": "55aa62797435bfa9a2f6d7e1cc6053d2d7728c57101d405e95dffa26364c1e0d",
+      "docRelative": "frontend/uicoding/ui-prototype-js/accordion/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/analog-clock": {
+      "hash": "9ba4aff28ffb3bf6da4b8e3013b372c40e8637e56a119b865590d063bcc58ceb",
+      "docRelative": "frontend/uicoding/ui-prototype-js/analog-clock/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/auth-input": {
+      "hash": "b96d7a550e627501043e0ae2deb479387517c5502ec446eaa15b229c51cb1b07",
+      "docRelative": "frontend/uicoding/ui-prototype-js/auth-input/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/birthyear-histogram": {
+      "hash": "3b6de6318059290fd69dc18c8a2641a74b9a4e68a4a1f2dbade6322650a6eead",
+      "docRelative": "frontend/uicoding/ui-prototype-js/birthyear-histogram/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/book-flight": {
+      "hash": "aa8fcde95f65c43bb34e9f856c6a59ad9b40ef10d3847729a42d44f227d4040f",
+      "docRelative": "frontend/uicoding/ui-prototype-js/book-flight/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/carousel": {
+      "hash": "a5c4c9607cac29438f325ef81c289e5593a31fceb32988cfba4c6fd2ef7de2b4",
+      "docRelative": "frontend/uicoding/ui-prototype-js/carousel/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/claude-clone-chat": {
+      "hash": "9c998cc1c4781451019b860a9bbba5ef4ebac69e55929120d9be646ed6c3bbba",
+      "docRelative": "frontend/uicoding/ui-prototype-js/claude-clone-chat/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/connect-four": {
+      "hash": "ee76f553ec853919c28c859457499ce4e9db4c8683e591767f40a4424bc1fe5c",
+      "docRelative": "frontend/uicoding/ui-prototype-js/connect-four/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/counter": {
+      "hash": "13538b114f00020c9f443daa0c3def74af94cadd6e81aed06bfa84ec6a404650",
+      "docRelative": "frontend/uicoding/ui-prototype-js/counter/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/crypto-converter": {
+      "hash": "29ce331ca20cd95acd1832c857ef045065eedcb173d341177b19780bd4b44800",
+      "docRelative": "frontend/uicoding/ui-prototype-js/crypto-converter/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/data-table": {
+      "hash": "70029ccd47b027d8be04bb2e5474708a4ae063b1ac9179204f59bde8d9853ba0",
+      "docRelative": "frontend/uicoding/ui-prototype-js/data-table/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/draggable-cell": {
+      "hash": "af86c706601f9856d2b2cd5da2503000adc779c6d7b7cbdf494c4999e6cfadb2",
+      "docRelative": "frontend/uicoding/ui-prototype-js/draggable-cell/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/file-explorer": {
+      "hash": "b8846cd33c154cbd7786cbd79f68146e82b2f7ba3067ad64fe0f48ce87db632b",
+      "docRelative": "frontend/uicoding/ui-prototype-js/file-explorer/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/generate-table": {
+      "hash": "13d7ebceb8b1be43287eefe5edf131fbef42de0c85d57941bc262d025cf0331c",
+      "docRelative": "frontend/uicoding/ui-prototype-js/generate-table/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/grid-light": {
+      "hash": "6b8b0a8b5908b7683a0bd9d41d23daca616b692d162b81d151b284bed1e39735",
+      "docRelative": "frontend/uicoding/ui-prototype-js/grid-light/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/hacker-news": {
+      "hash": "df55c6937d83bb700b213095c6958e538c72e07f1bde6defc2231c9a71b74224",
+      "docRelative": "frontend/uicoding/ui-prototype-js/hacker-news/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/holigrail-layout": {
+      "hash": "d7bc67f57f8d4f97d9bd46ba8f7c5ca971231014af1821d7d32a7dc2f71db171",
+      "docRelative": "frontend/uicoding/ui-prototype-js/holigrail-layout/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/like-button": {
+      "hash": "f7ff387710ba25362160516560a7bdddc8ced5d83b5955b9b82c44b535f513d2",
+      "docRelative": "frontend/uicoding/ui-prototype-js/like-button/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/memory-game": {
+      "hash": "92cda5f2ce08e612679d330afe4fb16be66c61e5d9a605000e79174ac2e2f004",
+      "docRelative": "frontend/uicoding/ui-prototype-js/memory-game/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/modal-dialog": {
+      "hash": "b47b186be7e49289d8235767a502290bb1534b4b0551a63193fca5809d5e3667",
+      "docRelative": "frontend/uicoding/ui-prototype-js/modal-dialog/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/mortgage-calculator": {
+      "hash": "162139077523b85761b2ddab853191c735a19cff7573f4c4580a547a73dcc57b",
+      "docRelative": "frontend/uicoding/ui-prototype-js/mortgage-calculator/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/nested-checkbox": {
+      "hash": "e4c42bdc08f212ed53eb603defe9484cb1b028447c4cba93ba811c4243fc9afa",
+      "docRelative": "frontend/uicoding/ui-prototype-js/nested-checkbox/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/pixel-art": {
+      "hash": "227298afb0973a35a6f225d11e3905b5b7e82ce9f3d800bf6ba9bb3798f40272",
+      "docRelative": "frontend/uicoding/ui-prototype-js/pixel-art/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/progress-bar": {
+      "hash": "704b7bf5b173097b2e93a2b250932b756997075a7b5b1ebbe58ea5c29372afa8",
+      "docRelative": "frontend/uicoding/ui-prototype-js/progress-bar/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/roll-dice": {
+      "hash": "3a301398548ed62127e1693d89eef8e179372f14ed3779a2c37ffcae1a50fc80",
+      "docRelative": "frontend/uicoding/ui-prototype-js/roll-dice/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/signup-form": {
+      "hash": "94fb904859905ab9ebcb55a769a30ed9a27dee4b6f785f14c867b757e912fea1",
+      "docRelative": "frontend/uicoding/ui-prototype-js/signup-form/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/snake-game": {
+      "hash": "d9c8d74e1261999d23ace8bbab5699b49c543d2a3a452761e49343f01b00d9fd",
+      "docRelative": "frontend/uicoding/ui-prototype-js/snake-game/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/star-rating": {
+      "hash": "1636424f0d2f3f4941f925392628ac874188662421c122d8891ad06780930b74",
+      "docRelative": "frontend/uicoding/ui-prototype-js/star-rating/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/stop-watch": {
+      "hash": "42ced71946c334cc578691653ae2d4c4573936108257c781abb15b2c77c34cd1",
+      "docRelative": "frontend/uicoding/ui-prototype-js/stop-watch/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/tab": {
+      "hash": "955a341b2b0919d6edd3a265c96d7c304bd1aa18f55823983dee50101a0f256e",
+      "docRelative": "frontend/uicoding/ui-prototype-js/tab/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/tic-tac-toe": {
+      "hash": "a08b5ac9085896e184b8f95c3e3e110d317e335d934459550b82f38ec841dfc5",
+      "docRelative": "frontend/uicoding/ui-prototype-js/tic-tac-toe/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/todo": {
+      "hash": "c9ecd78cc1f495c22410588ab8b42d3d14dff52236e89d60352512bb180005c0",
+      "docRelative": "frontend/uicoding/ui-prototype-js/todo/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/toggle": {
+      "hash": "8afc66fadaa70d11c948dd3ad7be5c033f514ef41b2db4a74937dc7a1051714e",
+      "docRelative": "frontend/uicoding/ui-prototype-js/toggle/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/traffic-light": {
+      "hash": "85e0aad48aa8cc0e234701a48c2d02fad26e57ef3a44e4ff9864a3a802162b34",
+      "docRelative": "frontend/uicoding/ui-prototype-js/traffic-light/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/transfer-list": {
+      "hash": "1ff7d6b3278972595ee1b945d5076508ef95aebdbb0c89fbda36c890531db736",
+      "docRelative": "frontend/uicoding/ui-prototype-js/transfer-list/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/undo-counter": {
+      "hash": "bf18ef2b2e0c47ee3b6be4c437b24add2c1eae8723b6b8bcd51564e8ac121a2d",
+      "docRelative": "frontend/uicoding/ui-prototype-js/undo-counter/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/user-database": {
+      "hash": "7128041c678536bdbd3d2cc68dcab697c93e4a3aebb51f9e7d8e9e4f36c3f254",
+      "docRelative": "frontend/uicoding/ui-prototype-js/user-database/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/whack-a-mole": {
+      "hash": "6d08ee194857bcfdde424acacd4520865b49970a9bb81c0faa41b3a615f3ef11",
+      "docRelative": "frontend/uicoding/ui-prototype-js/whack-a-mole/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/wordle": {
+      "hash": "4b9ce6952230d0814dd7055daeba7759a55f426fb2c63c45ce1c0438a528188e",
+      "docRelative": "frontend/uicoding/ui-prototype-js/wordle/_index.mdx"
     }
   }
 }

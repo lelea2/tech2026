@@ -1,0 +1,43 @@
+.container {
+  padding: 20px;
+  font-family: sans-serif;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.controls button {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progress {
+  width: 400px;
+  height: 20px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #22c55e;
+  transition: width 50ms linear;
+}
+
+.state-preview {
+  margin-top: 20px;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  width: fit-content;
+}

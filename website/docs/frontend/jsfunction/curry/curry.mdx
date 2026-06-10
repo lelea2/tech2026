@@ -10,29 +10,29 @@ title: curry
  * @returns {Function}
  */
 export default function curry(fn) {
-	function buildCurried(collectedArgs, boundThis) {
-		return function curried(...args) {
-			const nextThis = boundThis === undefined ? this : boundThis;
+  function buildCurried(collectedArgs, boundThis) {
+    return function curried(...args) {
+      const nextThis = boundThis === undefined ? this : boundThis;
 
-			if (fn.length === 0) {
-				return fn.apply(nextThis, collectedArgs.concat(args));
-			}
+      if (fn.length === 0) {
+        return fn.apply(nextThis, collectedArgs.concat(args));
+      }
 
-			if (args.length === 0) {
-				return buildCurried(collectedArgs, nextThis);
-			}
+      if (args.length === 0) {
+        return buildCurried(collectedArgs, nextThis);
+      }
 
-			const nextArgs = collectedArgs.concat(args);
+      const nextArgs = collectedArgs.concat(args);
 
-			if (nextArgs.length >= fn.length) {
-				return fn.apply(nextThis, nextArgs);
-			}
+      if (nextArgs.length >= fn.length) {
+        return fn.apply(nextThis, nextArgs);
+      }
 
-			return buildCurried(nextArgs, nextThis);
-		};
-	}
+      return buildCurried(nextArgs, nextThis);
+    };
+  }
 
-	return buildCurried([], undefined);
+  return buildCurried([], undefined);
 }
 
 // Example usage:

@@ -15,54 +15,54 @@ title: textSearch
  * @returns {string}
  */
 export default function textSearch(content, query) {
-	if (query.length === 0 || content.length === 0 || query.length > content.length) {
-		return content;
-	}
+  if (query.length === 0 || content.length === 0 || query.length > content.length) {
+    return content;
+  }
 
-	const contentLower = content.toLowerCase();
-	const queryLower = query.toLowerCase();
-	const qLen = query.length;
-	const rawRanges = [];
+  const contentLower = content.toLowerCase();
+  const queryLower = query.toLowerCase();
+  const qLen = query.length;
+  const rawRanges = [];
 
-	// Left-to-right greedy scan so earlier characters get priority.
-	let i = 0;
-	while (i <= content.length - qLen) {
-		if (contentLower.slice(i, i + qLen) === queryLower) {
-			rawRanges.push([i, i + qLen]);
-			i += qLen;
-		} else {
-			i++;
-		}
-	}
+  // Left-to-right greedy scan so earlier characters get priority.
+  let i = 0;
+  while (i <= content.length - qLen) {
+    if (contentLower.slice(i, i + qLen) === queryLower) {
+      rawRanges.push([i, i + qLen]);
+      i += qLen;
+    } else {
+      i++;
+    }
+  }
 
-	if (rawRanges.length === 0) {
-		return content;
-	}
+  if (rawRanges.length === 0) {
+    return content;
+  }
 
-	// Merge touching ranges: e.g. [0,2] + [2,4] becomes [0,4].
-	const mergedRanges = [rawRanges[0]];
-	for (let j = 1; j < rawRanges.length; j++) {
-		const [start, end] = rawRanges[j];
-		const last = mergedRanges[mergedRanges.length - 1];
+  // Merge touching ranges: e.g. [0,2] + [2,4] becomes [0,4].
+  const mergedRanges = [rawRanges[0]];
+  for (let j = 1; j < rawRanges.length; j++) {
+    const [start, end] = rawRanges[j];
+    const last = mergedRanges[mergedRanges.length - 1];
 
-		if (start <= last[1]) {
-			last[1] = Math.max(last[1], end);
-		} else {
-			mergedRanges.push([start, end]);
-		}
-	}
+    if (start <= last[1]) {
+      last[1] = Math.max(last[1], end);
+    } else {
+      mergedRanges.push([start, end]);
+    }
+  }
 
-	let result = '';
-	let cursor = 0;
+  let result = '';
+  let cursor = 0;
 
-	for (const [start, end] of mergedRanges) {
-		result += content.slice(cursor, start);
-		result += `<b>${content.slice(start, end)}</b>`;
-		cursor = end;
-	}
+  for (const [start, end] of mergedRanges) {
+    result += content.slice(cursor, start);
+    result += `<b>${content.slice(start, end)}</b>`;
+    cursor = end;
+  }
 
-	result += content.slice(cursor);
-	return result;
+  result += content.slice(cursor);
+  return result;
 }
 
 // Examples:

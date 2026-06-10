@@ -1,0 +1,48 @@
+.table {
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table td,
+.table th {
+  padding: 4px;
+  border-bottom: 1px solid #ddd;
+  text-align: start;
+}
+
+.table th {
+  vertical-align: top;
+}
+
+.sortButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 600;
+}
+
+.filterInput {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.rangeFilter {
+  display: flex;
+  gap: 4px;
+}
+
+.pagination {
+  display: flex;
+  font-size: 14px;
+  gap: 12px;
+}
+
+.pages {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}

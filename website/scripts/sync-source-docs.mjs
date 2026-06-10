@@ -162,6 +162,10 @@ function labelForExt(ext) {
   return (languageByExt[ext] || ext.replace('.', '') || 'Code').toUpperCase();
 }
 
+function isComparableLanguageVariant(ext) {
+  return ext === '.js' || ext === '.py';
+}
+
 function splitFrontmatter(source) {
   const normalized = source.replace(/\r\n/g, '\n');
 
@@ -549,7 +553,7 @@ async function main() {
 
     const files = await collectFiles(sourceRoot);
 
-    const docsByRelative = new Map();
+    const sourcesByBaseRelative = new Map();
     for (const absFile of files) {
       const relativePath = toPosix(path.relative(repoRoot, absFile));
       const relativeFromSource = toPosix(path.relative(sourceRoot, absFile));
@@ -587,22 +591,46 @@ async function main() {
       const relativeWithoutExt = sourceExt
         ? relativeFromSource.slice(0, -sourceExt.length)
         : relativeFromSource;
-      const docRelative = `${toPosix(path.join(folder.docDir, relativeWithoutExt))}.mdx`;
+      const baseDocRelative = toPosix(path.join(folder.docDir, relativeWithoutExt));
 
-      if (!docsByRelative.has(docRelative)) {
-        docsByRelative.set(docRelative, {
+      if (!sourcesByBaseRelative.has(baseDocRelative)) {
+        sourcesByBaseRelative.set(baseDocRelative, {
           baseName: path.basename(relativeWithoutExt),
-          variants: [],
+          entries: [],
         });
       }
 
-      docsByRelative.get(docRelative).variants.push({
+      sourcesByBaseRelative.get(baseDocRelative).entries.push({
         relativePath,
         source,
         sourceHash,
+        sourceExt,
         language,
         label: labelForExt(sourceExt),
       });
+    }
+
+    const docsByRelative = new Map();
+    for (const [baseDocRelative, doc] of sourcesByBaseRelative.entries()) {
+      const allEntriesCanMerge =
+        doc.entries.length === 1 ||
+        doc.entries.every((entry) => isComparableLanguageVariant(entry.sourceExt));
+
+      if (allEntriesCanMerge) {
+        docsByRelative.set(`${baseDocRelative}.mdx`, {
+          baseName: doc.baseName,
+          variants: doc.entries,
+        });
+        continue;
+      }
+
+      for (const entry of doc.entries) {
+        const docRelative = `${baseDocRelative}${entry.sourceExt}.mdx`;
+        docsByRelative.set(docRelative, {
+          baseName: `${doc.baseName}${entry.sourceExt}`,
+          variants: [entry],
+        });
+      }
     }
 
     for (const [docRelative, doc] of docsByRelative.entries()) {

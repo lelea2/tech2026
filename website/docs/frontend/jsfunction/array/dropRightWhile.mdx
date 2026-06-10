@@ -33,18 +33,18 @@ title: dropRightWhile
  * @returns {T[]}
  */
 export default function dropRightWhile(array, predicate) {
-	let cutIndex = array.length;
+  let cutIndex = array.length;
 
-	for (let i = array.length - 1; i >= 0; i -= 1) {
-		if (predicate(array[i], i, array)) {
-			cutIndex = i;
-			continue;
-		}
+  for (let i = array.length - 1; i >= 0; i -= 1) {
+    if (predicate(array[i], i, array)) {
+      cutIndex = i;
+      continue;
+    }
 
-		break;
-	}
+    break;
+  }
 
-	return array.slice(0, cutIndex);
+  return array.slice(0, cutIndex);
 }
 
 // Example usage:

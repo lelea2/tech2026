@@ -1,0 +1,66 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.heading {
+  margin-bottom: 24px;
+  font-size: 32px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  min-height: 180px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  text-decoration: none;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.company {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.description {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.date {
+  font-size: 14px;
+  color: #666;
+}
+
+.loadMore {
+  margin-top: 24px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #111;
+  color: white;
+  cursor: pointer;
+}
+
+.loadMore:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

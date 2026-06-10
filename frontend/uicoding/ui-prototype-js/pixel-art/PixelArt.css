@@ -1,0 +1,38 @@
+.pixel-art {
+  font-family: sans-serif;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tabs button.active {
+  font-weight: bold;
+  border: 2px solid #000;
+}
+
+.colors {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.color {
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.canvas {
+  display: grid;
+  width: fit-content;
+  border: 1px solid #ccc;
+}
+
+.cell {
+  padding: 0;
+  border: 1px solid #ddd;
+  cursor: crosshair;
+}
