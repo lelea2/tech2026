@@ -596,6 +596,10 @@
       "hash": "c5c0212f71018acdec7b8ef8f9aeef8c9e184b7b0d632fbc6630151f99625c26",
       "docRelative": "frontend/jsfunction/promise/PromiseMerge.mdx"
     },
+    "frontend/jsfunction/promise/PromiseSchedular.js": {
+      "hash": "66d2b1fc2fc18a9b27cb82135155786efe545dbfd24def262e15a957f3e2ca88",
+      "docRelative": "frontend/jsfunction/promise/PromiseSchedular.mdx"
+    },
     "frontend/jsfunction/promise/Promisify.js": {
       "hash": "f9b05fe8023c5377bf298fa5bf1a3e52a5032d203bdd5d39ae6875100ec3da6c",
       "docRelative": "frontend/jsfunction/promise/Promisify.mdx"
@@ -1133,7 +1137,7 @@
       "docRelative": "frontend/jsfunction/prismaORM/_index.mdx"
     },
     "__nav__:frontend/jsfunction/promise": {
-      "hash": "1c0737c1465f15e05a6016eb6546be763bedad341dfe01c3c7783e17894d384a",
+      "hash": "86e1c7ba6422e295a51e611685b3da02931bb61e242616c84a94684af2076a18",
       "docRelative": "frontend/jsfunction/promise/_index.mdx"
     },
     "__nav__:frontend/jsfunction/range": {
