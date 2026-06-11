@@ -9,7 +9,10 @@
 import { ListNode } from './ds_v1/LinkedList.js';
 
 export default function removeNthLastNode(head, n) {
-  const dummy = new ListNode(0, head);
+  const dummy = {
+    val: 0,
+    next: head,
+  };
 
   let fast = dummy;
   let slow = dummy;

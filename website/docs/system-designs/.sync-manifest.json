@@ -9,7 +9,7 @@
       "docRelative": "backend/Tournament.mdx"
     },
     "system-designs/backend/model_eval_training_llm_design.mdx": {
-      "hash": "c3bf716f6941a1250d95e4c9ebb40ec6a94cb491c16aba71917828aada20e920",
+      "hash": "d4f0f035fbe17ca82cfb40f293e080838d7a437a62399df54200524f8ee46e1f",
       "docRelative": "backend/model_eval_training_llm_design.mdx"
     },
     "system-designs/frontend/autocomplete.mdx": {
@@ -20,6 +20,10 @@
       "hash": "19d6aa6609e77b061e05bc2138684ce47a3b36a4f403b00602f5033637dd0d85",
       "docRelative": "frontend/chat-app.mdx"
     },
+    "system-designs/frontend/masonry-layout-system-design.mdx": {
+      "hash": "1c78de8aa547f56c46edca46302e071dda818017423e638142808ee379c19a53",
+      "docRelative": "frontend/masonry-layout-system-design.mdx"
+    },
     "system-designs/frontend/theme-design.mdx": {
       "hash": "1c6f3e12b107433c05b71de1e4033ebcce2edc15e45dfdc87172187f1d422c4f",
       "docRelative": "frontend/theme-design.mdx"
@@ -29,7 +33,7 @@
       "docRelative": "backend/_index.mdx"
     },
     "__nav__:frontend": {
-      "hash": "2b6d5d8f800565d463869d252025d044b2983ddfff5f442e4902ae86da84138d",
+      "hash": "5601df5b272b172bb832177ba9ff5c7d9931aca89f60f6c66d0cbba49896b106",
       "docRelative": "frontend/_index.mdx"
     }
   }

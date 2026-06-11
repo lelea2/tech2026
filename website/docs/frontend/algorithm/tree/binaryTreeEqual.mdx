@@ -1,0 +1,47 @@
+---
+title: binaryTreeEqual
+---
+
+# binaryTreeEqual
+
+~~~javascript
+// interface TreeNode {
+//   val: number;
+//   left: TreeNode | null;
+//   right: TreeNode | null;
+// }
+
+/**
+ * Time: O(n)
+ * Space: O(n) in the worst case for the queue.
+ */
+/**
+ * Returns true if two binary trees are identical.
+ */
+function binaryTreeEqual(
+  // a: TreeNode | null,
+  // b: TreeNode | null,
+  a, b
+) {
+  // Both nodes are empty
+  if (a === null && b === null) {
+    return true;
+  }
+
+  // One node exists, the other doesn't
+  if (a === null || b === null) {
+    return false;
+  }
+
+  // Values differ
+  if (a.val !== b.val) {
+    return false;
+  }
+
+  // Compare left and right subtrees
+  return (
+    binaryTreeEqual(a.left, b.left) &&
+    binaryTreeEqual(a.right, b.right)
+  );
+}
+~~~

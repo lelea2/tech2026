@@ -1,0 +1,153 @@
+export class BinaryTreeNode {
+  /**
+   * Initialize a Binary Tree node.
+   * @param {*} value The value of the node.
+   */
+  constructor(value) {
+    this.value = value;
+    this.left = null;
+    this.right = null;
+  }
+}
+
+export class BinaryTree {
+  /**
+   * Initialize the Binary Tree.
+   * @param {*} value The value of the root node.
+   */
+  constructor(value) {
+    if (value === undefined) {
+      this.root = null;
+    } else {
+      this.root = value instanceof BinaryTreeNode ? value : new BinaryTreeNode(value);
+    }
+  }
+
+  /**
+   * Get the number of nodes in the tree.
+   * @return {number} The number of nodes in the tree.
+   */
+  size() {
+    const countNode = node => {
+      if (node == null) {
+        return 0;
+      }
+      return 1 + countNode(node.left) + countNode(node.right);
+    }
+    return this.root === null ? 0 :countNode(this.root);
+  }
+
+  /**
+   * Get the height of the tree.
+   * @return {number} The height of the tree.
+   */
+  height() {
+    const getHeight = (node) => {
+      if (node == null) {
+        return -1;
+      }
+      return 1 + Math.max(getHeight(node.left), getHeight(node.right));
+    };
+
+    return this.root === null ? 0 : getHeight(this.root);
+  }
+
+  /**
+   * Traverse the tree in an in-order fashion.
+   * @return {Array<*>} An array of values of the nodes in in-order traversal.
+   */
+  inOrder() {
+    const result = [];
+    const dfs = (node) => {
+      if (node === null) return;
+      dfs(node.left);
+      result.push(node.value);
+      dfs(node.right);
+    };
+
+    dfs(this.root);
+    return result;
+  }
+
+  /**
+   * Traverse the tree in a pre-order fashion.
+   * @return {Array<*>} An array of values of the nodes in pre-order traversal.
+   */
+  preOrder() {
+    const result = [];
+
+    const dfs = (node) => {
+      if (node === null) return;
+      result.push(node.value);
+      dfs(node.left);
+      dfs(node.right);
+    };
+
+    dfs(this.root);
+    return result;
+  }
+
+  /**
+   * Traverse the tree in a post-order fashion.
+   * @return {Array<*>} An array of values of the nodes in post-order traversal.
+   */
+  postOrder() {
+    const result = [];
+
+    const dfs = (node) => {
+      if (node === null) return;
+      dfs(node.left);
+      dfs(node.right);
+      result.push(node.value);
+    };
+
+    dfs(this.root);
+    return result;
+  }
+
+  /**
+   * Checks if the binary tree is balanced, i.e. depth of the two subtrees of
+   * every node never differ by more than 1.
+   * @return {boolean}
+   */
+  isBalanced() {
+    const checkHeight = (node) => {
+      if (node === null) return 0;
+      const leftHeight = checkHeight(node.left);
+      if (leftHeight === -1) return -1;
+      const rightHeight = checkHeight(node.right);
+      if (rightHeight === -1) return -1;
+      if (Math.abs(leftHeight - rightHeight) > 1) {
+        return -1;
+      }
+      return 1 + Math.max(leftHeight, rightHeight);
+    };
+
+    return checkHeight(this.root) !== -1;
+  }
+
+  /**
+   * Checks if the binary tree is complete, i.e., all levels are completely filled except possibly the last level,
+   * which is filled from left to right.
+   * @return {boolean} True if the binary tree is complete, false otherwise.
+   */
+  isComplete() {
+    if (this.root === null) return true;
+
+    const queue = [this.root];
+    let seenNull = false;
+    while (queue.length > 0) {
+      const node = queue.shift();
+      if (node === null) {
+        seenNull = true;
+      } else {
+        if (seenNull) {
+          return false;
+        }
+        queue.push(node.left);
+        queue.push(node.right);
+      }
+    }
+    return true;
+  }
+}

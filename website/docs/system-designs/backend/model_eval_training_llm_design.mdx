@@ -110,7 +110,24 @@ Collect:
 
 During long training jobs, checkpoint evaluation should run asynchronously:
 
-![ML lifecycle feedback loop](./assets/checkpoint_eval_sequence_diagram.png)
+```mermaid
+sequenceDiagram
+  participant T as Trainer
+  participant C as Checkpoint Store
+  participant Q as Eval Scheduler
+  participant E as Eval Workers
+  participant R as Eval Result Store
+  participant G as Promotion Gate
+
+  T->>C: publish checkpoint N
+  C->>Q: checkpoint-created event
+  Q->>E: schedule eval suite
+  E->>C: load checkpoint N
+  E->>E: run benchmark/safety/robustness evals
+  E->>R: write scores + artifacts + traces
+  R->>G: update gate status
+  G-->>T: continue / warn / stop / promote
+```
 
 Key design choice: **evaluation must not block training by default**, but gate-sensitive evals should be able to stop or pause a run when hard thresholds fail.
 
@@ -131,7 +148,18 @@ Use statistical confidence intervals where possible. Do not overreact to tiny mo
 
 Only promoted checkpoints should become first-class model artifacts:
 
-![ML lifecycle feedback loop](./assets/model_promotion_gate_flow_chart.png)
+```mermaid
+flowchart TD
+  A[Raw Checkpoint] --> B{Required Eval Suite Passed?}
+  B -- No --> C[Keep for Research Only]
+  B -- Yes --> D[Candidate Model Version]
+  D --> E{Safety + Regression Gate Passed?}
+  E -- No --> F[Blocked from Serving]
+  E -- Yes --> G[Model Registry]
+  G --> H[Staging Deployment]
+  H --> I[Shadow or Canary]
+  I --> J[Production Deployment]
+```
 
 ---
 
@@ -283,7 +311,15 @@ This creates a bridge between production reality and training repeatability.
 
 ### 7.4 Comparison View
 
-![ML lifecycle feedback loop](./assets/eval_metric_mapping_flow_chart.png)
+```mermaid
+flowchart LR
+  A[Offline Eval Result] --> C[Task Taxonomy Mapper]
+  B[Online Trace Eval Result] --> C
+  C --> D[Comparable Metric Layer]
+  D --> E[Regression Dashboard]
+  D --> F[Release Gate]
+  D --> G[Training Data Feedback]
+```
 
 Example comparison output:
 

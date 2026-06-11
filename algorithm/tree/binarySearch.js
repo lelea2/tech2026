@@ -1,4 +1,20 @@
 /**
+ * Interview Question:
+ * Given a sorted array of numbers and a target number, implement binary search.
+ *
+ * Requirements:
+ * - Return the index of the target if it exists
+ * - Return -1 if the target is not found
+ * - Use an iterative approach with two pointers, low and high
+ * - Achieve O(log n) time complexity and O(1) space complexity
+ *
+ * Follow-up:
+ * Discuss how the solution changes when duplicates exist and the interviewer
+ * asks for the first or last occurrence of the target.
+ */
+// Time: O(log n), Space: O(1)
+
+/**
  * @param {Array<number>} arr The input integer array to be searched.
  * @param {number} target The target integer to search within the array.
  * @return {number} The index of target element in the array, or -1 if not found.

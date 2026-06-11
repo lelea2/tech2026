@@ -7,6 +7,7 @@
  * @param {TreeNode | null} root
  * @return {TreeNode | null}
  */
+// Time: O(n), Space: O(h) where h is the height of the tree
 export default function binaryTreeFlip(root) {
   if (root === null) {
     return null;

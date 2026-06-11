@@ -1,3 +1,20 @@
+/**
+ * Interview Question:
+ * Implement a Binary Search Tree data structure.
+ *
+ * Requirements:
+ * - Support inserting values while preserving BST ordering
+ * - Support searching for whether a value exists in the tree
+ * - Support deleting values while preserving BST ordering
+ * - Handle delete cases for leaf nodes, nodes with one child, nodes with two
+ *   children, and deleting the root
+ *
+ * Follow-up:
+ * Discuss average vs worst-case time complexity for insert, search, and delete.
+ */
+// Time: O(log n) average, O(n) worst-case for insert, search, and delete
+// Space: O(n)
+
 export default class BinarySearchTree {
   constructor() {
     this.root = null;
