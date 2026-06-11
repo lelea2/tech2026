@@ -1,11 +1,15 @@
 {
   "files": {
+    "backend/quizzes/backend-scaling-horizontal-vertical.mdx": {
+      "hash": "90b41a9f9853e019fe0587784dbe57b1027857c8c4f87a1b8cc57d8078cbadb0",
+      "docRelative": "quizzes/backend-scaling-horizontal-vertical.mdx"
+    },
     "backend/quizzes/rest-vs-graphql-vs-gRPC.md": {
-      "hash": "8756d325f3f83de73a6802aee712cbfa3b0f6d2f14852b625748aab110102af6",
+      "hash": "f1b1fbce72d36362d219f21b77e5bfec5a6b07184f5a7582c124af78f4c99ce0",
       "docRelative": "quizzes/rest-vs-graphql-vs-gRPC.mdx"
     },
     "__nav__:quizzes": {
-      "hash": "ad58f68630476ea7bf8d9fff5e492620e7f26bcc211f9ebe3ad3a64359c3cc65",
+      "hash": "c66995568665bbc221355a81747aae20066b9d56c1b070248a9aaba00edcfe88",
       "docRelative": "quizzes/_index.mdx"
     }
   }
