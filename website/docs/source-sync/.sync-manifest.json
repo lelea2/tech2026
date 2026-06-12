@@ -124,6 +124,14 @@
       "hash": "1376b6b24ce0ebfa9572297012fd4570dff3b5faf6474985f986f57dd216a673",
       "docRelative": "frontend/jsfunction/array/maxBy.mdx"
     },
+    "frontend/jsfunction/array/mergeMeeting.js": {
+      "hash": "c21503deba61dfe4bfadfc04b1e1d63fc46b75462ac56e8c8e2454d0c505de3c",
+      "docRelative": "frontend/jsfunction/array/mergeMeeting.mdx"
+    },
+    "frontend/jsfunction/array/mergeOverlapInterval.js": {
+      "hash": "08bffe61f84793275b59d8f09851e028001f2d8562c71d8ab52b1404cde6ecc5",
+      "docRelative": "frontend/jsfunction/array/mergeOverlapInterval.mdx"
+    },
     "frontend/jsfunction/array/minBy.js": {
       "hash": "8824c381b747eaa333471333ad001f5210ae9a7358ae60951c64d053e257ebb3",
       "docRelative": "frontend/jsfunction/array/minBy.mdx"
@@ -492,6 +500,10 @@
       "hash": "8f6587a8cc21a023c119c23dd92cc03f8896d833921dd3665ed2f8fa97cf785f",
       "docRelative": "frontend/jsfunction/jsonStringify/superJSONAdvance.mdx"
     },
+    "frontend/jsfunction/limitConcurrency.js": {
+      "hash": "00d0a5c30404a2c24a5d38d1299bc63868aecd5bb4f86cf612d4e88bac31e61c",
+      "docRelative": "frontend/jsfunction/limitConcurrency.mdx"
+    },
     "frontend/jsfunction/limits.js": {
       "hash": "b41dceac49281fe4361a496c50462efe625cf97d1959b67c218915412992147f",
       "docRelative": "frontend/jsfunction/limits.mdx"
@@ -845,7 +857,7 @@
       "docRelative": "frontend/uicoding/ui-prototype-js/claude-clone-chat/icon.mdx"
     },
     "frontend/uicoding/ui-prototype-js/connect-four/ConnectFour.js": {
-      "hash": "c2f78920fa61bd7054f1c15740df2deb5fb67d4e31407ddb5ea410c6285e936a",
+      "hash": "f55247f4e66972f97f6d68a932b9d5445aaa2ba0b4663964b311ea4b3cf94ca4",
       "docRelative": "frontend/uicoding/ui-prototype-js/connect-four/ConnectFour.mdx"
     },
     "frontend/uicoding/ui-prototype-js/connect-four/styles.module.css": {
@@ -885,7 +897,7 @@
       "docRelative": "frontend/uicoding/ui-prototype-js/draggable-cell/styles.module.mdx"
     },
     "frontend/uicoding/ui-prototype-js/file-explorer/FileExplorer.js": {
-      "hash": "6921fee23f0c2a8121fc583e6a9d98d6f7773277f4045db02761fe5be93161ba",
+      "hash": "db21d56a689fa5998a92d0970d2d50956110c38ba568b36727c921f7d97de19c",
       "docRelative": "frontend/uicoding/ui-prototype-js/file-explorer/FileExplorer.mdx"
     },
     "frontend/uicoding/ui-prototype-js/generate-table/GenerateTable.js": {
@@ -1009,7 +1021,7 @@
       "docRelative": "frontend/uicoding/ui-prototype-js/roll-dice/App.module.mdx"
     },
     "frontend/uicoding/ui-prototype-js/roll-dice/RollDice.js": {
-      "hash": "3ad9ead5f7fa14b94610dff28f1c92d411fa17fac95fe42df713c4e548a95da0",
+      "hash": "ce7773504a31deb14a740b5220f4c9afd55f50734d1c5f1c6652587f24a7ad62",
       "docRelative": "frontend/uicoding/ui-prototype-js/roll-dice/RollDice.mdx"
     },
     "frontend/uicoding/ui-prototype-js/signup-form/SignupForm.js": {
@@ -1128,6 +1140,10 @@
       "hash": "0a10a93fd720be269e665bf2f93da85408e2f040e4d2637582a3befcf3ea7a5d",
       "docRelative": "frontend/uicoding/ui-prototype-js/wordle/styles.module.mdx"
     },
+    "backend/quizzes/backend-scaling-horizontal-vertical.mdx": {
+      "hash": "90b41a9f9853e019fe0587784dbe57b1027857c8c4f87a1b8cc57d8078cbadb0",
+      "docRelative": "backend/quizzes/backend-scaling-horizontal-vertical.mdx"
+    },
     "backend/quizzes/rest-vs-graphql-vs-gRPC.md": {
       "hash": "f1b1fbce72d36362d219f21b77e5bfec5a6b07184f5a7582c124af78f4c99ce0",
       "docRelative": "backend/quizzes/rest-vs-graphql-vs-gRPC.mdx"
@@ -1160,17 +1176,21 @@
       "hash": "0a505a14c2cc212d82cd73bb168d6bda88b15e3554880d55fca2ff82c5ea80f6",
       "docRelative": "algorithm/array/kRowPascalTriangle.mdx"
     },
+    "algorithm/array/maxProductSubArray.js": {
+      "hash": "89a5b5184e9a9f09436245c15c3fd448152c27ee867057036f2c671ef565c99f",
+      "docRelative": "algorithm/array/maxProductSubArray.mdx"
+    },
     "algorithm/array/maxProfit.js": {
       "hash": "fb2e60efa96968d6861b984d44558853c897ddffb1b506dc8e61c5ada49c0007",
       "docRelative": "algorithm/array/maxProfit.mdx"
     },
-    "algorithm/array/maxSubArray.py": {
-      "hash": "e5a8178e5a5a7ee75aa27c0f7d272863cf6e602300b2ecb6f07ea2083f1e9afe",
-      "docRelative": "algorithm/array/maxSubArray.mdx"
+    "algorithm/array/maxSumSubArray.py": {
+      "hash": "32b837e69f53d069442edc59c0f3994ba553a1417af152c53f82a9d35e602d4f",
+      "docRelative": "algorithm/array/maxSumSubArray.mdx"
     },
-    "algorithm/array/maxSubArray.js": {
-      "hash": "e5a8178e5a5a7ee75aa27c0f7d272863cf6e602300b2ecb6f07ea2083f1e9afe",
-      "docRelative": "algorithm/array/maxSubArray.mdx"
+    "algorithm/array/maxSumSubArray.js": {
+      "hash": "32b837e69f53d069442edc59c0f3994ba553a1417af152c53f82a9d35e602d4f",
+      "docRelative": "algorithm/array/maxSumSubArray.mdx"
     },
     "algorithm/array/twoSum.js": {
       "hash": "b7d8df1c9be94957876d326204090867da21dcb5dc815b811e2ae43a8b8a9770",
@@ -1200,6 +1220,10 @@
       "hash": "e0d96a50b462996648f5d4c92eff69a45a0a4a29488f3fce5f9a8cdf893adce0",
       "docRelative": "algorithm/dfs/calculateEquation.mdx"
     },
+    "algorithm/dfs/checkPackageDependencies.js": {
+      "hash": "ac487d1f36787e7bad1f587359a54d67ae3265f0f7b9fd9996532369aa21785a",
+      "docRelative": "algorithm/dfs/checkPackageDependencies.mdx"
+    },
     "algorithm/dfs/countIslandOnGrid.js": {
       "hash": "0d2b8be42d005c0303aaa5d40c5e4e448e66845e67b233c5e96d0fb51ac2cb60",
       "docRelative": "algorithm/dfs/countIslandOnGrid.mdx"
@@ -1208,13 +1232,29 @@
       "hash": "eea5da97639e79f9396b3cb22524f7055a8f220c1e337991754a63079a34a5f4",
       "docRelative": "algorithm/graph/aliendOrder.mdx"
     },
+    "algorithm/heap/Heap.js": {
+      "hash": "34b045bda6e233945b28e02ac7b8ea06fae098805866975dbbb39b247344f21a",
+      "docRelative": "algorithm/heap/Heap.mdx"
+    },
+    "algorithm/heap/MinHeap.js": {
+      "hash": "b1f20b0ceea64fe473f8110543f346b708a84d0ff614faa0bd7dec71aebcc93d",
+      "docRelative": "algorithm/heap/MinHeap.mdx"
+    },
+    "algorithm/heap/heapSort.js": {
+      "hash": "379f8004a724e70cbeba5f7fa2b4a68d456170a1ff65ed030feece0d7d329b56",
+      "docRelative": "algorithm/heap/heapSort.mdx"
+    },
+    "algorithm/heap/shortestPathDistance.js": {
+      "hash": "24b929782f822cc4eeebc76e6b5c838c03be50cde51eb287e6b4abb270a625d4",
+      "docRelative": "algorithm/heap/shortestPathDistance.mdx"
+    },
     "algorithm/isMeetingCalendarValid.js": {
       "hash": "7d35708df6828b1c83ad7d39c5b6e3895acc4e36e579274c3cb7e75776d4ca35",
       "docRelative": "algorithm/isMeetingCalendarValid.mdx"
     },
-    "algorithm/linkedlist/Heap.js": {
-      "hash": "42ac6d33f0a4570768a4dc663618fa82dba7bd04672c53e270d2c8c6ec997d57",
-      "docRelative": "algorithm/linkedlist/Heap.mdx"
+    "algorithm/linkedlist/LinkedList.js": {
+      "hash": "7262c85fed8d75451305194ebd750ba117bd6d7adf098dd9b2bde58f0c50dd72",
+      "docRelative": "algorithm/linkedlist/LinkedList.mdx"
     },
     "algorithm/linkedlist/isCircularLinkedList.py": {
       "hash": "39d70f084a68c73c2a7072c8d5cfdb5c6d04c52a4a7fafb481121e533fb087fd",
@@ -1240,24 +1280,24 @@
       "hash": "2ed772bf36d7c7f5e88b1356bbd26cba82455a6a3427454bf562948ab655c498",
       "docRelative": "algorithm/lru/lru.mdx"
     },
-    "algorithm/lru/lru_O(1).js": {
-      "hash": "8faddf5a71a0cb2f7c00851ac183eb043aeefe22400158b3be5d67639e78b65b",
-      "docRelative": "algorithm/lru/lru_O(1).mdx"
+    "algorithm/lru/lru_O1.js": {
+      "hash": "7e3300c30adde77993782279fdebb6e1cef8cc31bfa9b33ec1c55bcfc1c270a1",
+      "docRelative": "algorithm/lru/lru_O1.mdx"
     },
-    "algorithm/lru/lru_O(n).js": {
-      "hash": "cc860c9a09c71281f536efdcdd6d91c0a8e2baaf265bc73619c308a1f6017262",
-      "docRelative": "algorithm/lru/lru_O(n).mdx"
+    "algorithm/lru/lru_On.js": {
+      "hash": "1e08c2fed2b9e30c565aca2772f7fcd8163bc34c2053fe962bb974f7fe094d2b",
+      "docRelative": "algorithm/lru/lru_On.mdx"
     },
     "algorithm/mostCommonElement.js": {
       "hash": "8cec5205685c93fd5c347d5aa8adaf9837a617e878b380ffb9586e23dc79fff9",
       "docRelative": "algorithm/mostCommonElement.mdx"
     },
     "algorithm/stack/Queue.js": {
-      "hash": "4b117f6a95d27a309d9f2d5a56151a35fbee8fd17e0351387f82769ed6d1a800",
+      "hash": "19be1b2f3918fb1f15557903d022e5626806671b6b0f738e71051684671cabe0",
       "docRelative": "algorithm/stack/Queue.mdx"
     },
     "algorithm/stack/Stack.js": {
-      "hash": "59a5cc7852a2f298c6701b4082913713aea95a79a679cd38b6bfc24b2e9a9e24",
+      "hash": "b95ac44073a31971eb2ea4783bbc9c9f30073defdcc804623648293475166884",
       "docRelative": "algorithm/stack/Stack.mdx"
     },
     "algorithm/stack/isBalanceBracket.py": {
@@ -1272,12 +1312,20 @@
       "hash": "0d855699717cfe62ed5df275fc9430f4778305b84b9f1de0b172fbeed86bb19a",
       "docRelative": "algorithm/stringAnagram.mdx"
     },
+    "algorithm/tree/BinaryTree.js": {
+      "hash": "5b5794d6111e70acb6a5cb5f79cd30e0340b5deab79b149921ad784bf575ad89",
+      "docRelative": "algorithm/tree/BinaryTree.mdx"
+    },
+    "algorithm/tree/bfs.js": {
+      "hash": "e3164c9c0b8eb33bbcee5e56aeed885e6bde8bde35209286bb2f8635a8648d53",
+      "docRelative": "algorithm/tree/bfs.mdx"
+    },
     "algorithm/tree/binarySearch.js": {
-      "hash": "a342696cdf679e67769c5236cd6bc1fdacc8a653390de066a32b9cf4ffbac7d6",
+      "hash": "07c776c50196453ef0f2d2d114ce8110cf64efaeb3c3f19aa1bdbadeabe93a84",
       "docRelative": "algorithm/tree/binarySearch.mdx"
     },
     "algorithm/tree/binarySearchTree.js": {
-      "hash": "1b85762128461fe317e4e09175f66cb1ada60bd92108364f57275f53caaa492c",
+      "hash": "f806a8a77ba4d2895e0a038f5e35471d9988d08c667a0eca1bb570a971c68cfc",
       "docRelative": "algorithm/tree/binarySearchTree.mdx"
     },
     "algorithm/tree/binaryTreeEqual.js": {
@@ -1285,8 +1333,12 @@
       "docRelative": "algorithm/tree/binaryTreeEqual.mdx"
     },
     "algorithm/tree/binaryTreeFlip.js": {
-      "hash": "d8096409b231619439ce7630a129e492a2f7f01ff74bf4838e6b884665a4bcb6",
+      "hash": "b6370969221f98f4271430fd42aa86fabb82778cfe24714f3b3f7490e43a78d8",
       "docRelative": "algorithm/tree/binaryTreeFlip.mdx"
+    },
+    "algorithm/tree/binaryTreeLevelOrderTraversal.js": {
+      "hash": "515111035db5bf68b444badcebacc1524f05f71f075293a169ec4d692ab63aad",
+      "docRelative": "algorithm/tree/binaryTreeLevelOrderTraversal.mdx"
     },
     "algorithm/tree/binaryTreeMaximumDepth.js": {
       "hash": "9bf4a5df17f07eb1ccaa83bdd477b7bd17f201e10046aad3237dece4bcadc940",
@@ -1296,17 +1348,41 @@
       "hash": "6cac2d18e41972be30bc745121f19d37743d083f081945fa4d2b3f763c45d649",
       "docRelative": "algorithm/tree/binaryTreeSubTree.mdx"
     },
+    "algorithm/tree/compareBinaryTree.js": {
+      "hash": "1dfb810595d1bc55a36c1c2168716f1265cb362c092e951a5169c22113af7771",
+      "docRelative": "algorithm/tree/compareBinaryTree.mdx"
+    },
+    "algorithm/tree/dfs.js": {
+      "hash": "3f034dc2e53dee289520b9b4fd10dfe80794af2b4114dc6db7c061b7c387336d",
+      "docRelative": "algorithm/tree/dfs.mdx"
+    },
+    "algorithm/tree/findInRotatedArray.js": {
+      "hash": "23d5c60893c42dcb230ec6aab854f950b3ff8d7b68537d0a1dc72ef170efe25e",
+      "docRelative": "algorithm/tree/findInRotatedArray.mdx"
+    },
+    "algorithm/tree/graphIsTree.js": {
+      "hash": "980c508be2b77c3d52117193b03ae4d423937aab52d2f899095608b7db195404",
+      "docRelative": "algorithm/tree/graphIsTree.mdx"
+    },
     "algorithm/tree/isSymetricTree.js": {
       "hash": "9339191a867c7b47fdf9d080d580a7aa424bf16d2c55cf1a56d595b68452b22f",
       "docRelative": "algorithm/tree/isSymetricTree.mdx"
     },
     "algorithm/tree/lowestCommonAncestor.py": {
-      "hash": "e7e55a444405dd0cc8a360ee79794451e98545b4c315bc329062d1b027e0d99f",
+      "hash": "1bc40d558c879b2f3b9b96894dc9cbd12a34457ee04d72e5e3679f109b487a80",
       "docRelative": "algorithm/tree/lowestCommonAncestor.mdx"
     },
     "algorithm/tree/lowestCommonAncestor.js": {
-      "hash": "e7e55a444405dd0cc8a360ee79794451e98545b4c315bc329062d1b027e0d99f",
+      "hash": "1bc40d558c879b2f3b9b96894dc9cbd12a34457ee04d72e5e3679f109b487a80",
       "docRelative": "algorithm/tree/lowestCommonAncestor.mdx"
+    },
+    "algorithm/tree/maxWaterTrappedBetweenWall.js": {
+      "hash": "496e9a5cb73f8c6ecf27fa9f4b6aa4ad02e785ffc6e29d29a89f1f486b8de2c7",
+      "docRelative": "algorithm/tree/maxWaterTrappedBetweenWall.mdx"
+    },
+    "algorithm/tree/smallestInRotatedArray.js": {
+      "hash": "3e0b1ae653025176e80fd2242e1e901055c580cbdc0362e0cf0db4829ff6593e",
+      "docRelative": "algorithm/tree/smallestInRotatedArray.mdx"
     },
     "algorithm/trie/findWordsInGrid.js": {
       "hash": "f6ab0fc3afa18bc2c05e46398b1f0d6a72dacdede6bff1749f12f785b9f1df2d",
@@ -1349,7 +1425,7 @@
       "docRelative": "algorithm/two-pointers/minimumMoveToMakePalindrome.mdx"
     },
     "algorithm/two-pointers/removeNthLasNode.js": {
-      "hash": "1f98337d2e8f3a1240c36f3a5e3238c4a1e9f4a1120a89d7a11498f13afad5c2",
+      "hash": "2624915b9e11e3b7a2a71840b471e57db3cb96b0ff559f406223c79cc662820b",
       "docRelative": "algorithm/two-pointers/removeNthLasNode.mdx"
     },
     "algorithm/two-pointers/reverseWords.js": {
@@ -1361,11 +1437,11 @@
       "docRelative": "algorithm/two-pointers/shortestSubsrtingContainingCharacters.mdx"
     },
     "__nav__:algorithm": {
-      "hash": "08310079726e4b8934e1914a94780fb38c9a4b0083b78e963958416c1881cda2",
+      "hash": "ad2c78889f83291dce134a9ee6a8cc1fc355c0ce475030994d38cafb9fdeb8c6",
       "docRelative": "algorithm/_index.mdx"
     },
     "__nav__:algorithm/array": {
-      "hash": "cdd7419156208262fd9c1394f6a4402e49febd0be428d4d918c52dff2d6c31cb",
+      "hash": "2f705e55ccdc372543920de225979e240b6480a872a62e96a1f2e6dba2554290",
       "docRelative": "algorithm/array/_index.mdx"
     },
     "__nav__:algorithm/bit": {
@@ -1373,19 +1449,23 @@
       "docRelative": "algorithm/bit/_index.mdx"
     },
     "__nav__:algorithm/dfs": {
-      "hash": "5f4c11bd54c95d97dbae0e9a405bcd76d1cb51b5bcc6f2f5728f6304e7523651",
+      "hash": "5638b82f75338ec04d25f159ac7d1d7172ac3a7638677991118bca53654ff438",
       "docRelative": "algorithm/dfs/_index.mdx"
     },
     "__nav__:algorithm/graph": {
       "hash": "4995fd49aef8cd0bc27603cad37918c4ce5507324bf0b1346b4101d50156559b",
       "docRelative": "algorithm/graph/_index.mdx"
     },
+    "__nav__:algorithm/heap": {
+      "hash": "7d4ef0b6722745165459e701fa7e859eda513360c631e9dcc8fa57b1155b2552",
+      "docRelative": "algorithm/heap/_index.mdx"
+    },
     "__nav__:algorithm/linkedlist": {
-      "hash": "1ac2619d8b7651584900e17b3fa4e82748536cd4cbc1075ac4f5bb04eeaf8ae8",
+      "hash": "28399adc82656a11f21a298e5909aaf37d7c0ae5dc959bf0627a87b3573b914e",
       "docRelative": "algorithm/linkedlist/_index.mdx"
     },
     "__nav__:algorithm/lru": {
-      "hash": "c288be89325f3863f44fdd12ffb545630c5bae64f022ecba914dd26a95e2c0bd",
+      "hash": "1f0a2ba19f36b064018ddd2f20b36afe5f44f9eae60973a03e40229f6cebcdef",
       "docRelative": "algorithm/lru/_index.mdx"
     },
     "__nav__:algorithm/stack": {
@@ -1393,7 +1473,7 @@
       "docRelative": "algorithm/stack/_index.mdx"
     },
     "__nav__:algorithm/tree": {
-      "hash": "4c70de173dafbdce4b7c11a67367006897dc9c49cdb93e7ef5ee4d6ba5fb310a",
+      "hash": "06fe2d51a89bc0f96ec86ab8ee4d044255a81991e83bdf81edeaff539008832e",
       "docRelative": "algorithm/tree/_index.mdx"
     },
     "__nav__:algorithm/trie": {
@@ -1409,7 +1489,7 @@
       "docRelative": "backend/_index.mdx"
     },
     "__nav__:backend/quizzes": {
-      "hash": "ad58f68630476ea7bf8d9fff5e492620e7f26bcc211f9ebe3ad3a64359c3cc65",
+      "hash": "c66995568665bbc221355a81747aae20066b9d56c1b070248a9aaba00edcfe88",
       "docRelative": "backend/quizzes/_index.mdx"
     },
     "__nav__:frontend": {
@@ -1417,7 +1497,7 @@
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
-      "hash": "d7de7034e94eab353861d6c91c08c6ae061fae1cb530aacaa6b9bccadd4a4446",
+      "hash": "bf1730288554d2c8e9f6f5da511e6d649749c2eef3011aac28c43aa5e0a95820",
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/2d-readingOrder": {
@@ -1441,7 +1521,7 @@
       "docRelative": "frontend/jsfunction/apply_call_bind/_index.mdx"
     },
     "__nav__:frontend/jsfunction/array": {
-      "hash": "a5e0a1f2efee1db914fccc7223dace10f22721ae3a0e5dacd427213d17eed3dd",
+      "hash": "9b371373a8ea25d3ea45b833ef7f26055f6a00ca82fd0015a1c52e6eeec86b77",
       "docRelative": "frontend/jsfunction/array/_index.mdx"
     },
     "__nav__:frontend/jsfunction/array.prototype": {

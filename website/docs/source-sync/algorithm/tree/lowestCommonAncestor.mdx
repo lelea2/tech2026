@@ -95,29 +95,47 @@ class Solution:
 // since a node can be a descendant of itself according to the LCA definition.
 
 /**
+ *  * Binary Search Tree Lowest Common Ancestor
+ * In a BST:
+ * - left subtree values are smaller than root.val
+ * - right subtree values are larger than root.val
+ * If both nodes are smaller than root, LCA is in the left subtree.
+ * If both nodes are larger than root, LCA is in the right subtree.
+ * Otherwise, root is the split point, so root is the LCA.
+ */
+/**
  * Definition for a binary tree node.
- * function TreeNode(val) {
- *     this.val = val;
- *     this.left = this.right = null;
+ * 
+interface TreeNode {
+  val: number;
+  left: TreeNode | null;
+  right: TreeNode | null;
+}
  * }
  */
 /**
  * @param {TreeNode} root
- * @param {TreeNode} p
- * @param {TreeNode} q
+ * @param {TreeNode} a
+ * @param {TreeNode} b
  * @return {TreeNode}
  */
-var lowestCommonAncestor = function(root, p, q) {
-  var count = 0;
+/*
+Time:  O(h)
+Space: O(1)
 
-  while(true) {
-    var value = root.val;
-    if (p.val >= value && value >= q.val || p.val <= value && value <= q.val) {
-      return root;
-    } else if(p.val > value && q.val > value){
+h = height of the tree
+Balanced BST: O(log n)
+Skewed BST:   O(n)
+*/
+export default function lowestCommonAncestor(root, a, b) {
+  while(root !== null) {
+    const value = root.val;
+    if (a.val < value && b.val < value) {
+      root = root.left
+    } else if(a.val > value && b.val > value){
       root =  root.right;
     } else {
-      root =  root.left;
+      return root
     }
   }
 };
