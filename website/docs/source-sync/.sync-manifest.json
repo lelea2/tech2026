@@ -1460,6 +1460,10 @@
       "hash": "79530e177fe0a1cd2174cc0467feaf19da1d91984cdcc85e2a8aaa14466dc7db",
       "docRelative": "algorithm/two-pointers/shortestSubsrtingContainingCharacters.mdx"
     },
+    "algorithm/two-pointers/twoNumberSum.js": {
+      "hash": "6779c62e0368939c330e2a4d9642548233684fd5140431a8e47f46995301fe7f",
+      "docRelative": "algorithm/two-pointers/twoNumberSum.mdx"
+    },
     "__nav__:algorithm": {
       "hash": "ad2c78889f83291dce134a9ee6a8cc1fc355c0ce475030994d38cafb9fdeb8c6",
       "docRelative": "algorithm/_index.mdx"
@@ -1505,7 +1509,7 @@
       "docRelative": "algorithm/trie/_index.mdx"
     },
     "__nav__:algorithm/two-pointers": {
-      "hash": "4d285b43ddaebfe7ba101ad2751cc8767212289a509b32525ba69968d85cefc9",
+      "hash": "a5f6120d4811d714b2cbe3279aa22353147476e9d6615f85f0fb248d27c9d8ba",
       "docRelative": "algorithm/two-pointers/_index.mdx"
     },
     "__nav__:backend": {
