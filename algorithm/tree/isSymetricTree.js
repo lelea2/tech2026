@@ -32,35 +32,35 @@
 // 2. If not, reverse the right subtree.
 // 3. Check if the left and right subtrees are identical.
 export default function isSymmetricTree(root) {
-  if(root == null || (root.right == null && root.left == null) ){
+  if (root === null || (root.right === null && root.left === null)) {
     return true;
   }
 
   // reverse tree on the right
   root.right = revertTree(root.right);
   return isSameTree(root.left, root.right);
-};
+}
 
 // Function to reverse tree
 function revertTree(node) {
-  if (node == null || node.left == null && node.right == null) {
+  if (node === null || (node.left === null && node.right === null)) {
     return node;
   }
-  var temp = revertTree(node.left); // temp -> left (reverse child)
+  const temp = revertTree(node.left); // temp -> left (reverse child)
   node.left = revertTree(node.right); // left -> right (reverse child)
   node.right = temp; // right -> temp
   return node;
 }
 
 // function checking similar tree
-function isSameTree(left,right) {
-  if (left == null && right== null) {
+function isSameTree(left, right) {
+  if (left === null && right === null) {
     return true;
   }
-  if (left == null && right != null || right == null && left != null) {
+  if (left === null || right === null) {
     return false;
   }
-  if (left.val != right.val) {
+  if (left.val !== right.val) {
     return false;
   }
   return isSameTree(left.right, right.right) && isSameTree(left.left, right.left);

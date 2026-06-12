@@ -1,0 +1,62 @@
+/**
+ * Interview Question:
+ * Given an array, determine whether it represents a valid max heap.
+ *
+ * JavaScript heap representation:
+ * A binary heap is commonly stored in an array instead of linked tree nodes.
+ * For a node at index i:
+ * - left child index = 2 * i + 1
+ * - right child index = 2 * i + 2
+ * - parent index = Math.floor((i - 1) / 2)
+ *
+ * Max heap rules:
+ * - The tree must be complete. An array naturally represents a complete binary
+ *   tree when read from left to right.
+ * - Every parent must be greater than or equal to its children.
+ *
+ * Why checking only direct children is enough:
+ * If every parent is >= its direct children, then the heap property holds for
+ * the whole tree recursively. We do not need to compare a node with every
+ * descendant.
+ *
+ * Example:
+ * [90, 15, 10, 7, 12, 2] -> true
+ * [9, 15, 10, 7, 12, 2] -> false because 9 < 15
+ *
+ * Complexity:
+ * O(n) time because every node is checked once.
+ * O(h) recursion space, where h is the heap height.
+ *
+ * @param {number[]} arr
+ * @param {number} i
+ * @param {number} n
+ * @return {boolean}
+ */
+export default function isHeap(arr, i = 0, n = arr.length) {
+  // Empty array and single-node array are valid heaps.
+  if (n <= 1) {
+    return true;
+  }
+
+  const left = 2 * i + 1;
+  const right = 2 * i + 2;
+
+  // Leaf nodes have no children, so they already satisfy the heap property.
+  if (left >= n) {
+    return true;
+  }
+
+  // If the left child exists and is greater than parent, max heap is invalid.
+  if (arr[i] < arr[left]) {
+    return false;
+  }
+
+  // Right child may not exist for the last internal node.
+  // Only compare it when its index is inside the array.
+  if (right < n && arr[i] < arr[right]) {
+    return false;
+  }
+
+  // Recursively verify that both child subtrees also satisfy max-heap order.
+  return isHeap(arr, left, n) && isHeap(arr, right, n);
+}
