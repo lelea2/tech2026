@@ -28,6 +28,10 @@
       "hash": "0a505a14c2cc212d82cd73bb168d6bda88b15e3554880d55fca2ff82c5ea80f6",
       "docRelative": "array/kRowPascalTriangle.mdx"
     },
+    "algorithm/array/maxProductSubArray.js": {
+      "hash": "89a5b5184e9a9f09436245c15c3fd448152c27ee867057036f2c671ef565c99f",
+      "docRelative": "array/maxProductSubArray.mdx"
+    },
     "algorithm/array/maxProfit.js": {
       "hash": "fb2e60efa96968d6861b984d44558853c897ddffb1b506dc8e61c5ada49c0007",
       "docRelative": "array/maxProfit.mdx"
@@ -67,6 +71,10 @@
     "algorithm/dfs/calculateEquation.js": {
       "hash": "e0d96a50b462996648f5d4c92eff69a45a0a4a29488f3fce5f9a8cdf893adce0",
       "docRelative": "dfs/calculateEquation.mdx"
+    },
+    "algorithm/dfs/checkPackageDependencies.js": {
+      "hash": "ac487d1f36787e7bad1f587359a54d67ae3265f0f7b9fd9996532369aa21785a",
+      "docRelative": "dfs/checkPackageDependencies.mdx"
     },
     "algorithm/dfs/countIslandOnGrid.js": {
       "hash": "0d2b8be42d005c0303aaa5d40c5e4e448e66845e67b233c5e96d0fb51ac2cb60",
@@ -192,6 +200,10 @@
       "hash": "6cac2d18e41972be30bc745121f19d37743d083f081945fa4d2b3f763c45d649",
       "docRelative": "tree/binaryTreeSubTree.mdx"
     },
+    "algorithm/tree/compareBinaryTree.js": {
+      "hash": "1dfb810595d1bc55a36c1c2168716f1265cb362c092e951a5169c22113af7771",
+      "docRelative": "tree/compareBinaryTree.mdx"
+    },
     "algorithm/tree/dfs.js": {
       "hash": "3f034dc2e53dee289520b9b4fd10dfe80794af2b4114dc6db7c061b7c387336d",
       "docRelative": "tree/dfs.mdx"
@@ -277,7 +289,7 @@
       "docRelative": "two-pointers/shortestSubsrtingContainingCharacters.mdx"
     },
     "__nav__:array": {
-      "hash": "82a2430e8a304c9242305e55378e6dfb3eb8a9ecebdd4108457b0ac62db0acba",
+      "hash": "2f705e55ccdc372543920de225979e240b6480a872a62e96a1f2e6dba2554290",
       "docRelative": "array/_index.mdx"
     },
     "__nav__:bit": {
@@ -285,7 +297,7 @@
       "docRelative": "bit/_index.mdx"
     },
     "__nav__:dfs": {
-      "hash": "5f4c11bd54c95d97dbae0e9a405bcd76d1cb51b5bcc6f2f5728f6304e7523651",
+      "hash": "5638b82f75338ec04d25f159ac7d1d7172ac3a7638677991118bca53654ff438",
       "docRelative": "dfs/_index.mdx"
     },
     "__nav__:graph": {
@@ -309,7 +321,7 @@
       "docRelative": "stack/_index.mdx"
     },
     "__nav__:tree": {
-      "hash": "e0bb810b40f02f8d5b402daade6fa6a2ee852a73460ea74de85694b52ceef5d7",
+      "hash": "06fe2d51a89bc0f96ec86ab8ee4d044255a81991e83bdf81edeaff539008832e",
       "docRelative": "tree/_index.mdx"
     },
     "__nav__:trie": {

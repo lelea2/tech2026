@@ -1,0 +1,52 @@
+/**
+ * Interview Question:
+ * Implement a helper that runs asynchronous tasks with a maximum concurrency
+ * limit.
+ *
+ * Requirements:
+ * - Accept an array of task functions, where each task returns a value or Promise
+ * - Run at most `limit` tasks at the same time
+ * - Preserve result order so the returned array matches the input task order
+ * - Reject if any task rejects, just like Promise.all
+ *
+ * Approach:
+ * Keep a Set of currently executing promises. Start each task and add its
+ * promise to the Set. When the Set reaches the concurrency limit, wait for the
+ * fastest active task to finish with Promise.race before starting more tasks.
+ * Store every promise in `results`, then return Promise.all(results) so output
+ * order follows the original task order.
+ *
+ * Complexity:
+ * O(n) task scheduling work and O(n) space for results.
+ *
+ * @param {Array<() => Promise<unknown> | unknown>} tasks
+ * @param {number} limit
+ * @return {Promise<unknown[]>}
+ */
+async function limitConcurrency(tasks, limit) {
+  // Store all task promises in input order so Promise.all preserves result order.
+  const results = [];
+
+  // Track only the promises that are still running.
+  const executing = new Set();
+
+  for (const task of tasks) {
+    // Promise.resolve().then(...) makes sync and async tasks behave consistently.
+    const p = Promise.resolve().then(() => task());
+
+    results.push(p);
+    executing.add(p);
+    
+    // Remove the promise from the active Set whether it resolves or rejects.
+    const clean = () => executing.delete(p);
+    p.then(clean, clean);
+
+    // If the limit is reached, pause until any active task finishes.
+    if (executing.size >= limit) {
+      await Promise.race(executing);
+    }
+  }
+
+  // Wait for all tasks and return values in the same order as `tasks`.
+  return Promise.all(results);
+}
