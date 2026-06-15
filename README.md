@@ -6,7 +6,7 @@ Interview prep for 2026
 
 This repository now includes a Docusaurus site in `website` configured for GitHub Pages.
 
-- Local dev: `cd website && npm start`
+- Local dev: `cd website && npm start`, then open `http://localhost:3000/tech2026/`
 - Production build: `cd website && npm run build`
 - Source docs sync: `cd website && npm run sync:source-docs`
 - GitHub Pages deploy: push to `main` to trigger the workflow in `.github/workflows/deploy-docusaurus.yml`
