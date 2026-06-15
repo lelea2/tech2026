@@ -1,13 +1,13 @@
 ---
 name: sync-source-docs
-description: Use when frontend, backend, algorithm, system-designs, or company source files changed and docs need to be synced into website docs automatically. Also use when a custom folder format/path mapping is provided and document paths must be generated accordingly, including frontend/jsfunction, frontend/uicoding/ui-prototype-js, frontend/array, backend/quizzes, backend markdown/mdx content, system-designs markdown/mdx content, company subfolders, and separate algorithm navigation. Trigger phrases: sync docs, update documentation, refresh source docs, frontend changed, backend changed, algorithm changed, system design changed, company changed, company code sync, folder format mapping, jsfunction docs sync, ui prototype docs sync, uicoding docs sync, backend quizzes sync, backend md sync, algorithm docs sync, system-design docs sync, company docs sync, py js compare docs.
+description: Use when frontend, backend, algorithm, system-designs, company, or behavioral source files changed and docs need to be synced into website docs automatically. Also use when a custom folder format/path mapping is provided and document paths must be generated accordingly, including frontend/jsfunction, frontend/uicoding/ui-prototype-js, frontend/array, backend/quizzes, backend markdown/mdx content, system-designs markdown/mdx content, company subfolders, behavioral markdown/mdx content, and separate algorithm navigation. Trigger phrases: sync docs, update documentation, refresh source docs, frontend changed, backend changed, algorithm changed, system design changed, company changed, behavioral changed, behavioral docs sync, company code sync, folder format mapping, jsfunction docs sync, ui prototype docs sync, uicoding docs sync, backend quizzes sync, backend md sync, algorithm docs sync, system-design docs sync, company docs sync, py js compare docs.
 ---
 
 # Sync Source Docs
 
 ## Purpose
 
-Keep documentation in sync when files change under frontend, backend, algorithm, or system-designs folders outside website.
+Keep documentation in sync when files change under frontend, backend, algorithm, system-designs, company, or behavioral folders outside website.
 
 ## Scope
 
@@ -17,17 +17,22 @@ Keep documentation in sync when files change under frontend, backend, algorithm,
   - algorithm
   - system-designs
   - company (with subfolders: gusto, meta, splunk, etc.)
+  - behavorial (source folder for Behavioral docs; output uses the corrected `behavioral` docs path)
 - Ignore website as a source of truth
 - Write auto-generated docs to:
   - website/docs/source-sync
   - website/docs/system-designs (when using `--docs-subdir system-designs`)
   - website/docs/company (when using `--docs-subdir company`)
+  - website/docs/behavioral (when using `--docs-subdir behavioral`)
 - Source-of-truth rule for System Designs docs:
   - `website/docs/system-designs/**` must come only from root `system-designs/**`
   - Do not map `backend/**`, `frontend/**`, or other folders into `--docs-subdir system-designs`
 - Source-of-truth rule for Company docs:
   - `website/docs/company/**` must come only from root `company/**`
   - Do not map `backend/**`, `frontend/**`, `algorithm/**`, or other folders into `--docs-subdir company`
+- Source-of-truth rule for Behavioral docs:
+  - `website/docs/behavioral/**` must come only from root `behavorial/**`
+  - Do not map `backend/**`, `frontend/**`, `algorithm/**`, or other folders into `--docs-subdir behavioral`
 - Support custom source-to-doc path mapping format
 - If mapped docs folder path does not exist, create it under website/docs first
 - Folder names should map to navigation names automatically
@@ -58,6 +63,7 @@ Keep documentation in sync when files change under frontend, backend, algorithm,
 - If any file under `algorithm/**` is in scope, include `algorithm=.` for algorithm docs.
 - If any file under `system-designs/**` is in scope, include `system-designs=.` for system design docs.
 - If any file under `company/**` is in scope, include `company=.` for company docs.
+- If any file under `behavorial/**` is in scope, include `behavorial=.` for behavioral docs.
 - This guarantees new sibling folders and moved files are reflected correctly on the next sync.
 
 ### Post-hook behavior (new)
@@ -148,6 +154,10 @@ Run Company sync as a separate command (recommended):
 
 - cd website && npm run sync:source-docs -- --docs-subdir company --format "company=."
 
+Run Behavioral sync as a separate command (recommended):
+
+- cd website && npm run sync:source-docs -- --docs-subdir behavioral --format "behavorial=."
+
 Run all syncs in sequence for complete documentation refresh:
 
 - cd website && npm run sync:source-docs -- --docs-subdir frontend --format "frontend/jsfunction=jsfunction;frontend/uicoding=uicoding"
@@ -155,6 +165,7 @@ Run all syncs in sequence for complete documentation refresh:
 - cd website && npm run sync:source-docs -- --docs-subdir backend --format "backend=."
 - cd website && npm run sync:source-docs -- --docs-subdir system-designs --format "system-designs=."
 - cd website && npm run sync:source-docs -- --docs-subdir company --format "company=."
+- cd website && npm run sync:source-docs -- --docs-subdir behavioral --format "behavorial=."
 
 Mandatory rule for this docs subdir:
 
@@ -177,6 +188,21 @@ Mandatory rule for this docs subdir:
 This creates/updates:
 
 - website/docs/company
+
+Run Behavioral sync as a separate command (recommended):
+
+- cd website && npm run sync:source-docs -- --docs-subdir behavioral --format "behavorial=."
+
+Mandatory rule for this docs subdir:
+
+- Use only `behavorial=.` in the mapping for `--docs-subdir behavioral`.
+- Do not include additional mappings in that command.
+
+This creates/updates:
+
+- website/docs/behavioral
+
+Note: the source folder is currently spelled `behavorial`, but the docs output path and navigation label should be `behavioral`.
 
 Company folder structure and navigation:
 
@@ -259,6 +285,7 @@ Mapping format rules:
   - Algorithm: `--docs-subdir algorithm --format "algorithm=."`
   - System Design: `--docs-subdir system-designs --format "system-designs=."`
   - Company: `--docs-subdir company --format "company=."`
+  - Behavioral: `--docs-subdir behavioral --format "behavorial=."`
 - Check that parent `_index.mdx` was regenerated and now contains the new file link.
 
 ## Troubleshooting: Backend markdown/mdx or quizzes docs missing
@@ -293,6 +320,13 @@ Mapping format rules:
 - Folder navigation pages (`_index.mdx`) are generated for each company subfolder on sync.
 - If files were moved or new company folders added, rerun with the same mapping so new folders are discovered and stale old paths are removed.
 
+## Troubleshooting: Behavioral markdown/mdx docs missing
+
+- Use stable parent mapping for behavioral docs: `--docs-subdir behavioral --format "behavorial=."`.
+- Source behavioral markdown and mdx files are emitted into `website/docs/behavioral/**`.
+- The source folder is currently spelled `behavorial`; use that spelling on the left side of the mapping until the folder is renamed.
+- If files were moved, rerun with the same mapping so stale old paths are removed.
+
 ## Expected Output
 
 The sync command prints a summary in this format:
@@ -307,6 +341,7 @@ The sync command prints a summary in this format:
 - Frontend UI prototype sources under `frontend/uicoding/ui-prototype-js/**` should render both `.js` and `.css` files, and each challenge subfolder should have its own generated `_index.mdx` subnavigation page.
 - Markdown sources (`.md`/`.mdx`) are emitted as content-native MDX pages (not wrapped as one giant code block).
 - Backend and system-design markdown/mdx sources are emitted into their docs subdirs and included in folder navigation.
+- Behavioral markdown/mdx sources are emitted into `website/docs/behavioral/**` and included as their own navigation section.
 - Algorithm files are never skipped when only one language variant exists: a lone `.js` or `.py` file still becomes its own MDX page and appears in navigation.
 - If both `.py` and `.js` files share the same relative basename (for example `kRowPascalTriangle.py` + `kRowPascalTriangle.js`), they are merged into one MDX page with language tabs so readers can compare side-by-side in a single page.
 - If non-comparable source files share the same relative basename (for example `PixelArt.js` + `PixelArt.css`), render them as separate pages such as `PixelArt.js.mdx` and `PixelArt.css.mdx`.

@@ -120,6 +120,10 @@
       "hash": "7d35708df6828b1c83ad7d39c5b6e3895acc4e36e579274c3cb7e75776d4ca35",
       "docRelative": "isMeetingCalendarValid.mdx"
     },
+    "algorithm/linkedlist/DoubleLinkedList.js": {
+      "hash": "f166baa52b811f7debe02a6d3dec46387a0a37f6f1f2e80dd1ee1bfee01fb720",
+      "docRelative": "linkedlist/DoubleLinkedList.mdx"
+    },
     "algorithm/linkedlist/LinkedList.js": {
       "hash": "7262c85fed8d75451305194ebd750ba117bd6d7adf098dd9b2bde58f0c50dd72",
       "docRelative": "linkedlist/LinkedList.mdx"
@@ -139,6 +143,10 @@
     "algorithm/linkedlist/linkedListCombinedSortedList.js": {
       "hash": "16098c8e46c2e630932e0b701ce5538887617e0db33a95738d3c68da7c186008",
       "docRelative": "linkedlist/linkedListCombinedSortedList.mdx"
+    },
+    "algorithm/linkedlist/removeDuplicateNodeFromLinkedList.js": {
+      "hash": "a38e438dffd3b71ebcb20897df7b80b7389fb473e61dd321f060b66067da43ca",
+      "docRelative": "linkedlist/removeDuplicateNodeFromLinkedList.mdx"
     },
     "algorithm/linkedlist/reverseList.js": {
       "hash": "0ac06ec2a7bb8e8bd4fdce1917968d890ab0c9ce9f65479e4834a18ddc83d754",
@@ -260,9 +268,21 @@
       "hash": "3e0b1ae653025176e80fd2242e1e901055c580cbdc0362e0cf0db4829ff6593e",
       "docRelative": "tree/smallestInRotatedArray.mdx"
     },
+    "algorithm/trie/SuffixTrie.js": {
+      "hash": "33bdbdcd398bec04a948ff67b973d5d378c3f30ad855354150e05095b197d26d",
+      "docRelative": "trie/SuffixTrie.mdx"
+    },
+    "algorithm/trie/Trie.js": {
+      "hash": "ec9a9ef673588b12e290791795bc98710cc9cc252ae59a58fef9070e36f183a0",
+      "docRelative": "trie/Trie.mdx"
+    },
     "algorithm/trie/findWordsInGrid.js": {
       "hash": "f6ab0fc3afa18bc2c05e46398b1f0d6a72dacdede6bff1749f12f785b9f1df2d",
       "docRelative": "trie/findWordsInGrid.mdx"
+    },
+    "algorithm/trie/trie-structure.mdx": {
+      "hash": "650fa927a9614a7534f452a7e807a318ec95bb98741e4b26e61739093adf8aa1",
+      "docRelative": "trie/trie-structure.mdx"
     },
     "algorithm/two-pointers/3Sum.py": {
       "hash": "6769853fc638c01114f2e196aba4451bae4bd9aaf1f2a4ff67bd7ea034209fac",
@@ -337,7 +357,7 @@
       "docRelative": "heap/_index.mdx"
     },
     "__nav__:linkedlist": {
-      "hash": "28399adc82656a11f21a298e5909aaf37d7c0ae5dc959bf0627a87b3573b914e",
+      "hash": "4c64b4d24398081ecc260ed8f43c53c7222edc455f102a4118dde99dd9c25ebc",
       "docRelative": "linkedlist/_index.mdx"
     },
     "__nav__:lru": {
@@ -353,7 +373,7 @@
       "docRelative": "tree/_index.mdx"
     },
     "__nav__:trie": {
-      "hash": "f646444391f0b1fccf0ecbffc03b3ee6f0b5493464b6c3f553c927c35dbee222",
+      "hash": "277c20b2f6d48aeb87dbe6561c88121e28b0d8167cee3cd49b81c357bc41c2c8",
       "docRelative": "trie/_index.mdx"
     },
     "__nav__:two-pointers": {

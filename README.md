@@ -27,6 +27,7 @@ Use this skill when `frontend`, `backend`, or `algorithm` changes and you want d
 - `website/docs/backend`
 - `website/docs/algorithm`
 - `website/docs/system-designs`
+- `website/docs/behavioral`
 - `website/docs/source-sync` (optional catch-all)
 
 ### How To Run `sync-source-docs`
@@ -40,7 +41,10 @@ From repository root:
    - `npm run sync:source-docs -- --docs-subdir company --format "company=."`
    - `npm run sync:source-docs -- --docs-subdir algorithm --format "algorithm=."`
    - `npm run sync:source-docs -- --docs-subdir system-designs --format "system-designs=."`
+   - `npm run sync:source-docs -- --docs-subdir behavioral --format "behavorial=."`
 3. `npm run build`
+
+Note: the source folder is currently spelled `behavorial`, but the generated docs route is `website/docs/behavioral`.
 
 Optional: use catch-all output folder.
 

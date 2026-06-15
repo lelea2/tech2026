@@ -124,6 +124,11 @@ const config = {
             label: 'ML',
           },
           {
+            to: '/docs/behavioral',
+            position: 'left',
+            label: 'Behavioral',
+          },
+          {
             to: '/docs/system-designs',
             position: 'left',
             label: 'System Design',
