@@ -1,0 +1,140 @@
+import assert from "node:assert/strict";
+import { pathToFileURL } from "node:url";
+
+/**
+ * Interview Question:
+ * Implement a Trie, also called a prefix tree.
+ *
+ * Requirements:
+ * - Insert words into the Trie
+ * - Check whether a full word exists
+ * - Print all words stored in the Trie
+ *
+ * Why use a Trie:
+ * A Trie stores words character by character. Words with the same prefix share
+ * the same path, which makes prefix-based lookup efficient.
+ *
+ * Example:
+ * add("ball")
+ * add("bat")
+ * add("doll")
+ *
+ * isWord("ball") -> true
+ * isWord("ba") -> false, because "ba" is only a prefix
+ * print() -> ["ball", "bat", "doll"]
+ *
+ * Approach:
+ * Each TrieNode has:
+ * - keys: a Map from character to child TrieNode
+ * - end: a boolean marking whether this node completes a word
+ *
+ * Complexity:
+ * - add(word): O(k), where k is word length
+ * - isWord(word): O(k)
+ * - print(): O(total characters stored)
+ */
+
+class TrieNode {
+  constructor() {
+    this.keys = new Map();
+    this.end = false;
+  }
+
+  setEnd() {
+    this.end = true;
+  }
+
+  isEnd() {
+    return this.end;
+  }
+}
+
+export default class Trie {
+  constructor() {
+    this.root = new TrieNode();
+  }
+
+  add(word) {
+    let node = this.root;
+
+    for (const char of word) {
+      // Create the next node only if this character path does not exist yet.
+      if (!node.keys.has(char)) {
+        node.keys.set(char, new TrieNode());
+      }
+
+      // Move down one character in the Trie.
+      node = node.keys.get(char);
+    }
+
+    // Mark the final character node as a complete word.
+    node.setEnd();
+  }
+
+  isWord(word) {
+    let node = this.root;
+
+    for (const char of word) {
+      // Missing character path means the word cannot exist.
+      if (!node.keys.has(char)) {
+        return false;
+      }
+
+      node = node.keys.get(char);
+    }
+
+    // The path must exist and must be marked as a completed word.
+    return node.isEnd();
+  }
+
+  print() {
+    const words = [];
+
+    const search = (node, prefix) => {
+      // If this node completes a word, collect the current prefix.
+      if (node.isEnd()) {
+        words.push(prefix);
+      }
+
+      // Continue DFS through every child character.
+      for (const [char, childNode] of node.keys.entries()) {
+        search(childNode, `${prefix}${char}`);
+      }
+    };
+
+    search(this.root, "");
+    return words;
+  }
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const trie = new Trie();
+
+  trie.add("ball");
+  trie.add("bat");
+  trie.add("doll");
+  trie.add("dork");
+  trie.add("do");
+  trie.add("dorm");
+  trie.add("send");
+  trie.add("sense");
+
+  assert.equal(trie.isWord("ball"), true);
+  assert.equal(trie.isWord("bat"), true);
+  assert.equal(trie.isWord("ba"), false);
+  assert.equal(trie.isWord("doll"), true);
+  assert.equal(trie.isWord("dor"), false);
+  assert.equal(trie.isWord("dorf"), false);
+  assert.deepEqual(trie.print(), [
+    "ball",
+    "bat",
+    "do",
+    "doll",
+    "dork",
+    "dorm",
+    "send",
+    "sense",
+  ]);
+
+  console.log("Trie tests passed");
+}

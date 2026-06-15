@@ -1,0 +1,104 @@
+import assert from "node:assert/strict";
+import { pathToFileURL } from "node:url";
+
+/**
+ * Interview Question:
+ * Implement a Suffix Trie data structure for a given string.
+ *
+ * Requirements:
+ * - Build the trie from all suffixes of the input string
+ * - Store an end symbol at the end of each suffix
+ * - Support `contains(string)` to check whether a full suffix exists
+ *
+ * Example:
+ * Input string: "abc"
+ *
+ * Suffixes inserted:
+ * - "abc"
+ * - "bc"
+ * - "c"
+ *
+ * Root shape:
+ * {
+ *   a: { b: { c: { "*": true } } },
+ *   b: { c: { "*": true } },
+ *   c: { "*": true }
+ * }
+ *
+ * Key idea:
+ * A suffix trie stores every suffix of a string. To build it, start at every
+ * index in the string and insert the substring from that index to the end.
+ *
+ * Important interview note:
+ * This implementation checks whether a string is a suffix that was inserted,
+ * not whether it is any arbitrary substring. For arbitrary substring search, the
+ * `contains` method would return true after following the path, without
+ * requiring the end symbol.
+ *
+ * Complexity:
+ * - Building: O(n^2) time and O(n^2) space
+ * - contains(string): O(m) time, where m is the search string length
+ */
+export default class SuffixTrie {
+  constructor(string) {
+    this.root = {};
+    this.endSymbol = "*";
+    this.populateSuffixTrieFrom(string);
+  }
+
+  populateSuffixTrieFrom(string) {
+    // Insert every suffix: string[i..end].
+    for (let i = 0; i < string.length; i++) {
+      this.insertSubstringStartingAt(i, string);
+    }
+  }
+
+  insertSubstringStartingAt(startIndex, string) {
+    let node = this.root;
+
+    for (let i = startIndex; i < string.length; i++) {
+      const letter = string[i];
+
+      // Create a new branch when this character path does not exist.
+      if (!(letter in node)) {
+        node[letter] = {};
+      }
+
+      // Move deeper into the suffix path.
+      node = node[letter];
+    }
+
+    // Mark the end of this suffix.
+    node[this.endSymbol] = true;
+  }
+
+  contains(string) {
+    let node = this.root;
+
+    for (const letter of string) {
+      // If a character path is missing, this suffix is not present.
+      if (!(letter in node)) {
+        return false;
+      }
+
+      node = node[letter];
+    }
+
+    // Require the end symbol so only full inserted suffixes return true.
+    return this.endSymbol in node;
+  }
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const trie = new SuffixTrie("babc");
+
+  assert.equal(trie.contains("babc"), true);
+  assert.equal(trie.contains("abc"), true);
+  assert.equal(trie.contains("bc"), true);
+  assert.equal(trie.contains("c"), true);
+  assert.equal(trie.contains("bab"), false);
+  assert.equal(trie.contains("ab"), false);
+  assert.equal(trie.contains("x"), false);
+
+  console.log("SuffixTrie tests passed");
+}
