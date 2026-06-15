@@ -1,5 +1,13 @@
 {
   "files": {
+    "behavorial/em-difficult-stakeholder-framework.mdx": {
+      "hash": "39a05da8e5e981a93412eb3fb11d71a7dd6789004ec1255a8a46f254c3d0c2cc",
+      "docRelative": "em-difficult-stakeholder-framework.mdx"
+    },
+    "behavorial/em-product-design-vision-platform-interview.mdx": {
+      "hash": "66c845246ebdc61479aabfd6d3c22898d53711a6b7832bf87638173d62eb8cb2",
+      "docRelative": "em-product-design-vision-platform-interview.mdx"
+    },
     "behavorial/engineering-manager-behavioral-interview.mdx": {
       "hash": "2ffb688111a2a252efc51f2c780cc37c61a719b5e92e351c91bc93a6b994941c",
       "docRelative": "engineering-manager-behavioral-interview.mdx"
