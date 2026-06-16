@@ -326,7 +326,33 @@ When the user types:
 - Show error state.
 - Keep the input usable.
 
-![Autocomplete](./assets/autocomplete_cache_sequence_chart.png)
+![Autocomplete component architecture and request flow](./autocomplete.png)
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Input
+  participant Controller
+  participant Cache
+  participant API
+  participant Popup
+
+  User->>Input: Type query
+  Input->>Controller: onQueryChange(query)
+  Controller->>Controller: Debounce
+  Controller->>Cache: get(query)
+
+  alt Cache hit
+    Cache-->>Controller: results
+    Controller->>Popup: render results
+  else Cache miss
+    Controller->>API: fetchResults(query)
+    Controller->>Popup: loading
+    API-->>Controller: results
+    Controller->>Cache: set(query, results)
+    Controller->>Popup: render results
+  end
+```
 
 ---
 
