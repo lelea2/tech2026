@@ -8,6 +8,10 @@
       "hash": "7260e99908c1d228fcd64de581e705750f5f86b76836477d571ecd76f7256a7b",
       "docRelative": "frontend/autocomplete.png"
     },
+    "system-designs/frontend/newsfeed.png": {
+      "hash": "7c32bed9378a970683aa76380ad349cac4434cec781db46acf6504823a8b8857",
+      "docRelative": "frontend/newsfeed.png"
+    },
     "system-designs/backend/Tournament.mdx": {
       "hash": "80aa534caa8f0c51c2767ce294439c8f98bea2d40a684b047d31e8a9268e216b",
       "docRelative": "backend/Tournament.mdx"
@@ -17,19 +21,23 @@
       "docRelative": "backend/model_eval_training_llm_design.mdx"
     },
     "system-designs/frontend/autocomplete.mdx": {
-      "hash": "c28e203103a25d3912a1fab771cbb6597b3ff4b50d0ecc0d327a8951587ef159",
+      "hash": "0a4f6781f6d672957870080c7712c24866f77f9bd05c29358310b156ed4ff884",
       "docRelative": "frontend/autocomplete.mdx"
     },
     "system-designs/frontend/chat-app.mdx": {
       "hash": "19d6aa6609e77b061e05bc2138684ce47a3b36a4f403b00602f5033637dd0d85",
       "docRelative": "frontend/chat-app.mdx"
     },
+    "system-designs/frontend/common.mdx": {
+      "hash": "b6a745a8034882e7ce963c2cf14e759ffd2cabaa5b124804dea1eb0df526fc00",
+      "docRelative": "frontend/common.mdx"
+    },
     "system-designs/frontend/masonry-layout-system-design.mdx": {
       "hash": "1c78de8aa547f56c46edca46302e071dda818017423e638142808ee379c19a53",
       "docRelative": "frontend/masonry-layout-system-design.mdx"
     },
     "system-designs/frontend/news-feed.mdx": {
-      "hash": "9fa11a0f8ebb94f6bd52382dcfb57ed4557afccc80cfb4caf1926bfbbfb83927",
+      "hash": "96c38a97c3e129545b48980e004f553a1f7f5102a18b5e628dc4ae7ecd7868b4",
       "docRelative": "frontend/news-feed.mdx"
     },
     "system-designs/frontend/theme-design.mdx": {
@@ -41,7 +49,7 @@
       "docRelative": "backend/_index.mdx"
     },
     "__nav__:frontend": {
-      "hash": "485bb37c024ee5350e75009d0d47b577c641426c3c83333d10c1c6ea95832ea4",
+      "hash": "e12ad03ba3d64a6a611cbfe990f390de0725239a47fbb920e43239eaee5689a9",
       "docRelative": "frontend/_index.mdx"
     }
   }

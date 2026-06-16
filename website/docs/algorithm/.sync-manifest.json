@@ -96,6 +96,10 @@
       "hash": "eea5da97639e79f9396b3cb22524f7055a8f220c1e337991754a63079a34a5f4",
       "docRelative": "graph/aliendOrder.mdx"
     },
+    "algorithm/graph/cycleInGraph.js": {
+      "hash": "9cd4acfb4e239e68eef72da465941fce3818904c555072db61d0d369e7878295",
+      "docRelative": "graph/cycleInGraph.mdx"
+    },
     "algorithm/heap/Heap.js": {
       "hash": "34b045bda6e233945b28e02ac7b8ea06fae098805866975dbbb39b247344f21a",
       "docRelative": "heap/Heap.mdx"
@@ -167,6 +171,14 @@
     "algorithm/mostCommonElement.js": {
       "hash": "8cec5205685c93fd5c347d5aa8adaf9837a617e878b380ffb9586e23dc79fff9",
       "docRelative": "mostCommonElement.mdx"
+    },
+    "algorithm/recursive/fibonacci.js": {
+      "hash": "a31f0e5f8f975a03618d4c28380bbc74e8af864431ed54a734d887b5961ea6c8",
+      "docRelative": "recursive/fibonacci.mdx"
+    },
+    "algorithm/recursive/permutation.js": {
+      "hash": "9ca55cbb1aef2b2e97a2a7c097e438d0b63591e67c8c8c4c15becbe5b4c81a80",
+      "docRelative": "recursive/permutation.mdx"
     },
     "algorithm/stack/Queue.js": {
       "hash": "19be1b2f3918fb1f15557903d022e5626806671b6b0f738e71051684671cabe0",
@@ -268,6 +280,10 @@
       "hash": "3e0b1ae653025176e80fd2242e1e901055c580cbdc0362e0cf0db4829ff6593e",
       "docRelative": "tree/smallestInRotatedArray.mdx"
     },
+    "algorithm/tree/validBST.js": {
+      "hash": "f3448c15ccb183032c82f166aa9df1bae7002955c24a1e8d9b2982664ffd4bc3",
+      "docRelative": "tree/validBST.mdx"
+    },
     "algorithm/trie/SuffixTrie.js": {
       "hash": "33bdbdcd398bec04a948ff67b973d5d378c3f30ad855354150e05095b197d26d",
       "docRelative": "trie/SuffixTrie.mdx"
@@ -349,7 +365,7 @@
       "docRelative": "dfs/_index.mdx"
     },
     "__nav__:graph": {
-      "hash": "4995fd49aef8cd0bc27603cad37918c4ce5507324bf0b1346b4101d50156559b",
+      "hash": "a2f0489157a8d27c01674c11a298d854e5ca0e5e04227ae9e6bce331e4599d6a",
       "docRelative": "graph/_index.mdx"
     },
     "__nav__:heap": {
@@ -364,12 +380,16 @@
       "hash": "1f0a2ba19f36b064018ddd2f20b36afe5f44f9eae60973a03e40229f6cebcdef",
       "docRelative": "lru/_index.mdx"
     },
+    "__nav__:recursive": {
+      "hash": "da9ed8863721a8484548a3bf19533f4fb9b58dc82132e9747b79e935dec32903",
+      "docRelative": "recursive/_index.mdx"
+    },
     "__nav__:stack": {
       "hash": "e3caa644ca5cb3eb73573701d079af50f69800dc4cae55ab426968ad1ed37de2",
       "docRelative": "stack/_index.mdx"
     },
     "__nav__:tree": {
-      "hash": "57b1d99938da5fd9db06b3b56d2ed1e96e767ee4f5693ae689dd0b6c0ffb796d",
+      "hash": "11f3fc94ac493a546d310825530f6834f716c6075f629434834f685f831c845a",
       "docRelative": "tree/_index.mdx"
     },
     "__nav__:trie": {
