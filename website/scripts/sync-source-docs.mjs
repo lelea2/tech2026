@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '../..');
 const defaultDocsSubdir = 'source-sync';
 const defaultFormat = 'frontend=frontend;backend=backend;algorithm=algorithm';
-const renderVersion = '6';
+const renderVersion = '7';
 
 const allowedExtensions = new Set([
   '.js',
@@ -213,6 +213,10 @@ function escapeMdxBracesOutsideCodeFences(markdown) {
     }
 
     if (activeFence) {
+      return line;
+    }
+
+    if (/^\s*(import|export)\b/.test(line)) {
       return line;
     }
 
