@@ -1,9 +1,31 @@
-// Given a list of edges representing an unweighted, directed graph with at least one node
-// Write a function that returns boolean representing whether the give graph contains a cycle
-
-// O(v + e) time
-// O(v) space time
-// where v is number of vertices and e is the number of edges in graph
+/**
+ * Interview question:
+ * Given an adjacency list for a directed graph, return true if the graph
+ * contains a cycle; otherwise return false.
+ *
+ * Input format:
+ * edges[node] contains all nodes that `node` points to.
+ *
+ * Example:
+ * edges = [
+ *   [1, 3], // 0 -> 1, 0 -> 3
+ *   [2],    // 1 -> 2
+ *   [0],    // 2 -> 0, creates 0 -> 1 -> 2 -> 0
+ *   []
+ * ]
+ * Output: true
+ *
+ * Approach:
+ * Use DFS with two tracking arrays:
+ * - visited: nodes we have already fully explored or started exploring.
+ * - currentlyInStack: nodes in the current DFS path.
+ *
+ * If DFS reaches a neighbor that is already in the current recursion stack,
+ * we found a back edge, which means the directed graph has a cycle.
+ *
+ * Time: O(v + e), where v is the number of vertices and e is the number of edges.
+ * Space: O(v), for the visited arrays and recursion stack.
+ */
 export default function cycleInGraph(edges) {
   const numberOfNodes = edges.length;
   const visited = new Array(numberOfNodes).fill(false);
@@ -24,17 +46,26 @@ export default function cycleInGraph(edges) {
 function inNodeCycle(node, edges, visited, currentlyInStack) {
   visited[node] = true;
   currentlyInStack[node] = true;
+
   const neighbors = edges[node];
-  for (const neighbor in neighbors) {
+
+  for (const neighbor of neighbors) {
     if (!visited[neighbor]) {
-      const containsCycle = isNodeCycle(neighbor, edges, visited, currentlyInStack);
+      const containsCycle = inNodeCycle(neighbor, edges, visited, currentlyInStack);
+
       if (containsCycle) {
         return true;
       }
     } else if (currentlyInStack[neighbor]) {
+      // The neighbor is still in the current DFS path, so this is a back edge.
       return true;
     }
   }
+
   currentlyInStack[node] = false;
   return false;
 }
+
+// Test cases:
+// cycleInGraph([[1], [2], [0]]) === true
+// cycleInGraph([[1, 2], [3], [3], []]) === false

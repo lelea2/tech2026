@@ -1,0 +1,353 @@
+---
+title: 'Prompt Playground – System Design'
+author: Staff Engineer
+date: 2026-06-17
+tags: [system-design, llm, developer-tools, interview]
+---
+
+import \{ Callout \} from '@/components/ui/callout';
+
+# Prompt Playground – System Design
+
+A workspace that lets engineers and product teams **iterate on prompts**, test them against multiple models, version-control the results, and run automated evaluations — all from a single UI.
+
+---
+
+## Problem Statement
+
+Prompt engineering today is fragmented: engineers paste prompts into a model's chat UI, copy responses to a doc, tweak by hand, and re-run manually. There is no structured way to:
+
+- Track which prompt version produced which output
+- Run the same prompt across multiple models simultaneously
+- Assert that a change to a prompt didn't regress quality
+- Share a tested prompt with teammates as a versioned artifact
+
+The playground solves this by treating prompts as first-class, versionable, testable assets.
+
+---
+
+## Goals and Non-Goals
+
+### Goals
+
+- Low-latency interactive prompt execution with streaming responses
+- Side-by-side multi-model comparison
+- Prompt versioning with diff and fork
+- Structured evaluation (assertions, scoring, batch runs)
+- Team collaboration (share, comment, fork prompts)
+- Variable injection and template support
+
+### Non-Goals (v1)
+
+- Fine-tuning or model training
+- Production traffic routing / A/B testing
+- Billing or cost optimization engine
+- Plugin marketplace
+
+---
+
+## High-Level Architecture
+
+```
+┌────────────────────────────────────────────────────────┐
+│                     Client Layer                       │
+│  Prompt Editor │ Variable Panel │ Response Viewer      │
+└──────────────────────────┬─────────────────────────────┘
+                           │ HTTPS / SSE
+┌──────────────────────────▼─────────────────────────────┐
+│               BFF / API Gateway                        │
+│  Auth │ Rate Limiting │ Streaming Proxy │ Model Router  │
+└──────────────────────────┬─────────────────────────────┘
+                           │
+┌──────────────────────────▼─────────────────────────────┐
+│                   Core Services                        │
+│  Execution Engine │ Eval Service │ Version Service     │
+└──────────────────────────┬─────────────────────────────┘
+                           │
+┌──────────────────────────▼─────────────────────────────┐
+│              Infrastructure / Storage                  │
+│  Prompt Store (PG) │ Result Cache (Redis)              │
+│  Eval Results DB (Timescale) │ Blob Store (S3)         │
+└────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Component Deep-Dives
+
+### 1. Client Layer
+
+**Prompt Editor**
+
+- Monaco-based editor with syntax highlighting for `\{\{variable\}\}` interpolation
+- Real-time token count (client-side tiktoken WASM)
+- Keyboard shortcut to run (`Cmd+Enter`)
+
+**Variable Panel**
+
+- JSON key-value pairs or CSV upload for batch runs
+- Live preview of resolved prompt before execution
+
+**Response Viewer**
+
+- Streaming render via SSE — first token displayed in < 200 ms
+- Side-by-side diff between two prompt versions or two models
+- Copy-as-JSON for downstream use in test fixtures
+
+---
+
+### 2. BFF / API Gateway
+
+The Backend-for-Frontend (BFF) is the only entry point for all client requests.
+
+| Responsibility  | Implementation                                          |
+| --------------- | ------------------------------------------------------- |
+| Authentication  | JWT / OAuth PKCE; API key for CI                        |
+| Rate limiting   | Token-bucket per user, sliding window per org           |
+| Model routing   | Routes by `provider` field; fails over on 429/5xx       |
+| Streaming proxy | Converts upstream SSE to client SSE; backpressure aware |
+
+<Callout type="info">Keep the BFF thin — business logic lives in Core Services, not here.</Callout>
+
+---
+
+### 3. Execution Engine
+
+Handles single runs, batch runs, and scheduled re-runs.
+
+```
+Run Request
+    │
+    ├─ Cache lookup (Redis, keyed on sha256(prompt+params+model))
+    │       hit ──► return cached response
+    │
+    └─ Cache miss
+            │
+            ├─ Inject variables into template
+            ├─ Call Model Router → upstream LLM API
+            ├─ Stream tokens back through BFF
+            └─ Persist result → Prompt Store + Result Cache
+```
+
+**Batch runs** are queued via a job queue (e.g. BullMQ / SQS) and fan-out across N workers. Each worker produces a result that is written to the Eval Results DB.
+
+**Determinism note:** Cache key includes `temperature`, `seed`, and `model_version`. When reproducibility matters, clients should pin both.
+
+---
+
+### 4. Eval Service
+
+Evaluations let teams assert prompt quality programmatically.
+
+**Eval types (v1):**
+
+| Type         | How it works                |
+| ------------ | --------------------------- |
+| Exact match  | Response == expected string |
+| Contains     | Response includes substring |
+| Regex        | Response matches pattern    |
+| LLM-as-judge | Secondary model scores 1–5  |
+| Latency      | p50/p95 within threshold    |
+
+**Eval run lifecycle:**
+
+```
+POST /evals/run
+    │
+    ├─ Resolve test cases from dataset
+    ├─ Fan out to Execution Engine (batch)
+    ├─ Collect results
+    ├─ Apply assertions
+    └─ Write score + pass/fail to Eval Results DB
+```
+
+Results are queryable over time, enabling regression tracking (TimescaleDB for time-series queries on score per prompt version).
+
+---
+
+### 5. Version Service
+
+Treats prompts like source code.
+
+- Every save is an immutable snapshot (content-addressed by SHA)
+- Supports linear history, branching (fork), and merging (manual)
+- Diff endpoint returns a structured JSON delta (token-level diffing optional)
+- Tags / labels: `staging`, `production`, `deprecated`
+
+```
+POST /prompts/:id/versions   → create snapshot
+GET  /prompts/:id/versions   → list versions
+GET  /prompts/:id/diff?a=v3&b=v5  → structured diff
+POST /prompts/:id/fork       → copy to new prompt
+```
+
+---
+
+### 6. Storage
+
+| Store           | Technology  | What lives there                                 |
+| --------------- | ----------- | ------------------------------------------------ |
+| Prompt Store    | PostgreSQL  | Prompts, versions, metadata, user/org ownership  |
+| Result Cache    | Redis       | Raw completions, keyed by content-hash; TTL 24 h |
+| Eval Results DB | TimescaleDB | Scores, latencies, pass/fail over time           |
+| Blob Store      | S3 / GCS    | Large batch outputs, exported datasets           |
+
+---
+
+## Data Model (simplified)
+
+```sql
+-- Core entities
+prompts        (id, org_id, name, created_at)
+prompt_versions(id, prompt_id, body, variables_schema, sha, created_at)
+runs           (id, version_id, model, params, status, created_at)
+run_results    (id, run_id, output, tokens_in, tokens_out, latency_ms)
+
+-- Eval
+eval_suites    (id, prompt_id, name)
+eval_cases     (id, suite_id, input_vars, expected)
+eval_runs      (id, suite_id, version_id, started_at, finished_at)
+eval_results   (time, eval_run_id, case_id, passed, score, latency_ms)
+-- ↑ TimescaleDB hypertable on `time`
+```
+
+---
+
+## Key Design Decisions and Trade-offs
+
+### Approach A — Stateless Execution (chosen for v1)
+
+Each run is fully stateless: no server-side session, results are written immediately to storage, clients poll or stream.
+
+|          |                                                                             |
+| -------- | --------------------------------------------------------------------------- |
+| **Pros** | Simple to scale horizontally; easy to retry; no sticky sessions             |
+| **Cons** | Cold-start latency on cache miss; repeated token cost for identical prompts |
+
+### Approach B — Stateful Session (considered, deferred)
+
+A long-lived WebSocket session per user with server-side conversation memory.
+
+|          |                                                             |
+| -------- | ----------------------------------------------------------- |
+| **Pros** | Supports multi-turn playground; feels more like a REPL      |
+| **Cons** | Harder to scale (session affinity); complex reconnect logic |
+
+---
+
+### Caching Strategy Trade-offs
+
+| Strategy                                         | Pros                                      | Cons                                      |
+| ------------------------------------------------ | ----------------------------------------- | ----------------------------------------- |
+| Exact-match (SHA of prompt+params)               | Zero extra cost on replay                 | Any param change = cache miss             |
+| Semantic similarity (embedding nearest-neighbor) | Reuses results for near-identical prompts | Stale results may differ; high complexity |
+| No cache                                         | Always fresh                              | Full LLM cost on every run; slow CI       |
+
+**Chosen:** Exact-match for v1. Semantic cache is a v2 feature behind a flag.
+
+---
+
+### Streaming Architecture Trade-offs
+
+| Approach                 | Pros                                                | Cons                                       |
+| ------------------------ | --------------------------------------------------- | ------------------------------------------ |
+| Server-Sent Events (SSE) | Simple; HTTP/1.1 compatible; auto-reconnect         | Unidirectional; no backpressure            |
+| WebSocket                | Bidirectional; binary frames; backpressure possible | More complex infra; firewall issues        |
+| HTTP chunked             | Works everywhere                                    | No reconnect; long-polling fallback needed |
+
+**Chosen:** SSE with chunked encoding fallback. Bidirectional is not needed in v1.
+
+---
+
+### Eval Scoring: Rule-based vs LLM-as-judge
+
+|                | Rule-based          | LLM-as-judge                |
+| -------------- | ------------------- | --------------------------- |
+| Speed          | Fast (< 1 ms)       | Slow (1–5 s per case)       |
+| Cost           | Zero                | ~$0.001–0.01 per assertion  |
+| Reliability    | Deterministic       | Non-deterministic           |
+| Expressiveness | Low (exact / regex) | High (nuance, tone, safety) |
+
+**Chosen:** Both. Rule-based for cheap fast gates in CI; LLM-as-judge as an optional layer for nuanced evals.
+
+---
+
+## Non-Functional Requirements
+
+| Requirement                  | Target                                               |
+| ---------------------------- | ---------------------------------------------------- |
+| Streaming first token        | < 200 ms p50                                         |
+| API response (non-streaming) | < 500 ms p95 excluding LLM time                      |
+| Prompt save / version        | < 100 ms                                             |
+| Eval batch (100 cases)       | < 60 s wall-clock                                    |
+| Availability                 | 99.9% (3 nines)                                      |
+| Multi-tenancy                | Org-scoped data isolation (row-level security in PG) |
+
+---
+
+## Security Considerations
+
+- **API key isolation:** Each user's LLM credentials are encrypted at rest (AES-256) and never logged
+- **Prompt confidentiality:** Prompts are org-scoped; no cross-org reads via PG row-level security
+- **Output sanitization:** Response viewer renders as plain text by default; opt-in markdown rendering
+- **Rate limits:** Per-user token budget to prevent runaway batch jobs
+- **Audit log:** Every run is logged with user, timestamp, model, and token count
+
+---
+
+## Scalability Path
+
+```
+v1 — Monolith + managed DB
+        ↓
+v2 — Extract Execution Engine as separate service; Redis for job queue
+        ↓
+v3 — Eval Service scales independently; TimescaleDB for metrics
+        ↓
+v4 — Multi-region; CDN for static assets; read replicas for PG
+```
+
+---
+
+## Interview Discussion Points
+
+### "How would you handle prompt injection attacks?"
+
+Prompt injection — where a crafted variable value hijacks the system prompt — is a real risk. Mitigations:
+
+1. Clear delimiter injection (wrap user content in structured XML tags)
+2. Separate system vs. user content at the API layer, never concatenate
+3. Output filtering for PII / harmful content before returning to client
+
+### "How do you keep eval results meaningful over time?"
+
+Model providers silently update model weights. A `gpt-4o` response today may differ from one in 3 months. Solutions:
+
+- Snapshot the model version string (not just model name) with each run
+- Re-run eval baselines on a weekly cron to detect drift
+- Alert when score delta > threshold vs. 7-day rolling average
+
+### "How would you support real-time collaboration?"
+
+Extend to OT (Operational Transformation) or CRDTs on the prompt editor, similar to how Figma handles concurrent edits. Version Service already provides the event log; the delta can be broadcast via a presence layer (e.g. Liveblocks, PartyKit, or a lightweight WebSocket service).
+
+### "What's your biggest scaling concern?"
+
+**Batch eval runs.** A single eval suite with 10,000 test cases × 3 models = 30,000 LLM calls. Solutions:
+
+- Queue with priority lanes (interactive > CI > nightly)
+- Per-org concurrency cap
+- Semantic deduplication to avoid re-running identical cases
+
+---
+
+## Summary
+
+The Prompt Playground is a developer tool that brings software engineering discipline — versioning, testing, CI, diff — to prompt development. The core insight is that prompts are code: they deserve the same tooling we give source code.
+
+Key design bets:
+
+1. Streaming-first UX — perceived latency is critical for an iterative tool
+2. Prompts as immutable versioned artifacts — enables reliable eval regression
+3. Pluggable eval layer — rule-based for speed, LLM-as-judge for nuance
+4. Thin BFF — business logic in services, not the gateway

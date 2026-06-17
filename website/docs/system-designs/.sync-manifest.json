@@ -8,9 +8,17 @@
       "hash": "7260e99908c1d228fcd64de581e705750f5f86b76836477d571ecd76f7256a7b",
       "docRelative": "frontend/autocomplete.png"
     },
+    "system-designs/frontend/google-calendar.png": {
+      "hash": "42e44ac47f61c64659ccc16a63b1b90e3761fd8cdeba498bdb1bace9cee58c45",
+      "docRelative": "frontend/google-calendar.png"
+    },
     "system-designs/frontend/newsfeed.png": {
       "hash": "7c32bed9378a970683aa76380ad349cac4434cec781db46acf6504823a8b8857",
       "docRelative": "frontend/newsfeed.png"
+    },
+    "system-designs/frontend/richtexteditor.png": {
+      "hash": "592701c33e1c48937a82965d23d439d3ee486403cb4a542bb40003df2e51c187",
+      "docRelative": "frontend/richtexteditor.png"
     },
     "system-designs/backend/Tournament.mdx": {
       "hash": "80aa534caa8f0c51c2767ce294439c8f98bea2d40a684b047d31e8a9268e216b",
@@ -20,6 +28,10 @@
       "hash": "d4f0f035fbe17ca82cfb40f293e080838d7a437a62399df54200524f8ee46e1f",
       "docRelative": "backend/model_eval_training_llm_design.mdx"
     },
+    "system-designs/backend/prompt-playground.mdx": {
+      "hash": "a7bd3420ccbb5fa9affb1f78d75970e0ffa5f67e7d15a64779a0aac6892ac949",
+      "docRelative": "backend/prompt-playground.mdx"
+    },
     "system-designs/frontend/autocomplete.mdx": {
       "hash": "0a4f6781f6d672957870080c7712c24866f77f9bd05c29358310b156ed4ff884",
       "docRelative": "frontend/autocomplete.mdx"
@@ -28,28 +40,36 @@
       "hash": "19d6aa6609e77b061e05bc2138684ce47a3b36a4f403b00602f5033637dd0d85",
       "docRelative": "frontend/chat-app.mdx"
     },
-    "system-designs/frontend/common.mdx": {
-      "hash": "b6a745a8034882e7ce963c2cf14e759ffd2cabaa5b124804dea1eb0df526fc00",
-      "docRelative": "frontend/common.mdx"
+    "system-designs/frontend/design-google-calendar-frontend-system-design.mdx": {
+      "hash": "693b773944f9e6f859cb24d176f2baeaac74c6603ac94a4d71182d250b5fd15e",
+      "docRelative": "frontend/design-google-calendar-frontend-system-design.mdx"
+    },
+    "system-designs/frontend/google-docs-design.mdx": {
+      "hash": "617dcc06b3869b463660bc0660685dc01b6f2c5405152c1e1d318fb4a235981e",
+      "docRelative": "frontend/google-docs-design.mdx"
     },
     "system-designs/frontend/masonry-layout-system-design.mdx": {
       "hash": "1c78de8aa547f56c46edca46302e071dda818017423e638142808ee379c19a53",
       "docRelative": "frontend/masonry-layout-system-design.mdx"
     },
     "system-designs/frontend/news-feed.mdx": {
-      "hash": "96c38a97c3e129545b48980e004f553a1f7f5102a18b5e628dc4ae7ecd7868b4",
+      "hash": "e57034a6c8d966b7cf729b1da0ce57990910d52b5766b221b2782d192e98ee59",
       "docRelative": "frontend/news-feed.mdx"
+    },
+    "system-designs/frontend/rich-text-editor.mdx": {
+      "hash": "785648247c4e0c5e9440971e6d094ec4b46a17cc1c2411c5756602f2352f118c",
+      "docRelative": "frontend/rich-text-editor.mdx"
     },
     "system-designs/frontend/theme-design.mdx": {
       "hash": "1c6f3e12b107433c05b71de1e4033ebcce2edc15e45dfdc87172187f1d422c4f",
       "docRelative": "frontend/theme-design.mdx"
     },
     "__nav__:backend": {
-      "hash": "c32fc7092a72610fe66b94aaa6bc4f611689919d4499907575e0b13e6dd8a384",
+      "hash": "952c7182c501f8fd102d76a08f227034a88b37891f3c4d278315577ffd5efb7d",
       "docRelative": "backend/_index.mdx"
     },
     "__nav__:frontend": {
-      "hash": "e12ad03ba3d64a6a611cbfe990f390de0725239a47fbb920e43239eaee5689a9",
+      "hash": "ec6be56781e39fdebe8fbea8557024500815b5f0a120261f6e196378594e67d5",
       "docRelative": "frontend/_index.mdx"
     }
   }
