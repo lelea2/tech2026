@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <style>
+      .title{font:700 34px Arial, sans-serif; fill:#111}
+      .label{font:700 19px Arial, sans-serif; fill:#111}
+      .small{font:15px Arial, sans-serif; fill:#222}
+      .tiny{font:13px Arial, sans-serif; fill:#333}
+      .box{fill:#fff;stroke:#222;stroke-width:2.5;rx:16;ry:16}
+      .soft{fill:#f8f8f8;stroke:#222;stroke-width:2;rx:14;ry:14}
+      .line{stroke:#222;stroke-width:2;fill:none}
+      .dash{stroke:#555;stroke-width:2;fill:none;stroke-dasharray:7 6}
+      .scribble{stroke:#333;stroke-width:3;fill:none;stroke-linecap:round}
+    </style>
+  </defs>
+  <rect width="1600" height="1000" fill="#fff"/>
+  <text x="60" y="60" class="title">Sandboxed Cloud IDE — Frontend Wireframe Sketch</text>
+  <text x="60" y="92" class="small">Primary experience: edit notebook/code, run cells, see output/logs in near real time, manage files, and observe runtime status.</text>
+
+  <rect x="60" y="125" width="1480" height="805" class="box"/>
+  <rect x="60" y="125" width="1480" height="58" class="soft"/>
+  <circle cx="95" cy="154" r="8" fill="#222"/><circle cx="122" cy="154" r="8" fill="#222"/><circle cx="149" cy="154" r="8" fill="#222"/>
+  <rect x="195" y="141" width="430" height="27" class="box"/>
+  <text x="215" y="161" class="tiny">/workspaces/ml-demo/notebook.ipynb</text>
+  <rect x="1260" y="138" width="130" height="32" class="soft"/>
+  <text x="1284" y="160" class="tiny">Share</text>
+  <rect x="1405" y="138" width="105" height="32" class="soft"/>
+  <text x="1428" y="160" class="tiny">Run All</text>
+
+  <rect x="80" y="205" width="255" height="695" class="soft"/>
+  <text x="105" y="240" class="label">Files</text>
+  <text x="105" y="278" class="small">▾ workspace</text>
+  <text x="126" y="310" class="small">📄 notebook.ipynb</text>
+  <text x="126" y="342" class="small">📁 src</text>
+  <text x="148" y="374" class="small">train.py</text>
+  <text x="148" y="406" class="small">utils.py</text>
+  <text x="126" y="438" class="small">📁 data</text>
+  <rect x="105" y="802" width="95" height="36" class="box"/>
+  <text x="126" y="826" class="tiny">Upload</text>
+  <rect x="215" y="802" width="95" height="36" class="box"/>
+  <text x="230" y="826" class="tiny">New File</text>
+
+  <rect x="360" y="205" width="730" height="695" class="box"/>
+  <rect x="380" y="225" width="690" height="44" class="soft"/>
+  <text x="405" y="253" class="label">Notebook / Code Editor</text>
+  <rect x="970" y="232" width="78" height="28" class="box"/>
+  <text x="990" y="252" class="tiny">Run ▶</text>
+
+  <rect x="385" y="292" width="680" height="172" class="soft"/>
+  <text x="405" y="322" class="tiny">Cell 1 · Python</text>
+  <path d="M410 350 H760 M410 378 H865 M410 406 H710 M410 434 H820" class="scribble"/>
+  <rect x="385" y="478" width="680" height="112" class="soft"/>
+  <text x="405" y="508" class="tiny">Output</text>
+  <path d="M410 535 H620 M410 561 H920" class="dash"/>
+
+  <rect x="385" y="620" width="680" height="172" class="soft"/>
+  <text x="405" y="650" class="tiny">Cell 2 · Shell</text>
+  <path d="M410 678 H710 M410 706 H930 M410 734 H780" class="scribble"/>
+  <rect x="385" y="813" width="150" height="42" class="box"/>
+  <text x="420" y="840" class="small">+ Add Cell</text>
+
+  <rect x="1115" y="205" width="395" height="215" class="soft"/>
+  <text x="1140" y="240" class="label">Runtime Status</text>
+  <text x="1140" y="278" class="small">State: Running</text>
+  <text x="1140" y="310" class="small">CPU: 1.2 / 2 vCPU</text>
+  <text x="1140" y="342" class="small">Memory: 2.8 / 4 GB</text>
+  <text x="1140" y="374" class="small">Sandbox: microVM</text>
+
+  <rect x="1115" y="445" width="395" height="455" class="box"/>
+  <rect x="1135" y="465" width="355" height="42" class="soft"/>
+  <text x="1155" y="492" class="label">Streaming Logs</text>
+  <text x="1140" y="540" class="tiny">seq=184 stdout  training epoch 1/10...</text>
+  <text x="1140" y="572" class="tiny">seq=185 stdout  loss=0.812 acc=0.72</text>
+  <text x="1140" y="604" class="tiny">seq=186 stderr  warning: fallback path</text>
+  <text x="1140" y="636" class="tiny">seq=187 event   checkpoint saved</text>
+  <text x="1140" y="668" class="tiny">seq=188 stdout  training epoch 2/10...</text>
+  <path d="M1140 705 H1470 M1140 738 H1440 M1140 771 H1490" class="dash"/>
+  <rect x="1140" y="828" width="105" height="36" class="box"/>
+  <text x="1163" y="851" class="tiny">Pause</text>
+  <rect x="1260" y="828" width="105" height="36" class="box"/>
+  <text x="1280" y="851" class="tiny">Clear</text>
+  <rect x="1380" y="828" width="105" height="36" class="box"/>
+  <text x="1404" y="851" class="tiny">Export</text>
+
+  <text x="80" y="960" class="small">FE architecture callouts: local editor state, durable autosave, execution state machine, resumable WebSocket stream, virtualized logs, rich-output blob fetching, accessibility-first keyboard flow.</text>
+</svg>

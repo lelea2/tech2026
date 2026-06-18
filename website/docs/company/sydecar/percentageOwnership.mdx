@@ -1,0 +1,234 @@
+---
+title: percentageOwnership
+---
+
+# percentageOwnership
+
+~~~javascript
+/**
+ * Interview Question:
+ * Given a list of people and entities, calculate each person's total effective
+ * ownership percentage in every entity.
+ *
+ * Ownership can be direct:
+ * - James owns 60% of British Intelligence LLC
+ *
+ * Ownership can also be indirect through another entity:
+ * - James owns 20% of Cool Identity Associates LLC
+ * - Cool Identity Associates LLC owns 20% of British Intelligence LLC
+ * - James indirectly owns 20% * 20% = 4% of British Intelligence LLC
+ *
+ * Answer:
+ * Treat the records as a graph:
+ * - Entity nodes can own other entity nodes or person nodes
+ * - Person nodes are terminal owners
+ *
+ * For each entity, run DFS through its ownership graph. When the DFS reaches a
+ * person, add the percentage for that person. When the DFS reaches another
+ * entity, recursively calculate that entity's person ownership and multiply the
+ * nested percentage by the current ownership percentage.
+ *
+ * A visitedNode Set is needed to track the current recursion path. Without it,
+ * circular ownership such as Company A owning Company B and Company B owning
+ * Company A would recurse forever. The set also lets us skip invalid cyclic
+ * paths while still allowing the same entity to appear in a different branch.
+ *
+ * Complexity:
+ * O(E + O) per root entity in the normal acyclic case, where E is number of
+ * entity/person records visited and O is number of ownership edges followed.
+ *
+ * Sample data and expected ownership:
+  {
+    "id": "id-mi6",
+    "name": "British Intelligence LLC",
+    "type": "entity",
+    "owners": [
+      {
+        "id": "id-007",
+        "percentage": 60
+      },
+      {
+        "id": "id-c1",
+        "percentage": 20
+      }
+    ]
+  },
+  {
+    "id": "id-007",
+    "name": "James Bond",
+    "type": "person"
+  },
+  {
+    "id": "id-c1",
+    "name": "Cool Identity Associates LLC",
+    "type": "entity",
+    "owners": [
+      {
+        "id": "id-007",
+        "percentage": 20
+      },
+      {
+        "id": "id-006",
+        "percentage": 10
+      }
+    ]
+  },
+  {
+    "id": "id-006",
+    "name": "Alec Trevelyan",
+    "type": "person"
+  }
+]
+
+
+
+  [British Intelligence LLC] 
+    |                     |        
+    |                     |        
+   60%                   20% 
+ James Bond     [Cool Identity Associates LLC]
+                    |               |
+                    20%             10%
+                  James Bond     Alec Trevelyan 
+
+
+British Intelligence LLC:
+  * James Bond owns 60% of the company explicity. 
+  * Additionally, they own 20% of Cool Identity Associates LLC which owns 20% of the company. 
+  * Therefore, James owns => 60% + (20%*20%) => 60% + 4% => 64%
+    
+  * Alec Trevelyan owns 10% of Cool Identity Associates LLC which owns 20% of the company.
+  * Therefore, Alec owns => 2%
+
+Cool Identity Associates LLC:
+  * James Bond owns 20%
+  * Alec Trevelyan owns 10%
+ **/
+
+
+const companyData = [
+  {
+    "id": "id-mi6",
+    "name": "British Intelligence LLC",
+    "type": "entity",
+    "owners": [
+      {
+        "id": "id-007",
+        "percentage": 60
+      },
+      {
+        "id": "id-c1",
+        "percentage": 20
+      }
+    ]
+  },
+  {
+    "id": "id-007",
+    "name": "James Bond",
+    "type": "person"
+  },
+  {
+    "id": "id-c1",
+    "name": "Cool Identity Associates LLC",
+    "type": "entity",
+    "owners": [
+      {
+        "id": "id-007",
+        "percentage": 20
+      },
+      {
+        "id": "id-006",
+        "percentage": 10
+      }
+    ]
+  },
+  {
+    "id": "id-006",
+    "name": "Alec Trevelyan",
+    "type": "person"
+  }
+];
+
+function getOwneshipRecords(data) {
+  // console.log('>>>> data testing', data);
+  const byIdMap = new Map();
+  
+  for(const record of data) {
+    byIdMap.set(record.id, record); // {"id-mi6": Object<>}
+  }
+  /**
+   {"id-mi6": Object<>,
+    "id-007": Object<>, // this does not have percentage,
+    "id-006": Object<>,
+   }
+  **/
+  // return byIdMap;
+  
+  const result = {};
+  // record the entity
+  for (const record of data) {
+    if (record.type === 'entity') {
+      result[record.name] = getPersonOwnership(record.id, byIdMap);
+    }
+    // result
+    /**
+       {"id-mi6": Map<user_map>},
+       {"id-c1": Map<user_map>}
+    **/
+  }
+  console.log('>>>> result', result);
+  return result;
+}
+
+
+// helper
+function getPersonOwnership(entityId, byIdMap, visitedNode = new Set()) {
+  const entity = byIdMap.get(entityId);// entity based on the entityId; // get entity information ===> get the personEntityId  
+  if (!entity || entity.type !== 'entity') {
+    return {};
+  }
+
+  // visitedNode tracks the current DFS path, not all entities ever seen.
+  // If we see the same entity again before unwinding, there is circular
+  // ownership, so stop this path to avoid infinite recursion.
+  if (visitedNode.has(entityId)) {
+    return {};
+  }
+    
+  // Mark this entity as active in the current recursion path.
+  visitedNode.add(entityId);
+ 
+  const ownership = {}; // map that i have for the ownerName and the data would be the percentage
+  const owners = entity.owners ?? [];
+  for (const owner of owners) {
+    const ownerRecord = byIdMap.get(owner.id); // entity based on entityID (owner.id) ===> {"id": "id-007", "name": "James Bond", "type": "person"}
+    // console.log('>>>> ownerRecord', owner, ownerRecord);
+    const directPercentage = owner.percentage;
+    if (ownerRecord.type === 'person') {
+      // console.log('>>>> im going in here', ownership);
+      ownership[ownerRecord.name] = (ownership[ownerRecord.name] ?? 0) + directPercentage; // ==> onwership record ==> {"James Bond": ...}
+    } else if (ownerRecord.type === 'entity') {
+      // Recursively resolve the nested entity's person owners.
+      // Pass visitedNode so every recursive call shares the same active path.
+      const nestedOwnership = getPersonOwnership(ownerRecord.id, byIdMap, visitedNode);
+      console.log('>>>> nestOwnership', nestedOwnership);
+      for (const[name, nestedPercentage] of Object.entries(nestedOwnership)) {
+        ownership[name] = (ownership[name] ?? 0) + (directPercentage * nestedPercentage) / 100;
+      }
+    }
+  }
+
+  // Backtrack: this entity is no longer active for sibling branches.
+  visitedNode.delete(entityId);
+  // return ownership map of all the name person with equity
+  console.log('>>>> ownership', JSON.stringify(ownership));
+  return ownership;
+}
+
+console.log('>>>> start testing >>>>');
+const ownership = getOwneshipRecords(companyData);
+
+console.log('>>> owning', ownership['British Intelligence LLC']['James Bond']);
+// console.log('>>> end testing');
+
+~~~

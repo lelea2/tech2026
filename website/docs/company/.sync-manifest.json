@@ -1,36 +1,60 @@
 {
   "files": {
+    "company/c3.ai/checkPackageDependencies.js": {
+      "hash": "2e8db71010069cd60d30ba5ca4b20b2470cf369c1b1633562b0338f66c29a35b",
+      "docRelative": "c3.ai/checkPackageDependencies.mdx"
+    },
     "company/coursera/textAdjustification.js": {
-      "hash": "3235e6e218ca1ab0eb01d1f96ae5674799b4841dcc8d28ca057fee020a8e4e8b",
+      "hash": "b0ce521fc7747218196680c083553ff8d86862a72ea1f4b337caa96774846958",
       "docRelative": "coursera/textAdjustification.mdx"
     },
     "company/gusto/Benefit.js": {
-      "hash": "93eaa38f59f47942e69f0347cda1bc178993cb8936793cf457f9a65dafa7694c",
+      "hash": "17e13a420960a9f5a9ac2cd599af41248bf56e1ea06f162b9ed36e08abf82f7e",
       "docRelative": "gusto/Benefit.mdx"
     },
     "company/gusto/BracketCalculator.js": {
-      "hash": "2a9e755f597e736fffccda44d3b46c7c2c4d722d6d959d6539d3f598a1ccef1c",
+      "hash": "de1cb141bd8c427ca61d81d07c629d6e1fdf1416959eff251d4e42d8e0c6d706",
       "docRelative": "gusto/BracketCalculator.mdx"
     },
     "company/gusto/getPeopleAlive.js": {
-      "hash": "0d662941532c3a0ac37989a63d74f90193286406b356907c92136162977dae60",
+      "hash": "af1bf5cb4599281780aefc2bfd16f367ff837be3af31c863b81acd40362b89bf",
       "docRelative": "gusto/getPeopleAlive.mdx"
     },
     "company/harvey/retry.js": {
-      "hash": "bdd28af810aed7f24f090093b7a1efc1f07cbf5775f9aa0313ee9f27b6351b8c",
+      "hash": "5069ba9a709d92f8eec846a0bbcffe784fcace600d2a17e41050f7c99cb04341",
       "docRelative": "harvey/retry.mdx"
     },
     "company/harvey/wordCount.js": {
-      "hash": "52a11c78f1cab454b7e149f954a3e5adf4b0f6a496294ffe6990c4ce3d211d22",
+      "hash": "b76ec60ba70c9257e1023f23e2935dd1740a8982e9a762a0966cde8e6af9f7c5",
       "docRelative": "harvey/wordCount.mdx"
     },
     "company/meta/htmlText.js": {
-      "hash": "998b63eed4b9381dbfefdecc3622b46633b557ee185fb6ded810b681fa83acbb",
+      "hash": "fbf3f4ccaec79a204020c4213f563d0baaac27cdd79725fcfcf63aefb5850232",
       "docRelative": "meta/htmlText.mdx"
     },
+    "company/openai/chat-event-counter.js": {
+      "hash": "c677171daead2adf0118b4ecefdfa8a4cbf6fb459e6115fe13ed604286c70d52",
+      "docRelative": "openai/chat-event-counter.mdx"
+    },
+    "company/openai/distributedRateLimiter.js": {
+      "hash": "aae57f72dc39ae0b970634d470f9c401bb1a2d8a4922ab726255e0606ee23745",
+      "docRelative": "openai/distributedRateLimiter.mdx"
+    },
     "company/splunk/colorExclude.js": {
-      "hash": "286f8bfa5be39d19f636d75a71eee180046e17335bedc706fed0e04341ca3b4d",
+      "hash": "302a27a2d6bdcbde09538fad4d739e37a7ce2addbed5505379abe82be17b3fed",
       "docRelative": "splunk/colorExclude.mdx"
+    },
+    "company/sydecar/percentageOwnership.js": {
+      "hash": "92803c076495e74cf321f2d661ed92edf4914523d306e9f491a942d2bc4ae999",
+      "docRelative": "sydecar/percentageOwnership.mdx"
+    },
+    "company/sydecar/removeInvalidAttribute.js": {
+      "hash": "7b825f2c8f975e73ff90f1b3ebf337d194eee5538d1b538ce17ff7f944082107",
+      "docRelative": "sydecar/removeInvalidAttribute.mdx"
+    },
+    "__nav__:c3.ai": {
+      "hash": "c9a53b03ea8e84b8f231d7c68336c028e7fe4dd1de3e09d4af92eee572025f82",
+      "docRelative": "c3.ai/_index.mdx"
     },
     "__nav__:coursera": {
       "hash": "8e5f71503e6af05d1d6e3f9ccde194ca9e1f571d27756c3ea4a15a3f03723e98",
@@ -48,9 +72,17 @@
       "hash": "a166b72158fd6912f7eb91bbece9f0ceda391bfdf6250f0f1e2d597c321ea655",
       "docRelative": "meta/_index.mdx"
     },
+    "__nav__:openai": {
+      "hash": "5c4b11e80b3133885a559f061d4077a91f183855a06f4f8e0c614c29357c86a6",
+      "docRelative": "openai/_index.mdx"
+    },
     "__nav__:splunk": {
       "hash": "a40829cfb6c305c8d481214df29c6880f54d4f7b14319ea36bf302c3ac1949e2",
       "docRelative": "splunk/_index.mdx"
+    },
+    "__nav__:sydecar": {
+      "hash": "b14517e2386bc6428d9b796320974e6525ba30aaefb8a25adcbb85528355b0de",
+      "docRelative": "sydecar/_index.mdx"
     }
   }
 }

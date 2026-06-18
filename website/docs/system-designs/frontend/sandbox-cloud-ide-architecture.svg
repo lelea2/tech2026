@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#222"/>
+    </marker>
+    <style>
+      .title{font:700 34px Arial, sans-serif; fill:#111}
+      .subtitle{font:600 20px Arial, sans-serif; fill:#333}
+      .label{font:600 18px Arial, sans-serif; fill:#111}
+      .small{font:15px Arial, sans-serif; fill:#222}
+      .tiny{font:13px Arial, sans-serif; fill:#333}
+      .box{fill:#fff;stroke:#222;stroke-width:2.5;rx:18;ry:18}
+      .soft{fill:#f7f7f7;stroke:#222;stroke-width:2;rx:16;ry:16}
+      .group{fill:#fbfbfb;stroke:#555;stroke-width:2;stroke-dasharray:8 6;rx:20;ry:20}
+      .arrow{stroke:#222;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+      .dash{stroke:#555;stroke-width:2;fill:none;stroke-dasharray:8 6;marker-end:url(#arrow)}
+      .pipe{stroke:#111;stroke-width:4;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1600" height="1000" fill="#ffffff"/>
+  <text x="60" y="62" class="title">Sandboxed Cloud IDE — High-Level Architecture</text>
+  <text x="60" y="95" class="small">Staff-level framing: control plane stays multi-tenant; runtime data plane is isolated per session; browser never talks directly to a sandbox.</text>
+
+  <rect x="50" y="135" width="300" height="200" class="box"/>
+  <text x="82" y="175" class="label">Browser IDE</text>
+  <text x="82" y="210" class="small">• Monaco / Notebook editor</text>
+  <text x="82" y="236" class="small">• File tree + terminal</text>
+  <text x="82" y="262" class="small">• Output renderer</text>
+  <text x="82" y="288" class="small">• WSS with last_seq replay</text>
+
+  <rect x="430" y="120" width="500" height="285" class="group"/>
+  <text x="460" y="160" class="subtitle">Control Plane</text>
+  <rect x="465" y="190" width="195" height="72" class="soft"/>
+  <text x="485" y="220" class="label">API Gateway</text>
+  <text x="485" y="244" class="tiny">AuthN/Z, session tokens</text>
+  <rect x="690" y="190" width="200" height="72" class="soft"/>
+  <text x="710" y="220" class="label">Workspace Svc</text>
+  <text x="710" y="244" class="tiny">Metadata, file index</text>
+  <rect x="465" y="292" width="195" height="72" class="soft"/>
+  <text x="485" y="322" class="label">Session Mgr</text>
+  <text x="485" y="346" class="tiny">Lifecycle + quotas</text>
+  <rect x="690" y="292" width="200" height="72" class="soft"/>
+  <text x="710" y="322" class="label">Scheduler</text>
+  <text x="710" y="346" class="tiny">Bin-pack + autoscale</text>
+
+  <rect x="1040" y="135" width="410" height="210" class="box"/>
+  <text x="1070" y="175" class="label">Streaming Gateway</text>
+  <text x="1070" y="210" class="small">• Sharded by session_id</text>
+  <text x="1070" y="236" class="small">• WSS auth + fan-out</text>
+  <text x="1070" y="262" class="small">• Replay ring buffer + backpressure</text>
+  <text x="1070" y="288" class="small">• Async durable log write</text>
+
+  <rect x="80" y="500" width="550" height="365" class="group"/>
+  <text x="115" y="540" class="subtitle">CPU Runtime Fleet</text>
+  <rect x="115" y="570" width="215" height="95" class="soft"/>
+  <text x="135" y="602" class="label">CPU Host Agent</text>
+  <text x="135" y="629" class="small">Firecracker + jailer</text>
+  <text x="135" y="651" class="small">Warm microVM pool</text>
+  <rect x="370" y="570" width="220" height="95" class="soft"/>
+  <text x="390" y="602" class="label">microVM / session</text>
+  <text x="390" y="629" class="small">Guest kernel boundary</text>
+  <text x="390" y="651" class="small">Runtime Agent inside</text>
+  <rect x="370" y="705" width="220" height="110" class="soft"/>
+  <text x="390" y="737" class="label">Isolation layers</text>
+  <text x="390" y="763" class="small">RO base + overlay quota</text>
+  <text x="390" y="787" class="small">Default-deny egress</text>
+
+  <rect x="720" y="500" width="365" height="365" class="group"/>
+  <text x="755" y="540" class="subtitle">GPU Runtime Fleet</text>
+  <rect x="755" y="575" width="295" height="112" class="soft"/>
+  <text x="775" y="608" class="label">Single-tenant GPU Host</text>
+  <text x="775" y="634" class="small">Full VM + VFIO passthrough</text>
+  <text x="775" y="658" class="small">or hardened NVIDIA container</text>
+  <rect x="755" y="725" width="295" height="86" class="soft"/>
+  <text x="775" y="757" class="label">No Firecracker GPU</text>
+  <text x="775" y="782" class="small">Route gpu &gt; 0 at admission</text>
+
+  <rect x="1190" y="500" width="330" height="365" class="group"/>
+  <text x="1225" y="540" class="subtitle">Durable Stores</text>
+  <rect x="1225" y="575" width="245" height="82" class="soft"/>
+  <text x="1245" y="607" class="label">Object Store</text>
+  <text x="1245" y="632" class="small">Workspace files, snapshots, blobs</text>
+  <rect x="1225" y="690" width="245" height="82" class="soft"/>
+  <text x="1245" y="722" class="label">Log Store</text>
+  <text x="1245" y="747" class="small">Output replay + audit events</text>
+  <rect x="1225" y="805" width="245" height="45" class="soft"/>
+  <text x="1245" y="834" class="label">Metadata DB</text>
+
+  <path d="M350 210 C390 210 395 210 430 210" class="pipe"/>
+  <text x="365" y="196" class="tiny">HTTPS control</text>
+  <path d="M350 280 C640 460 925 280 1040 240" class="pipe"/>
+  <text x="690" y="388" class="tiny">WSS output stream</text>
+  <path d="M680 405 C570 465 505 500 480 570" class="arrow"/>
+  <text x="515" y="482" class="tiny">provision / control</text>
+  <path d="M890 360 C920 430 880 470 865 575" class="arrow"/>
+  <text x="900" y="465" class="tiny">gpu sessions</text>
+  <path d="M590 620 C790 450 980 430 1075 345" class="dash"/>
+  <path d="M1050 620 C1130 475 1190 390 1215 345" class="dash"/>
+  <text x="945" y="455" class="tiny">gRPC runtime output</text>
+  <path d="M930 255 C980 255 1005 255 1040 255" class="arrow"/>
+  <path d="M1245 345 C1280 425 1300 500 1320 575" class="dash"/>
+  <path d="M1280 345 C1295 475 1302 610 1320 690" class="dash"/>
+  <path d="M785 405 C980 455 1160 480 1250 575" class="dash"/>
+  <path d="M740 405 C875 560 1035 690 1225 825" class="dash"/>
+
+  <rect x="52" y="902" width="1496" height="58" class="soft"/>
+  <text x="75" y="930" class="label">Key staff-level callout:</text>
+  <text x="285" y="930" class="small">microVM by default for CPU untrusted code; GPU is a separate single-tenant pool; streaming is resumable and gateway-sharded; workspace files are durable object-store state.</text>
+</svg>

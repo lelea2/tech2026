@@ -1,0 +1,317 @@
+---
+title: 'Short Polling vs Long Polling vs SSE vs WebSockets'
+description: 'A system design comparison of common real-time communication techniques'
+tags:
+  - frontend-system-design
+  - networking
+  - polling
+  - server-sent-events
+  - websockets
+---
+
+# Short Polling vs Long Polling vs SSE vs WebSockets
+
+## Quick Comparison
+
+Choose the simplest technique that satisfies the required latency, message
+direction, update frequency, reliability, and scale.
+
+| Technique | Direction | Connection | Latency | Complexity | Best for |
+| --- | --- | --- | --- | --- | --- |
+| Short polling | Client requests, server responds | New connection per request | Depends on interval | Low | Infrequent status updates |
+| Long polling | Client requests, server delays response | Held until update or timeout | Low to moderate | Medium | Legacy server push |
+| SSE | Server to client | Long-lived HTTP stream | Low | Medium | Feeds, dashboards, AI streaming |
+| WebSocket | Bidirectional | Long-lived upgraded connection | Very low | High | Chat, collaboration, games |
+
+## 1. Short Polling
+
+Short polling repeatedly sends requests at a fixed or adaptive interval. The
+server responds immediately with the current state or available updates, and
+the connection closes after every response.
+
+```text
+Client                         Server
+  |------ GET /status ---------->|
+  |<----- no changes ------------|
+  |                               |
+  |------ GET /status ---------->|
+  |<----- updated state ----------|
+```
+
+### Advantages
+
+- Simple to implement with standard HTTP endpoints.
+- Easy to debug, cache, authorize, and monitor.
+- Compatible with proxies, gateways, and older infrastructure.
+- Independent requests make failures easy to retry.
+
+### Disadvantages
+
+- Produces empty requests when no data has changed.
+- Update latency can be as long as the polling interval.
+- Short intervals increase bandwidth, server load, and battery usage.
+- Clients polling simultaneously can create traffic spikes.
+
+### Common use cases
+
+- Background job or export status.
+- Order, payment, or shipment status.
+- Dashboards refreshed every 30 to 60 seconds.
+- Email unread counts.
+- Small internal tools where simplicity is the priority.
+
+### Scaling considerations
+
+- Add jitter so clients do not poll simultaneously.
+- Use exponential backoff when nothing changes.
+- Slow or pause polling when the tab is hidden.
+- Use `ETag`, `If-None-Match`, or version numbers.
+- Cache results shared by many users.
+
+## 2. Long Polling
+
+Long polling keeps an HTTP request open until new data is available or a
+timeout occurs. After receiving a response, the client immediately sends
+another request.
+
+```text
+Client                         Server
+  |------ GET /updates --------->|
+  |       request waits          |
+  |<----- new event -------------|
+  |------ GET /updates --------->|
+  |       request waits          |
+```
+
+### Advantages
+
+- Lower latency than short polling.
+- Uses familiar HTTP request and response semantics.
+- Compatible with infrastructure that cannot support WebSockets.
+- Useful as a fallback transport.
+
+### Disadvantages
+
+- Reconnects after each event or timeout.
+- Holds connection resources while waiting.
+- Coordinated timeouts can create reconnect spikes.
+- Ordering, missed events, and duplicates require application logic.
+- Less efficient when updates are frequent.
+
+### Common use cases
+
+- Notifications on legacy infrastructure.
+- Older chat implementations.
+- Waiting for a background task to complete.
+- Fallback when SSE or WebSockets are unavailable.
+
+### Scaling considerations
+
+- Use asynchronous servers instead of one blocking thread per request.
+- Configure proxy and load-balancer timeouts.
+- Add jitter to reconnect attempts.
+- Include event cursors or IDs for recovery.
+- Make repeated requests and responses idempotent.
+
+## 3. Server-Sent Events
+
+Server-Sent Events use a long-lived HTTP response with the
+`text/event-stream` content type. The server pushes events to the browser as
+they become available.
+
+SSE is one-way. The server sends events to the client, while the client uses
+ordinary HTTP requests to send commands or mutations.
+
+```text
+Client                         Server
+  |------ GET /events ---------->|
+  |<----- event: update ---------|
+  |<----- event: update ---------|
+  |<----- event: heartbeat ------|
+  |   connection remains open    |
+```
+
+### Advantages
+
+- Simple server-to-client streaming over standard HTTP.
+- Native browser support through `EventSource`.
+- Built-in automatic reconnection.
+- Supports event IDs and `Last-Event-ID` resume behavior.
+- Easy to inspect because events are text based.
+- Good fit when updates mostly flow from server to client.
+
+### Disadvantages
+
+- Does not provide bidirectional messaging.
+- Native `EventSource` offers limited custom-header control.
+- Binary data requires encoding or separate requests.
+- Proxies may buffer or terminate long-lived responses.
+- Slow consumers and backpressure require explicit handling.
+- HTTP/1.1 browser connection limits can matter across many tabs.
+
+### Common use cases
+
+- AI-generated token streaming.
+- Live news, sports scores, or election results.
+- Social activity feeds.
+- Monitoring dashboards and operational logs.
+- Build, deployment, and job-progress updates.
+- Server-driven notifications.
+
+### Scaling considerations
+
+- Send heartbeat events to detect dead connections.
+- Use event IDs to resume after reconnecting.
+- Put pub/sub infrastructure behind horizontally scaled SSE servers.
+- Disable intermediary response buffering.
+- Limit buffers and disconnect very slow consumers.
+- Prefer HTTP/2 where possible for connection multiplexing.
+
+## 4. WebSockets
+
+WebSockets create a persistent, full-duplex connection. The client and server
+can both send messages at any time without opening a new HTTP request.
+
+```text
+Client                         Server
+  |------ HTTP upgrade --------->|
+  |<----- 101 Switching ----------|
+  |<===== bidirectional =========>|
+  |<===== messages at any time ==>|
+```
+
+### Advantages
+
+- Full-duplex communication.
+- Low per-message overhead after connection setup.
+- Very low latency for interactive applications.
+- Supports text and binary messages.
+- Both sides can send data independently.
+
+### Disadvantages
+
+- More application and operational complexity.
+- Reconnection and resume behavior must be designed.
+- Heartbeats, acknowledgements, ordering, and deduplication are custom.
+- Stateful connections complicate deployment and load balancing.
+- Authentication renewal and authorization need explicit protocols.
+- Restrictive proxies may terminate upgraded connections.
+
+### Common use cases
+
+- One-to-one and group chat.
+- Google Docs-style collaborative editing.
+- Multiplayer games.
+- Shared whiteboards and cursor presence.
+- Live auctions and trading interfaces.
+- Ride, delivery, or dispatch tracking.
+- Interactive device control.
+
+### Scaling considerations
+
+- Keep connection servers lightweight and horizontally scalable.
+- Route cross-server events through a message broker.
+- Store durable state outside WebSocket connection servers.
+- Define heartbeat, reconnect, acknowledgement, and resume protocols.
+- Use stable message IDs to detect duplicates.
+- Apply per-user and per-connection rate limits.
+- Drain connections gracefully during deployments.
+
+## Detailed Comparison
+
+| Factor | Short polling | Long polling | SSE | WebSocket |
+| --- | --- | --- | --- | --- |
+| Direction | Request/response | Delayed request/response | Server to client | Bidirectional |
+| Protocol | HTTP | HTTP | HTTP stream | WebSocket after HTTP upgrade |
+| Connection | Short lived | Until event or timeout | Long lived | Long lived |
+| Browser API | `fetch` | `fetch` | `EventSource` | `WebSocket` |
+| Binary support | Yes | Yes | Not native | Yes |
+| Automatic reconnect | Custom | Custom | Built in | Custom |
+| Resume mechanism | Version or timestamp | Event cursor | `Last-Event-ID` | Custom |
+| Best frequency | Low | Low to medium | Medium to high | High |
+| Infrastructure complexity | Low | Medium | Medium | High |
+
+## Common System Design Examples
+
+| System | Recommended starting point | Reason |
+| --- | --- | --- |
+| Export job status | Short polling | Updates are infrequent |
+| Payment status | Short polling | Correctness matters more than milliseconds |
+| Legacy notification service | Long polling | Server push without WebSocket support |
+| AI chat response | SSE or streaming `fetch` | Data primarily flows from server |
+| News feed updates | SSE | Continuous server-driven events |
+| Monitoring dashboard | SSE | Frequent one-way updates |
+| Chat application | WebSocket | Frequent bidirectional messages |
+| Collaborative document | WebSocket | Edits and acknowledgements flow both ways |
+| Multiplayer game | WebSocket | Low-latency interactive state |
+| Live sports scores | SSE | Primarily server-to-client updates |
+| Email inbox refresh | Short polling or SSE | Depends on freshness requirements |
+| Ride tracking | WebSocket or SSE plus HTTP | Depends on client message frequency |
+
+## Decision Guide
+
+### Choose short polling when
+
+- Updates are infrequent.
+- Seconds or minutes of latency are acceptable.
+- Simplicity and compatibility are most important.
+- The system already exposes a status endpoint.
+
+### Choose long polling when
+
+- Lower latency than short polling is needed.
+- SSE and WebSockets are unavailable.
+- Events are infrequent enough that reconnecting is acceptable.
+
+### Choose SSE when
+
+- Messages mostly flow from server to client.
+- Events are text based.
+- Automatic browser reconnection is useful.
+- Client mutations can use normal HTTP APIs.
+
+### Choose WebSockets when
+
+- Client and server both send frequent messages.
+- Very low latency is a core requirement.
+- Binary messaging is useful.
+- The team can operate stateful connections reliably.
+
+## Reliability Requirements
+
+The transport does not guarantee application correctness. Discuss:
+
+- Stable event or message IDs.
+- Ordering guarantees.
+- Duplicate detection.
+- Resume position after reconnecting.
+- Heartbeats and dead-connection detection.
+- Exponential backoff with jitter.
+- Slow-consumer handling and bounded buffers.
+- Authentication renewal.
+- Authorization for every subscription or channel.
+- Fallback behavior when the preferred transport fails.
+
+## Interview Trade-offs
+
+1. Lower latency versus infrastructure complexity.
+2. Persistent connections versus stateless requests.
+3. One-way streaming versus full-duplex communication.
+4. Delivery guarantees versus throughput and memory usage.
+5. Faster failure detection versus heartbeat traffic.
+6. Buffering slow consumers versus disconnecting them.
+7. Sticky sessions versus broker-based event routing.
+8. Native browser APIs versus custom transport libraries.
+
+## Final Recommendation
+
+Do not choose WebSockets only because a requirement says "real time."
+
+- Use short polling for simple, infrequent status changes.
+- Use long polling mainly for compatibility or fallback.
+- Use SSE for continuous server-driven browser updates.
+- Use WebSockets for highly interactive bidirectional applications.
+
+A strong system design answer connects the transport choice to latency,
+message direction, event frequency, recovery behavior, operational complexity,
+and expected scale.

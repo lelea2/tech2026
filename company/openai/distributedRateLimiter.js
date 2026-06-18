@@ -1,0 +1,379 @@
+/**
+ * Interview question: Distributed Sliding-Window Rate Limiter
+ *
+ * Design a rate limiter shared by multiple application servers. A client may
+ * make at most `limit` accepted requests during a rolling `windowMs` period.
+ *
+ * The shared remote store is normally the source of truth. During a remote
+ * outage, each server continues serving requests from a local mirror and
+ * records accepted requests or resets in a journal. When the remote store
+ * becomes available again, the journals are replayed in canonical-time order.
+ *
+ * Supported operations:
+ * - ["allow", serverId, clientId, timestampMs]
+ * - ["reset", serverId, clientId, timestampMs]
+ * - ["set_remote", isAvailable]
+ * - ["restart", serverId]
+ *
+ * Return one boolean for every `allow` operation:
+ * - true: the request is accepted.
+ * - false: the client has reached its limit.
+ *
+ * Important assumptions:
+ * - `serverOffsets` contains the clock offset for every server.
+ * - Canonical time is `serverTimestamp - serverOffset`.
+ * - Canonical timestamps are non-decreasing for each client within a store.
+ * - The rolling window is half-open: (T - windowMs, T].
+ * - A simulated restart does not erase remote state, local mirrors, or journals.
+ *
+ * Availability trade-off:
+ * During a remote outage, different servers cannot coordinate their local
+ * decisions. They can each allow requests based on stale remote state, so the
+ * global limit may be temporarily exceeded. This is an availability-first
+ * design. A strict limiter should fail closed or route all decisions through
+ * one consistent store instead.
+ *
+ * Approach:
+ * - Normalize server timestamps to one canonical clock.
+ * - Store accepted timestamps in a sliding-window queue per client.
+ * - Advance a head pointer to expire timestamps without shifting arrays.
+ * - Clone remote client state into a server-local mirror during an outage.
+ * - Journal accepted requests and resets, then replay them after recovery.
+ *
+ * Complexity:
+ * - Normal `allow`: amortized O(1).
+ * - `reset`: O(1).
+ * - Outage recovery: O(j log j) to sort and replay j journal entries.
+ * - Space: O(r + l + j), for remote timestamps, local mirrors, and journal
+ *   entries.
+ *
+ * @param {number} limit
+ * @param {number} windowMs
+ * @param {Array<[string, number]>} serverOffsets - [serverId, offsetMs]
+ * @param {Array<Array>} operations
+ * @returns {boolean[]}
+ */
+export default function distributedRateLimiter(
+  limit,
+  windowMs,
+  serverOffsets,
+  operations
+) {
+  const offsetByServer = new Map(serverOffsets);
+
+  const remote = new Store(windowMs);
+  const localByServer = new Map();
+
+  let remoteAvailable = true;
+
+  // Keep outage mutations so the shared store can be reconciled after recovery.
+  let journal = [];
+
+  const answers = [];
+
+  for (let i = 0; i < operations.length; i++) {
+    const op = operations[i];
+    const type = op[0];
+
+    if (type === "set_remote") {
+      const nextAvailable = op[1];
+
+      // Start serving future requests from server-local mirrors.
+      if (remoteAvailable === true && nextAvailable === false) {
+        remoteAvailable = false;
+      }
+
+      // Restore the shared state by replaying all outage mutations in order.
+      else if (remoteAvailable === false && nextAvailable === true) {
+        journal.sort((a, b) => {
+          if (a.time !== b.time) return a.time - b.time;
+          return a.index - b.index;
+        });
+
+        for (const entry of journal) {
+          if (entry.type === "allow") {
+            remote.forceInsert(entry.clientId, entry.time);
+          } else {
+            remote.reset(entry.clientId);
+          }
+        }
+
+        journal = [];
+        localByServer.clear();
+        remoteAvailable = true;
+      }
+
+      continue;
+    }
+
+    if (type === "restart") {
+      // In this simulation, state lives outside the restarted server process.
+      continue;
+    }
+
+    const [, serverId, clientId, timestampMs] = op;
+    // Convert different server clocks into a comparable timeline.
+    const canonicalTime = timestampMs - offsetByServer.get(serverId);
+
+    if (type === "allow") {
+      const store = getActiveStore({
+        remoteAvailable,
+        remote,
+        localByServer,
+        serverId,
+        clientId,
+        windowMs,
+      });
+
+      const allowed = store.allow(clientId, canonicalTime, limit);
+      answers.push(allowed);
+
+      if (!remoteAvailable && allowed) {
+        // Rejected requests do not affect remote state and are not journaled.
+        journal.push({
+          type: "allow",
+          clientId,
+          time: canonicalTime,
+          index: i,
+        });
+      }
+    }
+
+    else if (type === "reset") {
+      const store = getActiveStore({
+        remoteAvailable,
+        remote,
+        localByServer,
+        serverId,
+        clientId,
+        windowMs,
+      });
+
+      store.reset(clientId);
+
+      if (!remoteAvailable) {
+        journal.push({
+          type: "reset",
+          clientId,
+          time: canonicalTime,
+          index: i,
+        });
+      }
+    }
+  }
+
+  return answers;
+}
+
+/**
+ * Gets either the shared remote store or the server-local mirror.
+ */
+function getActiveStore({
+  remoteAvailable,
+  remote,
+  localByServer,
+  serverId,
+  clientId,
+  windowMs,
+}) {
+  if (remoteAvailable) {
+    return remote;
+  }
+
+  if (!localByServer.has(serverId)) {
+    localByServer.set(serverId, new Store(windowMs));
+  }
+
+  const local = localByServer.get(serverId);
+
+  // Lazily initialize this client's local view from the last shared state.
+  if (!local.hasClient(clientId)) {
+    local.cloneClientFrom(clientId, remote);
+  }
+
+  return local;
+}
+
+/**
+ * Sliding-window request store.
+ *
+ * For each client, keep:
+ * - times: accepted request canonical times
+ * - head: first non-expired index
+ *
+ * Because canonical times are non-decreasing in input order,
+ * we can expire old requests by advancing head.
+ */
+class Store {
+  constructor(windowMs) {
+    this.windowMs = windowMs;
+    this.data = new Map();
+  }
+
+  hasClient(clientId) {
+    return this.data.has(clientId);
+  }
+
+  ensureClient(clientId) {
+    if (!this.data.has(clientId)) {
+      this.data.set(clientId, {
+        times: [],
+        head: 0,
+      });
+    }
+
+    return this.data.get(clientId);
+  }
+
+  cloneClientFrom(clientId, otherStore) {
+    const other = otherStore.data.get(clientId);
+
+    if (!other) {
+      this.data.set(clientId, {
+        times: [],
+        head: 0,
+      });
+      return;
+    }
+
+    // Copy only the live suffix from the other store.
+    this.data.set(clientId, {
+      times: other.times.slice(other.head),
+      head: 0,
+    });
+  }
+
+  allow(clientId, time, limit) {
+    const state = this.ensureClient(clientId);
+
+    this.expire(state, time);
+
+    const currentCount = state.times.length - state.head;
+
+    if (currentCount >= limit) {
+      return false;
+    }
+
+    state.times.push(time);
+    return true;
+  }
+
+  forceInsert(clientId, time) {
+    const state = this.ensureClient(clientId);
+
+    this.expire(state, time);
+
+    // Preserve decisions already returned to callers during the outage.
+    // Rechecking could retroactively contradict an accepted request.
+    state.times.push(time);
+  }
+
+  reset(clientId) {
+    this.data.set(clientId, {
+      times: [],
+      head: 0,
+    });
+  }
+
+  expire(state, currentTime) {
+    const minExclusive = currentTime - this.windowMs;
+
+    // Window is half-open: (currentTime - windowMs, currentTime]
+    // Therefore timestamps <= currentTime - windowMs are expired.
+    while (
+      state.head < state.times.length &&
+      state.times[state.head] <= minExclusive
+    ) {
+      state.head++;
+    }
+
+    // Optional memory compaction.
+    if (state.head > 1024 && state.head * 2 > state.times.length) {
+      state.times = state.times.slice(state.head);
+      state.head = 0;
+    }
+  }
+}
+
+/**
+ * Test case 1: shared limit across servers with clock normalization
+ *
+ * Input:
+ * distributedRateLimiter(
+ *   2,
+ *   1000,
+ *   [["server-1", 0], ["server-2", 100]],
+ *   [
+ *     ["allow", "server-1", "client-1", 1000],
+ *     ["allow", "server-2", "client-1", 1200],
+ *     ["allow", "server-1", "client-1", 1300],
+ *   ],
+ * )
+ *
+ * Server 2's timestamp 1200 becomes canonical time 1100.
+ *
+ * Output: [true, true, false]
+ */
+
+/**
+ * Test case 2: the lower window boundary is excluded
+ *
+ * Input:
+ * distributedRateLimiter(
+ *   1,
+ *   1000,
+ *   [["server-1", 0]],
+ *   [
+ *     ["allow", "server-1", "client-1", 0],
+ *     ["allow", "server-1", "client-1", 1000],
+ *   ],
+ * )
+ *
+ * At T = 1000, the window is (0, 1000], so the request at 0 expires.
+ *
+ * Output: [true, true]
+ */
+
+/**
+ * Test case 3: reset clears one client's accepted-request history
+ *
+ * Input:
+ * distributedRateLimiter(
+ *   1,
+ *   1000,
+ *   [["server-1", 0]],
+ *   [
+ *     ["allow", "server-1", "client-1", 100],
+ *     ["allow", "server-1", "client-1", 200],
+ *     ["reset", "server-1", "client-1", 300],
+ *     ["allow", "server-1", "client-1", 400],
+ *   ],
+ * )
+ *
+ * Output: [true, false, true]
+ */
+
+/**
+ * Test case 4: outage favors availability and may over-admit globally
+ *
+ * Input:
+ * distributedRateLimiter(
+ *   2,
+ *   1000,
+ *   [["server-1", 0], ["server-2", 0]],
+ *   [
+ *     ["allow", "server-1", "client-1", 100],
+ *     ["set_remote", false],
+ *     ["allow", "server-1", "client-1", 200],
+ *     ["allow", "server-2", "client-1", 300],
+ *     ["set_remote", true],
+ *     ["allow", "server-1", "client-1", 400],
+ *   ],
+ * )
+ *
+ * During the outage, both local mirrors start from the same remote state and
+ * independently accept another request. Recovery replays both accepted
+ * decisions, so the next request is rejected.
+ *
+ * Output: [true, true, true, false]
+ */

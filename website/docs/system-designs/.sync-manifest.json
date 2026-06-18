@@ -8,9 +8,17 @@
       "hash": "7260e99908c1d228fcd64de581e705750f5f86b76836477d571ecd76f7256a7b",
       "docRelative": "frontend/autocomplete.png"
     },
+    "system-designs/frontend/chat-gpt.png": {
+      "hash": "df666b1e6299407a8ebc38390ef20dcbd90628443208757c33d24e0d8bcb098a",
+      "docRelative": "frontend/chat-gpt.png"
+    },
     "system-designs/frontend/google-calendar.png": {
       "hash": "42e44ac47f61c64659ccc16a63b1b90e3761fd8cdeba498bdb1bace9cee58c45",
       "docRelative": "frontend/google-calendar.png"
+    },
+    "system-designs/frontend/google-docs.png": {
+      "hash": "5f7d52ded9e724121f726355a02a21194b7607ffead8fd7fa186ee1ee18a9254",
+      "docRelative": "frontend/google-docs.png"
     },
     "system-designs/frontend/newsfeed.png": {
       "hash": "7c32bed9378a970683aa76380ad349cac4434cec781db46acf6504823a8b8857",
@@ -19,6 +27,18 @@
     "system-designs/frontend/richtexteditor.png": {
       "hash": "592701c33e1c48937a82965d23d439d3ee486403cb4a542bb40003df2e51c187",
       "docRelative": "frontend/richtexteditor.png"
+    },
+    "system-designs/frontend/sandbox-cloud-ide-architecture.svg": {
+      "hash": "d5408f61ecbc42342093ce1e8146a463301811b1e086baad983a1e48a306a08a",
+      "docRelative": "frontend/sandbox-cloud-ide-architecture.svg"
+    },
+    "system-designs/frontend/sandbox-cloud-ide-fe-wireframe.svg": {
+      "hash": "0e102b9bad09f0f8aff39edf6bc771472d4f8495ae58038f642d3f871a2f0165",
+      "docRelative": "frontend/sandbox-cloud-ide-fe-wireframe.svg"
+    },
+    "system-designs/frontend/video-netflix.png": {
+      "hash": "6e0ef9664c9fbde91a5ce5388c65ae98db8e6726a990d0f77a219c35d933ae64",
+      "docRelative": "frontend/video-netflix.png"
     },
     "system-designs/backend/Tournament.mdx": {
       "hash": "157eeae56ec7baa1f7b1c864d4723278fe677a48e2e43a45d6154b8bc2123896",
@@ -32,6 +52,10 @@
       "hash": "49fc3dc0ce644779a20e900956eb74c610ffd281af9f045c61c02ed5957bfe84",
       "docRelative": "backend/prompt-playground.mdx"
     },
+    "system-designs/backend/short-url.mdx": {
+      "hash": "87391f743863315c2a6f577afbe234c6ab00d0fb373e7b82c3881b9436f9a68e",
+      "docRelative": "backend/short-url.mdx"
+    },
     "system-designs/frontend/autocomplete.mdx": {
       "hash": "c5292500395a6c9c4c6eed17dd477f60885bc6f577b45fc81f2cc6589724c569",
       "docRelative": "frontend/autocomplete.mdx"
@@ -40,12 +64,16 @@
       "hash": "8fd3f4eb4e28bb66f509fd64dbd7255bef6ba91d8862f14ad7de20543f356dad",
       "docRelative": "frontend/chat-app.mdx"
     },
+    "system-designs/frontend/chat-gpt.mdx": {
+      "hash": "143117744c20dbd5728908af8175699adffdd98fca59c9a833637de33c70a0c3",
+      "docRelative": "frontend/chat-gpt.mdx"
+    },
     "system-designs/frontend/design-google-calendar-frontend-system-design.mdx": {
       "hash": "09f4bb99c8b1f9942a49adb89c8a76136945e369d7daf4bb9de0723d755a99f1",
       "docRelative": "frontend/design-google-calendar-frontend-system-design.mdx"
     },
     "system-designs/frontend/google-docs-design.mdx": {
-      "hash": "a36dae6b0fec571d3061057d2f5b023297c43d451b126d9971a8a5e6a5c1452a",
+      "hash": "1194fe63d27b5029678bb449f5190a672ee7225382fd45af81ba13c74fa3e7c1",
       "docRelative": "frontend/google-docs-design.mdx"
     },
     "system-designs/frontend/masonry-layout-system-design.mdx": {
@@ -60,16 +88,28 @@
       "hash": "fac94f28ceebe154ca2a1380d890b1854fb299bee71ba1714c06062c5b03ebce",
       "docRelative": "frontend/rich-text-editor.mdx"
     },
+    "system-designs/frontend/sandboxed-cloud-ide-system-design.mdx": {
+      "hash": "d49e1ec6bd4c85ae2a3388bc4c2edfa214763e3e85c1755f30f8f528abbae38b",
+      "docRelative": "frontend/sandboxed-cloud-ide-system-design.mdx"
+    },
     "system-designs/frontend/theme-design.mdx": {
       "hash": "30afca243578d61286a7b2ffc0e5e101d0891579a3cf56abf4a5cf3d6645a9a5",
       "docRelative": "frontend/theme-design.mdx"
     },
+    "system-designs/frontend/video-netflix.mdx": {
+      "hash": "288e43e05ea91602f1467b434ec5b63d58e08b988fd11fe9cc92698d92f875a1",
+      "docRelative": "frontend/video-netflix.mdx"
+    },
+    "system-designs/frontend/websocket-vs.SSE-vs.polling.mdx": {
+      "hash": "d8b37039d10af746d892ec4cca5de73610e5e63b48763ac79d395acff55c0ad2",
+      "docRelative": "frontend/websocket-vs.SSE-vs.polling.mdx"
+    },
     "__nav__:backend": {
-      "hash": "952c7182c501f8fd102d76a08f227034a88b37891f3c4d278315577ffd5efb7d",
+      "hash": "755dd0b74eb68b3c8b585b9f606789b645fa0fec3dc78e302a4f0309fdeefc85",
       "docRelative": "backend/_index.mdx"
     },
     "__nav__:frontend": {
-      "hash": "ec6be56781e39fdebe8fbea8557024500815b5f0a120261f6e196378594e67d5",
+      "hash": "ef8f06966eacf0b50af7849b72c99b2282b225b060f98a7dfebf4f47ba6ddb1a",
       "docRelative": "frontend/_index.mdx"
     }
   }

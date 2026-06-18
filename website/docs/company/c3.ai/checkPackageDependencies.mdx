@@ -1,0 +1,87 @@
+---
+title: checkPackageDependencies
+---
+
+# checkPackageDependencies
+
+~~~javascript
+/**
+ * Interview Question:
+ * Given a package dependency graph, return all transitive dependencies for a
+ * requested package.
+ *
+ * Example:
+ * A depends on B, C, D
+ * B depends on E, F
+ * C depends on E, D
+ * E depends on K
+ *
+ * getDependencies("A") -> ["B", "E", "K", "F", "C", "D"]
+ *
+ * Requirements:
+ * - Include direct and indirect dependencies
+ * - Avoid adding duplicate dependencies to the result
+ * - Detect circular dependencies, for example A -> B -> A
+ * - Return an empty list when a package has no dependencies
+ *
+ * Answer:
+ * Treat the package map as a directed graph and use DFS. For each dependency,
+ * add it to the result if it has not already been seen, then recursively visit
+ * that dependency's children. Track the current ancestor path to detect cycles.
+ *
+ * Complexity:
+ * O(P + D) time, where P is number of packages visited and D is dependency
+ * edges traversed. O(P) space for recursion/path/result tracking.
+ */
+
+const packages = {
+  "A": ["B", "C", "D"],
+  "B": ["E", "F"],
+  "C": ["E", "D"],
+  "E": ["K"]
+};
+
+export default function getDependencies(_package) {
+  const result = [];
+  const added = new Set();
+  const visited = new Set();
+  const visiting = new Set();
+
+  function dfs(packageName) {
+    if (visiting.has(packageName)) {
+      return false;
+    }
+
+    if (visited.has(packageName)) {
+      return true;
+    }
+
+    visiting.add(packageName);
+
+    const dependencies = packages[packageName] || [];
+
+    for (const dependency of dependencies) {
+      if (!added.has(dependency)) {
+        added.add(dependency);
+        result.push(dependency);
+      }
+
+      if (!dfs(dependency)) {
+        return false;
+      }
+    }
+
+    visiting.delete(packageName);
+    visited.add(packageName);
+
+    return true;
+  }
+
+  return dfs(_package) ? result : false;
+}
+
+console.log(getDependencies("A"));
+
+// [ 'B', 'E', 'K', 'F', 'C', 'D' ]
+
+~~~
