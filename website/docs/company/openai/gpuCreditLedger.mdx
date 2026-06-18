@@ -1,0 +1,188 @@
+---
+title: gpuCreditLedger
+---
+
+# gpuCreditLedger
+
+~~~javascript
+/**
+ * Interview question: GPU Credit Ledger
+ *
+ * Build an in-memory ledger that tracks GPU credits for multiple tenants.
+ * Each event contains:
+ *
+ * [eventId, tenantId, delta]
+ *
+ * A positive delta adds credits and a negative delta spends credits. An event
+ * must be rejected if applying it would make the tenant's balance negative.
+ *
+ * The ledger must also be idempotent. Replaying the same `eventId` returns the
+ * event's original result without changing any balance again.
+ *
+ * Operations:
+ * - ["get", tenantId]: return the tenant's current balance.
+ * - ["apply", [eventId, tenantId, delta]]: apply an event and return true or
+ *   false.
+ *
+ * Important assumptions:
+ * - Event IDs are globally unique across all tenants.
+ * - A repeated event ID represents the same logical event.
+ * - Reusing an event ID with a different tenant or delta still returns the
+ *   original result; the new payload is ignored.
+ * - Initial events are processed in order and use the same validation and
+ *   idempotency rules as later events.
+ * - Results from initial events are not included in the returned array.
+ *
+ * Approach:
+ * - Store the current balance for each tenant in a Map.
+ * - Store every event ID's accepted or rejected result in another Map.
+ * - Check the event-result Map before evaluating or applying an event.
+ * - Reject and remember any event that would produce a negative balance.
+ *
+ * Complexity:
+ * - Apply event: O(1) average time.
+ * - Get balance: O(1) average time.
+ * - Space: O(t + e), where t is the number of tenants and e is the number of
+ *   unique event IDs.
+ *
+ * @param {Array<[string, string, number]>} initEvents
+ * @param {Array<["get", string] | ["apply", [string, string, number]]>} operations
+ * @returns {Array<number | boolean>}
+ */
+export default function initLedger(initEvents, operations) {
+  const balances = new Map(); // tenantId -> current GPU-credit balance
+  const eventResults = new Map(); // eventId -> original accepted/rejected result
+
+  function applyEvent(event) {
+    const [eventId, tenantId, delta] = event;
+
+    // Return the original decision without applying a duplicate event twice.
+    if (eventResults.has(eventId)) {
+      return eventResults.get(eventId);
+    }
+
+    const currentBalance = balances.get(tenantId) ?? 0;
+    const nextBalance = currentBalance + delta;
+
+    // Record rejected events too, so retrying one remains idempotently rejected.
+    if (nextBalance < 0) {
+      eventResults.set(eventId, false);
+      return false;
+    }
+
+    // The event is valid, so commit both its balance change and result.
+    balances.set(tenantId, nextBalance);
+    eventResults.set(eventId, true);
+    return true;
+  }
+
+  // Seed the ledger without adding initialization results to the output.
+  for (const event of initEvents) {
+    applyEvent(event);
+  }
+
+  const result = [];
+
+  for (const op of operations) {
+    const [type, payload] = op;
+
+    if (type === 'get') {
+      const tenantId = payload;
+      result.push(balances.get(tenantId) ?? 0);
+    } else if (type === 'apply') {
+      const event = payload;
+      result.push(applyEvent(event));
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Test case 1: add, spend, and read GPU credits
+ *
+ * Input:
+ * initLedger(
+ *   [["event-1", "tenant-a", 100]],
+ *   [
+ *     ["get", "tenant-a"],
+ *     ["apply", ["event-2", "tenant-a", -40]],
+ *     ["get", "tenant-a"],
+ *   ],
+ * )
+ *
+ * Output: [100, true, 60]
+ */
+
+/**
+ * Test case 2: reject a debit that would make the balance negative
+ *
+ * Input:
+ * initLedger(
+ *   [["event-1", "tenant-a", 30]],
+ *   [
+ *     ["apply", ["event-2", "tenant-a", -50]],
+ *     ["get", "tenant-a"],
+ *   ],
+ * )
+ *
+ * The rejected event does not change the balance.
+ *
+ * Output: [false, 30]
+ */
+
+/**
+ * Test case 3: replaying an accepted event does not apply it twice
+ *
+ * Input:
+ * initLedger(
+ *   [],
+ *   [
+ *     ["apply", ["event-1", "tenant-a", 25]],
+ *     ["apply", ["event-1", "tenant-a", 25]],
+ *     ["get", "tenant-a"],
+ *   ],
+ * )
+ *
+ * Output: [true, true, 25]
+ */
+
+/**
+ * Test case 4: replaying a rejected event returns the same rejection
+ *
+ * Input:
+ * initLedger(
+ *   [],
+ *   [
+ *     ["apply", ["event-1", "tenant-a", -10]],
+ *     ["apply", ["event-1", "tenant-a", 100]],
+ *     ["get", "tenant-a"],
+ *   ],
+ * )
+ *
+ * The second payload is ignored because `event-1` was already rejected.
+ *
+ * Output: [false, false, 0]
+ */
+
+/**
+ * Test case 5: tenants have independent balances
+ *
+ * Input:
+ * initLedger(
+ *   [
+ *     ["event-1", "tenant-a", 100],
+ *     ["event-2", "tenant-b", 50],
+ *   ],
+ *   [
+ *     ["apply", ["event-3", "tenant-a", -20]],
+ *     ["get", "tenant-a"],
+ *     ["get", "tenant-b"],
+ *     ["get", "missing-tenant"],
+ *   ],
+ * )
+ *
+ * Output: [true, 80, 50, 0]
+ */
+
+~~~
