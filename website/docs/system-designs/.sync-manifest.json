@@ -20,6 +20,10 @@
       "hash": "5f7d52ded9e724121f726355a02a21194b7607ffead8fd7fa186ee1ee18a9254",
       "docRelative": "google-docs.png"
     },
+    "system-designs/i18n.png": {
+      "hash": "fd6d2e9fd5a69d3c6947665db4ad8c5ba879e38af192f7896612c2b95d8c2583",
+      "docRelative": "i18n.png"
+    },
     "system-designs/newsfeed.png": {
       "hash": "7c32bed9378a970683aa76380ad349cac4434cec781db46acf6504823a8b8857",
       "docRelative": "newsfeed.png"
@@ -71,6 +75,10 @@
     "system-designs/google-docs-design.mdx": {
       "hash": "21ec09f8eb195fb1b48833b5e6fd8b134f0d66ea4212619caebf77390fe19633",
       "docRelative": "google-docs-design.mdx"
+    },
+    "system-designs/i18n-design.mdx": {
+      "hash": "19b247dbf720c63bcbab360fe12e3cfd6742d76ed9036c5d27665e1734787aef",
+      "docRelative": "i18n-design.mdx"
     },
     "system-designs/masonry-layout-system-design.mdx": {
       "hash": "1c8d4bb7f33b751429b77c3448c7694039d0112d39b27cc305067bd8dac94927",
