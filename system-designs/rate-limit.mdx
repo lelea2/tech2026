@@ -1,0 +1,564 @@
+---
+title: 'Rate Limiter System Design'
+description: 'Staff-level system design checklist for API and platform rate limiting'
+tags:
+  - backend-system-design
+  - distributed-systems
+  - rate-limiter
+  - api-gateway
+  - reliability
+---
+
+![Rate limiter component architecture and request flow](./rate-limiter.png)
+
+# Rate Limiter System Design
+
+## Interview Goal
+
+Design a rate limiter that protects APIs and backend systems from abusive,
+buggy, or unexpectedly high traffic while keeping legitimate users productive.
+
+At staff level, do more than name token bucket or Redis. Clarify the product
+policy, fairness model, consistency requirements, placement in the stack,
+failure behavior, operational controls, and how teams safely change limits over
+time.
+
+## Staff-Level Checklist
+
+- Clarify who or what is being limited: user, IP, tenant, API key, endpoint, or device.
+- Define hard limits, soft limits, burst limits, and quotas.
+- Choose algorithm by product behavior, not by memorized popularity.
+- Decide where rate limiting runs: client, edge, gateway, service, or background worker.
+- Design distributed counters and consistency trade-offs.
+- Define behavior during cache, Redis, region, or config failures.
+- Return useful response headers and retry guidance.
+- Protect high-value resources such as login, search, LLM inference, media upload, and writes.
+- Support tiered plans, overrides, allowlists, and emergency blocks.
+- Add observability for denied traffic, near-limit users, and false positives.
+- Make config changes safe through versioning, audit logs, canaries, and rollback.
+
+## 1. Clarify Requirements
+
+### Functional requirements
+
+- Allow or reject a request according to configured limits.
+- Support multiple dimensions such as user ID, API key, tenant ID, IP, route, and region.
+- Support different limits by endpoint and customer tier.
+- Allow short bursts while controlling long-term average rate.
+- Return retry information when a request is rejected.
+- Expose administrative controls for overrides, blocks, and emergency changes.
+- Emit metrics and audit logs for accepted and rejected decisions.
+
+### Non-functional requirements
+
+- Low decision latency, usually single-digit milliseconds at the gateway.
+- Highly available and safe under dependency failures.
+- Horizontally scalable across gateways and regions.
+- Resistant to key explosion and high-cardinality attacks.
+- Predictable behavior for legitimate users near the limit.
+- Configurable without deploying application code.
+- Auditable because rate limits directly affect customer access.
+
+### Questions to ask
+
+- Are we protecting a public API, internal API, login flow, or expensive compute resource?
+- Should limits be strict or approximate?
+- What is the request volume and peak QPS?
+- Is traffic global and multi-region?
+- Are limits per user, tenant, IP, API key, route, or a combination?
+- Do paid tiers get different limits?
+- What should happen if the limiter store is unavailable?
+- Is it acceptable to temporarily over-allow during outages?
+- Do we need monthly quota, per-minute rate, and burst control?
+- Are denied requests billable or visible in analytics?
+
+## 2. Product Policy Comes First
+
+Rate limiting is product policy expressed as infrastructure.
+
+Examples:
+
+```text
+Free user:
+  60 requests per minute
+  burst up to 10 requests
+  10,000 requests per month
+
+Enterprise tenant:
+  5,000 requests per minute
+  burst up to 500 requests
+  custom monthly quota
+
+Login endpoint:
+  5 attempts per minute per account
+  20 attempts per hour per IP block
+```
+
+Define:
+
+- What entity is being protected.
+- What entity is being limited.
+- What time window matters.
+- Whether burst traffic is allowed.
+- Whether the decision must be globally strict.
+- Whether legitimate traffic should degrade or be blocked.
+
+## 3. Common Algorithms
+
+### Fixed window counter
+
+Counts requests in a fixed interval, such as one minute.
+
+```text
+key = user:123:/search:2026-06-19T10:42
+count <= limit
+```
+
+Advantages:
+
+- Simple and cheap.
+- Easy to implement with atomic increment and TTL.
+- Works well for coarse quotas.
+
+Disadvantages:
+
+- Boundary burst problem: a user can send limit requests at the end of one
+  window and limit requests at the start of the next.
+
+Use for:
+
+- Daily or monthly quotas.
+- Simple low-risk endpoints.
+- Internal systems where precision is not critical.
+
+### Sliding window log
+
+Stores timestamps for each request and removes expired entries.
+
+Advantages:
+
+- Accurate rolling-window behavior.
+- Easy to reason about.
+
+Disadvantages:
+
+- Memory grows with request volume.
+- Expensive for high-QPS users.
+
+Use for:
+
+- Low-volume but high-value actions such as password reset or account creation.
+- Interview clarity when exact behavior matters.
+
+### Sliding window counter
+
+Approximates a rolling window by weighting the previous fixed window.
+
+```text
+estimated = currentWindowCount + previousWindowCount * overlapRatio
+```
+
+Advantages:
+
+- Lower memory than timestamp logs.
+- Smoother than fixed windows.
+
+Disadvantages:
+
+- Approximate.
+- More complex than fixed windows.
+
+Use for:
+
+- API gateway limits where small approximation is acceptable.
+
+### Token bucket
+
+Tokens refill at a configured rate up to a maximum capacity. Each request
+consumes one or more tokens.
+
+Advantages:
+
+- Supports bursts naturally.
+- Controls long-term average rate.
+- Common fit for APIs.
+
+Disadvantages:
+
+- Requires careful distributed state management.
+- Users may experience bursty accept/reject behavior near empty bucket.
+
+Use for:
+
+- General API limits.
+- Expensive operations with weighted costs.
+- User or tenant traffic shaping.
+
+### Leaky bucket
+
+Requests enter a queue and drain at a fixed rate.
+
+Advantages:
+
+- Smooths traffic.
+- Useful when downstream systems prefer steady load.
+
+Disadvantages:
+
+- Adds queueing latency.
+- Requires queue length, timeout, and backpressure decisions.
+
+Use for:
+
+- Background jobs.
+- Webhook delivery.
+- Systems where smoothing is better than immediate rejection.
+
+## 4. Where to Apply Rate Limits
+
+### Client-side hints
+
+- Useful for reducing accidental traffic.
+- Cannot be trusted for enforcement.
+
+### Edge or CDN
+
+- Best for IP-based abuse, bots, and volumetric traffic.
+- Very low latency and protects origin.
+- Has limited user context unless tokens are inspected.
+
+### API gateway
+
+- Good default for authenticated API limits.
+- Centralizes policy across services.
+- Can return consistent headers and error formats.
+
+### Service-level limiter
+
+- Required for resource-specific limits.
+- Knows domain context, such as model type, upload size, or account risk.
+- Should complement, not replace, gateway protection.
+
+### Background workers
+
+- Useful for queues and asynchronous workloads.
+- Can smooth downstream calls and third-party API usage.
+
+Staff-level answer: apply layered limits. A login endpoint, for example, may
+need IP, account, device, and tenant-level protections at different layers.
+
+## 5. High-Level Architecture
+
+```text
+Client
+  |
+Edge / CDN
+  |  IP and bot protection
+  v
+API Gateway
+  |  user, API key, tenant, route limits
+  v
+Service
+  |  domain-specific limits and weighted costs
+  v
+Backend dependency
+```
+
+Shared components:
+
+```text
+Rate Limit Config Service
+  -> versioned policies
+  -> rollout and override controls
+
+Decision Engine
+  -> parses identity and route
+  -> builds limit keys
+  -> evaluates algorithm
+  -> returns allow, deny, or degrade
+
+Counter Store
+  -> Redis, distributed cache, local memory, or durable quota store
+
+Telemetry Pipeline
+  -> metrics, audit logs, abuse signals, billing events
+```
+
+## 6. Data Model and Keys
+
+Example rate-limit key:
+
+```text
+tenant:{tenantId}:user:{userId}:route:{routeGroup}:minute
+```
+
+Avoid raw unbounded values in keys without normalization. Attackers can create
+many unique keys and exhaust memory.
+
+Key dimensions:
+
+- Tenant ID.
+- User ID.
+- API key.
+- IP or IP prefix.
+- Device ID.
+- Route group.
+- HTTP method.
+- Region.
+- Model or resource class.
+
+Use route groups instead of exact URLs when URLs contain IDs or query strings.
+
+## 7. Distributed Counter Design
+
+### Centralized store
+
+Use Redis or another low-latency atomic counter store.
+
+Advantages:
+
+- Simple mental model.
+- Stronger cross-gateway consistency.
+- Easy to inspect and reset.
+
+Disadvantages:
+
+- Adds network latency to every decision.
+- Store outage can affect all traffic.
+- Hot keys can overload one shard.
+
+### Local counters with periodic sync
+
+Each gateway keeps local counters and syncs periodically.
+
+Advantages:
+
+- Very fast and highly available.
+- Survives remote store latency.
+
+Disadvantages:
+
+- Approximate global limits.
+- Can over-allow under high concurrency or outages.
+
+### Sharded quotas
+
+Pre-allocate part of a global limit to each region or gateway.
+
+Advantages:
+
+- Lower coordination cost.
+- Bounds over-allowing.
+
+Disadvantages:
+
+- Unused quota in one shard may not help another shard.
+- Requires rebalancing.
+
+### Hybrid approach
+
+- Use local in-memory buckets for low-latency burst decisions.
+- Reconcile against a shared store for stronger long-term limits.
+- Use strict central checks for high-risk actions.
+
+This is often the staff-level answer: match consistency cost to risk.
+
+## 8. Multi-Region Behavior
+
+Questions:
+
+- Is a user's limit global or region-local?
+- Can requests from the same user hit multiple regions at once?
+- Is temporary overage acceptable?
+- How quickly must config changes propagate?
+
+Options:
+
+1. Route each user or tenant to a home region.
+2. Use globally replicated counters with higher latency.
+3. Allocate regional quota slices.
+4. Accept approximate regional limits and enforce strict monthly quota later.
+
+For public APIs, approximate per-minute regional enforcement plus strict
+billing/quota reconciliation is often reasonable. For login abuse or financial
+actions, stricter coordination may be required.
+
+## 9. Failure Modes
+
+| Failure                    | Possible behavior                                      |
+| -------------------------- | ------------------------------------------------------ |
+| Counter store unavailable  | Fail open, fail closed, or use local fallback          |
+| Config service unavailable | Continue using last known good config                  |
+| Redis shard hot            | Split keys, add local cache, or shard by subkey        |
+| Gateway restarts           | Recover from shared store or accept local counter loss |
+| Region partition           | Enforce regional limits and reconcile later            |
+| Clock skew                 | Use store-side time or monotonic server time           |
+| Telemetry pipeline down    | Continue decisions and buffer/drop logs by policy      |
+
+### Fail open versus fail closed
+
+Fail open:
+
+- Better user availability.
+- Risk of abuse and downstream overload.
+
+Fail closed:
+
+- Protects infrastructure and sensitive endpoints.
+- Can cause broad customer-facing outage.
+
+Use risk-based behavior:
+
+- Fail closed for login brute force, payments, and dangerous mutations.
+- Fail open or degrade for low-risk read endpoints.
+- Use stale/local fallback for core product flows.
+
+## 10. Response Contract
+
+When rejecting a request:
+
+```http
+HTTP/1.1 429 Too Many Requests
+Retry-After: 12
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1718820020
+```
+
+Response body:
+
+```json
+{
+  "error": "rate_limited",
+  "message": "Too many requests. Try again in 12 seconds.",
+  "retryAfterSeconds": 12
+}
+```
+
+Staff-level detail:
+
+- Do not expose sensitive internal policy names.
+- Provide actionable retry information.
+- Make error formats consistent across APIs.
+- For streaming APIs, define whether limits are checked at start, per token,
+  or by weighted cost.
+
+## 11. Weighted Limits
+
+Not all requests cost the same.
+
+Examples:
+
+- `GET /profile`: 1 token.
+- `POST /search`: 5 tokens.
+- `POST /upload`: based on file size.
+- LLM request: based on input tokens, output tokens, model, and tools.
+
+Weighted token buckets are useful when protecting expensive resources. The
+limiter can reserve estimated cost upfront and adjust after completion if exact
+cost is only known later.
+
+## 12. Abuse and Fairness
+
+Rate limiting should separate:
+
+- accidental client bugs,
+- normal bursty use,
+- scraping,
+- credential stuffing,
+- spam,
+- denial-of-service traffic.
+
+Controls:
+
+- Per-IP and per-account limits.
+- Tenant-level aggregate limits.
+- Device or session limits.
+- Progressive challenges such as CAPTCHA.
+- Temporary blocks and risk scoring.
+- Allowlist for trusted internal systems.
+- Customer-specific overrides with expiration.
+
+Fairness questions:
+
+- Can one user consume all tenant quota?
+- Should background tasks be lower priority than interactive requests?
+- Should paid users get reserved capacity?
+- Should retries count against the limit?
+
+## 13. Observability
+
+Track:
+
+- Allowed and denied decisions by key type, route, tenant, and region.
+- Near-limit users and tenants.
+- Store latency and error rate.
+- Config version used for each decision.
+- Hot keys and key cardinality.
+- Estimated over-allow during fallback mode.
+- False-positive reports and customer escalations.
+- Downstream saturation despite accepted traffic.
+- 429 rate correlated with product conversion or task success.
+
+Logs should include decision metadata but avoid sensitive raw identifiers when
+possible. Hash or tokenize keys where appropriate.
+
+## 14. Configuration and Operations
+
+Rate-limit configuration should be:
+
+- Versioned.
+- Audited.
+- Validated before rollout.
+- Tested in shadow mode.
+- Rollable by region, tenant, route, and percentage.
+- Revertible quickly.
+
+Support:
+
+- Dry-run mode that logs would-be denies without blocking.
+- Emergency global blocks.
+- Temporary customer overrides.
+- Expiring allowlist entries.
+- Policy simulation from production traces.
+
+This is a staff-level operational point: the limiter will be changed often
+during incidents, launches, abuse events, and customer escalations.
+
+## 15. Testing Strategy
+
+- Unit-test each algorithm and boundary condition.
+- Test distributed concurrency and duplicate requests.
+- Test burst behavior at window boundaries.
+- Test config rollout and rollback.
+- Test hot-key and high-cardinality attacks.
+- Test Redis or counter-store outages.
+- Test multi-region partitions.
+- Load-test gateway decision latency.
+- Validate `Retry-After` and rate-limit headers.
+- Shadow-test policies before enforcement.
+- Chaos-test fallback behavior.
+
+## 16. Important Trade-offs
+
+1. Strict global limits versus latency and availability.
+2. Fail open versus fail closed.
+3. Token bucket burstiness versus leaky bucket smoothing.
+4. Centralized counters versus local approximations.
+5. Per-user fairness versus tenant-level simplicity.
+6. Low cardinality keys versus precise policy.
+7. Exact analytics versus low decision latency.
+8. Dynamic configuration versus operational risk.
+9. Customer experience versus infrastructure protection.
+10. Blocking abuse versus avoiding false positives.
+
+## Interview Closing Summary
+
+Start by defining the policy: who is limited, what resource is protected, and
+what behavior is acceptable near or above the limit. Then choose the algorithm
+and placement.
+
+A strong staff-level design uses layered enforcement, low-latency counters,
+safe configuration, risk-based failure modes, clear `429` responses, and
+observability that detects both abuse and false positives. The best answer
+shows care for product experience as much as infrastructure protection.

@@ -24,6 +24,10 @@
       "hash": "7c32bed9378a970683aa76380ad349cac4434cec781db46acf6504823a8b8857",
       "docRelative": "newsfeed.png"
     },
+    "system-designs/rate-limiter.png": {
+      "hash": "3e345492223338e5e3cc87a55e5f89f6e8caf4865f8c40e791d0ae9100c0ad45",
+      "docRelative": "rate-limiter.png"
+    },
     "system-designs/richtexteditor.png": {
       "hash": "592701c33e1c48937a82965d23d439d3ee486403cb4a542bb40003df2e51c187",
       "docRelative": "richtexteditor.png"
@@ -83,6 +87,10 @@
     "system-designs/prompt-playground.mdx": {
       "hash": "42a5e21e9187bc1b291f3034a3bc2d0f6010d85dc36421f7cacbe3a696bd4357",
       "docRelative": "prompt-playground.mdx"
+    },
+    "system-designs/rate-limit.mdx": {
+      "hash": "9b24adaeea69d12ce1a5b084e3c886fc0eab015397af3635edb98fd36ee6182b",
+      "docRelative": "rate-limit.mdx"
     },
     "system-designs/rich-text-editor.mdx": {
       "hash": "1f4b99640db4dbe0431904c36064c02057032385337eb643f4bcc911f50a6cf3",
