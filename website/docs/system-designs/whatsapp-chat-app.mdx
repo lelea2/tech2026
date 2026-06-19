@@ -1,0 +1,722 @@
+---
+title: 'WhatsApp-Style Chat Application System Design'
+description: 'Staff-level frontend and backend system design guide for a reliable private messaging product'
+tags:
+  - system-design
+  - frontend-system-design
+  - backend-system-design
+  - chat
+  - websockets
+  - distributed-systems
+---
+
+![Whatsapp docs architecture and request flow](./whatsapp-chat.png)
+
+# WhatsApp-Style Chat Application System Design
+
+## Interview Goal
+
+Design a private messaging product supporting one-to-one conversations, group
+chat, media attachments, delivery receipts, presence, offline delivery, and
+multiple devices.
+
+At staff level, connect frontend and backend decisions to product outcomes:
+
+- Messages should feel immediate.
+- Accepted messages should not silently disappear.
+- Retries should not create duplicates.
+- Conversation ordering should be understandable.
+- Offline and weak-network behavior should be intentional.
+- Private content should remain protected.
+- Optional features should not make core messaging unavailable.
+
+This is a conceptual design for a WhatsApp-style product, not a description of
+any company's private implementation.
+
+## Staff-Level Checklist
+
+### Frontend
+
+- Conversation list, message timeline, composer, and media flows.
+- Optimistic sending and explicit message state.
+- WebSocket lifecycle, reconnect, resume, and deduplication.
+- Offline outbox and local persistence.
+- Pagination, virtualization, scroll anchoring, and unread markers.
+- Multi-device synchronization and conflict handling.
+- Accessibility, localization, and weak-device performance.
+
+### Backend
+
+- Connection gateway and session management.
+- Durable message acceptance and idempotency.
+- Conversation sequencing and delivery fan-out.
+- Offline inboxes, push notifications, and receipts.
+- Group membership and authorization.
+- Media upload and download pipeline.
+- Multi-region routing, storage, and disaster recovery.
+- End-to-end encryption and metadata minimization.
+- Abuse controls, observability, and capacity planning.
+
+### Product
+
+- Define what sent, delivered, and read actually mean.
+- Prioritize messaging over presence, typing, and analytics.
+- Design graceful behavior for poor networks and low-end devices.
+- Provide transparent privacy and safety controls.
+- Protect users from spam without weakening private communication.
+- Roll out protocol changes without abandoning older clients.
+
+## 1. Clarify Requirements
+
+### Functional requirements
+
+- Register and authenticate users.
+- Start one-to-one and group conversations.
+- Send text, emoji, reactions, replies, and edits when supported.
+- Upload images, video, audio, and documents.
+- Show sent, delivered, and read states.
+- Show typing and online presence when privacy settings allow it.
+- Deliver messages to temporarily offline users.
+- Synchronize history across a user's linked devices.
+- Send push notifications to backgrounded or disconnected devices.
+- Search local or server-visible metadata according to the privacy model.
+- Block and report abusive users.
+
+### Non-functional requirements
+
+- Low perceived send latency.
+- Durable acceptance of messages.
+- At-least-once transport with effective exactly-once user experience.
+- Deterministic ordering within a conversation.
+- High availability under regional or dependency failures.
+- Efficient operation on weak networks and low-memory devices.
+- Strong tenant and user isolation.
+- Privacy-preserving content and metadata handling.
+- Horizontal scale for connections, messages, groups, and media.
+
+### Questions to ask
+
+- Is end-to-end encryption required?
+- What does delivery mean: server accepted, recipient device received, or all devices received?
+- How many users and concurrent connections should we support?
+- What is the maximum group size?
+- How many linked devices can one user have?
+- Is full cross-device history required?
+- Are message edits and deletion supported?
+- What media types and maximum file sizes are required?
+- Is global multi-region operation required?
+- Are presence, read receipts, and search configurable for privacy?
+
+## 2. Define Product Semantics First
+
+Ambiguous product semantics create inconsistent implementations.
+
+### Message states
+
+```text
+draft
+  -> queued locally
+  -> sending
+  -> accepted by server
+  -> delivered to recipient device
+  -> read
+
+Any transient state may become failed or retrying.
+```
+
+Possible definitions:
+
+- **Queued:** stored in the sender's local outbox.
+- **Sent:** durably accepted by the messaging service.
+- **Delivered:** at least one recipient device acknowledged receipt.
+- **Read:** the recipient opened the conversation and acknowledged a read position.
+
+For groups, decide whether delivery and read status are per member, aggregated,
+or omitted above a size threshold.
+
+### Ordering
+
+Do not promise a meaningful global order across all conversations. A practical
+contract is:
+
+- The server assigns a monotonic sequence within each conversation.
+- The client preserves local optimistic order before acknowledgement.
+- Messages with the same timestamp are ordered by sequence or stable ID.
+- Late messages are inserted by server sequence without surprising scroll jumps.
+
+### Delivery guarantee
+
+Exactly-once transport is unrealistic across retries and failures. Build:
+
+- At-least-once delivery.
+- Stable client-generated message IDs.
+- Idempotent server acceptance.
+- Client and server deduplication.
+
+This produces an effectively exactly-once experience for users.
+
+## 3. Critical User Flows
+
+### Send a message
+
+1. Client creates a stable message ID.
+2. Message is written to the local outbox.
+3. UI renders it optimistically as queued or sending.
+4. Client sends it over WebSocket or an HTTP fallback.
+5. Gateway authenticates the device and validates the envelope.
+6. Messaging service verifies conversation membership.
+7. Message is durably stored and assigned a conversation sequence.
+8. Server acknowledges the sender.
+9. Fan-out delivers the message to recipient devices or offline inboxes.
+10. Recipient acknowledgements update delivery state.
+11. Push notifications are scheduled when necessary.
+
+### Receive after reconnecting
+
+1. Client reconnects with device ID and last acknowledged cursor.
+2. Server authenticates the session.
+3. Missing messages are fetched from the durable inbox or sync service.
+4. Client deduplicates by message ID.
+5. Client persists messages before advancing its acknowledgement cursor.
+6. Live delivery resumes after catch-up.
+
+### Upload media
+
+1. Client requests an upload session.
+2. Backend returns a short-lived signed upload URL.
+3. Client uploads directly to object storage.
+4. Media pipeline scans, validates, and creates derivatives.
+5. Client sends a message containing the encrypted media reference and metadata.
+6. Recipients download through a CDN using authorized URLs.
+
+## 4. High-Level Architecture
+
+```text
+Web / Mobile / Desktop Clients
+  |
+  +-- WebSocket: messages, receipts, presence, typing
+  +-- HTTPS: history, media sessions, account and group management
+  |
+Global Edge / Load Balancer
+  |
+  +-- Connection Gateway
+  +-- Authentication and Device Session Service
+  |
+Messaging Platform
+  |
+  +-- Message Acceptance Service
+  +-- Conversation Sequencer
+  +-- Delivery and Fan-out Service
+  +-- Offline Inbox / Sync Service
+  +-- Group and Membership Service
+  +-- Receipt Service
+  +-- Presence Service
+  +-- Push Notification Service
+  |
+Media Platform
+  |
+  +-- Upload Service
+  +-- Object Storage
+  +-- Scan / Transcode / Thumbnail Workers
+  +-- CDN
+  |
+Data Platform
+  |
+  +-- Message Store
+  +-- Conversation Metadata Store
+  +-- Device and Membership Store
+  +-- Event Stream
+  +-- Analytics and Abuse Systems
+```
+
+Separate durable messaging from ephemeral presence and typing. Messaging should
+continue if presence, analytics, media processing, or push notification systems
+are degraded.
+
+## 5. Frontend Architecture
+
+### Main modules
+
+| Module               | Responsibility                                                     |
+| -------------------- | ------------------------------------------------------------------ |
+| Conversation list    | Recent conversations, unread counts, and pagination                |
+| Message timeline     | Rendering, grouping, receipts, unread boundary, and virtualization |
+| Composer             | Drafts, attachments, replies, and send actions                     |
+| Connection manager   | WebSocket lifecycle, heartbeat, reconnect, and resume              |
+| Outbox               | Durable pending messages and retries                               |
+| Sync engine          | History catch-up, deduplication, and cursor management             |
+| Local database       | Conversations, messages, drafts, and media metadata                |
+| Media manager        | Uploads, downloads, thumbnails, and progress                       |
+| Notification manager | Foreground notifications and deep-link behavior                    |
+
+### State ownership
+
+Keep durable message state in a normalized local database rather than only in
+component state.
+
+```text
+conversationsById
+messagesById
+messageIdsByConversation
+outboxByMessageId
+syncCursorByConversation
+draftByConversation
+uploadByAttachmentId
+```
+
+React or the UI framework should subscribe to focused queries. Replacing a
+large message array on every receipt or token update causes unnecessary
+rendering.
+
+### Optimistic sending
+
+- Generate the message ID before network submission.
+- Persist the message and outbox entry atomically.
+- Render immediately with a queued state.
+- Reuse the same ID on every retry.
+- Replace temporary metadata with server sequence and timestamps after acknowledgement.
+- Expose manual retry for terminal failures.
+- Never silently remove a failed message.
+
+### Connection management
+
+The client should:
+
+- Authenticate the connection with a short-lived device token.
+- Send heartbeats and detect half-open connections.
+- Reconnect with exponential backoff and jitter.
+- Pause aggressive reconnecting when offline or backgrounded.
+- Resume from the last durable acknowledgement cursor.
+- Detect sequence gaps and request catch-up.
+- Refresh credentials without losing the local outbox.
+- Fall back to HTTPS submission when appropriate.
+
+### Message timeline performance
+
+- Load recent messages first and paginate backward.
+- Virtualize long conversations.
+- Preserve scroll position when older messages are prepended.
+- Anchor scrolling to stable message IDs.
+- Avoid auto-scrolling when the user reads older messages.
+- Show a new-message indicator instead.
+- Reserve media dimensions to prevent layout shift.
+- Lazy-load media and expensive message types.
+
+### Offline behavior
+
+- Store drafts and queued messages locally.
+- Allow text composition without connectivity.
+- Clearly distinguish queued, retrying, and failed states.
+- Resume uploads when feasible.
+- Reconcile acknowledgements and remote messages after reconnecting.
+- Bound storage and provide predictable cleanup behavior.
+
+## 6. Backend Message Acceptance
+
+The write path should be short and durable:
+
+```text
+1. Authenticate user and device.
+2. Validate message size and schema.
+3. Verify active conversation membership.
+4. Check idempotency by sender device and message ID.
+5. Assign conversation sequence.
+6. Persist the message and acceptance result.
+7. Acknowledge the sender.
+8. Publish a durable delivery event.
+```
+
+Avoid acknowledging a message before it reaches durable storage or a replicated
+log that can recover the write.
+
+Use an outbox pattern, transactional log, or change-data capture so persistence
+and delivery publication cannot diverge silently.
+
+## 7. Message Data Model
+
+```text
+Message
+  conversation_id
+  sequence
+  message_id
+  sender_user_id
+  sender_device_id
+  client_created_at
+  server_accepted_at
+  type
+  encrypted_payload
+  attachment_refs[]
+  reply_to_message_id
+  status
+```
+
+```text
+Conversation
+  conversation_id
+  type: direct | group
+  created_at
+  latest_sequence
+  membership_version
+```
+
+```text
+DeviceCursor
+  device_id
+  conversation_id
+  last_delivered_sequence
+  last_read_sequence
+```
+
+Partition messages by conversation ID, with sequence as the clustering key.
+This supports ordered range reads and pagination within a conversation.
+
+Very large groups may require additional partitioning to prevent one hot
+conversation from overwhelming a shard.
+
+## 8. Fan-Out Strategy
+
+### Fan-out on write
+
+Create delivery entries for every recipient device when a message is accepted.
+
+Advantages:
+
+- Fast recipient reads.
+- Simple offline inbox consumption.
+
+Disadvantages:
+
+- Expensive for large groups.
+- Membership and device fan-out can amplify writes significantly.
+
+### Fan-out on read
+
+Store one conversation message and let recipients query new sequences.
+
+Advantages:
+
+- Lower write amplification.
+- Better for very large groups or channels.
+
+Disadvantages:
+
+- More expensive reads.
+- Requires efficient membership and cursor queries.
+
+### Hybrid approach
+
+- Fan out direct messages and small groups on write.
+- Use shared logs and per-user cursors for large groups.
+- Select strategy by group size and activity.
+
+## 9. Group Membership
+
+Group operations need a clear versioned membership model:
+
+- Add and remove members.
+- Promote and demote administrators.
+- Leave a group.
+- Change group metadata.
+- Enforce maximum size.
+
+Every message should be authorized against the relevant membership version.
+Define whether a removed member can receive messages accepted concurrently with
+removal and whether a newly added member receives prior history.
+
+Under end-to-end encryption, membership changes may require encryption-key
+rotation and distribution to remaining devices.
+
+## 10. Multi-Device Synchronization
+
+Treat each linked device as an independent delivery endpoint:
+
+- Each device has authentication credentials and delivery cursors.
+- Sender messages are synchronized to the sender's other devices.
+- New devices require an explicit history-transfer or server-sync policy.
+- Device revocation should stop future delivery quickly.
+- Receipts should identify device or aggregate to user-level product semantics.
+
+Avoid assuming one user's devices are always online simultaneously.
+
+## 11. Presence and Typing
+
+Presence and typing are ephemeral:
+
+- Keep them in memory or a short-lived distributed store.
+- Use leases and heartbeats.
+- Throttle and coalesce updates.
+- Drop stale events rather than queueing them indefinitely.
+- Enforce privacy settings before subscription.
+- Degrade silently when the presence service is unavailable.
+
+Do not put presence updates into the durable message log.
+
+## 12. Receipts
+
+Model receipts as monotonic cursors when possible:
+
+```text
+recipient device D has delivered through sequence 428
+recipient user U has read through sequence 421
+```
+
+This is more compact than storing one receipt row per message.
+
+Requirements:
+
+- Receipt updates must never move backward.
+- Duplicate updates should be harmless.
+- Privacy settings may disable read receipts.
+- Group receipt detail may be bounded or summarized.
+- Receipt failure must not block message delivery.
+
+## 13. Media Pipeline
+
+- Upload directly to object storage with short-lived signed URLs.
+- Validate size, type, and checksums.
+- Scan content according to product policy.
+- Generate thumbnails and compatible derivatives asynchronously.
+- Encrypt media with per-object keys for end-to-end encrypted products.
+- Deliver through a CDN.
+- Use resumable and chunked uploads for large files.
+- Allow text messages to send even when attachments fail.
+- Expire abandoned uploads.
+
+Do not route large media bytes through WebSocket messaging servers.
+
+## 14. End-to-End Encryption
+
+With end-to-end encryption:
+
+- Clients encrypt message content before upload.
+- Servers route ciphertext and cannot inspect plaintext.
+- Devices manage identity keys and session keys.
+- Group membership changes require secure key updates.
+- New-device linking requires a trusted verification flow.
+- Backups need a separate encryption and recovery design.
+
+Product trade-offs:
+
+- Server-side full-text search becomes unavailable or limited.
+- Content moderation relies more on metadata, user reports, and client-side signals.
+- Lost keys may mean unrecoverable history.
+- Multi-device synchronization and backup restoration become more complex.
+
+Be precise: transport encryption protects network traffic, while end-to-end
+encryption prevents intermediaries, including the service, from reading content.
+
+## 15. Multi-Region Design
+
+Possible routing model:
+
+- Assign each conversation or user a home region.
+- Route message writes to the authoritative region.
+- Maintain connections at nearby edges.
+- Forward accepted messages through the backbone to recipient regions.
+- Replicate durable logs for disaster recovery.
+
+Trade-offs:
+
+- A single conversation authority simplifies ordering.
+- Cross-region writes increase latency.
+- Active-active sequencing is more complex.
+- Regional failover must prevent conflicting sequence assignments.
+
+During a home-region outage, choose explicitly between:
+
+- Temporarily delaying writes to preserve ordering.
+- Failing over with a consensus or lease transfer.
+- Accepting limited local writes that require later reconciliation.
+
+## 16. Push Notifications
+
+Push is a wake-up hint, not the source of truth:
+
+- Trigger push after durable message acceptance.
+- Suppress it when the target device is actively connected to the conversation.
+- Avoid including sensitive plaintext on locked screens by default.
+- Collapse notifications when providers support it.
+- Retry provider failures asynchronously.
+- Fetch authoritative messages from the sync service after wake-up.
+
+Messaging must still work when APNs, FCM, or another push provider is delayed.
+
+## 17. Reliability and Failure Handling
+
+| Failure                               | Expected behavior                                      |
+| ------------------------------------- | ------------------------------------------------------ |
+| Sender loses connection after sending | Retry with the same message ID                         |
+| Duplicate submission arrives          | Return the original acceptance result                  |
+| Recipient is offline                  | Persist delivery state and notify later                |
+| WebSocket sequence gap appears        | Pause live application and fetch missing messages      |
+| Presence service fails                | Continue messaging without presence                    |
+| Push provider fails                   | Queue or retry notification; message remains available |
+| Media processing fails                | Preserve text and show attachment failure              |
+| One region fails                      | Route according to the conversation failover policy    |
+| Receipt is duplicated                 | Apply monotonic cursor update idempotently             |
+| Analytics pipeline fails              | Buffer or drop by policy; never block messages         |
+
+Retries should be bounded and jittered. Backpressure should protect overloaded
+gateways, brokers, stores, and recipient devices.
+
+## 18. Security, Privacy, and Abuse
+
+- Authenticate users and individual devices.
+- Authorize every conversation and group action.
+- Rotate and revoke device credentials.
+- Rate-limit registration, messaging, group invitations, and media uploads.
+- Detect spam campaigns and automated abuse using privacy-aware metadata.
+- Support block, report, leave, and invitation controls.
+- Protect contact discovery from enumeration.
+- Minimize retention of IP addresses and unnecessary social-graph metadata.
+- Keep administrative access auditable.
+- Design legal and safety workflows that match the encryption model.
+
+User reports should contain only the information users intentionally submit,
+especially in an end-to-end encrypted product.
+
+## 19. Capacity Planning
+
+Estimate:
+
+- Daily and peak active users.
+- Concurrent connections.
+- Messages per user per day.
+- Peak messages per second.
+- Average message-envelope size.
+- Average devices per user.
+- Direct versus group-message ratio.
+- Fan-out amplification.
+- Media uploads and CDN bandwidth.
+- Offline retention duration.
+- Receipt, presence, and typing-event volume.
+
+Connection capacity and message throughput are different dimensions. A gateway
+may hold millions of mostly idle connections but process far fewer messages per
+second.
+
+## 20. Observability
+
+### Product quality metrics
+
+- Send success rate.
+- Time from local send to server acceptance.
+- Time from acceptance to recipient delivery.
+- Offline catch-up latency.
+- Duplicate-message and ordering anomaly rates.
+- Failed and retried message rate.
+- Media upload success and completion time.
+- Crash-free and reconnect-success rates.
+
+### Service metrics
+
+- Concurrent connections and reconnect storms.
+- Gateway CPU, memory, and outbound buffer depth.
+- Message-store write and read latency.
+- Broker lag and fan-out queue depth.
+- Hot conversations and partitions.
+- Push-provider latency and failures.
+- Regional replication lag.
+
+Trace with message, conversation, device, and request IDs while avoiding
+plaintext content and sensitive relationship data.
+
+## 21. Accessibility and Inclusive Product Design
+
+- Make the conversation list and timeline keyboard navigable.
+- Announce new messages without overwhelming screen-reader users.
+- Provide accessible names for media and icon controls.
+- Support text scaling and large touch targets.
+- Do not rely only on color for delivery state.
+- Respect reduced-motion preferences.
+- Design for right-to-left languages and locale-specific timestamps.
+- Provide captions or transcripts for supported media where possible.
+- Test on low-memory devices and poor networks.
+
+## 22. Testing Strategy
+
+- Unit-test message state transitions and outbox retry behavior.
+- Contract-test WebSocket events and version compatibility.
+- Test duplicate, delayed, missing, and out-of-order messages.
+- Test disconnect immediately before and after acknowledgement.
+- Test offline sending followed by reconnect and catch-up.
+- Test group membership races.
+- Test multi-device delivery and device revocation.
+- Load-test reconnect storms and hot groups.
+- Chaos-test gateways, brokers, stores, regions, and push providers.
+- Verify encryption-key rotation and device-linking flows.
+- Test accessibility, localization, and weak-device performance.
+
+## 23. Staff-Level Product Care
+
+A staff-level design should make user trust visible in technical choices.
+
+### Protect the core promise
+
+- Message delivery is more important than presence or analytics.
+- Never show a sent state before durable acceptance.
+- Never discard failed messages without telling the sender.
+- Keep retries idempotent and understandable.
+
+### Design for real-world networks
+
+- Assume mobile clients move between Wi-Fi and cellular networks.
+- Expect suspended apps, expired credentials, and clock drift.
+- Preserve drafts and outbox entries through crashes.
+- Make recovery automatic without hiding terminal failures.
+
+### Respect privacy
+
+- Make read receipts, presence, and previews configurable.
+- Minimize metadata collection and retention.
+- Explain security boundaries accurately.
+- Provide clear device and session management.
+
+### Manage product complexity
+
+- Version protocols so older clients continue to function.
+- Roll out receipts, edits, reactions, and media independently.
+- Use feature flags and capability negotiation.
+- Degrade optional features before core messaging.
+- Define ownership across client, messaging, media, identity, privacy, and safety teams.
+
+### Set meaningful objectives
+
+Establish service-level objectives for:
+
+- Durable message acceptance.
+- End-to-end delivery latency.
+- Offline catch-up.
+- Reconnect success.
+- Duplicate and ordering correctness.
+- Media reliability.
+- Privacy and security incident response.
+
+## 24. Important Trade-offs
+
+1. Strong ordering versus multi-region write latency.
+2. Fan-out on write versus fan-out on read.
+3. At-least-once delivery versus duplicate handling.
+4. Rich presence versus privacy and infrastructure cost.
+5. Server-side search versus end-to-end encryption.
+6. Full history sync versus storage and key-management complexity.
+7. Exact group receipts versus write amplification.
+8. Immediate failover versus sequence consistency.
+9. Long offline retention versus storage cost.
+10. Aggressive spam detection versus false positives and privacy.
+
+## Interview Closing Summary
+
+Start with product semantics: what sent, delivered, read, ordered, and deleted
+mean. Then design a durable message-acceptance path with stable IDs,
+conversation sequencing, idempotent retries, fan-out, offline inboxes, and
+multi-device cursors.
+
+On the frontend, emphasize optimistic sending backed by a durable outbox,
+reconnect and resume behavior, timeline performance, media handling, and clear
+failure states.
+
+The staff-level difference is care for the whole product: protect user trust,
+make optional systems degradable, respect privacy, support poor networks,
+measure user-visible delivery quality, and evolve protocols safely across many
+client versions and engineering teams.
