@@ -24,6 +24,10 @@
       "hash": "fd6d2e9fd5a69d3c6947665db4ad8c5ba879e38af192f7896612c2b95d8c2583",
       "docRelative": "i18n.png"
     },
+    "system-designs/multimodal-file-ingestion.png": {
+      "hash": "f09a4178656b7fcd39c80d3dbca33476d19a7a27b6b897b096dd41d5e173c8c9",
+      "docRelative": "multimodal-file-ingestion.png"
+    },
     "system-designs/newsfeed.png": {
       "hash": "7c32bed9378a970683aa76380ad349cac4434cec781db46acf6504823a8b8857",
       "docRelative": "newsfeed.png"
@@ -48,6 +52,10 @@
       "hash": "164a210d53184162bb64e904a39d084eec6ca4a501bd3f0c261fa664313183ed",
       "docRelative": "tiny-url.png"
     },
+    "system-designs/ux-mock.svg": {
+      "hash": "9172b514e9baeb4015517f804a34328a2bfce59c5a9dbdb7b4fda0c051ad1c72",
+      "docRelative": "ux-mock.svg"
+    },
     "system-designs/video-netflix.png": {
       "hash": "6e0ef9664c9fbde91a5ce5388c65ae98db8e6726a990d0f77a219c35d933ae64",
       "docRelative": "video-netflix.png"
@@ -55,6 +63,10 @@
     "system-designs/whatsapp-chat.png": {
       "hash": "1dcfcb6a205693ba8d5c4450babffc7845dd3a483b139fcd4b4757f94c6b7832",
       "docRelative": "whatsapp-chat.png"
+    },
+    "system-designs/README.md": {
+      "hash": "cb82119a02b42fbe7147de8ee4500c0131b4125090e05ef85c229c7337bb6ef7",
+      "docRelative": "README.mdx"
     },
     "system-designs/Tournament.mdx": {
       "hash": "eb675f8eee4f2c92937da22f2f60c14c44a2e81a27d6ca686b9f8e89cefd6294",
@@ -88,6 +100,10 @@
       "hash": "2701d90c227a9c1f0df21dc0fa0632941e73da2c4e077b93ff7499e0a4f74d60",
       "docRelative": "model_eval_training_llm_design.mdx"
     },
+    "system-designs/multimodal-file-ingestion-retrieval.mdx": {
+      "hash": "eff03e929e4631eb3a26fc263ad8080e3660914b272256afee3a4b22dc944c34",
+      "docRelative": "multimodal-file-ingestion-retrieval.mdx"
+    },
     "system-designs/news-feed.mdx": {
       "hash": "3abc75467b09bec8311acccecb0398dba7d18cadad8c5e3a9d89664aaef64f1c",
       "docRelative": "news-feed.mdx"
@@ -97,7 +113,7 @@
       "docRelative": "prompt-playground.mdx"
     },
     "system-designs/rate-limit.mdx": {
-      "hash": "9b24adaeea69d12ce1a5b084e3c886fc0eab015397af3635edb98fd36ee6182b",
+      "hash": "c2904cc2bd4b9026a16010b7cfc0cd939f514c45c6957e2797b5639572bde9e2",
       "docRelative": "rate-limit.mdx"
     },
     "system-designs/rich-text-editor.mdx": {

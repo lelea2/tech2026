@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="820" viewBox="0 0 1280 820">
+  <defs><style>
+    .bg{fill:#f8fafc}.panel{fill:#fff;stroke:#d1d5db;stroke-width:1.5;rx:16}.dark{fill:#111827}.muted{fill:#6b7280}.text{font:14px Arial,sans-serif;fill:#111827}.h1{font:700 24px Arial,sans-serif;fill:#111827}.h2{font:700 17px Arial,sans-serif;fill:#111827}.small{font:12px Arial,sans-serif;fill:#4b5563}.tiny{font:11px Arial,sans-serif;fill:#6b7280}.btn{fill:#2563eb;rx:10}.btnText{font:700 13px Arial,sans-serif;fill:#fff}.pill{fill:#eef2ff;rx:12}.pillText{font:700 11px Arial,sans-serif;fill:#3730a3}.ok{fill:#ecfdf5;stroke:#10b981}.warn{fill:#fffbeb;stroke:#f59e0b}.err{fill:#fef2f2;stroke:#ef4444}.line{stroke:#e5e7eb;stroke-width:1}.quote{fill:#f9fafb;stroke:#d1d5db;rx:10}.accent{fill:#eff6ff;stroke:#3b82f6;rx:10}
+  </style></defs>
+  <rect class="bg" width="1280" height="820"/>
+  <rect x="24" y="20" width="1232" height="70" class="panel"/>
+  <text x="52" y="64" class="h1">Multimodal Knowledge Workspace</text>
+  <rect x="1010" y="38" width="110" height="34" class="btn"/><text x="1038" y="60" class="btnText">Upload</text>
+  <rect x="1130" y="38" width="90" height="34" class="panel"/><text x="1155" y="60" class="small">Share</text>
+
+  <rect x="24" y="110" width="280" height="680" class="panel"/>
+  <text x="48" y="145" class="h2">Files</text>
+  <rect x="48" y="166" width="230" height="42" class="accent"/><text x="66" y="191" class="text">Q3 Product Strategy.pdf</text>
+  <text x="66" y="226" class="tiny">READY • 42 pages • text + images</text>
+  <line x1="48" y1="246" x2="278" y2="246" class="line"/>
+  <text x="66" y="277" class="text">Design Review.pptx</text><text x="66" y="298" class="tiny">PROCESSING • OCR 80%</text>
+  <line x1="48" y1="318" x2="278" y2="318" class="line"/>
+  <text x="66" y="349" class="text">Customer Call.mp4</text><text x="66" y="370" class="tiny">TRANSCRIBING • 00:14:23 indexed</text>
+  <line x1="48" y1="390" x2="278" y2="390" class="line"/>
+  <text x="66" y="421" class="text">Architecture.png</text><text x="66" y="442" class="tiny">READY • OCR + vision caption</text>
+
+  <rect x="48" y="520" width="230" height="120" class="warn" rx="14"/>
+  <text x="66" y="548" class="h2">Ingestion status</text>
+  <text x="66" y="575" class="small">Queue: 12 jobs</text>
+  <text x="66" y="597" class="small">P95 processing: 46s</text>
+  <text x="66" y="619" class="small">Failures: 2 unsupported files</text>
+
+  <rect x="328" y="110" width="586" height="680" class="panel"/>
+  <text x="356" y="146" class="h2">Ask across files</text>
+  <rect x="356" y="166" width="526" height="52" class="panel"/><text x="378" y="198" class="muted text">Where did we discuss latency risks and mitigation?</text>
+  <rect x="356" y="238" width="526" height="112" class="quote"/>
+  <text x="378" y="268" class="text">Answer</text>
+  <text x="378" y="293" class="small">The main latency risk is large-file processing backlog. The mitigation is to separate</text>
+  <text x="378" y="314" class="small">raw upload from async ingestion, use modality-specific worker pools, and return partial</text>
+  <text x="378" y="335" class="small">results as soon as text chunks are ready.</text>
+
+  <text x="356" y="385" class="h2">Top retrieved chunks</text>
+  <rect x="356" y="405" width="526" height="96" class="accent"/>
+  <text x="378" y="433" class="text">Q3 Product Strategy.pdf • page 17</text>
+  <text x="378" y="456" class="small">“Use queue-based ingestion and worker autoscaling to absorb upload spikes...”</text>
+  <rect x="756" y="423" width="84" height="24" class="pill"/><text x="774" y="439" class="pillText">0.92 score</text>
+
+  <rect x="356" y="520" width="526" height="96" class="quote"/>
+  <text x="378" y="548" class="text">Design Review.pptx • slide 9</text>
+  <text x="378" y="571" class="small">“Separate OCR and visual embedding stages to avoid blocking text search...”</text>
+  <rect x="756" y="538" width="84" height="24" class="pill"/><text x="774" y="554" class="pillText">0.86 score</text>
+
+  <rect x="356" y="635" width="526" height="96" class="quote"/>
+  <text x="378" y="663" class="text">Customer Call.mp4 • 00:14:23</text>
+  <text x="378" y="686" class="small">“Customers want citations that point back to page, slide, or timestamp...”</text>
+  <rect x="756" y="653" width="84" height="24" class="pill"/><text x="774" y="669" class="pillText">0.81 score</text>
+
+  <rect x="936" y="110" width="320" height="680" class="panel"/>
+  <text x="964" y="146" class="h2">Preview + citations</text>
+  <rect x="964" y="168" width="264" height="170" fill="#f3f4f6" stroke="#d1d5db" rx="12"/>
+  <rect x="990" y="196" width="210" height="16" fill="#d1d5db" rx="4"/><rect x="990" y="226" width="160" height="16" fill="#d1d5db" rx="4"/><rect x="990" y="256" width="196" height="16" fill="#d1d5db" rx="4"/><rect x="990" y="286" width="120" height="16" fill="#d1d5db" rx="4"/>
+  <text x="964" y="372" class="text">Citation anchors</text>
+  <rect x="964" y="392" width="264" height="46" class="ok" rx="10"/><text x="982" y="421" class="small">PDF page 17, paragraph 3</text>
+  <rect x="964" y="452" width="264" height="46" class="ok" rx="10"/><text x="982" y="481" class="small">PPT slide 9 image region</text>
+  <rect x="964" y="512" width="264" height="46" class="ok" rx="10"/><text x="982" y="541" class="small">Video 00:14:23–00:15:02</text>
+
+  <text x="964" y="610" class="h2">Must-have UX states</text>
+  <text x="964" y="638" class="small">• Uploading, processing, ready, failed</text>
+  <text x="964" y="662" class="small">• Partial indexing progress by modality</text>
+  <text x="964" y="686" class="small">• Permission-safe search scope</text>
+  <text x="964" y="710" class="small">• Source citation preview</text>
+  <text x="964" y="734" class="small">• Retry failed ingestion</text>
+</svg>
