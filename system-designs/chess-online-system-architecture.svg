@@ -1,0 +1,133 @@
+<svg width="1400" height="920" viewBox="0 0 1400 920" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155" />
+    </marker>
+    <style>
+      .title { font: 700 28px Inter, Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 15px Inter, Arial, sans-serif; fill: #475569; }
+      .box { fill: #ffffff; stroke: #334155; stroke-width: 1.5; rx: 16; }
+      .boxBlue { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.5; rx: 16; }
+      .boxGreen { fill: #ecfdf5; stroke: #059669; stroke-width: 1.5; rx: 16; }
+      .boxAmber { fill: #fffbeb; stroke: #d97706; stroke-width: 1.5; rx: 16; }
+      .boxPurple { fill: #f5f3ff; stroke: #7c3aed; stroke-width: 1.5; rx: 16; }
+      .boxRed { fill: #fef2f2; stroke: #dc2626; stroke-width: 1.5; rx: 16; }
+      .label { font: 700 16px Inter, Arial, sans-serif; fill: #0f172a; }
+      .small { font: 500 12px Inter, Arial, sans-serif; fill: #475569; }
+      .tiny { font: 500 11px Inter, Arial, sans-serif; fill: #64748b; }
+      .line { stroke: #334155; stroke-width: 1.8; marker-end: url(#arrow); }
+      .dash { stroke: #64748b; stroke-width: 1.5; stroke-dasharray: 6 6; marker-end: url(#arrow); }
+      .group { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; rx: 20; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="920" fill="#f8fafc"/>
+  <text x="60" y="52" class="title">Chess.com-like Online Playing System — High-Level Architecture</text>
+  <text x="60" y="80" class="subtitle">Core pattern: single-writer game ownership + WebSockets + server-authoritative clocks + durable event log</text>
+
+  <!-- Client layer -->
+  <rect x="55" y="120" width="270" height="230" class="group"/>
+  <text x="75" y="150" class="label">Clients</text>
+  <rect x="80" y="175" width="220" height="60" class="boxBlue"/>
+  <text x="100" y="200" class="label">Web / Mobile App</text>
+  <text x="100" y="220" class="small">Board, clocks, move list</text>
+  <rect x="80" y="260" width="220" height="60" class="boxBlue"/>
+  <text x="100" y="285" class="label">Spectators</text>
+  <text x="100" y="305" class="small">Read-only game stream</text>
+
+  <!-- Edge -->
+  <rect x="395" y="120" width="250" height="230" class="group"/>
+  <text x="415" y="150" class="label">Edge Layer</text>
+  <rect x="420" y="175" width="200" height="60" class="box"/>
+  <text x="440" y="200" class="label">API Gateway</text>
+  <text x="440" y="220" class="small">Auth, REST, rate limits</text>
+  <rect x="420" y="260" width="200" height="60" class="box"/>
+  <text x="440" y="285" class="label">WebSocket Gateway</text>
+  <text x="440" y="305" class="small">Upgrade, route, resume</text>
+
+  <!-- Gameplay -->
+  <rect x="715" y="105" width="340" height="280" class="group"/>
+  <text x="735" y="135" class="label">Real-Time Gameplay</text>
+  <rect x="745" y="160" width="280" height="72" class="boxGreen"/>
+  <text x="765" y="185" class="label">Game Session Server</text>
+  <text x="765" y="205" class="small">Single writer per active game</text>
+  <text x="765" y="222" class="tiny">Move ordering, legality, clocks</text>
+  <rect x="745" y="252" width="280" height="52" class="boxAmber"/>
+  <text x="765" y="275" class="label">Game Directory</text>
+  <text x="765" y="292" class="small">game_id → owner + lease + epoch</text>
+  <rect x="745" y="322" width="280" height="42" class="boxAmber"/>
+  <text x="765" y="347" class="label">Matchmaking</text>
+
+  <!-- Durable log -->
+  <rect x="1115" y="120" width="235" height="230" class="group"/>
+  <text x="1135" y="150" class="label">Durability</text>
+  <rect x="1140" y="175" width="185" height="70" class="boxPurple"/>
+  <text x="1160" y="200" class="label">Move Event Log</text>
+  <text x="1160" y="220" class="small">Append before broadcast</text>
+  <rect x="1140" y="270" width="185" height="50" class="boxPurple"/>
+  <text x="1160" y="300" class="label">Game Archive</text>
+
+  <!-- Source of truth -->
+  <rect x="230" y="455" width="300" height="270" class="group"/>
+  <text x="250" y="485" class="label">Transactional Data</text>
+  <rect x="260" y="510" width="220" height="60" class="box"/>
+  <text x="280" y="535" class="label">Postgres</text>
+  <text x="280" y="555" class="small">Users, ratings, games</text>
+  <rect x="260" y="595" width="220" height="60" class="box"/>
+  <text x="280" y="620" class="label">Outbox Table</text>
+  <text x="280" y="640" class="small">Reliable event publish</text>
+
+  <!-- Async processing -->
+  <rect x="610" y="455" width="340" height="270" class="group"/>
+  <text x="630" y="485" class="label">Async Consumers</text>
+  <rect x="640" y="510" width="260" height="50" class="boxGreen"/>
+  <text x="660" y="540" class="label">Rating Service</text>
+  <rect x="640" y="580" width="260" height="50" class="boxGreen"/>
+  <text x="660" y="610" class="label">Leaderboard Consumer</text>
+  <rect x="640" y="650" width="260" height="50" class="boxGreen"/>
+  <text x="660" y="680" class="label">Anti-Cheat / Analytics</text>
+
+  <!-- Serving -->
+  <rect x="1030" y="455" width="300" height="270" class="group"/>
+  <text x="1050" y="485" class="label">Read / Serving Layer</text>
+  <rect x="1060" y="510" width="220" height="60" class="boxRed"/>
+  <text x="1080" y="535" class="label">Redis Sorted Sets</text>
+  <text x="1080" y="555" class="small">Fast leaderboards</text>
+  <rect x="1060" y="595" width="220" height="60" class="boxRed"/>
+  <text x="1080" y="620" class="label">Redis Presence</text>
+  <text x="1080" y="640" class="small">Online and queues</text>
+  <rect x="1060" y="675" width="220" height="35" class="boxRed"/>
+  <text x="1080" y="698" class="label">CDN / Search</text>
+
+  <!-- Observability -->
+  <rect x="55" y="790" width="1295" height="70" class="group"/>
+  <text x="80" y="820" class="label">Observability</text>
+  <text x="220" y="820" class="small">move latency • durable append latency • reconnect rate • clock correction delta • ownership transfer • stale epoch rejection • consumer lag</text>
+  <text x="220" y="842" class="small">trace: MAKE_MOVE → session owner → event log → broadcast → GameFinished → rating → outbox → leaderboard</text>
+
+  <!-- arrows -->
+  <line x1="300" y1="205" x2="420" y2="205" class="line"/>
+  <line x1="300" y1="290" x2="420" y2="290" class="line"/>
+  <line x1="620" y1="290" x2="745" y2="196" class="line"/>
+  <line x1="620" y1="205" x2="745" y2="196" class="line"/>
+  <line x1="885" y1="232" x2="885" y2="252" class="line"/>
+  <line x1="1025" y1="196" x2="1140" y2="210" class="line"/>
+  <line x1="1140" y1="210" x2="1025" y2="196" class="dash"/>
+  <line x1="900" y1="232" x2="900" y2="510" class="line"/>
+  <line x1="900" y1="535" x2="640" y2="535" class="line"/>
+  <line x1="640" y1="535" x2="480" y2="540" class="line"/>
+  <line x1="480" y1="625" x2="640" y2="605" class="line"/>
+  <line x1="900" y1="605" x2="1060" y2="540" class="line"/>
+  <line x1="900" y1="675" x2="1060" y2="692" class="line"/>
+  <line x1="1180" y1="510" x2="620" y2="205" class="dash"/>
+
+  <!-- annotations -->
+  <rect x="690" y="405" width="400" height="32" rx="16" fill="#e0f2fe" stroke="#0284c7"/>
+  <text x="710" y="426" class="small">Gameplay path is strongly consistent per game; downstream systems are eventually consistent.</text>
+
+  <rect x="60" y="385" width="520" height="42" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="80" y="412" class="small">Client uses optimistic preview, but server acknowledgement is the committed source of truth.</text>
+
+  <rect x="820" y="60" width="470" height="40" rx="20" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="845" y="85" class="small">Failure recovery: acquire higher epoch → replay move log → reconnect clients with missing events.</text>
+</svg>

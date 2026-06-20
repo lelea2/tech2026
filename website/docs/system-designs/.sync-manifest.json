@@ -12,9 +12,25 @@
       "hash": "df666b1e6299407a8ebc38390ef20dcbd90628443208757c33d24e0d8bcb098a",
       "docRelative": "chat-gpt.png"
     },
+    "system-designs/chess-live-game-fe-wireframe.svg": {
+      "hash": "f8b04c9f05d4e5d509d01cbc3992d3ab261d28372e7d4e8b70a43124b8124e82",
+      "docRelative": "chess-live-game-fe-wireframe.svg"
+    },
+    "system-designs/chess-online-system-architecture.svg": {
+      "hash": "3f99872af8c4dd8fc20245934555cf735dad56eacaacb89213369edcf4b1c691",
+      "docRelative": "chess-online-system-architecture.svg"
+    },
     "system-designs/dropbox.png": {
       "hash": "7f05c54311c5622788ca9680b97f0ed747bbd0641c228f785a22565aba20a930",
       "docRelative": "dropbox.png"
+    },
+    "system-designs/github-actions-fe-run-view.svg": {
+      "hash": "c618adc3bc826faa21f968af2b0fe590d448640ad8eeeb6dc86548729b2d65f8",
+      "docRelative": "github-actions-fe-run-view.svg"
+    },
+    "system-designs/github-actions-system-architecture.svg": {
+      "hash": "e27d28337a0e2d251c2e9b3d5b662de74f969ab27d505fe8177b6d810702f94b",
+      "docRelative": "github-actions-system-architecture.svg"
     },
     "system-designs/google-calendar.png": {
       "hash": "42e44ac47f61c64659ccc16a63b1b90e3761fd8cdeba498bdb1bace9cee58c45",
@@ -80,6 +96,10 @@
       "hash": "7b685a4b6549ed121e66d211d6fdb1bc1942329d07b9a145a4365215644393e2",
       "docRelative": "chat-gpt.mdx"
     },
+    "system-designs/chess-com-online-playing-system.mdx": {
+      "hash": "27b6b80a4835f1d283a01870a9ef2b38aba553b635e89c8712e23f495ef54368",
+      "docRelative": "chess-com-online-playing-system.mdx"
+    },
     "system-designs/design-google-calendar-frontend-system-design.mdx": {
       "hash": "8cfb24589b9ed47388cb2a4e755fb051dd1cc3664eced56a900533acb5f151f8",
       "docRelative": "design-google-calendar-frontend-system-design.mdx"
@@ -91,6 +111,10 @@
     "system-designs/figma.mdx": {
       "hash": "595267864fb8da68cd37dab736fc94dc4a2efcc2ad49d5e42c55474dc62046a3",
       "docRelative": "figma.mdx"
+    },
+    "system-designs/github-actions-system-design.mdx": {
+      "hash": "b800a2e4b146e00cc18ccf6d4dbe222b2456a5f5eb7f6cad64c3551f62ca8457",
+      "docRelative": "github-actions-system-design.mdx"
     },
     "system-designs/google-docs-design.mdx": {
       "hash": "21ec09f8eb195fb1b48833b5e6fd8b134f0d66ea4212619caebf77390fe19633",
