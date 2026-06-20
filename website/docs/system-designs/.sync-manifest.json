@@ -12,6 +12,10 @@
       "hash": "df666b1e6299407a8ebc38390ef20dcbd90628443208757c33d24e0d8bcb098a",
       "docRelative": "chat-gpt.png"
     },
+    "system-designs/dropbox.png": {
+      "hash": "7f05c54311c5622788ca9680b97f0ed747bbd0641c228f785a22565aba20a930",
+      "docRelative": "dropbox.png"
+    },
     "system-designs/google-calendar.png": {
       "hash": "42e44ac47f61c64659ccc16a63b1b90e3761fd8cdeba498bdb1bace9cee58c45",
       "docRelative": "google-calendar.png"
@@ -64,10 +68,6 @@
       "hash": "1dcfcb6a205693ba8d5c4450babffc7845dd3a483b139fcd4b4757f94c6b7832",
       "docRelative": "whatsapp-chat.png"
     },
-    "system-designs/README.md": {
-      "hash": "cb82119a02b42fbe7147de8ee4500c0131b4125090e05ef85c229c7337bb6ef7",
-      "docRelative": "README.mdx"
-    },
     "system-designs/Tournament.mdx": {
       "hash": "eb675f8eee4f2c92937da22f2f60c14c44a2e81a27d6ca686b9f8e89cefd6294",
       "docRelative": "Tournament.mdx"
@@ -83,6 +83,14 @@
     "system-designs/design-google-calendar-frontend-system-design.mdx": {
       "hash": "8cfb24589b9ed47388cb2a4e755fb051dd1cc3664eced56a900533acb5f151f8",
       "docRelative": "design-google-calendar-frontend-system-design.mdx"
+    },
+    "system-designs/dropbox.mdx": {
+      "hash": "0450fc35ce2bda469463f17aa7345103aa52e56f777d7cc579761d3d2f00893c",
+      "docRelative": "dropbox.mdx"
+    },
+    "system-designs/figma.mdx": {
+      "hash": "595267864fb8da68cd37dab736fc94dc4a2efcc2ad49d5e42c55474dc62046a3",
+      "docRelative": "figma.mdx"
     },
     "system-designs/google-docs-design.mdx": {
       "hash": "21ec09f8eb195fb1b48833b5e6fd8b134f0d66ea4212619caebf77390fe19633",
