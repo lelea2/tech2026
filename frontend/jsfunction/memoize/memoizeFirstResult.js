@@ -1,0 +1,95 @@
+/**
+ * Interview question: Memoize First Result
+ *
+ * Implement a wrapper that calls the original function only once, stores the
+ * first returned value, and returns that same value for every future call.
+ *
+ * This is different from normal argument-based memoization:
+ * - normal memoize caches one result per argument key,
+ * - memoizeFirstResult ignores future arguments and always returns the first
+ *   computed result.
+ *
+ * This pattern is useful for lazy initialization:
+ * - create one expensive config object,
+ * - initialize a singleton,
+ * - compute a value once and reuse it.
+ *
+ * Behavior:
+ * - The wrapped function can be called many times.
+ * - The original function runs only on the first call.
+ * - `getCallCount()` returns how many times the wrapper was called, not how
+ *   many times the original function ran.
+ *
+ * Time:
+ * - First call: cost of fn.
+ * - Later calls: O(1).
+ *
+ * Space:
+ * - O(1), because only one cached result is stored.
+ *
+ * @param {Function} fn
+ * @returns {Function}
+ */
+export default function memoizeFirstResult(fn) {
+  let hasRun = false;
+  let firstResult;
+  let callCount = 0;
+
+  function memoized(...args) {
+    // Track wrapper calls for debugging/interview verification.
+    callCount++;
+
+    if (!hasRun) {
+      // Only the first invocation calls the original function.
+      firstResult = fn(...args);
+      hasRun = true;
+    }
+
+    // Later invocations ignore their arguments and return the first result.
+    return firstResult;
+  }
+
+  memoized.getCallCount = function () {
+    return callCount;
+  };
+
+  return memoized;
+}
+
+/**
+ * Example:
+ *
+ * let originalCalls = 0;
+ *
+ * const createValue = (name) => {
+ *   originalCalls++;
+ *   return `hello ${name}`;
+ * };
+ *
+ * const memoized = memoizeFirstResult(createValue);
+ *
+ * memoized("Ava"); // "hello Ava", originalCalls = 1
+ * memoized("Ben"); // "hello Ava", originalCalls = 1
+ * memoized("Cat"); // "hello Ava", originalCalls = 1
+ *
+ * memoized.getCallCount(); // 3
+ *
+ * Interview takeaway:
+ * The wrapper was called 3 times, but the original function ran only once.
+ */
+
+
+/**
+ * function add(a, b) {
+  console.log("Original function ran");
+  return a + b;
+}
+
+const memoizedAdd = memoizeFirstResult(add);
+
+console.log(memoizedAdd(1, 2)); // Original function ran, 3
+console.log(memoizedAdd(10, 20)); // 3
+console.log(memoizedAdd(100, 200)); // 3
+
+console.log(memoizedAdd.getCallCount()); // 3
+ */
