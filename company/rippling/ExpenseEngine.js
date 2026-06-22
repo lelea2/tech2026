@@ -4,6 +4,28 @@
  * Build an in-memory engine that evaluates company expense reports against
  * configurable policy rules.
  *
+ * Why this is needed:
+ * Companies reimburse employees for business expenses, but every company has
+ * rules: meal limits, travel budgets, blocked categories, manager approval
+ * thresholds, and department-level spending caps. Manually reviewing every
+ * expense does not scale, so the system should automatically flag suspicious
+ * or policy-violating expenses for review.
+ *
+ * What the engine does:
+ * - Takes raw expense records.
+ * - Takes configurable policy rules.
+ * - Checks each individual expense against single-expense rules.
+ * - Groups related expenses, such as by employee or department, for aggregate
+ *   rules.
+ * - Returns structured violations that a UI, reviewer, or workflow system can
+ *   use to explain why an expense needs attention.
+ *
+ * What the engine does not do:
+ * - It does not approve or reject reimbursement directly.
+ * - It does not persist expenses or rules.
+ * - It does not run payment workflows.
+ * - It only evaluates rules and returns violations.
+ *
  * The system supports two kinds of rules:
  *
  * 1. ExpenseRule
