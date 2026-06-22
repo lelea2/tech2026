@@ -84,10 +84,6 @@
       "hash": "3d87dd68bd9e2f7604a10ef0f4873aa19319e9dc7c8c9850a75ba828b14fc089",
       "docRelative": "frontend/jsfunction/apply_call_bind/call.mdx"
     },
-    "frontend/jsfunction/apply_call_bind/example.html": {
-      "hash": "3407afb0d79f909cd56a56b7e3ed716f793d3747cf6dd6887c503c6a6051f2d5",
-      "docRelative": "frontend/jsfunction/apply_call_bind/example.mdx"
-    },
     "frontend/jsfunction/array/compact.js": {
       "hash": "ea0147ee2d82cab54389156cf9cddd450e55e12f3fae9841b97e689a76673c92",
       "docRelative": "frontend/jsfunction/array/compact.mdx"
@@ -877,7 +873,7 @@
       "docRelative": "frontend/jsfunction/UndoableDatabase/_index.mdx"
     },
     "__nav__:frontend/jsfunction/apply_call_bind": {
-      "hash": "fb78e365c9763e405530a2b4042f350f0d3c3b8b87ebc1da9558c52f5d08ccb8",
+      "hash": "f29086606beb38a4327ae844e42bc3421a35489a7ba46f7490e4c7c4a4c19b75",
       "docRelative": "frontend/jsfunction/apply_call_bind/_index.mdx"
     },
     "__nav__:frontend/jsfunction/array": {
