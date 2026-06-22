@@ -1,0 +1,142 @@
+<svg width="1400" height="920" viewBox="0 0 1400 920" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.15"/>
+    </filter>
+    <style>
+      .title { font: 700 30px Arial, sans-serif; fill: #111; }
+      .sub { font: 15px Arial, sans-serif; fill: #555; }
+      .ui { fill: #fff; stroke: #222; stroke-width: 1.5; filter: url(#shadow); }
+      .panel { fill: #F7F7F7; stroke: #333; stroke-width: 1.2; }
+      .canvas { fill: #FBFBFB; stroke: #C7C7C7; stroke-width: 1.5; }
+      .toolbar { fill: #F0F4FF; stroke: #4D6BFE; stroke-width: 1.2; }
+      .button { fill: #fff; stroke: #999; rx: 8; }
+      .text { font: 14px Arial, sans-serif; fill: #222; }
+      .small { font: 12px Arial, sans-serif; fill: #444; }
+      .label { font: 700 13px Arial, sans-serif; fill: #111; }
+      .muted { font: 12px Arial, sans-serif; fill: #777; }
+      .shape { fill: #EAF7EA; stroke: #45A049; stroke-width: 2; }
+      .shape2 { fill: #FFF0DB; stroke: #D99800; stroke-width: 2; }
+      .shape3 { fill: #F5EAFB; stroke: #8F4DE8; stroke-width: 2; }
+      .cursor { fill: none; stroke: #4D6BFE; stroke-width: 2; }
+      .comment { fill: #FFF7CC; stroke: #D6B000; stroke-width: 1.5; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="920" fill="#FAFAFA"/>
+  <text x="60" y="58" class="title">Collaborative Drawing Tool — UX Wireframe</text>
+  <text x="60" y="84" class="sub">Interview focus: tool discoverability, low-latency editing, collaboration awareness, layer control, comments, sharing, and export</text>
+
+  <!-- App Window -->
+  <rect x="60" y="120" width="1280" height="720" rx="18" class="ui"/>
+
+  <!-- Top bar -->
+  <rect x="60" y="120" width="1280" height="68" rx="18" fill="#FFFFFF" stroke="#222" stroke-width="1.2"/>
+  <text x="90" y="162" class="label">Acme Brand Board</text>
+  <text x="235" y="162" class="muted">Saved 8s ago</text>
+  <rect x="540" y="137" width="320" height="34" class="button"/>
+  <text x="565" y="159" class="small">Search commands, layers, assets...</text>
+  <circle cx="1030" cy="154" r="16" fill="#E8F0FE" stroke="#4D6BFE"/>
+  <text x="1022" y="159" class="small">KD</text>
+  <circle cx="1068" cy="154" r="16" fill="#EAF7EA" stroke="#45A049"/>
+  <text x="1060" y="159" class="small">AM</text>
+  <circle cx="1106" cy="154" r="16" fill="#FFF0DB" stroke="#D99800"/>
+  <text x="1098" y="159" class="small">JL</text>
+  <rect x="1160" y="137" width="76" height="34" rx="8" fill="#111" stroke="#111"/>
+  <text x="1178" y="159" font-family="Arial" font-size="13" fill="#fff">Share</text>
+  <rect x="1248" y="137" width="64" height="34" class="button"/>
+  <text x="1264" y="159" class="small">Export</text>
+
+  <!-- Left toolbar -->
+  <rect x="80" y="215" width="58" height="410" rx="16" class="toolbar"/>
+  <rect x="94" y="235" width="30" height="30" rx="7" fill="#fff" stroke="#4D6BFE"/>
+  <text x="102" y="255" class="small">↖</text>
+  <rect x="94" y="277" width="30" height="30" rx="7" fill="#fff" stroke="#999"/>
+  <text x="102" y="298" class="small">□</text>
+  <rect x="94" y="319" width="30" height="30" rx="7" fill="#fff" stroke="#999"/>
+  <text x="102" y="340" class="small">○</text>
+  <rect x="94" y="361" width="30" height="30" rx="7" fill="#fff" stroke="#999"/>
+  <text x="103" y="382" class="small">T</text>
+  <rect x="94" y="403" width="30" height="30" rx="7" fill="#fff" stroke="#999"/>
+  <text x="102" y="424" class="small">✎</text>
+  <rect x="94" y="445" width="30" height="30" rx="7" fill="#fff" stroke="#999"/>
+  <text x="102" y="466" class="small">💬</text>
+  <rect x="94" y="487" width="30" height="30" rx="7" fill="#fff" stroke="#999"/>
+  <text x="102" y="508" class="small">🖼</text>
+  <text x="86" y="600" class="muted">Tools</text>
+
+  <!-- Left panel -->
+  <rect x="160" y="210" width="240" height="610" rx="12" class="panel"/>
+  <text x="185" y="245" class="label">Pages</text>
+  <rect x="185" y="265" width="190" height="48" rx="8" fill="#fff" stroke="#4D6BFE"/>
+  <text x="200" y="294" class="text">Landing Page</text>
+  <rect x="185" y="323" width="190" height="40" rx="8" fill="#fff" stroke="#AAA"/>
+  <text x="200" y="348" class="small">Social Ad</text>
+  <text x="185" y="402" class="label">Layers</text>
+  <rect x="185" y="422" width="190" height="36" rx="6" fill="#fff" stroke="#AAA"/>
+  <text x="200" y="445" class="small">Hero Group</text>
+  <rect x="185" y="466" width="190" height="36" rx="6" fill="#fff" stroke="#AAA"/>
+  <text x="200" y="489" class="small">CTA Button</text>
+  <rect x="185" y="510" width="190" height="36" rx="6" fill="#fff" stroke="#AAA"/>
+  <text x="200" y="533" class="small">Product Image</text>
+  <rect x="185" y="554" width="190" height="36" rx="6" fill="#fff" stroke="#AAA"/>
+  <text x="200" y="577" class="small">Background</text>
+  <text x="185" y="638" class="label">Assets</text>
+  <rect x="185" y="660" width="82" height="58" rx="8" fill="#fff" stroke="#AAA"/>
+  <rect x="293" y="660" width="82" height="58" rx="8" fill="#fff" stroke="#AAA"/>
+  <text x="205" y="695" class="small">Logo</text>
+  <text x="311" y="695" class="small">Photo</text>
+
+  <!-- Canvas area -->
+  <rect x="430" y="210" width="610" height="610" rx="12" class="canvas"/>
+  <text x="455" y="240" class="muted">Canvas / infinite board</text>
+  <rect x="510" y="285" width="430" height="310" rx="18" fill="#FFFFFF" stroke="#BBBBBB" stroke-width="1.5"/>
+  <rect x="555" y="330" width="170" height="42" rx="10" class="shape3"/>
+  <text x="585" y="356" class="text">Brand Header</text>
+  <circle cx="820" cy="375" r="58" class="shape2"/>
+  <rect x="565" y="430" width="300" height="28" rx="8" class="shape"/>
+  <rect x="565" y="472" width="230" height="28" rx="8" class="shape"/>
+  <rect x="565" y="525" width="130" height="42" rx="12" fill="#111" stroke="#111"/>
+  <text x="596" y="551" font-family="Arial" font-size="14" fill="#fff">Start</text>
+
+  <!-- Selection box -->
+  <rect x="548" y="322" width="185" height="58" fill="none" stroke="#4D6BFE" stroke-width="2" stroke-dasharray="6 4"/>
+  <circle cx="548" cy="322" r="5" fill="#4D6BFE"/>
+  <circle cx="733" cy="322" r="5" fill="#4D6BFE"/>
+  <circle cx="548" cy="380" r="5" fill="#4D6BFE"/>
+  <circle cx="733" cy="380" r="5" fill="#4D6BFE"/>
+
+  <!-- Cursors/comments -->
+  <path d="M885 490 L905 535 L890 528 L880 548 L870 543 L881 522 L865 522 Z" class="cursor" fill="#E8F0FE"/>
+  <rect x="910" y="525" width="98" height="28" rx="8" fill="#E8F0FE" stroke="#4D6BFE"/>
+  <text x="925" y="544" class="small">Alex</text>
+  <rect x="825" y="265" width="170" height="72" rx="12" class="comment"/>
+  <text x="842" y="292" class="small">Comment</text>
+  <text x="842" y="315" class="small">Try larger headline?</text>
+
+  <!-- Right properties panel -->
+  <rect x="1070" y="210" width="240" height="610" rx="12" class="panel"/>
+  <text x="1095" y="245" class="label">Properties</text>
+  <text x="1095" y="282" class="small">Selected: Brand Header</text>
+  <text x="1095" y="326" class="label">Position</text>
+  <rect x="1095" y="345" width="82" height="34" class="button"/>
+  <text x="1110" y="367" class="small">X  120</text>
+  <rect x="1190" y="345" width="82" height="34" class="button"/>
+  <text x="1205" y="367" class="small">Y  80</text>
+  <text x="1095" y="420" class="label">Typography</text>
+  <rect x="1095" y="438" width="177" height="34" class="button"/>
+  <text x="1110" y="460" class="small">Inter / 32 / Bold</text>
+  <text x="1095" y="515" class="label">Fill</text>
+  <rect x="1095" y="535" width="34" height="34" rx="8" fill="#F5EAFB" stroke="#8F4DE8"/>
+  <text x="1145" y="557" class="small">#F5EAFB</text>
+  <text x="1095" y="615" class="label">Collaboration</text>
+  <rect x="1095" y="637" width="177" height="60" rx="8" fill="#fff" stroke="#AAA"/>
+  <text x="1110" y="662" class="small">3 active editors</text>
+  <text x="1110" y="684" class="small">2 unresolved comments</text>
+  <text x="1095" y="750" class="label">Version</text>
+  <rect x="1095" y="770" width="177" height="34" class="button"/>
+  <text x="1110" y="792" class="small">View history</text>
+
+  <!-- Callouts at bottom -->
+  <text x="60" y="880" class="small">UX callout: the app should feel instant locally while collaboration, persistence, permission checks, and export jobs happen asynchronously behind the scenes.</text>
+</svg>

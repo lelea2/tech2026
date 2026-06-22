@@ -1,0 +1,73 @@
+---
+title: checkSubArraySum
+---
+
+# checkSubArraySum
+
+~~~javascript
+/**
+ * Determine if a given array contains a subarray of at least two elements whose sum is a multiple of a specified number k.
+
+An array is considered to have a "good subarray" 
+if there exists at least one subarray (consisting of two or more elements) such that the sum of the elements in this subarray is a multiple of k.
+
+(Note: 0 is considered a multiple of any integer k.)
+
+For example, the array [23, 2, 4, 7] with k = 6 has a "good subarray" ([2, 4]), as the sum 6 is a multiple of k = 6. 
+The array [5, 0, 0, 0] with k = 3 has a "good subarray", as the subarray [0, 0] sums to 0, which is a multiple of 3.
+ */
+
+// Time Complexity: O(n)
+// Space Complexity: O(min(n, k))
+
+export default function checkSubarraySum(nums, k) {
+  // Edge case: null or too short cannot have
+  // a subarray of at least 2 elements.
+  if (!nums || nums.length < 2) {
+    return false;
+  }
+
+  // Map remainder -> earliest index where this remainder appeared.
+  //
+  // We store the earliest index because we want the longest distance
+  // possible when we see the same remainder again.
+  const remainderIndexMap = new Map();
+
+  // Important initialization:
+  //
+  // remainder 0 exists before the array starts at index -1.
+  //
+  // This handles cases where nums[0..i] itself is divisible by k
+  // and has length at least 2.
+  remainderIndexMap.set(0, -1);
+
+  let prefixSum = 0;
+
+  for (let i = 0; i < nums.length; i++) {
+    prefixSum += nums[i];
+
+    // If k is not 0, use modulo.
+    // If k is 0, we cannot divide by zero, so use prefixSum directly.
+    let remainder = k === 0 ? prefixSum : prefixSum % k;
+
+    if (remainderIndexMap.has(remainder)) {
+      const previousIndex = remainderIndexMap.get(remainder);
+
+      // The subarray length must be at least 2.
+      //
+      // Current index i minus previous index must be > 1.
+      if (i - previousIndex > 1) {
+        return true;
+      }
+    } else {
+      // Only store the first occurrence of this remainder.
+      //
+      // Do not overwrite it because the earliest index gives us
+      // the best chance to form a length >= 2 subarray.
+      remainderIndexMap.set(remainder, i);
+    }
+  }
+
+  return false;
+}
+~~~

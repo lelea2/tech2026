@@ -1,0 +1,92 @@
+---
+title: shortestSubsrtingContainingCharacters
+---
+
+# shortestSubsrtingContainingCharacters
+
+~~~javascript
+/**
+ * @param {string} str1
+ * @param {string} str2
+ * @return {string}
+ */
+
+// Use sliding window + frequency map.
+// We want the smallest window in str1 that contains all characters from str2.
+// We will use a two-pointer approach to find the minimum window.
+// Expand right until the window contains all required characters.
+// Then shrink left while the window is still valid.
+// Track the smallest valid window seen.
+export default function shortestSubstringContainingCharacters(str1, str2) {
+  if (!str1 || !str2 || str2.length > str1.length) {
+    return "";
+  }
+
+  // Count characters we need from str2.
+  const need = new Map();
+
+  for (const ch of str2) {
+    need.set(ch, (need.get(ch) || 0) + 1);
+  }
+
+  // Number of unique characters whose required count is satisfied.
+  let formed = 0;
+  const required = need.size;
+
+  // Current window character counts.
+  const window = new Map();
+
+  let left = 0;
+
+  // Best answer so far: [length, start, end]
+  let best = [Infinity, 0, 0];
+
+  for (let right = 0; right < str1.length; right++) {
+    const rightChar = str1[right];
+
+    // Add current right character into window.
+    window.set(rightChar, (window.get(rightChar) || 0) + 1);
+
+    // If this character is needed and we now have enough of it,
+    // one requirement is satisfied.
+    if (
+      need.has(rightChar) &&
+      window.get(rightChar) === need.get(rightChar)
+    ) {
+      formed++;
+    }
+
+    // When all character requirements are satisfied,
+    // try shrinking from the left.
+    while (left <= right && formed === required) {
+      const currentLength = right - left + 1;
+
+      if (currentLength < best[0]) {
+        best = [currentLength, left, right];
+      }
+
+      const leftChar = str1[left];
+
+      // Remove left character from window.
+      window.set(leftChar, window.get(leftChar) - 1);
+
+      // If removing it breaks a required count,
+      // the window is no longer valid.
+      if (
+        need.has(leftChar) &&
+        window.get(leftChar) < need.get(leftChar)
+      ) {
+        formed--;
+      }
+
+      left++;
+    }
+  }
+
+  if (best[0] === Infinity) {
+    return "";
+  }
+
+  return str1.slice(best[1], best[2] + 1);
+}
+~~~

@@ -1,6 +1,6 @@
 ---
-title: "Design GitHub Actions: Multi-Tenant CI/CD Platform"
-description: "Staff-level system design for a durable, fair, isolated, real-time CI/CD workflow execution platform similar to GitHub Actions."
+title: 'Design GitHub Actions: Multi-Tenant CI/CD Platform'
+description: 'Staff-level system design for a durable, fair, isolated, real-time CI/CD workflow execution platform similar to GitHub Actions.'
 tags:
   - system-design
   - distributed-systems
@@ -9,6 +9,8 @@ tags:
   - multi-tenant
   - staff-engineer
 ---
+
+![High-level architecture](./github-actions-system-architecture.svg)
 
 # Design GitHub Actions: Multi-Tenant CI/CD Platform
 
@@ -24,16 +26,16 @@ The system is not just a cron runner. It is a **durable workflow execution engin
 
 ## 2. Scale Assumptions
 
-| Metric | Target |
-|---|---:|
-| Repositories | 10M |
-| Push events | 10/sec average |
-| Burst traffic | 100/sec |
-| Peak concurrent jobs | 100K |
-| Build duration | minutes to hours |
-| Live log viewers | thousands at any moment |
-| Log freshness target | < 1 second to viewer |
-| Platform model | Multi-tenant SaaS |
+| Metric               |                  Target |
+| -------------------- | ----------------------: |
+| Repositories         |                     10M |
+| Push events          |          10/sec average |
+| Burst traffic        |                 100/sec |
+| Peak concurrent jobs |                    100K |
+| Build duration       |        minutes to hours |
+| Live log viewers     | thousands at any moment |
+| Log freshness target |    < 1 second to viewer |
+| Platform model       |       Multi-tenant SaaS |
 
 ### Key implication
 
@@ -58,16 +60,16 @@ Because jobs run for minutes or hours, the hard part is not accepting pushes. Th
 
 ## Non-Functional Requirements
 
-| Category | Requirement |
-|---|---|
-| Availability | Workflow submission and status APIs should remain highly available. |
-| Durability | Workflow state, cancellation, and logs must survive process restart. |
-| Isolation | Jobs from different tenants must not share unsafe compute, network, filesystem, or secrets context. |
-| Fairness | One tenant firing 10K builds should not starve other tenants. |
-| Latency | Log/status streaming should be under 1 second in the normal case. |
-| Scalability | Support 100K concurrent jobs and bursty repo events. |
-| Observability | Every run should be traceable from trigger to scheduler to runner to logs. |
-| Security | Least-privilege tokens, secret redaction, sandboxing, audit logs. |
+| Category      | Requirement                                                                                         |
+| ------------- | --------------------------------------------------------------------------------------------------- |
+| Availability  | Workflow submission and status APIs should remain highly available.                                 |
+| Durability    | Workflow state, cancellation, and logs must survive process restart.                                |
+| Isolation     | Jobs from different tenants must not share unsafe compute, network, filesystem, or secrets context. |
+| Fairness      | One tenant firing 10K builds should not starve other tenants.                                       |
+| Latency       | Log/status streaming should be under 1 second in the normal case.                                   |
+| Scalability   | Support 100K concurrent jobs and bursty repo events.                                                |
+| Observability | Every run should be traceable from trigger to scheduler to runner to logs.                          |
+| Security      | Least-privilege tokens, secret redaction, sandboxing, audit logs.                                   |
 
 ---
 
@@ -85,25 +87,23 @@ The workflow engine owns the run state machine. The scheduler owns fairness and 
 
 ## 5. High-Level Architecture
 
-![High-level architecture](./github-actions-system-architecture.svg)
-
 ### Main components
 
-| Component | Responsibility |
-|---|---|
-| Event Ingestion | Receives repo events from Git, webhook, manual dispatch, or schedule. |
-| Workflow Resolver | Fetches workflow YAML, validates syntax, expands matrix jobs and DAG. |
-| Workflow Engine | Durable state machine for run/job/step lifecycle. |
-| Run State Store | Source of truth for workflow state, attempts, leases, cancellation, timestamps. |
-| Fair Scheduler | Selects runnable jobs using tenant quotas, concurrency limits, priority, and capacity. |
-| Runner Control Plane | Assigns jobs to managed or self-hosted runners. |
-| Runner Fleet | Executes jobs inside isolated sandbox environments. |
-| Log Ingest | Receives ordered log chunks from runners. |
-| Log Stream | Durable append-only log stream partitioned by run/job. |
-| Live Gateway | WebSocket/SSE gateway for UI live status and logs. |
-| Artifact Store | Stores build artifacts, caches, and downloadable outputs. |
-| Metadata DB | Stores repos, workflow definitions, runs, jobs, steps, users, orgs. |
-| Outbox/Event Bus | Emits run completed, job failed, artifact uploaded, billing usage, audit events. |
+| Component            | Responsibility                                                                         |
+| -------------------- | -------------------------------------------------------------------------------------- |
+| Event Ingestion      | Receives repo events from Git, webhook, manual dispatch, or schedule.                  |
+| Workflow Resolver    | Fetches workflow YAML, validates syntax, expands matrix jobs and DAG.                  |
+| Workflow Engine      | Durable state machine for run/job/step lifecycle.                                      |
+| Run State Store      | Source of truth for workflow state, attempts, leases, cancellation, timestamps.        |
+| Fair Scheduler       | Selects runnable jobs using tenant quotas, concurrency limits, priority, and capacity. |
+| Runner Control Plane | Assigns jobs to managed or self-hosted runners.                                        |
+| Runner Fleet         | Executes jobs inside isolated sandbox environments.                                    |
+| Log Ingest           | Receives ordered log chunks from runners.                                              |
+| Log Stream           | Durable append-only log stream partitioned by run/job.                                 |
+| Live Gateway         | WebSocket/SSE gateway for UI live status and logs.                                     |
+| Artifact Store       | Stores build artifacts, caches, and downloadable outputs.                              |
+| Metadata DB          | Stores repos, workflow definitions, runs, jobs, steps, users, orgs.                    |
+| Outbox/Event Bus     | Emits run completed, job failed, artifact uploaded, billing usage, audit events.       |
 
 ---
 
@@ -568,12 +568,12 @@ Global capacity
 
 ### Scheduling algorithm options
 
-| Algorithm | Use case |
-|---|---|
-| Weighted Fair Queuing | Fairness across tenants with plan weights. |
-| Deficit Round Robin | Simple and efficient for large queue counts. |
-| Token Bucket | Enforce burst limits per tenant/repo. |
-| Priority Queues | Allow urgent jobs without bypassing fairness. |
+| Algorithm             | Use case                                      |
+| --------------------- | --------------------------------------------- |
+| Weighted Fair Queuing | Fairness across tenants with plan weights.    |
+| Deficit Round Robin   | Simple and efficient for large queue counts.  |
+| Token Bucket          | Enforce burst limits per tenant/repo.         |
+| Priority Queues       | Allow urgent jobs without bypassing fairness. |
 
 ### Example policy
 
@@ -618,11 +618,11 @@ Each job gets an ephemeral sandbox:
 
 ## Isolation levels
 
-| Level | Option | Tradeoff |
-|---|---|---|
-| Strongest | VM or microVM | Better tenant isolation, slower startup. |
-| Medium | Container with gVisor/Kata/Firecracker-style isolation | Good balance. |
-| Fastest | Plain container | Lower isolation, risky for untrusted multi-tenant workloads. |
+| Level     | Option                                                 | Tradeoff                                                     |
+| --------- | ------------------------------------------------------ | ------------------------------------------------------------ |
+| Strongest | VM or microVM                                          | Better tenant isolation, slower startup.                     |
+| Medium    | Container with gVisor/Kata/Firecracker-style isolation | Good balance.                                                |
+| Fastest   | Plain container                                        | Lower isolation, risky for untrusted multi-tenant workloads. |
 
 For a GitHub Actions-like public CI system, prefer **ephemeral VM or microVM isolation** for managed runners.
 
@@ -758,15 +758,15 @@ UI lists artifact -> user downloads through signed URL
 
 ## 20. Consistency Model
 
-| Data | Consistency model |
-|---|---|
-| Run/job state | Strong consistency in DB. |
-| Cancellation | Strongly persisted before effects. |
+| Data            | Consistency model                          |
+| --------------- | ------------------------------------------ |
+| Run/job state   | Strong consistency in DB.                  |
+| Cancellation    | Strongly persisted before effects.         |
 | Scheduler queue | Eventually consistent with DB, reconciled. |
-| Logs | Ordered per job, append-only. |
-| UI status | Eventually consistent, near real-time. |
-| Artifacts | Read-after-write after metadata commit. |
-| Billing/audit | Outbox-driven eventual processing. |
+| Logs            | Ordered per job, append-only.              |
+| UI status       | Eventually consistent, near real-time.     |
+| Artifacts       | Read-after-write after metadata commit.    |
+| Billing/audit   | Outbox-driven eventual processing.         |
 
 ---
 
@@ -850,17 +850,17 @@ lease_epoch
 
 ## 24. Failure Scenarios
 
-| Failure | Handling |
-|---|---|
-| Runner dies mid-build | Lease expires, attempt marked lost, retry if policy allows. |
-| API server dies during cancel | Cancel flag already persisted; reconciler continues cancellation. |
-| Scheduler assigns duplicate job | DB compare-and-swap lease epoch prevents dual ownership. |
-| Log gateway crashes | Client reconnects with cursor; durable log stream catches up. |
-| Log ingest is slow | Runner buffers bounded chunks, applies backpressure, then fails safely if buffer exceeds limit. |
-| Tenant floods platform | Token bucket + concurrency quota + fair scheduler protects others. |
-| Object storage upload fails | Job can retry upload; metadata commits only after successful upload. |
-| Workflow YAML creates huge matrix | Resolver enforces expansion limits. |
-| Secret appears in logs | Redaction filter and audit alert; still assume secrets may need rotation. |
+| Failure                           | Handling                                                                                        |
+| --------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Runner dies mid-build             | Lease expires, attempt marked lost, retry if policy allows.                                     |
+| API server dies during cancel     | Cancel flag already persisted; reconciler continues cancellation.                               |
+| Scheduler assigns duplicate job   | DB compare-and-swap lease epoch prevents dual ownership.                                        |
+| Log gateway crashes               | Client reconnects with cursor; durable log stream catches up.                                   |
+| Log ingest is slow                | Runner buffers bounded chunks, applies backpressure, then fails safely if buffer exceeds limit. |
+| Tenant floods platform            | Token bucket + concurrency quota + fair scheduler protects others.                              |
+| Object storage upload fails       | Job can retry upload; metadata commits only after successful upload.                            |
+| Workflow YAML creates huge matrix | Resolver enforces expansion limits.                                                             |
+| Secret appears in logs            | Redaction filter and audit alert; still assume secrets may need rotation.                       |
 
 ---
 
@@ -888,18 +888,18 @@ DB only receives durable state transitions
 
 ## 26. Technology Choices
 
-| Need | Technology choice |
-|---|---|
-| Metadata/state | PostgreSQL, MySQL, Spanner, CockroachDB |
-| Scheduling queue | Kafka/Pulsar + scheduler workers, or Redis Streams for smaller scale |
-| Logs | Kafka/Pulsar hot stream + object storage archive |
-| Artifacts | S3/GCS/Azure Blob |
-| Live updates | WebSocket or SSE gateway |
+| Need             | Technology choice                                                         |
+| ---------------- | ------------------------------------------------------------------------- |
+| Metadata/state   | PostgreSQL, MySQL, Spanner, CockroachDB                                   |
+| Scheduling queue | Kafka/Pulsar + scheduler workers, or Redis Streams for smaller scale      |
+| Logs             | Kafka/Pulsar hot stream + object storage archive                          |
+| Artifacts        | S3/GCS/Azure Blob                                                         |
+| Live updates     | WebSocket or SSE gateway                                                  |
 | Runner isolation | VM/microVM/container sandbox with gVisor/Kata/Firecracker-style isolation |
-| Secrets | KMS-backed secrets manager |
-| Cache | Object storage + metadata DB + TTL policies |
-| Fairness | Weighted fair queuing / deficit round robin |
-| Observability | OpenTelemetry, Prometheus, logs/traces/metrics |
+| Secrets          | KMS-backed secrets manager                                                |
+| Cache            | Object storage + metadata DB + TTL policies                               |
+| Fairness         | Weighted fair queuing / deficit round robin                               |
+| Observability    | OpenTelemetry, Prometheus, logs/traces/metrics                            |
 
 ---
 

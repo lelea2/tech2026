@@ -20,9 +20,21 @@
       "hash": "3f99872af8c4dd8fc20245934555cf735dad56eacaacb89213369edcf4b1c691",
       "docRelative": "chess-online-system-architecture.svg"
     },
+    "system-designs/design_tool_architecture.svg": {
+      "hash": "b3ec4614290d01ea5b7ce8a8c58821e13886e004ccbffd48ea522c1b482c00ca",
+      "docRelative": "design_tool_architecture.svg"
+    },
+    "system-designs/design_tool_ux_wireframe.svg": {
+      "hash": "32ae983b0fe471ac243f1923c6f00c7eef15d0715835a44e80f9415fa80ca8c8",
+      "docRelative": "design_tool_ux_wireframe.svg"
+    },
     "system-designs/dropbox.png": {
       "hash": "7f05c54311c5622788ca9680b97f0ed747bbd0641c228f785a22565aba20a930",
       "docRelative": "dropbox.png"
+    },
+    "system-designs/figma.png": {
+      "hash": "2c37c162b2abbc878aa7d6d29d601de73f232b0500d50ab43136f716b6304229",
+      "docRelative": "figma.png"
     },
     "system-designs/github-actions-fe-run-view.svg": {
       "hash": "c618adc3bc826faa21f968af2b0fe590d448640ad8eeeb6dc86548729b2d65f8",
@@ -109,11 +121,11 @@
       "docRelative": "dropbox.mdx"
     },
     "system-designs/figma.mdx": {
-      "hash": "595267864fb8da68cd37dab736fc94dc4a2efcc2ad49d5e42c55474dc62046a3",
+      "hash": "2d2ab791c0042fc7295ecdb36981cd251488bc91a9f6b5b31837486a57cf052f",
       "docRelative": "figma.mdx"
     },
     "system-designs/github-actions-system-design.mdx": {
-      "hash": "b800a2e4b146e00cc18ccf6d4dbe222b2456a5f5eb7f6cad64c3551f62ca8457",
+      "hash": "8b7228fa984e56358456d7e53fc2484433e81761db105f0c6f007e708e30c7a9",
       "docRelative": "github-actions-system-design.mdx"
     },
     "system-designs/google-docs-design.mdx": {

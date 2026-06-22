@@ -1,0 +1,157 @@
+<svg width="1400" height="920" viewBox="0 0 1400 920" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.18"/>
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#333"/>
+    </marker>
+    <style>
+      .title { font: 700 32px Arial, sans-serif; fill: #111; }
+      .subtitle { font: 16px Arial, sans-serif; fill: #555; }
+      .section { font: 700 18px Arial, sans-serif; fill: #111; }
+      .text { font: 14px Arial, sans-serif; fill: #222; }
+      .small { font: 12px Arial, sans-serif; fill: #444; }
+      .box { fill: #fff; stroke: #222; stroke-width: 1.5; rx: 16; filter: url(#shadow); }
+      .client { fill: #F4F7FF; stroke: #4D6BFE; }
+      .edge { fill: #F8FFF4; stroke: #45A049; }
+      .service { fill: #FFF8E8; stroke: #D99800; }
+      .data { fill: #F8F0FF; stroke: #8F4DE8; }
+      .ops { fill: #F7F7F7; stroke: #666; }
+      .arrow { stroke: #333; stroke-width: 1.8; fill: none; marker-end: url(#arrow); }
+      .dash { stroke-dasharray: 7 5; }
+      .label { font: 12px Arial, sans-serif; fill: #333; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="920" fill="#FAFAFA"/>
+  <text x="60" y="58" class="title">Collaborative Design / Drawing Tool — High-Level Architecture</text>
+  <text x="60" y="86" class="subtitle">Interview target: Figma / Canva / Excalidraw-like editor with real-time collaboration, persistence, assets, sharing, and exports</text>
+
+  <!-- Clients -->
+  <rect x="60" y="140" width="260" height="300" class="box client"/>
+  <text x="85" y="176" class="section">Web / Desktop Client</text>
+  <text x="85" y="210" class="text">• Canvas renderer: SVG / HTML5 Canvas / WebGL</text>
+  <text x="85" y="235" class="text">• Local document model</text>
+  <text x="85" y="260" class="text">• Tool state: select, pen, shape, text</text>
+  <text x="85" y="285" class="text">• Optimistic updates</text>
+  <text x="85" y="310" class="text">• Undo / redo stack</text>
+  <text x="85" y="335" class="text">• Presence cursors + comments</text>
+  <text x="85" y="360" class="text">• Offline queue / retry</text>
+  <text x="85" y="397" class="small">Hot path: pointer events → local render first → sync ops async</text>
+
+  <rect x="60" y="500" width="260" height="180" class="box client"/>
+  <text x="85" y="536" class="section">Mobile / Tablet Client</text>
+  <text x="85" y="570" class="text">• Read/comment flow</text>
+  <text x="85" y="595" class="text">• Lightweight edit mode</text>
+  <text x="85" y="620" class="text">• Touch gestures</text>
+  <text x="85" y="645" class="text">• Asset preview</text>
+
+  <!-- Edge -->
+  <rect x="410" y="150" width="260" height="230" class="box edge"/>
+  <text x="435" y="186" class="section">Edge / Gateway</text>
+  <text x="435" y="220" class="text">• AuthN / AuthZ</text>
+  <text x="435" y="245" class="text">• Rate limiting</text>
+  <text x="435" y="270" class="text">• File permission check</text>
+  <text x="435" y="295" class="text">• REST / GraphQL APIs</text>
+  <text x="435" y="320" class="text">• WebSocket upgrade</text>
+  <text x="435" y="345" class="text">• CDN for static assets</text>
+
+  <rect x="410" y="450" width="260" height="230" class="box edge"/>
+  <text x="435" y="486" class="section">Realtime Gateway</text>
+  <text x="435" y="520" class="text">• Sticky room routing</text>
+  <text x="435" y="545" class="text">• WebSocket fan-in/fan-out</text>
+  <text x="435" y="570" class="text">• Backpressure control</text>
+  <text x="435" y="595" class="text">• Presence heartbeat</text>
+  <text x="435" y="620" class="text">• Reconnect from sequence</text>
+  <text x="435" y="645" class="text">• Pub/Sub bridge</text>
+
+  <!-- Services -->
+  <rect x="760" y="90" width="260" height="190" class="box service"/>
+  <text x="785" y="126" class="section">Document Service</text>
+  <text x="785" y="160" class="text">• File metadata</text>
+  <text x="785" y="185" class="text">• Page / layer tree</text>
+  <text x="785" y="210" class="text">• Snapshot creation</text>
+  <text x="785" y="235" class="text">• Version history</text>
+  <text x="785" y="260" class="text">• Ownership + workspace</text>
+
+  <rect x="760" y="320" width="260" height="230" class="box service"/>
+  <text x="785" y="356" class="section">Collaboration Service</text>
+  <text x="785" y="390" class="text">• Room actor / session manager</text>
+  <text x="785" y="415" class="text">• Ordered operation log</text>
+  <text x="785" y="440" class="text">• CRDT / OT conflict resolution</text>
+  <text x="785" y="465" class="text">• Presence state</text>
+  <text x="785" y="490" class="text">• Catch-up from op sequence</text>
+  <text x="785" y="515" class="text">• Durable append before ack</text>
+
+  <rect x="760" y="590" width="260" height="210" class="box service"/>
+  <text x="785" y="626" class="section">Asset / Export Service</text>
+  <text x="785" y="660" class="text">• Image/video upload</text>
+  <text x="785" y="685" class="text">• Virus scan / validation</text>
+  <text x="785" y="710" class="text">• Thumbnails + transforms</text>
+  <text x="785" y="735" class="text">• PNG/PDF/SVG export jobs</text>
+  <text x="785" y="760" class="text">• Font management</text>
+
+  <!-- Data Stores -->
+  <rect x="1110" y="90" width="230" height="190" class="box data"/>
+  <text x="1135" y="126" class="section">Metadata DB</text>
+  <text x="1135" y="160" class="text">Postgres / Spanner</text>
+  <text x="1135" y="190" class="text">• users</text>
+  <text x="1135" y="215" class="text">• workspaces</text>
+  <text x="1135" y="240" class="text">• files</text>
+  <text x="1135" y="265" class="text">• permissions</text>
+
+  <rect x="1110" y="320" width="230" height="230" class="box data"/>
+  <text x="1135" y="356" class="section">Document Storage</text>
+  <text x="1135" y="390" class="text">Object store + KV</text>
+  <text x="1135" y="420" class="text">• snapshots</text>
+  <text x="1135" y="445" class="text">• compacted documents</text>
+  <text x="1135" y="470" class="text">• operation log</text>
+  <text x="1135" y="495" class="text">• version checkpoints</text>
+  <text x="1135" y="520" class="text">• replay cursor</text>
+
+  <rect x="1110" y="590" width="230" height="210" class="box data"/>
+  <text x="1135" y="626" class="section">Blob / Search / Cache</text>
+  <text x="1135" y="660" class="text">• S3/GCS for assets</text>
+  <text x="1135" y="685" class="text">• CDN thumbnails</text>
+  <text x="1135" y="710" class="text">• Redis presence/cache</text>
+  <text x="1135" y="735" class="text">• OpenSearch index</text>
+  <text x="1135" y="760" class="text">• Pub/Sub/Kafka topics</text>
+
+  <!-- Observability -->
+  <rect x="60" y="750" width="610" height="100" class="box ops"/>
+  <text x="85" y="786" class="section">Cross-cutting Platform Concerns</text>
+  <text x="85" y="820" class="text">Observability • audit logs • abuse detection • quota/billing • GDPR deletion • backups • disaster recovery • feature flags</text>
+
+  <!-- Arrows -->
+  <path d="M320 245 C350 245 375 245 410 245" class="arrow"/>
+  <text x="335" y="232" class="label">API calls</text>
+
+  <path d="M320 570 C350 570 375 570 410 570" class="arrow"/>
+  <text x="335" y="555" class="label">WS / REST</text>
+
+  <path d="M670 245 C705 210 720 185 760 185" class="arrow"/>
+  <text x="690" y="210" class="label">metadata</text>
+
+  <path d="M670 570 C705 525 720 455 760 440" class="arrow"/>
+  <text x="690" y="510" class="label">ops</text>
+
+  <path d="M1020 185 C1050 185 1070 185 1110 185" class="arrow"/>
+  <path d="M1020 440 C1050 440 1070 440 1110 440" class="arrow"/>
+  <path d="M1020 695 C1050 695 1070 695 1110 695" class="arrow"/>
+
+  <path d="M890 550 C890 565 890 575 890 590" class="arrow"/>
+  <text x="905" y="575" class="label">export reads document + assets</text>
+
+  <path d="M1225 320 C1225 295 1225 285 1225 280" class="arrow dash"/>
+  <text x="1240" y="306" class="label">file pointers</text>
+
+  <path d="M760 465 C720 480 705 510 670 540" class="arrow dash"/>
+  <text x="681" y="486" class="label">broadcast patches</text>
+
+  <path d="M410 625 C350 720 265 742 190 750" class="arrow dash"/>
+  <text x="250" y="724" class="label">metrics/logs/traces</text>
+
+  <!-- Footer notes -->
+  <text x="60" y="885" class="small">Key interview callout: keep pointer/rendering local, make collaboration append-only and ordered per document, periodically compact op logs into snapshots, and separate metadata, document state, and large binary assets.</text>
+</svg>
