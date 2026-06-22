@@ -6,27 +6,71 @@ title: curryIII
 
 ~~~javascript
 /**
+ * Interview question: Implement infinite curry with implicit evaluation
+ *
+ * This curry variant is different from the common arity-based curry.
+ *
+ * Normal curry:
+ * - executes when enough arguments have been collected based on fn.length.
+ *
+ * This implementation:
+ * - keeps returning another function forever,
+ * - stores every argument in a closure,
+ * - executes the original function only when the curried function is coerced
+ *   to a primitive value, such as during console output, arithmetic, string
+ *   conversion, or explicit Number()/String() calls.
+ *
+ * Example:
+ * const add = (...nums) => nums.reduce((sum, n) => sum + n, 0);
+ * const curriedAdd = curry(add);
+ *
+ * curriedAdd(1)(2)(3) is still a function.
+ * +curriedAdd(1)(2)(3) evaluates to 6.
+ * String(curriedAdd(1)(2)(3)) evaluates to "6".
+ *
+ * Key technique:
+ * JavaScript objects and functions can define conversion hooks:
+ * - Symbol.toPrimitive
+ * - valueOf
+ * - toString
+ *
+ * We attach those hooks to each returned function. When JS needs a primitive,
+ * the hook calls the original function with all collected arguments.
+ *
+ * Time:
+ * - Each partial call copies the collected arguments, so building a chain of n
+ *   arguments costs O(n) total argument storage work.
+ * - Evaluation calls fn once with all collected arguments.
+ *
+ * Space:
+ * - O(n) for the collected arguments captured in closures.
+ *
  * @param {Function} fn
  * @returns {Function}
  */
 export default function curry(fn) {
   function buildCurried(collectedArgs, boundThis) {
     const curried = function(...args) {
+      // Preserve the first useful `this` value across the whole chain.
       const nextThis = boundThis === undefined ? this : boundThis;
+
+      // Keep collecting arguments. Unlike arity-based curry, we do not check
+      // fn.length and do not execute here.
       return buildCurried(collectedArgs.concat(args), nextThis);
     };
 
-    // When coerced to a primitive, invoke fn with collected args
+    // Preferred primitive conversion hook. This handles numeric, string, and
+    // default primitive conversion contexts.
     curried[Symbol.toPrimitive] = () => {
       return fn.apply(boundThis, collectedArgs);
     };
 
-    // Fallback for valueOf (numeric context)
+    // Fallback for older or explicit numeric conversion paths.
     curried.valueOf = () => {
       return fn.apply(boundThis, collectedArgs);
     };
 
-    // Fallback for toString (string context)
+    // Fallback for explicit string conversion and display.
     curried.toString = () => {
       return String(fn.apply(boundThis, collectedArgs));
     };

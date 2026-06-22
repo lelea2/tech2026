@@ -1,359 +1,367 @@
 {
   "files": {
     "algorithm/array/arrayOfProduct.js": {
-      "hash": "0f205b518844d7178870a087f9084bde900e1b4817914dbc4161d5e56b44e790",
+      "hash": "45e330cbeb69d8cb73df4822ac131017f4da33b4568135f900271eac2f9acdcd",
       "docRelative": "array/arrayOfProduct.mdx"
     },
     "algorithm/array/arrayProductExcludingCurrent.js": {
-      "hash": "4a2b14451003b8c8e5c50eb787e30c0e2dec1b4f7a864d17b24a17cc5a39f8a9",
+      "hash": "8dd61e14423e07cb06e54d803399d61d4e44628d5ea10a45c915c32a53d86db9",
       "docRelative": "array/arrayProductExcludingCurrent.mdx"
     },
     "algorithm/array/arrayShuffle.js": {
-      "hash": "8e287e676b781dbf426d579481916fc701a7c0a2b25992969d4d62e8c35b94cc",
+      "hash": "1a587a8a2d3628c8aab041d6d5d455608e1a15d83a264014afbfbc8b32589cfe",
       "docRelative": "array/arrayShuffle.mdx"
     },
     "algorithm/array/coinChange.js": {
-      "hash": "f63245013d68944846917b03e0c56b8ec235afa308f823d10dc5000ac41f5470",
+      "hash": "337b3900713bd678c43de1a8e91ff21152da3522e5edeeb9b0ad0d7228ed6a97",
       "docRelative": "array/coinChange.mdx"
     },
     "algorithm/array/duplicateArray.js": {
-      "hash": "d8c1864360c3ffe190b2d6493ccb34622cddf78cf2b38be91980435b89504f50",
+      "hash": "bc685c19cb2b9ecfb2c0e498b758690a8bbd1ac902ebb86a193dbc0ba7a0f44f",
       "docRelative": "array/duplicateArray.mdx"
     },
+    "algorithm/array/findMedianSortedArray.js": {
+      "hash": "679bcbf16e543cb662d219072256fc86458e0b135e6b435431bf68f47fb6e078",
+      "docRelative": "array/findMedianSortedArray.mdx"
+    },
     "algorithm/array/findMissingNumberInSequence.js": {
-      "hash": "0714e9e0899c38627fcfc447dc85acc02470e3865a012cf28d4778b60243af43",
+      "hash": "b31f1f8845a3386c1796c5874eaf5778dbd4986796ef512f94126d437a0abc53",
       "docRelative": "array/findMissingNumberInSequence.mdx"
     },
     "algorithm/array/kRowPascalTriangle.py": {
-      "hash": "0a505a14c2cc212d82cd73bb168d6bda88b15e3554880d55fca2ff82c5ea80f6",
+      "hash": "836137b0c35eef0a193d474574390f8a7ac911e449e2d88f694a161118b26b06",
       "docRelative": "array/kRowPascalTriangle.mdx"
     },
     "algorithm/array/kRowPascalTriangle.js": {
-      "hash": "0a505a14c2cc212d82cd73bb168d6bda88b15e3554880d55fca2ff82c5ea80f6",
+      "hash": "836137b0c35eef0a193d474574390f8a7ac911e449e2d88f694a161118b26b06",
       "docRelative": "array/kRowPascalTriangle.mdx"
     },
     "algorithm/array/maxProductSubArray.js": {
-      "hash": "89a5b5184e9a9f09436245c15c3fd448152c27ee867057036f2c671ef565c99f",
+      "hash": "fdc737315b57bce9dc5dd8c861117c181c29d5c98f0c7f09d2396a58e2142f83",
       "docRelative": "array/maxProductSubArray.mdx"
     },
     "algorithm/array/maxProfit.js": {
-      "hash": "fb2e60efa96968d6861b984d44558853c897ddffb1b506dc8e61c5ada49c0007",
+      "hash": "96d6b154ceca50c5ad73324800076852edecdc164bc03b4c19a41796c0d199b3",
       "docRelative": "array/maxProfit.mdx"
     },
     "algorithm/array/maxSumSubArray.py": {
-      "hash": "32b837e69f53d069442edc59c0f3994ba553a1417af152c53f82a9d35e602d4f",
+      "hash": "55e6487d0eb23db41d50a1fcbfcc9cc9940ce52e3788ff6895d923faf7975a95",
       "docRelative": "array/maxSumSubArray.mdx"
     },
     "algorithm/array/maxSumSubArray.js": {
-      "hash": "32b837e69f53d069442edc59c0f3994ba553a1417af152c53f82a9d35e602d4f",
+      "hash": "55e6487d0eb23db41d50a1fcbfcc9cc9940ce52e3788ff6895d923faf7975a95",
       "docRelative": "array/maxSumSubArray.mdx"
     },
     "algorithm/array/twoSum.js": {
-      "hash": "b7d8df1c9be94957876d326204090867da21dcb5dc815b811e2ae43a8b8a9770",
+      "hash": "3eabc32d94e9c490cb307d0a254e4f04a0bc2aadd80892bf724a6ed49ce45763",
       "docRelative": "array/twoSum.mdx"
     },
     "algorithm/array/zigzag.js": {
-      "hash": "10e47e7dd89e965ed01ee349537e1545cce6ce8e66647453c28f49ed3afd808c",
+      "hash": "2188af883f67da3f8791a4fa1c9b99a1d21082683e4c73c832a0233ad5d1b957",
       "docRelative": "array/zigzag.mdx"
     },
     "algorithm/bit/addBinary.js": {
-      "hash": "178254477564780ed2e4c30f6f359b1a47cb496c5bd7f865dc04171b9b866cb8",
+      "hash": "1c5fa78eb2d118240c5df9b494c225be6d3c6b89b4fa109744b804eef3d533bd",
       "docRelative": "bit/addBinary.mdx"
     },
     "algorithm/bit/bitCount.js": {
-      "hash": "2aac7c558b9d794b9481ba9b680bb38f68971fcac438b63b01e4b81f494250a2",
+      "hash": "0a2c989f87c4dc86e9121fb6b1fcab9e0f3f08b16de06f862d641d94086bdd7d",
       "docRelative": "bit/bitCount.mdx"
     },
     "algorithm/bit/bitReversal.js": {
-      "hash": "9df67691c5ad7926f8945bca3970ba8bc21f97ee98f191f41fdc7bc16384ee2d",
+      "hash": "fe099a8c2efe829347e4f6bbed1abdf2efb90ad99dfb6c1c418c706ec869de39",
       "docRelative": "bit/bitReversal.mdx"
     },
     "algorithm/bit/countOnesBitInBinary.js": {
-      "hash": "ea8416e193032291a7714bd6d93bb28bfbcfdfd6e13171708f6a06c7a2931148",
+      "hash": "e4b552e702fd27739fa1bc22fda6fc1a6e1d385ab7b2d2b43c38bd99ef28b0f1",
       "docRelative": "bit/countOnesBitInBinary.mdx"
     },
     "algorithm/climbingStairs.js": {
-      "hash": "6ffc33431e2288df2d026e10111006d486ea32f79044350417cf3a13a16ae18f",
+      "hash": "5ff648b132b5b748e81ece369455cafa32cbea94b0e61da9d1f2a9e48eb8fec7",
       "docRelative": "climbingStairs.mdx"
     },
     "algorithm/dfs/boggle.js": {
-      "hash": "361cc2d478544b339b2e97b674d3558814c7e96a1f6c4c06e139f120ece0ddde",
+      "hash": "a174035c326bfe38419253faabeb95f5009fe6aea7a6ccd4faee807c2a026559",
       "docRelative": "dfs/boggle.mdx"
     },
     "algorithm/dfs/calculateEquation.js": {
-      "hash": "e0d96a50b462996648f5d4c92eff69a45a0a4a29488f3fce5f9a8cdf893adce0",
+      "hash": "12ee32443c7237271582e4e461359cef0d7d9a7e76c1db8a4297b959684ce193",
       "docRelative": "dfs/calculateEquation.mdx"
     },
     "algorithm/dfs/checkPackageDependencies.js": {
-      "hash": "ac487d1f36787e7bad1f587359a54d67ae3265f0f7b9fd9996532369aa21785a",
+      "hash": "c0bdfc3f454759ed217f0a03ebfbabc6646c815e7bccf90ca3dfe6e2c16de4ae",
       "docRelative": "dfs/checkPackageDependencies.mdx"
     },
     "algorithm/dfs/countIslandOnGrid.js": {
-      "hash": "0d2b8be42d005c0303aaa5d40c5e4e448e66845e67b233c5e96d0fb51ac2cb60",
+      "hash": "32a7bca9542e4ab1359611d2ed5812988bd74475e0916863f73162a4be9486c2",
       "docRelative": "dfs/countIslandOnGrid.mdx"
     },
+    "algorithm/dfs/maximizeAmoutAfterTwoDays.js": {
+      "hash": "ff9cecc27dd31dd43f60efadd73c95d18813e9f4199b7a1e450915055203d762",
+      "docRelative": "dfs/maximizeAmoutAfterTwoDays.mdx"
+    },
     "algorithm/graph/aliendOrder.js": {
-      "hash": "eea5da97639e79f9396b3cb22524f7055a8f220c1e337991754a63079a34a5f4",
+      "hash": "e21cb72c5cd4922e6400530fac743e324f01fceab1993b5cf0c8d03876b3bf06",
       "docRelative": "graph/aliendOrder.mdx"
     },
     "algorithm/graph/cycleInGraph.js": {
-      "hash": "9cd4acfb4e239e68eef72da465941fce3818904c555072db61d0d369e7878295",
+      "hash": "2ebebb811c1de636edef38a21055d88cc4995d822ac8424c9d298b91b18f3004",
       "docRelative": "graph/cycleInGraph.mdx"
     },
     "algorithm/heap/Heap.js": {
-      "hash": "34b045bda6e233945b28e02ac7b8ea06fae098805866975dbbb39b247344f21a",
+      "hash": "07090957a3e21364ed99debe1d5c846ca2e65f4c7aebdcd3a4c09e0c87c0bc13",
       "docRelative": "heap/Heap.mdx"
     },
     "algorithm/heap/MinHeap.js": {
-      "hash": "b1f20b0ceea64fe473f8110543f346b708a84d0ff614faa0bd7dec71aebcc93d",
+      "hash": "c94dce102cfd868472c8f4cfc832f1623a72371fef6bbdb4fc2c170030504a83",
       "docRelative": "heap/MinHeap.mdx"
     },
     "algorithm/heap/heapSort.js": {
-      "hash": "379f8004a724e70cbeba5f7fa2b4a68d456170a1ff65ed030feece0d7d329b56",
+      "hash": "e30c65c586041d95697594b55b7be8b66802558b5be826295a8993cdb4185514",
       "docRelative": "heap/heapSort.mdx"
     },
     "algorithm/heap/isHeap.js": {
-      "hash": "5a63cdafbc32072cf262af17d4b6bf62a1273aafe197c73b73604d1df854e1ed",
+      "hash": "baf61dfa326188d1105fe82f1d7791fab47363359d089a290889b1c73c5d81c0",
       "docRelative": "heap/isHeap.mdx"
     },
     "algorithm/heap/shortestPathDistance.js": {
-      "hash": "24b929782f822cc4eeebc76e6b5c838c03be50cde51eb287e6b4abb270a625d4",
+      "hash": "e5a9ce07cad3e794f45ce6bd1706c6af3c5c391506f069a0375b00a8d57db620",
       "docRelative": "heap/shortestPathDistance.mdx"
     },
     "algorithm/isMeetingCalendarValid.js": {
-      "hash": "7d35708df6828b1c83ad7d39c5b6e3895acc4e36e579274c3cb7e75776d4ca35",
+      "hash": "b08970ce919b1e7c8a129bca4c41ed7c1d9398461934d6487db38ca66da4fbd5",
       "docRelative": "isMeetingCalendarValid.mdx"
     },
     "algorithm/linkedlist/DoubleLinkedList.js": {
-      "hash": "f166baa52b811f7debe02a6d3dec46387a0a37f6f1f2e80dd1ee1bfee01fb720",
+      "hash": "7d6ce7881690881c0856634f2896d159ad99a2ddd96406c3d222de6839be7874",
       "docRelative": "linkedlist/DoubleLinkedList.mdx"
     },
     "algorithm/linkedlist/LinkedList.js": {
-      "hash": "7262c85fed8d75451305194ebd750ba117bd6d7adf098dd9b2bde58f0c50dd72",
+      "hash": "fdafe483495a45be8b0d59b7e2fbd73fb95003506d6c312bbcd3c04c0a829605",
       "docRelative": "linkedlist/LinkedList.mdx"
     },
     "algorithm/linkedlist/isCircularLinkedList.py": {
-      "hash": "39d70f084a68c73c2a7072c8d5cfdb5c6d04c52a4a7fafb481121e533fb087fd",
+      "hash": "6310e628414b72e7a5cda3acce14ed9c4ddefaaf1c03137715d6a3ef03574e50",
       "docRelative": "linkedlist/isCircularLinkedList.mdx"
     },
     "algorithm/linkedlist/isCircularLinkedList.js": {
-      "hash": "39d70f084a68c73c2a7072c8d5cfdb5c6d04c52a4a7fafb481121e533fb087fd",
+      "hash": "6310e628414b72e7a5cda3acce14ed9c4ddefaaf1c03137715d6a3ef03574e50",
       "docRelative": "linkedlist/isCircularLinkedList.mdx"
     },
     "algorithm/linkedlist/linkedListCombineKSorted.js": {
-      "hash": "317c859e9065d7dbd091c80ad8e54c4ac90a3f264c191f76c2eaaf893297de97",
+      "hash": "5245513ed5ca407f578c30ab419931fd081a4fc244801f3108a9f265c87597e5",
       "docRelative": "linkedlist/linkedListCombineKSorted.mdx"
     },
     "algorithm/linkedlist/linkedListCombinedSortedList.js": {
-      "hash": "16098c8e46c2e630932e0b701ce5538887617e0db33a95738d3c68da7c186008",
+      "hash": "bd341c37ec21d403a36765adcab9aefffb2d71d2e6cd79f593f3db0ef30b5a08",
       "docRelative": "linkedlist/linkedListCombinedSortedList.mdx"
     },
     "algorithm/linkedlist/removeDuplicateNodeFromLinkedList.js": {
-      "hash": "a38e438dffd3b71ebcb20897df7b80b7389fb473e61dd321f060b66067da43ca",
+      "hash": "cbb5ce6c57d9e5321c961b2f1b93d6d4c3959cb0623e5161466b1321b019c156",
       "docRelative": "linkedlist/removeDuplicateNodeFromLinkedList.mdx"
     },
     "algorithm/linkedlist/reverseList.js": {
-      "hash": "0ac06ec2a7bb8e8bd4fdce1917968d890ab0c9ce9f65479e4834a18ddc83d754",
+      "hash": "417e7c05ef57fdf16320fa15d543e1749c922f7248e5ccfba07a05807d2d5512",
       "docRelative": "linkedlist/reverseList.mdx"
     },
     "algorithm/lru/lru.js": {
-      "hash": "2ed772bf36d7c7f5e88b1356bbd26cba82455a6a3427454bf562948ab655c498",
+      "hash": "a5307619f4ee079e7133c3d6d0b92366ebffdb7fa421908bff6cb0fa60248257",
       "docRelative": "lru/lru.mdx"
     },
     "algorithm/lru/lru_O1.js": {
-      "hash": "7e3300c30adde77993782279fdebb6e1cef8cc31bfa9b33ec1c55bcfc1c270a1",
+      "hash": "c0d7aa42d90e17c3c960103c861988c385d02755624be274037e7731dbaaf103",
       "docRelative": "lru/lru_O1.mdx"
     },
     "algorithm/lru/lru_On.js": {
-      "hash": "1e08c2fed2b9e30c565aca2772f7fcd8163bc34c2053fe962bb974f7fe094d2b",
+      "hash": "08857bdbf089d01fd9fc9da0e91da5f5ed33d55cd5c025e2e757fe2fd48b1293",
       "docRelative": "lru/lru_On.mdx"
     },
     "algorithm/mostCommonElement.js": {
-      "hash": "8cec5205685c93fd5c347d5aa8adaf9837a617e878b380ffb9586e23dc79fff9",
+      "hash": "25e9e39cc08fe140e4f6bcea64e904c62673d26a27389d9a48e40a6d80aa04cf",
       "docRelative": "mostCommonElement.mdx"
     },
     "algorithm/recursive/fibonacci.js": {
-      "hash": "a31f0e5f8f975a03618d4c28380bbc74e8af864431ed54a734d887b5961ea6c8",
+      "hash": "a63aa83f7c2f257389a14ca80a680c77837666857c74e4f033bedc66a5ce3f06",
       "docRelative": "recursive/fibonacci.mdx"
     },
     "algorithm/recursive/permutation.js": {
-      "hash": "9ca55cbb1aef2b2e97a2a7c097e438d0b63591e67c8c8c4c15becbe5b4c81a80",
+      "hash": "eb9d60581c8d2715c27da783103d7aca7e5f5feff6e058dbd8aca1d685e644a1",
       "docRelative": "recursive/permutation.mdx"
     },
     "algorithm/stack/Queue.js": {
-      "hash": "19be1b2f3918fb1f15557903d022e5626806671b6b0f738e71051684671cabe0",
+      "hash": "812d23a51f6b7a8d64034049586f8eaaea79decde776bc9d83beec1b9b0305ad",
       "docRelative": "stack/Queue.mdx"
     },
     "algorithm/stack/Stack.js": {
-      "hash": "b95ac44073a31971eb2ea4783bbc9c9f30073defdcc804623648293475166884",
+      "hash": "2360af786da5f0253281096a843edb8de5009892165f339e06784b6f3ca54836",
       "docRelative": "stack/Stack.mdx"
     },
     "algorithm/stack/isBalanceBracket.py": {
-      "hash": "6edb1795fd6e6df988c4767c5b65f8497accc6d67d4a33075f51183fed5d9e14",
+      "hash": "534a99755859d20db8c3271cf0d1b069408de8d64123186325accbc59419480e",
       "docRelative": "stack/isBalanceBracket.mdx"
     },
     "algorithm/stack/isBalanceBracket.js": {
-      "hash": "6edb1795fd6e6df988c4767c5b65f8497accc6d67d4a33075f51183fed5d9e14",
+      "hash": "534a99755859d20db8c3271cf0d1b069408de8d64123186325accbc59419480e",
       "docRelative": "stack/isBalanceBracket.mdx"
     },
     "algorithm/stringAnagram.js": {
-      "hash": "0d855699717cfe62ed5df275fc9430f4778305b84b9f1de0b172fbeed86bb19a",
+      "hash": "3f57432222fbf231b5a6e003564f7511653395cb1a511ef132fa7d4a013ac7a4",
       "docRelative": "stringAnagram.mdx"
     },
     "algorithm/tree/BinaryTree.js": {
-      "hash": "5b5794d6111e70acb6a5cb5f79cd30e0340b5deab79b149921ad784bf575ad89",
+      "hash": "40d5127a13aa754b0f5a904f73bd240376b72661a37606b5ec65091ba3fcff3f",
       "docRelative": "tree/BinaryTree.mdx"
     },
     "algorithm/tree/bfs.js": {
-      "hash": "e3164c9c0b8eb33bbcee5e56aeed885e6bde8bde35209286bb2f8635a8648d53",
+      "hash": "d31e7832a186dafb60f2ddd6981f129757098ef673f2f5f976b1b2daa3bedc39",
       "docRelative": "tree/bfs.mdx"
     },
     "algorithm/tree/binarySearch.js": {
-      "hash": "07c776c50196453ef0f2d2d114ce8110cf64efaeb3c3f19aa1bdbadeabe93a84",
+      "hash": "a08b151ecfa78d1420e11c1259a7da7660e0abfc8355ad8ccb5271577ea15d98",
       "docRelative": "tree/binarySearch.mdx"
     },
     "algorithm/tree/binarySearchTree.js": {
-      "hash": "f806a8a77ba4d2895e0a038f5e35471d9988d08c667a0eca1bb570a971c68cfc",
+      "hash": "2e1e16f83044bcec839427711ebb9b00ff121ab20fd672f84c807cb16484bf4d",
       "docRelative": "tree/binarySearchTree.mdx"
     },
     "algorithm/tree/binaryTreeEqual.js": {
-      "hash": "deca4042bcaa58f0c27e0299adc9071fce0f2ac79878d66a36a7fd6b6995f0ac",
+      "hash": "0b694e72ece8b37f717ecd33e34d559803f9e96779d8ce4c31bf9e6b5b0ba30f",
       "docRelative": "tree/binaryTreeEqual.mdx"
     },
     "algorithm/tree/binaryTreeFlip.js": {
-      "hash": "b6370969221f98f4271430fd42aa86fabb82778cfe24714f3b3f7490e43a78d8",
+      "hash": "79fdb998864559358c848a6942a15bb6de26203f79f2068536c8e5a439c7cda8",
       "docRelative": "tree/binaryTreeFlip.mdx"
     },
     "algorithm/tree/binaryTreeLevelOrderTraversal.js": {
-      "hash": "515111035db5bf68b444badcebacc1524f05f71f075293a169ec4d692ab63aad",
+      "hash": "3f6b518f1e11f39ea19310b7d3d26fc856a503f0123b517048a6b3b7df7b0e01",
       "docRelative": "tree/binaryTreeLevelOrderTraversal.mdx"
     },
     "algorithm/tree/binaryTreeMaximumDepth.js": {
-      "hash": "9bf4a5df17f07eb1ccaa83bdd477b7bd17f201e10046aad3237dece4bcadc940",
+      "hash": "51ba85b35d85443391f00334d8bae9bbcd40e98cae9f893ccbbcb4bd04a0ad79",
       "docRelative": "tree/binaryTreeMaximumDepth.mdx"
     },
     "algorithm/tree/binaryTreeSubTree.js": {
-      "hash": "6cac2d18e41972be30bc745121f19d37743d083f081945fa4d2b3f763c45d649",
+      "hash": "f27667d419aabf7b1aa5224bc3df719cbaf38f8635ce73e63e6547efdabd0f1c",
       "docRelative": "tree/binaryTreeSubTree.mdx"
     },
     "algorithm/tree/compareBinaryTree.js": {
-      "hash": "1dfb810595d1bc55a36c1c2168716f1265cb362c092e951a5169c22113af7771",
+      "hash": "eaf569d0fa2d6e367195d1aed301034c88a72129b3cd43f3f509e16935a36dc8",
       "docRelative": "tree/compareBinaryTree.mdx"
     },
     "algorithm/tree/dfs.js": {
-      "hash": "3f034dc2e53dee289520b9b4fd10dfe80794af2b4114dc6db7c061b7c387336d",
+      "hash": "f035a22bb3a7b89387c770177de7322686a2fa58617a3fecc31056d090862e87",
       "docRelative": "tree/dfs.mdx"
     },
     "algorithm/tree/findInRotatedArray.js": {
-      "hash": "23d5c60893c42dcb230ec6aab854f950b3ff8d7b68537d0a1dc72ef170efe25e",
+      "hash": "385aa4e0fb9c2f0272e36b41a370982f773d19905bfeec09274d563a8c697aa3",
       "docRelative": "tree/findInRotatedArray.mdx"
     },
     "algorithm/tree/graphIsTree.js": {
-      "hash": "980c508be2b77c3d52117193b03ae4d423937aab52d2f899095608b7db195404",
+      "hash": "1105efaa0a53450a06e09a0636ecee872ca81953a24ad52f35a1a1b8d537c0ef",
       "docRelative": "tree/graphIsTree.mdx"
     },
     "algorithm/tree/invertBinaryTree.js": {
-      "hash": "9f5c251c03a75d1da53194e9145b11fa4f98318f5f4d08f9f76dcfd926882740",
+      "hash": "9d3eb9024c1f53ce99df4ac9cb4098469b46eeb41043c14e3f1708b59f7994cd",
       "docRelative": "tree/invertBinaryTree.mdx"
     },
     "algorithm/tree/isSameBinaryTree.js": {
-      "hash": "b747e32862643ca40164c43fcccc5a32d31ff7c3cfa451128eaa549f92cc3bea",
+      "hash": "b2ff39b34610a36c30c3fda09e12f6906fc526e13550310b6382a7a78975124f",
       "docRelative": "tree/isSameBinaryTree.mdx"
     },
     "algorithm/tree/isSymetricTree.js": {
-      "hash": "c052bbcf5b52bbbd86ed099aba59320ddb192d222db15519c2294200fa7f07d6",
+      "hash": "af1e2511ba602921a4732bd5d8e22cfff66d64d4a16321243cc8659b55328f42",
       "docRelative": "tree/isSymetricTree.mdx"
     },
     "algorithm/tree/lowestCommonAncestor.py": {
-      "hash": "1bc40d558c879b2f3b9b96894dc9cbd12a34457ee04d72e5e3679f109b487a80",
+      "hash": "ca89941be78acd32ca66d32f9908f904a7547d0239842f93f615fc97ea06d402",
       "docRelative": "tree/lowestCommonAncestor.mdx"
     },
     "algorithm/tree/lowestCommonAncestor.js": {
-      "hash": "1bc40d558c879b2f3b9b96894dc9cbd12a34457ee04d72e5e3679f109b487a80",
+      "hash": "ca89941be78acd32ca66d32f9908f904a7547d0239842f93f615fc97ea06d402",
       "docRelative": "tree/lowestCommonAncestor.mdx"
     },
     "algorithm/tree/maxWaterTrappedBetweenWall.js": {
-      "hash": "496e9a5cb73f8c6ecf27fa9f4b6aa4ad02e785ffc6e29d29a89f1f486b8de2c7",
+      "hash": "fb39ed897d9d2258a8cb9e78a7fe860c94a8daecb03ec86112518bdb43af2f8a",
       "docRelative": "tree/maxWaterTrappedBetweenWall.mdx"
     },
     "algorithm/tree/smallestInRotatedArray.js": {
-      "hash": "3e0b1ae653025176e80fd2242e1e901055c580cbdc0362e0cf0db4829ff6593e",
+      "hash": "481d4b3ac6540bf184c5302fb8f99dfb8c0a6bcfcaca738d426396347be16877",
       "docRelative": "tree/smallestInRotatedArray.mdx"
     },
     "algorithm/tree/validBST.js": {
-      "hash": "f3448c15ccb183032c82f166aa9df1bae7002955c24a1e8d9b2982664ffd4bc3",
+      "hash": "e5404a3cfe327cb81b47c4338863a3f364d57a869c3d798fbc22afaa671c2988",
       "docRelative": "tree/validBST.mdx"
     },
     "algorithm/trie/SuffixTrie.js": {
-      "hash": "33bdbdcd398bec04a948ff67b973d5d378c3f30ad855354150e05095b197d26d",
+      "hash": "4126c59b7a89c6906ca52a9452ab33333d90facaff8e6dafbef66fb28b9d71c6",
       "docRelative": "trie/SuffixTrie.mdx"
     },
     "algorithm/trie/Trie.js": {
-      "hash": "ec9a9ef673588b12e290791795bc98710cc9cc252ae59a58fef9070e36f183a0",
+      "hash": "a9e236b31b8c88abc0c1fd1848f95661f56fcd46e60f2a644ba91517e77dc2da",
       "docRelative": "trie/Trie.mdx"
     },
     "algorithm/trie/findWordsInGrid.js": {
-      "hash": "f6ab0fc3afa18bc2c05e46398b1f0d6a72dacdede6bff1749f12f785b9f1df2d",
+      "hash": "6225a84295048cdeac7f531522d0e67ecdf8d378043dfb1754ee2057e058ff8d",
       "docRelative": "trie/findWordsInGrid.mdx"
     },
     "algorithm/trie/trie-structure.mdx": {
-      "hash": "650fa927a9614a7534f452a7e807a318ec95bb98741e4b26e61739093adf8aa1",
+      "hash": "90de64140fdf2b65a36077e36a6cd45471da80a3778a34dcad2e6f2ce13f8e5e",
       "docRelative": "trie/trie-structure.mdx"
     },
     "algorithm/two-pointers/3Sum.py": {
-      "hash": "6769853fc638c01114f2e196aba4451bae4bd9aaf1f2a4ff67bd7ea034209fac",
+      "hash": "1b62a752633d9c2ca7827425563546fb7c04c9150611c3134ff917134ae97c4a",
       "docRelative": "two-pointers/3Sum.mdx"
     },
     "algorithm/two-pointers/3Sum.js": {
-      "hash": "6769853fc638c01114f2e196aba4451bae4bd9aaf1f2a4ff67bd7ea034209fac",
+      "hash": "1b62a752633d9c2ca7827425563546fb7c04c9150611c3134ff917134ae97c4a",
       "docRelative": "two-pointers/3Sum.mdx"
     },
     "algorithm/two-pointers/checkSubArraySum.js": {
-      "hash": "d82df0b2047c4eca4ae8400cae676f9ae7b8263dfe12e34689ebe1bafe5702b6",
+      "hash": "fc741a9212da2080b53472750970cfc7f0769f7b385a4e3fada041bbf58304eb",
       "docRelative": "two-pointers/checkSubArraySum.mdx"
     },
     "algorithm/two-pointers/dutchFlagSorting.js": {
-      "hash": "9b88deeeb3ec79de57e00559e2980f5849e959264b83d458570c0d708a9bfd45",
+      "hash": "6a6c639271123f6ca9d9db5f61c75e9716eb6f26064e25706fa3f404a6824f12",
       "docRelative": "two-pointers/dutchFlagSorting.mdx"
     },
     "algorithm/two-pointers/isPalindrome.py": {
-      "hash": "ebee735913e2e0857b4371e8cfb06350dfb772a03e53b1ae0a4d3aa29cd9d634",
+      "hash": "142d6eaff88c9eba5ad893be4887b9dd24d16830de3e3ffc81374fcac5221cdd",
       "docRelative": "two-pointers/isPalindrome.mdx"
     },
     "algorithm/two-pointers/isPalindrome.js": {
-      "hash": "ebee735913e2e0857b4371e8cfb06350dfb772a03e53b1ae0a4d3aa29cd9d634",
+      "hash": "142d6eaff88c9eba5ad893be4887b9dd24d16830de3e3ffc81374fcac5221cdd",
       "docRelative": "two-pointers/isPalindrome.mdx"
     },
     "algorithm/two-pointers/isPalindrome_Pair.py": {
-      "hash": "da63d48c943c76a418e66d844698813db9d20f7fa7a9ee53387dd97399603e08",
+      "hash": "dbc429691c4ea3bf9e60aa82d1a33fa0ce741cbc17f7c742fdb2f8f15492cda4",
       "docRelative": "two-pointers/isPalindrome_Pair.mdx"
     },
     "algorithm/two-pointers/isPalindrome_Pair.js": {
-      "hash": "da63d48c943c76a418e66d844698813db9d20f7fa7a9ee53387dd97399603e08",
+      "hash": "dbc429691c4ea3bf9e60aa82d1a33fa0ce741cbc17f7c742fdb2f8f15492cda4",
       "docRelative": "two-pointers/isPalindrome_Pair.mdx"
     },
     "algorithm/two-pointers/minimumMoveToMakePalindrome.js": {
-      "hash": "a62e5a6c86513ddceebdfc7bfd5611b71bbff1c4890d5f1bc67144c7d87590b3",
+      "hash": "10f8eefdb66f9c37ee39bbce594cc2db0874191d8954e981127a44a075c662f3",
       "docRelative": "two-pointers/minimumMoveToMakePalindrome.mdx"
     },
     "algorithm/two-pointers/removeNthLasNode.js": {
-      "hash": "2624915b9e11e3b7a2a71840b471e57db3cb96b0ff559f406223c79cc662820b",
+      "hash": "b44c1f72f6b810f60a96e96124fec229d021add17a0c31a53743310dc344952d",
       "docRelative": "two-pointers/removeNthLasNode.mdx"
     },
     "algorithm/two-pointers/reverseWords.js": {
-      "hash": "638c91f79a90cde6c64bc286869dd5fe64883f88eefa078c5b41920fce625dc9",
+      "hash": "2f8be7432c36eea5d8475fd8866db884157443e1871045a295270dc01415bf40",
       "docRelative": "two-pointers/reverseWords.mdx"
     },
     "algorithm/two-pointers/shortestSubsrtingContainingCharacters.js": {
-      "hash": "79530e177fe0a1cd2174cc0467feaf19da1d91984cdcc85e2a8aaa14466dc7db",
+      "hash": "ee83fe2f3914015ddc5c1821e838c4f94ef62be34874c9ad2aa74da52045c38a",
       "docRelative": "two-pointers/shortestSubsrtingContainingCharacters.mdx"
     },
     "algorithm/two-pointers/twoNumberSum.js": {
-      "hash": "6779c62e0368939c330e2a4d9642548233684fd5140431a8e47f46995301fe7f",
+      "hash": "b922af089e60d9532e036424dbcda6851aa9310f527f7630959e0a58060888cf",
       "docRelative": "two-pointers/twoNumberSum.mdx"
     },
     "__nav__:array": {
-      "hash": "aeb989ab7471b50888410e6847b2b239812e5dbd01fff60c0e89470776500141",
+      "hash": "129e063923be87c8ac38fe4f639578a4f1c0da12322a6076a3ba3bdd6b6fdd79",
       "docRelative": "array/_index.mdx"
     },
     "__nav__:bit": {
@@ -361,7 +369,7 @@
       "docRelative": "bit/_index.mdx"
     },
     "__nav__:dfs": {
-      "hash": "a67be0f032f0982ee4983ffc88b8f31db410e7b032f94d8f3c9500ae64641017",
+      "hash": "cb0eb65daa30888496ee8d92591a0d6da344575a0840d245f98547e860412dae",
       "docRelative": "dfs/_index.mdx"
     },
     "__nav__:graph": {

@@ -1,0 +1,433 @@
+---
+title: MusicPlayer
+---
+
+# MusicPlayer
+
+~~~javascript
+/**
+ * Interview question: Music Player Analytics
+ *
+ * Build an in-memory music player analytics system in incremental parts.
+ *
+ * Requirements:
+ * 1. Add songs to a music library and assign each song a unique ID.
+ * 2. Record when a user plays a song.
+ * 3. Print an analytics summary showing every song and its number of unique
+ *    listeners, in song insertion order.
+ * 4. For each user, return the last 3 unique songs they played, most recent
+ *    first.
+ * 5. Print the top K songs by unique listener count. Ties are broken by smaller
+ *    song ID first.
+ *
+ * Important behavior:
+ * - Replaying the same song by the same user should not increase that song's
+ *   unique listener count.
+ * - A user's recent history should contain unique songs only.
+ * - If a user replays a song already in their last-3 history, move it to the
+ *   front instead of duplicating it.
+ * - Unknown song IDs are ignored by playSong.
+ *
+ * Implementation plan:
+ * - Use a Map from song ID to title for song lookup.
+ * - Keep song IDs in insertion order for the full analytics summary.
+ * - Use a Map from song ID to Set<userId> to count unique listeners.
+ * - Use a Map from user ID to a small array of song IDs for last-3 history.
+ * - Use a min-heap of size K for top-K analytics so we do not sort every song.
+ *
+ * Complexity:
+ * - addSong: O(1).
+ * - playSong: O(1), because user history is capped at 3.
+ * - printAnalyticsSummary: O(S), where S is number of songs.
+ * - lastThreePlayedSongTitles: O(1), because max result size is 3.
+ * - printTopKAnalyticsSummary: O(S log K).
+ */
+class MinHeap {
+  constructor(compareFn) {
+    this.heap = [];
+    this.compare = compareFn;
+  }
+
+  size() {
+    return this.heap.length;
+  }
+
+  peek() {
+    return this.heap[0];
+  }
+
+  push(value) {
+    this.heap.push(value);
+    this.bubbleUp(this.heap.length - 1);
+  }
+
+  pop() {
+    if (this.heap.length === 0) return null;
+    if (this.heap.length === 1) return this.heap.pop();
+
+    const root = this.heap[0];
+    this.heap[0] = this.heap.pop();
+    this.bubbleDown(0);
+
+    return root;
+  }
+
+  replace(value) {
+    // Replace the current minimum with a better candidate in O(log K).
+    const root = this.heap[0];
+    this.heap[0] = value;
+    this.bubbleDown(0);
+    return root;
+  }
+
+  bubbleUp(index) {
+    while (index > 0) {
+      const parent = Math.floor((index - 1) / 2);
+
+      if (this.compare(this.heap[index], this.heap[parent]) >= 0) {
+        break;
+      }
+
+      [this.heap[index], this.heap[parent]] = [
+        this.heap[parent],
+        this.heap[index],
+      ];
+
+      index = parent;
+    }
+  }
+
+  bubbleDown(index) {
+    const n = this.heap.length;
+
+    while (true) {
+      let smallest = index;
+      const left = index * 2 + 1;
+      const right = index * 2 + 2;
+
+      if (
+        left < n &&
+        this.compare(this.heap[left], this.heap[smallest]) < 0
+      ) {
+        smallest = left;
+      }
+
+      if (
+        right < n &&
+        this.compare(this.heap[right], this.heap[smallest]) < 0
+      ) {
+        smallest = right;
+      }
+
+      if (smallest === index) {
+        break;
+      }
+
+      [this.heap[index], this.heap[smallest]] = [
+        this.heap[smallest],
+        this.heap[index],
+      ];
+
+      index = smallest;
+    }
+  }
+
+  toArray() {
+    return [...this.heap];
+  }
+}
+
+class MusicPlayer {
+  constructor() {
+    this.nextSongId = 1;
+
+    // songId -> songTitle
+    this.songs = new Map();
+
+    // song IDs in insertion order
+    this.songOrder = [];
+
+    // songId -> Set of userIds
+    this.songListeners = new Map();
+
+    // userId -> last 3 unique songIds, most recent first
+    this.userHistory = new Map();
+  }
+
+  /**
+   * Part 1
+   *
+   * Add a song to the library.
+   *
+   * Time: O(1)
+   * Space: O(1)
+   *
+   * @param {string} songTitle
+   * @returns {number}
+   */
+  addSong(songTitle) {
+    const songId = this.nextSongId;
+    this.nextSongId += 1;
+
+    this.songs.set(songId, songTitle);
+    this.songOrder.push(songId);
+    this.songListeners.set(songId, new Set());
+
+    return songId;
+  }
+
+  /**
+   * Part 1 + Part 2
+   *
+   * Record that a user played a song.
+   *
+   * Duplicate plays do not increase unique listener count,
+   * because listeners are stored in a Set.
+   *
+   * User history keeps only the last 3 unique songs.
+   *
+   * Time: O(1)
+   * Space: O(1) per new unique listener
+   *
+   * @param {number} songId
+   * @param {string} userId
+   * @returns {void}
+   */
+  playSong(songId, userId) {
+    if (!this.songs.has(songId)) {
+      // Requirement choice: ignore invalid plays instead of throwing, because
+      // play events often come from logs or clients that may be stale.
+      return;
+    }
+
+    // Part 1: unique listener tracking
+    this.songListeners.get(songId).add(userId);
+
+    // Part 2: last 3 unique songs per user
+    if (!this.userHistory.has(userId)) {
+      this.userHistory.set(userId, []);
+    }
+
+    const history = this.userHistory.get(userId);
+
+    // If the song already exists, remove it first.
+    // Since history has max size 3, this is O(3) = O(1).
+    const existingIndex = history.indexOf(songId);
+    if (existingIndex !== -1) {
+      history.splice(existingIndex, 1);
+    }
+
+    // Add most recent song to front.
+    history.unshift(songId);
+
+    // Keep only 3 songs.
+    if (history.length > 3) {
+      history.pop();
+    }
+  }
+
+  /**
+   * Part 1
+   *
+   * Print every song with its unique listener count.
+   * Order: song insertion order.
+   *
+   * Time: O(S), where S is number of songs
+   * Space: O(1) additional
+   *
+   * @returns {void}
+   */
+  printAnalyticsSummary() {
+    for (const songId of this.songOrder) {
+      const title = this.songs.get(songId);
+      const count = this.songListeners.get(songId).size;
+
+      console.log(this.formatAnalyticsLine(title, count));
+    }
+  }
+
+  /**
+   * Part 2
+   *
+   * Return the last 3 unique songs played by user.
+   * Most recent first.
+   *
+   * Time: O(1), because max history length is 3
+   * Space: O(1)
+   *
+   * @param {string} userId
+   * @returns {string[]}
+   */
+  lastThreePlayedSongTitles(userId) {
+    if (!this.userHistory.has(userId)) {
+      return [];
+    }
+
+    return this.userHistory
+      .get(userId)
+      .map((songId) => this.songs.get(songId));
+  }
+
+  /**
+   * Part 3
+   *
+   * Print top K songs by unique listener count.
+   *
+   * Ordering:
+   * 1. Higher unique listener count first
+   * 2. If tied, smaller songId first
+   *
+   * Uses a min-heap of size K, so this is better than O(S log S).
+   *
+   * Time: O(S log K)
+   * Space: O(K)
+   *
+   * @param {number} k
+   * @returns {void}
+   */
+  printTopKAnalyticsSummary(k) {
+    if (k <= 0) {
+      return;
+    }
+
+    /**
+     * For top-K, define "worse" item as:
+     * 1. Lower listener count
+     * 2. If tied, larger songId
+     *
+     * The min-heap root should be the worst item among the current top K.
+     */
+    const minHeap = new MinHeap((a, b) => {
+      if (a.count !== b.count) {
+        return a.count - b.count;
+      }
+
+      // Larger songId is worse, so it should come first in the min-heap.
+      return b.songId - a.songId;
+    });
+
+    for (const songId of this.songOrder) {
+      const count = this.songListeners.get(songId).size;
+      const candidate = { songId, count };
+
+      if (minHeap.size() < k) {
+        // Fill the heap until it contains K candidates.
+        minHeap.push(candidate);
+      } else {
+        const worstTopK = minHeap.peek();
+
+        // Once the heap has K songs, only replace the current worst top-K item
+        // when the new song is strictly better.
+        if (this.isBetterSong(candidate, worstTopK)) {
+          minHeap.replace(candidate);
+        }
+      }
+    }
+
+    const results = minHeap.toArray();
+
+    // Sort only K items for final output order.
+    // This keeps total time O(S log K + K log K).
+    results.sort((a, b) => {
+      if (a.count !== b.count) {
+        return b.count - a.count;
+      }
+
+      return a.songId - b.songId;
+    });
+
+    for (const item of results) {
+      const title = this.songs.get(item.songId);
+      console.log(this.formatAnalyticsLine(title, item.count));
+    }
+  }
+
+  /**
+   * A song is better if:
+   * 1. It has more unique listeners
+   * 2. If tied, it has smaller songId
+   */
+  isBetterSong(a, b) {
+    if (a.count !== b.count) {
+      return a.count > b.count;
+    }
+
+    return a.songId < b.songId;
+  }
+
+  formatAnalyticsLine(title, count) {
+    const suffix = count === 1 ? "listener" : "listeners";
+    return `${title}: ${count} unique ${suffix}`;
+  }
+}
+
+/**
+ * Manual test walkthrough:
+ *
+ * Step 1: create the player and add songs.
+ *
+ * const player = new MusicPlayer();
+ * const songA = player.addSong("Hello");
+ * const songB = player.addSong("Yellow");
+ * const songC = player.addSong("Halo");
+ * const songD = player.addSong("Fix You");
+ *
+ * Expected IDs:
+ * songA === 1
+ * songB === 2
+ * songC === 3
+ * songD === 4
+ *
+ * Step 2: record plays.
+ *
+ * player.playSong(songA, "user-1");
+ * player.playSong(songA, "user-1"); // duplicate listener, count stays 1
+ * player.playSong(songA, "user-2");
+ * player.playSong(songB, "user-1");
+ * player.playSong(songC, "user-1");
+ * player.playSong(songD, "user-1");
+ * player.playSong(songB, "user-1"); // moves Yellow to front of recent history
+ *
+ * Step 3: print all analytics.
+ *
+ * player.printAnalyticsSummary();
+ *
+ * Expected console output:
+ * Hello: 2 unique listeners
+ * Yellow: 1 unique listener
+ * Halo: 1 unique listener
+ * Fix You: 1 unique listener
+ *
+ * Step 4: get one user's last 3 unique songs.
+ *
+ * player.lastThreePlayedSongTitles("user-1");
+ *
+ * Expected output:
+ * ["Yellow", "Fix You", "Halo"]
+ *
+ * Explanation:
+ * user-1 played Hello, Yellow, Halo, Fix You, then Yellow again. The repeated
+ * Yellow moves to the front. Only the most recent 3 unique songs are kept.
+ *
+ * Step 5: print top 2 analytics.
+ *
+ * player.printTopKAnalyticsSummary(2);
+ *
+ * Expected console output:
+ * Hello: 2 unique listeners
+ * Yellow: 1 unique listener
+ *
+ * Explanation:
+ * Hello has the most listeners. Yellow, Halo, and Fix You tie with one listener,
+ * so the smaller song ID wins the tie.
+ *
+ * Step 6: unknown song play is ignored.
+ *
+ * player.playSong(999, "user-3");
+ * player.lastThreePlayedSongTitles("user-3");
+ *
+ * Expected output:
+ * []
+ */
+
+~~~

@@ -1,22 +1,49 @@
 /**
- * Database with undo/redo history for CRUD operations.
+ * Interview question: Undoable Database I
+ *
+ * Implement an in-memory user database that supports:
+ * - add user
+ * - update user
+ * - delete user
+ * - get current users
+ * - undo
+ * - redo
+ *
+ * This version treats every successful mutation as one committed history step.
+ * Calling add/update/delete immediately creates a new snapshot.
  *
  * Data structure:
- * - history: array of database snapshots
- * - index: pointer to current snapshot
+ * - history: array of full database snapshots
+ * - index: pointer to the current snapshot
  *
  * Each successful CRUD operation:
  * - creates a new users array
  * - discards redo history
  * - pushes one new snapshot
+ *
+ * Why snapshots?
+ * Snapshot history is simple and reliable for interviews. Undo/redo becomes
+ * moving an index left or right. The trade-off is memory: each commit stores a
+ * full copy of users.
+ *
+ * Time:
+ * - getUsers: O(n), because we clone users before returning them.
+ * - addUser: O(n), because it clones and commits a snapshot.
+ * - updateUser/deleteUser: O(n).
+ * - undo/redo: O(1).
+ *
+ * Space:
+ * - O(n * h), where n is users per snapshot and h is history length.
  */
 export default class Database {
   constructor() {
+    // Start with one empty committed snapshot.
     this.history = [[]];
     this.index = 0;
   }
 
   getUsers() {
+    // Return copies so callers cannot mutate internal history snapshots.
     return this.history[this.index].map((user) => ({ ...user }));
   }
 
@@ -32,6 +59,7 @@ export default class Database {
     const users = this.getUsers();
     const index = users.findIndex((user) => user.id === id);
 
+    // No successful mutation means no new history entry.
     if (index === -1) return;
 
     users[index] = {
@@ -47,26 +75,66 @@ export default class Database {
     const users = this.getUsers();
     const nextUsers = users.filter((user) => user.id !== id);
 
+    // Deleting a missing user should not create a redundant snapshot.
     if (nextUsers.length === users.length) return;
 
     this._commit(nextUsers);
   }
 
   undo() {
+    // Move to the previous snapshot when possible.
     if (this.index > 0) {
       this.index--;
     }
   }
 
   redo() {
+    // Move to the next snapshot when redo history exists.
     if (this.index < this.history.length - 1) {
       this.index++;
     }
   }
 
   _commit(users) {
+    // If we undo and then perform a new write, the old redo branch is invalid.
     this.history = this.history.slice(0, this.index + 1);
+
+    // Store a defensive copy so future external mutations cannot affect history.
     this.history.push(users.map((user) => ({ ...user })));
     this.index++;
   }
 }
+
+/**
+ * Example walkthrough:
+ *
+ * const db = new Database();
+ * db.addUser({ id: 1, name: "Ava" });
+ * db.addUser({ id: 2, name: "Ben" });
+ * db.updateUser(1, { name: "Ava Lee" });
+ * db.getUsers();
+ *
+ * Output:
+ * [
+ *   { id: 1, name: "Ava Lee" },
+ *   { id: 2, name: "Ben" }
+ * ]
+ *
+ * db.undo();
+ * db.getUsers();
+ *
+ * Output:
+ * [
+ *   { id: 1, name: "Ava" },
+ *   { id: 2, name: "Ben" }
+ * ]
+ *
+ * db.redo();
+ * db.getUsers();
+ *
+ * Output:
+ * [
+ *   { id: 1, name: "Ava Lee" },
+ *   { id: 2, name: "Ben" }
+ * ]
+ */

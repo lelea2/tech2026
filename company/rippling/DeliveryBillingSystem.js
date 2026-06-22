@@ -1,0 +1,119 @@
+/**
+ * Interview question: Delivery Billing System
+ *
+ * Design an in-memory system that can:
+ * - register delivery drivers with an hourly pay rate,
+ * - record completed deliveries for those drivers,
+ * - return the total payout owed across all recorded deliveries.
+ *
+ * Important behavior:
+ * - A driver can only be registered once.
+ * - Hourly rates cannot be negative.
+ * - A delivery must have a positive duration.
+ * - A delivery cannot exceed 3 hours.
+ * - getTotalCost() should be O(1), so we maintain a running total instead of
+ *   recomputing all delivery payouts on every read.
+ *
+ * Approach:
+ * - Use a Map from driverId to hourly rate for O(1) driver lookup.
+ * - Validate each delivery before adding it to the bill.
+ * - Convert seconds to hours before multiplying by the driver's hourly rate.
+ * - Add every valid payout to `totalCost`.
+ *
+ * Complexity:
+ * - addDriver: O(1) average time, O(1) additional space.
+ * - recordDelivery: O(1) average time.
+ * - getTotalCost: O(1).
+ * - Space: O(d), where d is the number of registered drivers.
+ */
+class DeliveryBillingSystem {
+  constructor() {
+    // driverId -> hourly rate
+    this.driverRates = new Map();
+
+    // Total payout across all deliveries.
+    // Kept updated so getTotalCost() is O(1).
+    this.totalCost = 0;
+  }
+
+  /**
+   * Registers a new driver with their hourly USD rate.
+   *
+   * @param {number} driverId
+   * @param {number} usdHourlyRate
+   * @returns {void}
+   */
+  addDriver(driverId, usdHourlyRate) {
+    // Driver registration is idempotency-sensitive. If a duplicate driver is
+    // allowed silently, future deliveries could use the wrong rate.
+    if (this.driverRates.has(driverId)) {
+      throw new Error(`Driver ${driverId} already exists`);
+    }
+
+    // Negative rates would make recorded deliveries reduce total payout.
+    if (usdHourlyRate < 0) {
+      throw new Error("Hourly rate cannot be negative");
+    }
+
+    this.driverRates.set(driverId, usdHourlyRate);
+  }
+
+  /**
+   * Records a completed delivery and adds its payout to the running total.
+   *
+   * payout = hourlyRate * (endTime - startTime) / 3600
+   *
+   * @param {number} driverId
+   * @param {number} startTime Unix epoch seconds
+   * @param {number} endTime Unix epoch seconds
+   * @returns {void}
+   */
+  recordDelivery(driverId, startTime, endTime) {
+    // We need the driver's rate before calculating payout.
+    if (!this.driverRates.has(driverId)) {
+      throw new Error(`Driver ${driverId} does not exist`);
+    }
+
+    const durationSeconds = endTime - startTime;
+
+    if (durationSeconds <= 0) {
+      throw new Error("Delivery endTime must be after startTime");
+    }
+
+    // Business rule from the prompt: reject suspicious or invalid deliveries.
+    if (durationSeconds > 10800) {
+      throw new Error("Delivery cannot exceed 3 hours");
+    }
+
+    const hourlyRate = this.driverRates.get(driverId);
+
+    // Convert seconds to fractional hours before applying the hourly rate.
+    const payout = hourlyRate * (durationSeconds / 3600);
+
+    // Keep totalCost updated on write so reads are constant time.
+    this.totalCost += payout;
+  }
+
+  /**
+   * Returns total accumulated payout across all recorded deliveries.
+   * Must be O(1).
+   *
+   * @returns {number}
+   */
+  getTotalCost() {
+    return this.totalCost;
+  }
+}
+
+/**
+ * Example:
+ *
+ * const billing = new DeliveryBillingSystem();
+ * billing.addDriver(1, 20);
+ * billing.addDriver(2, 30);
+ * billing.recordDelivery(1, 0, 1800);    // 0.5 hours * $20 = $10
+ * billing.recordDelivery(2, 0, 3600);    // 1 hour * $30 = $30
+ * billing.getTotalCost();
+ *
+ * Output: 40
+ */

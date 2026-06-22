@@ -1,0 +1,444 @@
+/**
+ * Interview question: Web API Article Voting
+ *
+ * Design an in-memory article voting system that supports:
+ * - adding articles,
+ * - upvoting and downvoting articles,
+ * - preventing duplicate same-direction votes from changing score,
+ * - tracking when a user flips their vote from upvote to downvote or vice versa,
+ * - returning the most recent K vote flips for a user,
+ * - returning the top K articles by score.
+ *
+ * Score rules:
+ * - Upvote contributes +1.
+ * - Downvote contributes -1.
+ * - Repeating the same vote is a no-op.
+ * - Flipping from upvote to downvote changes score by -2.
+ * - Flipping from downvote to upvote changes score by +2.
+ *
+ * Implementation plan:
+ * - Use article IDs as stable identifiers.
+ * - Store article score separately so score lookup and updates are O(1).
+ * - Store each user's current vote per article to detect duplicate votes and flips.
+ * - Store each user's flip history as append-only article IDs.
+ * - Use a min-heap of size K to compute top K articles without sorting all
+ *   articles when K is small.
+ *
+ * Complexity:
+ * - addArticle: O(1).
+ * - upVoteArticle / downVoteArticle: O(1).
+ * - getMostRecentKFlips: O(k).
+ * - getTopK: O(A log K + K log K), where A is number of articles.
+ */
+class MinHeap {
+  constructor(compareFn) {
+    this.heap = [];
+    this.compare = compareFn;
+  }
+
+  size() {
+    return this.heap.length;
+  }
+
+  peek() {
+    return this.heap[0];
+  }
+
+  push(value) {
+    this.heap.push(value);
+    this.bubbleUp(this.heap.length - 1);
+  }
+
+  pop() {
+    if (this.heap.length === 0) return null;
+    if (this.heap.length === 1) return this.heap.pop();
+
+    const root = this.heap[0];
+    this.heap[0] = this.heap.pop();
+    this.bubbleDown(0);
+
+    return root;
+  }
+
+  replace(value) {
+    // Replace the current worst top-K item with a better candidate.
+    const root = this.heap[0];
+    this.heap[0] = value;
+    this.bubbleDown(0);
+    return root;
+  }
+
+  bubbleUp(index) {
+    while (index > 0) {
+      const parent = Math.floor((index - 1) / 2);
+
+      if (this.compare(this.heap[index], this.heap[parent]) >= 0) {
+        break;
+      }
+
+      [this.heap[index], this.heap[parent]] = [
+        this.heap[parent],
+        this.heap[index],
+      ];
+
+      index = parent;
+    }
+  }
+
+  bubbleDown(index) {
+    const n = this.heap.length;
+
+    while (true) {
+      let smallest = index;
+      const left = index * 2 + 1;
+      const right = index * 2 + 2;
+
+      if (
+        left < n &&
+        this.compare(this.heap[left], this.heap[smallest]) < 0
+      ) {
+        smallest = left;
+      }
+
+      if (
+        right < n &&
+        this.compare(this.heap[right], this.heap[smallest]) < 0
+      ) {
+        smallest = right;
+      }
+
+      if (smallest === index) break;
+
+      [this.heap[index], this.heap[smallest]] = [
+        this.heap[smallest],
+        this.heap[index],
+      ];
+
+      index = smallest;
+    }
+  }
+
+  toArray() {
+    return [...this.heap];
+  }
+}
+
+class ArticleVotingSystem {
+  constructor() {
+    this.nextArticleId = 1;
+
+    // articleId -> articleName
+    this.articles = new Map();
+
+    // articleId -> score
+    this.articleScores = new Map();
+
+    // userId -> Map<articleId, vote>
+    // vote is 1 for upvote, -1 for downvote
+    this.userVotes = new Map();
+
+    // userId -> articleId[]
+    // append-only flip history
+    this.userFlips = new Map();
+  }
+
+  /**
+   * Add a new article.
+   *
+   * Time: O(1)
+   * Space: O(1)
+   *
+   * @param {string} articleName
+   * @returns {number}
+   */
+  addArticle(articleName) {
+    const articleId = this.nextArticleId;
+    this.nextArticleId += 1;
+
+    this.articles.set(articleId, articleName);
+    this.articleScores.set(articleId, 0);
+
+    return articleId;
+  }
+
+  /**
+   * User upvotes an article.
+   *
+   * @param {number} articleId
+   * @param {number} userId
+   * @returns {void}
+   */
+  upVoteArticle(articleId, userId) {
+    this.vote(articleId, userId, 1);
+  }
+
+  /**
+   * User downvotes an article.
+   *
+   * @param {number} articleId
+   * @param {number} userId
+   * @returns {void}
+   */
+  downVoteArticle(articleId, userId) {
+    this.vote(articleId, userId, -1);
+  }
+
+  /**
+   * Internal shared voting logic.
+   *
+   * Cases:
+   *
+   * 1. No existing vote:
+   *    apply new vote
+   *
+   * 2. Same existing vote:
+   *    no-op
+   *
+   * 3. Opposite existing vote:
+   *    record a flip
+   *    remove old vote from score
+   *    apply new vote to score
+   *
+   * Example:
+   * upvote -> downvote
+   * score changes from +1 contribution to -1 contribution
+   * total score delta = -2
+   *
+   * Time: O(1)
+   * Space: O(1) per new vote or flip
+   *
+   * @param {number} articleId
+   * @param {number} userId
+   * @param {1 | -1} newVote
+   * @returns {void}
+   */
+  vote(articleId, userId, newVote) {
+    if (!this.articles.has(articleId)) {
+      // Requirement choice: ignore votes for unknown articles rather than
+      // throwing, which keeps the API tolerant of stale clients.
+      return;
+    }
+
+    if (!this.userVotes.has(userId)) {
+      this.userVotes.set(userId, new Map());
+    }
+
+    if (!this.userFlips.has(userId)) {
+      this.userFlips.set(userId, []);
+    }
+
+    const votesByUser = this.userVotes.get(userId);
+    const currentVote = votesByUser.get(articleId);
+
+    if (currentVote === newVote) {
+      // Same vote repeated by the same user should not change score or history.
+      return;
+    }
+
+    let currentScore = this.articleScores.get(articleId);
+
+    if (currentVote !== undefined) {
+      // This is a flip.
+      // We record the article ID once per flip event, so repeated flips appear
+      // multiple times in recency history.
+      this.userFlips.get(userId).push(articleId);
+
+      // Remove old vote contribution.
+      currentScore -= currentVote;
+    }
+
+    // Apply new vote contribution.
+    votesByUser.set(articleId, newVote);
+    currentScore += newVote;
+
+    this.articleScores.set(articleId, currentScore);
+  }
+
+  /**
+   * Return the k most recent article IDs where this user flipped.
+   *
+   * Most recent first.
+   *
+   * Critical requirement:
+   * This is O(k), not O(totalFlips).
+   *
+   * We only walk backward from the end of the user's flip array.
+   *
+   * Time: O(min(k, F))
+   * Space: O(min(k, F))
+   *
+   * @param {number} userId
+   * @param {number} k
+   * @returns {number[]}
+   */
+  getMostRecentKFlips(userId, k) {
+    if (k <= 0 || !this.userFlips.has(userId)) {
+      return [];
+    }
+
+    const flips = this.userFlips.get(userId);
+    const result = [];
+
+    for (let i = flips.length - 1; i >= 0 && result.length < k; i--) {
+      result.push(flips[i]);
+    }
+
+    return result;
+  }
+
+  /**
+   * Return top k article IDs by score descending.
+   *
+   * Tie-breaker:
+   * Lower articleId wins for deterministic output.
+   *
+   * Uses a min-heap of size k.
+   *
+   * Time: O(A log K + K log K)
+   * Space: O(K)
+   *
+   * Where:
+   * A = number of articles
+   * K = requested top size
+   *
+   * @param {number} k
+   * @returns {number[]}
+   */
+  getTopK(k) {
+    if (k <= 0) {
+      return [];
+    }
+
+    /**
+     * Min-heap root should be the "worst" article among current top K.
+     *
+     * Worse means:
+     * 1. Lower score
+     * 2. If same score, larger articleId
+     *
+     * Larger articleId is worse because we use lower articleId as tie-break winner.
+     */
+    const minHeap = new MinHeap((a, b) => {
+      if (a.score !== b.score) {
+        return a.score - b.score;
+      }
+
+      return b.articleId - a.articleId;
+    });
+
+    for (const articleId of this.articles.keys()) {
+      const score = this.articleScores.get(articleId);
+      const candidate = { articleId, score };
+
+      if (minHeap.size() < k) {
+        minHeap.push(candidate);
+      } else if (this.isBetterArticle(candidate, minHeap.peek())) {
+        // The heap root is the current worst article in top K. Replace it only
+        // when the candidate should outrank it.
+        minHeap.replace(candidate);
+      }
+    }
+
+    const result = minHeap.toArray();
+
+    result.sort((a, b) => {
+      if (a.score !== b.score) {
+        return b.score - a.score;
+      }
+
+      return a.articleId - b.articleId;
+    });
+
+    return result.map((item) => item.articleId);
+  }
+
+  /**
+   * Better article means:
+   * 1. Higher score
+   * 2. If same score, lower articleId
+   *
+   * @param {{ articleId: number, score: number }} a
+   * @param {{ articleId: number, score: number }} b
+   * @returns {boolean}
+   */
+  isBetterArticle(a, b) {
+    if (a.score !== b.score) {
+      return a.score > b.score;
+    }
+
+    return a.articleId < b.articleId;
+  }
+
+  /**
+   * Optional helper for debugging.
+   *
+   * @param {number} articleId
+   * @returns {number}
+   */
+  getScore(articleId) {
+    return this.articleScores.get(articleId) ?? 0;
+  }
+}
+
+/**
+ * Manual test walkthrough:
+ *
+ * Step 1: create articles.
+ *
+ * const system = new ArticleVotingSystem();
+ * const articleA = system.addArticle("Design APIs");
+ * const articleB = system.addArticle("Build Payroll");
+ * const articleC = system.addArticle("Scale Search");
+ *
+ * Expected IDs:
+ * articleA === 1
+ * articleB === 2
+ * articleC === 3
+ *
+ * Step 2: basic voting and duplicate vote behavior.
+ *
+ * system.upVoteArticle(articleA, 101);   // articleA score: 1
+ * system.upVoteArticle(articleA, 101);   // duplicate, no score change
+ * system.upVoteArticle(articleA, 102);   // articleA score: 2
+ * system.downVoteArticle(articleB, 101); // articleB score: -1
+ *
+ * Expected:
+ * system.getScore(articleA) === 2
+ * system.getScore(articleB) === -1
+ *
+ * Step 3: vote flips.
+ *
+ * system.downVoteArticle(articleA, 101);
+ *
+ * Explanation:
+ * User 101 changes articleA from +1 to -1, so articleA score changes by -2:
+ * 2 -> 0.
+ *
+ * Expected:
+ * system.getScore(articleA) === 0
+ * system.getMostRecentKFlips(101, 1) === [1]
+ *
+ * Step 4: multiple flips and recency order.
+ *
+ * system.upVoteArticle(articleB, 101);   // flips articleB from -1 to +1
+ * system.upVoteArticle(articleC, 101);   // first vote, not a flip
+ * system.downVoteArticle(articleC, 101); // flips articleC from +1 to -1
+ *
+ * Expected:
+ * system.getMostRecentKFlips(101, 3) === [3, 2, 1]
+ *
+ * Step 5: top K articles.
+ *
+ * Current scores:
+ * articleA: 0
+ * articleB: 1
+ * articleC: -1
+ *
+ * Expected:
+ * system.getTopK(2) === [2, 1]
+ *
+ * Step 6: tie-break by smaller article ID.
+ *
+ * If articleA and articleB have the same score, articleA should rank first
+ * because articleA has the smaller article ID.
+ */

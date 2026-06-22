@@ -1,0 +1,195 @@
+---
+title: maximizeAmoutAfterTwoDays
+---
+
+# maximizeAmoutAfterTwoDays
+
+~~~javascript
+/**
+ * Interview question: Maximize Amount After Two Days of Currency Conversion
+ *
+ * You start with 1 unit of `initialCurrency`.
+ *
+ * On day 1, you may perform any number of conversions using `pairs1` and
+ * `rates1`. On day 2, you may perform any number of conversions using `pairs2`
+ * and `rates2`.
+ *
+ * Return the maximum amount of the original `initialCurrency` that you can
+ * end with after both days.
+ *
+ * Key observation:
+ * Each currency is a graph node. Each exchange pair is a bidirectional edge:
+ * - from -> to uses rate
+ * - to -> from uses 1 / rate
+ *
+ * Approach:
+ * 1. Build a graph for day 1 and another graph for day 2.
+ * 2. Starting with 1 unit of the initial currency, compute the best amount of
+ *    every currency reachable after day 1.
+ * 3. For each currency reachable after day 1, use that amount as the starting
+ *    amount on day 2.
+ * 4. Run the same best-amount graph search on the day 2 graph.
+ * 5. Keep the best amount that returns to `initialCurrency`.
+ *
+ * Why graph relaxation works here:
+ * For each edge, if converting through the current currency gives a better
+ * amount of the neighbor currency, update it and continue exploring from there.
+ * The prompt usually guarantees there are no arbitrage contradictions that can
+ * increase value forever. Without that guarantee, a profitable cycle could make
+ * the answer unbounded.
+ *
+ * Time:
+ * O((V1 + E1) + R * (V2 + E2)), where R is the number of currencies reachable
+ * after day 1. In practice, currency counts are usually small.
+ *
+ * Space:
+ * O(V1 + E1 + V2 + E2), for the graphs and best-amount maps.
+ *
+ * @param {string} initialCurrency
+ * @param {string[][]} pairs1
+ * @param {number[]} rates1
+ * @param {string[][]} pairs2
+ * @param {number[]} rates2
+ * @return {number}
+ */
+export default function maxAmount(initialCurrency, pairs1, rates1, pairs2, rates2) {
+  const day1Graph = buildGraph(pairs1, rates1);
+  const day2Graph = buildGraph(pairs2, rates2);
+
+  // Best amount of each currency after any number of conversions on day 1.
+  const day1Amounts = getBestAmounts(initialCurrency, 1.0, day1Graph);
+
+  let answer = 1.0;
+
+  // Day 1 may leave us with different currencies. Try each one as the bridge
+  // currency into day 2, then see how much initialCurrency we can recover.
+  for (const [currency, amount] of day1Amounts.entries()) {
+    const day2Amounts = getBestAmounts(currency, amount, day2Graph);
+
+    if (day2Amounts.has(initialCurrency)) {
+      answer = Math.max(answer, day2Amounts.get(initialCurrency));
+    }
+  }
+
+  return answer;
+}
+
+/**
+ * Build a bidirectional graph.
+ *
+ * If A -> B has rate r,
+ * then B -> A has rate 1 / r.
+ */
+function buildGraph(pairs, rates) {
+  const graph = new Map();
+
+  for (let i = 0; i < pairs.length; i++) {
+    const [from, to] = pairs[i];
+    const rate = rates[i];
+
+    // Ensure both currencies exist even before adding outgoing edges.
+    if (!graph.has(from)) graph.set(from, []);
+    if (!graph.has(to)) graph.set(to, []);
+
+    graph.get(from).push([to, rate]);
+    graph.get(to).push([from, 1 / rate]);
+  }
+
+  return graph;
+}
+
+/**
+ * Finds the maximum amount reachable for every currency
+ * from a starting currency and amount.
+ *
+ * Since constraints say there are no contradictions/cycles that improve value,
+ * a BFS/DFS-style relaxation is enough.
+ */
+function getBestAmounts(startCurrency, startAmount, graph) {
+  const best = new Map();
+  const queue = [];
+  let head = 0;
+
+  best.set(startCurrency, startAmount);
+  queue.push(startCurrency);
+
+  while (head < queue.length) {
+    const current = queue[head];
+    head++;
+
+    const currentAmount = best.get(current);
+
+    const neighbors = graph.get(current) || [];
+
+    for (const [next, rate] of neighbors) {
+      const nextAmount = currentAmount * rate;
+
+      // Relax the edge when this route produces a better amount.
+      if (!best.has(next) || nextAmount > best.get(next)) {
+        best.set(next, nextAmount);
+        queue.push(next);
+      }
+    }
+  }
+
+  return best;
+}
+
+/**
+ * Example 1: profitable route across two days
+ *
+ * Input:
+ * maxAmount(
+ *   "EUR",
+ *   [["EUR", "USD"], ["USD", "JPY"]],
+ *   [2, 3],
+ *   [["JPY", "USD"], ["USD", "EUR"]],
+ *   [0.2, 0.6],
+ * )
+ *
+ * Explanation:
+ * Day 1: 1 EUR -> 2 USD -> 6 JPY.
+ * Day 2 best return: starting from 2 USD -> 1.2 EUR.
+ *
+ * Output: 1.2
+ */
+
+/**
+ * Example 2: no conversion improves the original amount
+ *
+ * Input:
+ * maxAmount(
+ *   "USD",
+ *   [["USD", "EUR"]],
+ *   [0.9],
+ *   [["EUR", "USD"]],
+ *   [1],
+ * )
+ *
+ * Explanation:
+ * Converting USD -> EUR on day 1 gives 0.9 EUR, then day 2 returns only
+ * 0.9 USD. The best choice is to keep the original 1 USD.
+ *
+ * Output: 1
+ */
+
+/**
+ * Example 3: direct return after day 2
+ *
+ * Input:
+ * maxAmount(
+ *   "USD",
+ *   [["USD", "EUR"]],
+ *   [2],
+ *   [["EUR", "USD"]],
+ *   [0.75],
+ * )
+ *
+ * Explanation:
+ * Day 1: 1 USD -> 2 EUR.
+ * Day 2: 2 EUR -> 1.5 USD.
+ *
+ * Output: 1.5
+ */
+
+~~~

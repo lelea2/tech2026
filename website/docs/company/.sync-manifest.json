@@ -44,6 +44,26 @@
       "hash": "6aa9f9166d3ab08e3b11d411fe16831981ab52796fa4de4a89b6f53c30739899",
       "docRelative": "openai/gpuCreditLedger.mdx"
     },
+    "company/rippling/DeliveryBillingSystem.js": {
+      "hash": "8859591d96461a504d5ba4cd46a6da0a28a0546aa84da8861f8bb0f349ca8551",
+      "docRelative": "rippling/DeliveryBillingSystem.mdx"
+    },
+    "company/rippling/MusicPlayer.js": {
+      "hash": "f63d9c890f275ea3cc8285484cba3189f6e574b6071cac17064f416948b0102d",
+      "docRelative": "rippling/MusicPlayer.mdx"
+    },
+    "company/rippling/SimplifiedPoker.js": {
+      "hash": "3cf02d4e894298383ba25cf14acf7386538c861ca525f196071d18e4836e6a7d",
+      "docRelative": "rippling/SimplifiedPoker.mdx"
+    },
+    "company/rippling/WebApiArticleVoting.js": {
+      "hash": "b511f50b9e66a86fb3a2e15f447b8b4df22120371025f756db8a30da24a53fd9",
+      "docRelative": "rippling/WebApiArticleVoting.mdx"
+    },
+    "company/rippling/maximizeAmoutAfterTwoDays.js": {
+      "hash": "9beb7c432c9086b6dc219f611e0fd108a994a4df2d1bcc52a2ef33c4196a0e46",
+      "docRelative": "rippling/maximizeAmoutAfterTwoDays.mdx"
+    },
     "company/splunk/colorExclude.js": {
       "hash": "302a27a2d6bdcbde09538fad4d739e37a7ce2addbed5505379abe82be17b3fed",
       "docRelative": "splunk/colorExclude.mdx"
@@ -79,6 +99,10 @@
     "__nav__:openai": {
       "hash": "810185a0838ed3faaacd27147e5898d264ca6962e5108b6d7dd2af65564bc1e5",
       "docRelative": "openai/_index.mdx"
+    },
+    "__nav__:rippling": {
+      "hash": "bc6cfd0f5cc34bafb88c4e90bb6f566fe1a158799e5517544075db2ab5beeccc",
+      "docRelative": "rippling/_index.mdx"
     },
     "__nav__:splunk": {
       "hash": "a40829cfb6c305c8d481214df29c6880f54d4f7b14319ea36bf302c3ac1949e2",
