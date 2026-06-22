@@ -48,6 +48,10 @@
       "hash": "8859591d96461a504d5ba4cd46a6da0a28a0546aa84da8861f8bb0f349ca8551",
       "docRelative": "rippling/DeliveryBillingSystem.mdx"
     },
+    "company/rippling/ExpenseEngine.js": {
+      "hash": "775136c145fbde0fdacfb7d7cf1c8217ff242ce44ac7717fe3a9e477950521ab",
+      "docRelative": "rippling/ExpenseEngine.mdx"
+    },
     "company/rippling/MusicPlayer.js": {
       "hash": "f63d9c890f275ea3cc8285484cba3189f6e574b6071cac17064f416948b0102d",
       "docRelative": "rippling/MusicPlayer.mdx"
@@ -55,6 +59,14 @@
     "company/rippling/SimplifiedPoker.js": {
       "hash": "3cf02d4e894298383ba25cf14acf7386538c861ca525f196071d18e4836e6a7d",
       "docRelative": "rippling/SimplifiedPoker.mdx"
+    },
+    "company/rippling/TaskRunner.js": {
+      "hash": "40654e400b7acb5b8e5fe9e838cdd9a85b8cd0c921baa92cc8aa850684f6bd7f",
+      "docRelative": "rippling/TaskRunner.mdx"
+    },
+    "company/rippling/TaskRunnerSettle.js": {
+      "hash": "8f636537ae38c5781d944d389e2c919b4dbb17f755823352ccd241f99344ab22",
+      "docRelative": "rippling/TaskRunnerSettle.mdx"
     },
     "company/rippling/WebApiArticleVoting.js": {
       "hash": "b511f50b9e66a86fb3a2e15f447b8b4df22120371025f756db8a30da24a53fd9",
@@ -101,7 +113,7 @@
       "docRelative": "openai/_index.mdx"
     },
     "__nav__:rippling": {
-      "hash": "bc6cfd0f5cc34bafb88c4e90bb6f566fe1a158799e5517544075db2ab5beeccc",
+      "hash": "c8b0f9fb1728f73bc5f894538ac4299a5b00235c35c9ee1622e952e18fde9d87",
       "docRelative": "rippling/_index.mdx"
     },
     "__nav__:splunk": {

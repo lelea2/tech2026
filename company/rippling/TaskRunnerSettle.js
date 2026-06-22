@@ -1,0 +1,179 @@
+/**
+ * Interview question: Async Task Runner with Concurrency Limit, All-Settled
+ *
+ * Build a task runner that accepts an array of task functions and runs at most
+ * `concurrency` tasks at the same time.
+ *
+ * Unlike a fail-fast runner, this version should not reject when one task
+ * fails. It should wait for every task to settle and return an array shaped
+ * like Promise.allSettled():
+ *
+ * [
+ *   { status: "fulfilled", value },
+ *   { status: "rejected", reason },
+ * ]
+ *
+ * Requirements:
+ * - Each task is a function that may return a Promise or a synchronous value.
+ * - Synchronous throws should be captured as rejections.
+ * - At most `concurrency` tasks may run at once.
+ * - Results must stay aligned with the original task order.
+ * - One failed task must not stop the remaining tasks.
+ *
+ * Why this is useful:
+ * In production job runners, batch processors, uploaders, or API callers, we
+ * often want to process everything and report which items succeeded and which
+ * failed. This is especially useful when tasks are independent.
+ *
+ * Implementation plan:
+ * - Maintain `nextTaskIndex` for the next task waiting to start.
+ * - Maintain `runningCount` to enforce concurrency.
+ * - Maintain `completedCount` to know when all tasks have settled.
+ * - Start tasks until the concurrency limit is reached.
+ * - When a task settles, store either fulfilled or rejected result at the
+ *   original index.
+ * - Start another task whenever a slot opens.
+ *
+ * Complexity:
+ * - Time: O(n), excluding task execution time.
+ * - Space: O(n), for the result array.
+ */
+class AsyncTaskRunnerSettled {
+  constructor(tasks, concurrency = 2) {
+    if (!Array.isArray(tasks)) {
+      throw new Error("tasks must be an array");
+    }
+
+    if (concurrency <= 0) {
+      throw new Error("concurrency must be greater than 0");
+    }
+
+    this.tasks = tasks;
+    this.concurrency = concurrency;
+  }
+
+  async run() {
+    const results = new Array(this.tasks.length);
+
+    let nextTaskIndex = 0;
+    let runningCount = 0;
+    let completedCount = 0;
+
+    return new Promise((resolve) => {
+      const runNext = () => {
+        // Resolve only after every task has either fulfilled or rejected.
+        if (completedCount === this.tasks.length) {
+          resolve(results);
+          return;
+        }
+
+        // Fill every available worker slot, up to the concurrency limit.
+        while (
+          runningCount < this.concurrency &&
+          nextTaskIndex < this.tasks.length
+        ) {
+          const currentIndex = nextTaskIndex;
+          const task = this.tasks[currentIndex];
+
+          // Reserve the task before running it so no other worker can pick it.
+          nextTaskIndex += 1;
+          runningCount += 1;
+
+          Promise.resolve()
+            // Wrap task execution so synchronous throws become promise rejects.
+            .then(() => task())
+            .then((value) => {
+              // Store result at original index to preserve input order.
+              results[currentIndex] = {
+                status: "fulfilled",
+                value,
+              };
+            })
+            .catch((reason) => {
+              // Capture failure but do not reject the whole runner.
+              results[currentIndex] = {
+                status: "rejected",
+                reason,
+              };
+            })
+            .finally(() => {
+              runningCount -= 1;
+              completedCount += 1;
+
+              // A worker slot opened. Start the next queued task if any remain.
+              runNext();
+            });
+        }
+      };
+
+      runNext();
+    });
+  }
+}
+
+/**
+ * Manual test scenarios:
+ *
+ * Test format:
+ * - Arrange: create task functions and choose a concurrency limit.
+ * - Act: call `await runner.run()`.
+ * - Assert: verify every task has a settled result in original input order.
+ *
+ * Important:
+ * Pass task functions, not already-created Promises. If Promises are created
+ * before calling run(), they may start before the runner can enforce the
+ * concurrency limit.
+ *
+ * Scenario 1: fulfilled and rejected results are both returned.
+ *
+ * const tasks = [
+ *   () => Promise.resolve("a"),
+ *   () => Promise.reject(new Error("boom")),
+ *   () => "c",
+ * ];
+ *
+ * const runner = new AsyncTaskRunnerSettled(tasks, 2);
+ * await runner.run();
+ *
+ * Expected output shape:
+ * [
+ *   { status: "fulfilled", value: "a" },
+ *   { status: "rejected", reason: Error("boom") },
+ *   { status: "fulfilled", value: "c" },
+ * ]
+ *
+ * Scenario 2: preserve input order even when completion order differs.
+ *
+ * const tasks = [
+ *   () => new Promise((resolve) => setTimeout(() => resolve("slow"), 50)),
+ *   () => Promise.resolve("fast"),
+ * ];
+ *
+ * const runner = new AsyncTaskRunnerSettled(tasks, 2);
+ * await runner.run();
+ *
+ * Expected output:
+ * [
+ *   { status: "fulfilled", value: "slow" },
+ *   { status: "fulfilled", value: "fast" },
+ * ]
+ *
+ * Scenario 3: respect concurrency limit.
+ *
+ * let active = 0;
+ * let maxActive = 0;
+ *
+ * const tasks = Array.from({ length: 5 }, (_, index) => async () => {
+ *   active++;
+ *   maxActive = Math.max(maxActive, active);
+ *   await new Promise((resolve) => setTimeout(resolve, 10));
+ *   active--;
+ *   return index;
+ * });
+ *
+ * const runner = new AsyncTaskRunnerSettled(tasks, 2);
+ * await runner.run();
+ *
+ * Expected:
+ * maxActive === 2
+ */
