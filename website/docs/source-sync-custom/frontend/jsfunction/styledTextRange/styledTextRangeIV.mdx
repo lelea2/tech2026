@@ -1,0 +1,129 @@
+---
+title: styledTextRangeIV
+---
+
+# styledTextRangeIV
+
+~~~javascript
+/**
+ * Apply a shallow style patch to text range [start, end).
+ *
+ * Idea:
+ * - Empty selection is no-op.
+ * - Split ranges around selected interval.
+ * - Patch only overlapping middle pieces.
+ * - Preserve unspecified style fields.
+ * - Merge adjacent ranges if style objects are equal by value.
+ *
+ * @param {{
+ *   text: string,
+ *   ranges: {
+ *     start: number,
+ *     end: number,
+ *     style: { bold?: boolean, italic?: boolean, color?: string },
+ *   }[],
+ * }} node
+ * @param {number} start
+ * @param {number} end
+ * @param {{ bold?: boolean, italic?: boolean, color?: string }} patch
+ * @returns {{
+ *   text: string,
+ *   ranges: {
+ *     start: number,
+ *     end: number,
+ *     style: { bold?: boolean, italic?: boolean, color?: string },
+ *   }[],
+ * }}
+ */
+export default function patchTextRangeStyle(node, start, end, patch) {
+  if (start === end) {
+    return {
+      text: node.text,
+      ranges: node.ranges.map((range) => ({
+        start: range.start,
+        end: range.end,
+        style: { ...range.style },
+      })),
+    };
+  }
+
+  const ranges = [];
+
+  for (const range of node.ranges) {
+    // No overlap with selected range.
+    if (range.end <= start || range.start >= end) {
+      ranges.push(copyRange(range));
+      continue;
+    }
+
+    // Left unchanged piece.
+    if (range.start < start) {
+      ranges.push({
+        start: range.start,
+        end: start,
+        style: { ...range.style },
+      });
+    }
+
+    // Middle patched piece.
+    ranges.push({
+      start: Math.max(range.start, start),
+      end: Math.min(range.end, end),
+      style: {
+        ...range.style,
+        ...patch,
+      },
+    });
+
+    // Right unchanged piece.
+    if (range.end > end) {
+      ranges.push({
+        start: end,
+        end: range.end,
+        style: { ...range.style },
+      });
+    }
+  }
+
+  return {
+    text: node.text,
+    ranges: mergeAdjacentRanges(ranges),
+  };
+}
+
+function copyRange(range) {
+  return {
+    start: range.start,
+    end: range.end,
+    style: { ...range.style },
+  };
+}
+
+function mergeAdjacentRanges(ranges) {
+  const merged = [];
+
+  for (const range of ranges) {
+    const last = merged[merged.length - 1];
+
+    if (
+      last &&
+      last.end === range.start &&
+      sameStyle(last.style, range.style)
+    ) {
+      last.end = range.end;
+    } else {
+      merged.push(copyRange(range));
+    }
+  }
+
+  return merged;
+}
+
+function sameStyle(a, b) {
+  return (
+    a.bold === b.bold &&
+    a.italic === b.italic &&
+    a.color === b.color
+  );
+}
+~~~

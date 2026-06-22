@@ -1,0 +1,87 @@
+---
+title: intersectionWith
+---
+
+# intersectionWith
+
+~~~javascript
+/**
+ * Returns the intersection of arrays
+ * using a custom comparator function.
+ *
+ * Returned values come from the FIRST array
+ * and preserve original order.
+ *
+ * Time Complexity:
+ * O(n * m * k)
+ *
+ * @param {(a: any, b: any) => boolean} comparator
+ * @param {...Array} arrays
+ * @returns {Array}
+ */
+
+export default function intersectionWith(comparator, ...arrays) {
+  // No arrays provided
+  if (arrays.length === 0) {
+    return [];
+  }
+
+  // If any array is empty
+  if (arrays.some((arr) => arr.length === 0)) {
+    return [];
+  }
+
+  const [firstArray, ...restArrays] = arrays;
+
+  // Single array case
+  if (restArrays.length === 0) {
+    return [...firstArray];
+  }
+
+  const result = [];
+
+  for (const item of firstArray) {
+    // Avoid duplicate results
+    const alreadyExists = result.some((existing) =>
+      comparator(existing, item),
+    );
+
+    if (alreadyExists) {
+      continue;
+    }
+
+    // Item must exist in EVERY other array
+    const existsInAll = restArrays.every((arr) =>
+      arr.some((otherItem) =>
+        comparator(item, otherItem),
+      ),
+    );
+
+    if (existsInAll) {
+      result.push(item);
+    }
+  }
+
+  return result;
+}
+
+/**
+const arr1 = [
+  { x: 1, y: 2 },
+  { x: 2, y: 3 },
+];
+const arr2 = [
+  { y: 2, x: 1 },
+  { x: 3, y: 4 },
+];
+
+const result = intersectionWith(
+  (a, b) => a.x === b.x && a.y === b.y,
+  arr1,
+  arr2,
+); // => [{ x: 1, y: 2 }]
+
+intersectionWith((a, b) => a === b, [1, 2, 3], [2, 3, 4], [3, 4, 5]);
+// => [3]
+ */
+~~~

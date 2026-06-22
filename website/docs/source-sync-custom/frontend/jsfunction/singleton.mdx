@@ -1,0 +1,52 @@
+---
+title: singleton
+---
+
+# singleton
+
+~~~javascript
+/**
+ * GlobalMap implemented using Singleton pattern.
+ *
+ * Ensures only ONE Map instance exists
+ * across the entire application.
+ */
+
+export default class GlobalMap {
+  // Private static instance
+  static #instance = null;
+
+  /**
+   * Returns the singleton Map instance.
+   *
+   * @returns {Map}
+   */
+  static getInstance() {
+    // Create instance only once
+    if (GlobalMap.#instance === null) {
+      GlobalMap.#instance = new Map();
+    }
+
+    return GlobalMap.#instance;
+  }
+}
+
+export default GlobalMap;
+
+
+/**
+ * // fileA.js
+import GlobalMap from './GlobalMap';
+
+const gbMap = GlobalMap.getInstance();
+gbMap.set('count', 42);
+
+-- Somewhere else in another file, executed after the first:
+
+// fileB.js
+import GlobalMap from './GlobalMap';
+
+const gbMap = GlobalMap.getInstance();
+console.log(gbMap.get('count')); // 42
+ */
+~~~

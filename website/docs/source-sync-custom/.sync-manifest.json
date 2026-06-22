@@ -1,0 +1,1500 @@
+{
+  "files": {
+    "frontend/jsfunction/2d-readingOrder/readingOrder.js": {
+      "hash": "c42c87f044399a8a2e7c253d00d0ca93ff7686198624dfb78063e18e59aeca15",
+      "docRelative": "frontend/jsfunction/2d-readingOrder/readingOrder.mdx"
+    },
+    "frontend/jsfunction/2d-readingOrder/readingOrderII.js": {
+      "hash": "88b2d60616276268fd2bfda34d7439ad6afb8d6c4e475ae4a01a8d79906e12d9",
+      "docRelative": "frontend/jsfunction/2d-readingOrder/readingOrderII.mdx"
+    },
+    "frontend/jsfunction/BackboneModel.js": {
+      "hash": "e4138aa2badb6f693c9597a8cf29f241c52ab79a7aedb8df2e50a817c4a48936",
+      "docRelative": "frontend/jsfunction/BackboneModel.mdx"
+    },
+    "frontend/jsfunction/DrizzleORM/drizzleQuery.js": {
+      "hash": "e5854bc482f3b3f3a6961c89047109f1141a654c21f31856cc4f13b3a06e5c90",
+      "docRelative": "frontend/jsfunction/DrizzleORM/drizzleQuery.mdx"
+    },
+    "frontend/jsfunction/DrizzleORM/drizzleQueryII.js": {
+      "hash": "475d61f193a51cfba0c7c1bef11f876d058383c9d9ee4c669f53fd685f578310",
+      "docRelative": "frontend/jsfunction/DrizzleORM/drizzleQueryII.mdx"
+    },
+    "frontend/jsfunction/DrizzleORM/drizzleQueryIII.js": {
+      "hash": "12ad75973540b223e6bc28ff6bf99f9adb5c69785d8aa7bb729df1089ab8b3b2",
+      "docRelative": "frontend/jsfunction/DrizzleORM/drizzleQueryIII.mdx"
+    },
+    "frontend/jsfunction/Emitter/EventEmitter.js": {
+      "hash": "8c0f7b0407e9f7de66c4957a3dc533634dd2cc10b6490e9365ac9222fe39d149",
+      "docRelative": "frontend/jsfunction/Emitter/EventEmitter.mdx"
+    },
+    "frontend/jsfunction/Emitter/EventEmitterII.js": {
+      "hash": "6bb87d9878ed8c7b53c3f1906c8556730a79daa1f3cce05129b4aff0e14732d8",
+      "docRelative": "frontend/jsfunction/Emitter/EventEmitterII.mdx"
+    },
+    "frontend/jsfunction/IntersectionObserver.js": {
+      "hash": "66c9bacf0e5d1bb237555d29e01dcce71122dc69f6776ca5e5b15d422ec44d17",
+      "docRelative": "frontend/jsfunction/IntersectionObserver.mdx"
+    },
+    "frontend/jsfunction/StoreData.js": {
+      "hash": "844d62fc1824b489d87eb5be9017a7331dde74fae84ed0541a94bb6a4f9b2224",
+      "docRelative": "frontend/jsfunction/StoreData.mdx"
+    },
+    "frontend/jsfunction/UndoableDatabase/UndoableDatabase.js": {
+      "hash": "375bb08988f73a70f298d6cc7e429133616fe3da2ec7e7fd29776fdcd1db6377",
+      "docRelative": "frontend/jsfunction/UndoableDatabase/UndoableDatabase.mdx"
+    },
+    "frontend/jsfunction/UndoableDatabase/UndoableDatabaseII.js": {
+      "hash": "e7c0834a681af24b7039309155ad0ed1c09aa9507611c40bc126851bdf6f5186",
+      "docRelative": "frontend/jsfunction/UndoableDatabase/UndoableDatabaseII.mdx"
+    },
+    "frontend/jsfunction/VirtualList.js": {
+      "hash": "a4b0ca8f353a9a8194f686374487ba51626338001f5faf4c2c3e21ea49cb4462",
+      "docRelative": "frontend/jsfunction/VirtualList.mdx"
+    },
+    "frontend/jsfunction/apply_call_bind/Function.prototype.apply.js": {
+      "hash": "27ccad51de1c051d10f2d420c32931de4fed66d378915cffafa4c9d43e6c169d",
+      "docRelative": "frontend/jsfunction/apply_call_bind/Function.prototype.apply.mdx"
+    },
+    "frontend/jsfunction/apply_call_bind/Function.prototype.bind.js": {
+      "hash": "18082d8100aaaa24e6e09b731f26a6544e9d36d6c21b736043e34d1883aa89e0",
+      "docRelative": "frontend/jsfunction/apply_call_bind/Function.prototype.bind.mdx"
+    },
+    "frontend/jsfunction/apply_call_bind/Function.prototype.call.js": {
+      "hash": "622b3e598dcbfec340ac6e6c805cdf0771aaa1e30381a0f2e76ccd218eb4ec9b",
+      "docRelative": "frontend/jsfunction/apply_call_bind/Function.prototype.call.mdx"
+    },
+    "frontend/jsfunction/apply_call_bind/README.md": {
+      "hash": "97886065e2c3dd90728e391aaf0da1d82e3287aebdd758ad2f63d184b7c17164",
+      "docRelative": "frontend/jsfunction/apply_call_bind/README.mdx"
+    },
+    "frontend/jsfunction/apply_call_bind/apply.js": {
+      "hash": "609df2fa2b831f91e0a443353875cf41a152b743608b7ff82668c9194142fc50",
+      "docRelative": "frontend/jsfunction/apply_call_bind/apply.mdx"
+    },
+    "frontend/jsfunction/apply_call_bind/apply_bind_this.js": {
+      "hash": "f1ca1de60d6eec2b722cb781d46019ca589a3d92c5fd5ce3cfb81a82774bb0c8",
+      "docRelative": "frontend/jsfunction/apply_call_bind/apply_bind_this.mdx"
+    },
+    "frontend/jsfunction/apply_call_bind/bind.js": {
+      "hash": "f310698fcdc2642f44eb6dbfc6df41c08c374afa77c559d2b232b6b1648ba293",
+      "docRelative": "frontend/jsfunction/apply_call_bind/bind.mdx"
+    },
+    "frontend/jsfunction/apply_call_bind/call.js": {
+      "hash": "3d87dd68bd9e2f7604a10ef0f4873aa19319e9dc7c8c9850a75ba828b14fc089",
+      "docRelative": "frontend/jsfunction/apply_call_bind/call.mdx"
+    },
+    "frontend/jsfunction/apply_call_bind/example.html": {
+      "hash": "3407afb0d79f909cd56a56b7e3ed716f793d3747cf6dd6887c503c6a6051f2d5",
+      "docRelative": "frontend/jsfunction/apply_call_bind/example.mdx"
+    },
+    "frontend/jsfunction/array/compact.js": {
+      "hash": "ea0147ee2d82cab54389156cf9cddd450e55e12f3fae9841b97e689a76673c92",
+      "docRelative": "frontend/jsfunction/array/compact.mdx"
+    },
+    "frontend/jsfunction/array/compactII.js": {
+      "hash": "8edd71a84741a23ad4ea367146e7c6ec01e5149d319606578e7fbe5f877a2042",
+      "docRelative": "frontend/jsfunction/array/compactII.mdx"
+    },
+    "frontend/jsfunction/array/countBy.js": {
+      "hash": "03cee250f65d0dd93f0d7fa463550336f61de34d60ed01be52dc22bcd418c403",
+      "docRelative": "frontend/jsfunction/array/countBy.mdx"
+    },
+    "frontend/jsfunction/array/dropRightWhile.js": {
+      "hash": "cefc5acf166b089d435d48df5c31eebe60e2d242edfa34a0c97f320370792531",
+      "docRelative": "frontend/jsfunction/array/dropRightWhile.mdx"
+    },
+    "frontend/jsfunction/array/dropWhile.js": {
+      "hash": "34fab4a5db0564436e9196f1cb545d16bfdbf751c6db0b63877518b5d79450f7",
+      "docRelative": "frontend/jsfunction/array/dropWhile.mdx"
+    },
+    "frontend/jsfunction/array/fill.js": {
+      "hash": "6abbdf59fb7c6312d0c6b1ce6a56ec4027b6ab673c25a1a85fe69c1669bc0e5e",
+      "docRelative": "frontend/jsfunction/array/fill.mdx"
+    },
+    "frontend/jsfunction/array/findIndex.js": {
+      "hash": "148aab74ae75a5832b451ec980e0dbe8eeab573cd1aa3d58d3642ffb8987eba7",
+      "docRelative": "frontend/jsfunction/array/findIndex.mdx"
+    },
+    "frontend/jsfunction/array/findLastIndex.js": {
+      "hash": "4574a04e3015cd5418424a5a089ee83b7c29b5351152692e63c4b0e14ab9db07",
+      "docRelative": "frontend/jsfunction/array/findLastIndex.mdx"
+    },
+    "frontend/jsfunction/array/flattenArray.js": {
+      "hash": "de4fb437ba4634ab0756177b721d5f69e89a7d70e1f7920800f8587517f3a84e",
+      "docRelative": "frontend/jsfunction/array/flattenArray.mdx"
+    },
+    "frontend/jsfunction/array/groupBy.js": {
+      "hash": "81bf47015aaf1b5cce0644d3e5e1a9e94f2d3ec6e98ec09c823f15cad34556e1",
+      "docRelative": "frontend/jsfunction/array/groupBy.mdx"
+    },
+    "frontend/jsfunction/array/intersection.js": {
+      "hash": "a18f312a216bfa7e13ea85d83366cbc78104ea64c4c768fc4d084f3bb7526ee0",
+      "docRelative": "frontend/jsfunction/array/intersection.mdx"
+    },
+    "frontend/jsfunction/array/intersectionBy.js": {
+      "hash": "c8f0f006a9519d84c55504bb6f21f35a47af8c410f7ed0f93a35d174aabbce0e",
+      "docRelative": "frontend/jsfunction/array/intersectionBy.mdx"
+    },
+    "frontend/jsfunction/array/intersectionWith.js": {
+      "hash": "0410d84c220e157cfa828382d02da036bab6a3f5c99295837f88a02b6615a0b8",
+      "docRelative": "frontend/jsfunction/array/intersectionWith.mdx"
+    },
+    "frontend/jsfunction/array/kRowPascalTriangle.js": {
+      "hash": "3cd35f9b18a5af682997e7e8d9c88af3d64bb76e9d2544527e08c526e31d4ab3",
+      "docRelative": "frontend/jsfunction/array/kRowPascalTriangle.mdx"
+    },
+    "frontend/jsfunction/array/maxBy.js": {
+      "hash": "f95f4f1257753d7a9d27784bb86f86e7fffc8c351d737a39762eb154f4feb936",
+      "docRelative": "frontend/jsfunction/array/maxBy.mdx"
+    },
+    "frontend/jsfunction/array/mergeMeeting.js": {
+      "hash": "b38f9a7f4fe123ca44d13d6a45defe45758ae92595070dd9f5bc13f8a6026663",
+      "docRelative": "frontend/jsfunction/array/mergeMeeting.mdx"
+    },
+    "frontend/jsfunction/array/mergeOverlapInterval.js": {
+      "hash": "d5b319fdb2ace0be42b5021bb290e305cd0ea4880a41eb6b4a5996695d661b19",
+      "docRelative": "frontend/jsfunction/array/mergeOverlapInterval.mdx"
+    },
+    "frontend/jsfunction/array/minBy.js": {
+      "hash": "3391fe12612a6861b21452495f2fac848e0fcf51a9d79b7a28c1cf0fa5f1bb4a",
+      "docRelative": "frontend/jsfunction/array/minBy.mdx"
+    },
+    "frontend/jsfunction/array/once.js": {
+      "hash": "67e115aabb6373c418ad98343fa66eb70073b2725085d153f2117248de9ef903",
+      "docRelative": "frontend/jsfunction/array/once.mdx"
+    },
+    "frontend/jsfunction/array/turtle.js": {
+      "hash": "e70addda7e45052cb3445ba1a802ef4271e574718521718ce88f1879107a55eb",
+      "docRelative": "frontend/jsfunction/array/turtle.mdx"
+    },
+    "frontend/jsfunction/array/unionBy.js": {
+      "hash": "5ca17f66327ac73012e225df0556f71511979d3771846c47642b59062e1e912e",
+      "docRelative": "frontend/jsfunction/array/unionBy.mdx"
+    },
+    "frontend/jsfunction/array/uniqueArray.js": {
+      "hash": "48b3697058b09a67ff1fe472a812286d12dd678c9afde860c4c8fa476fa9097d",
+      "docRelative": "frontend/jsfunction/array/uniqueArray.mdx"
+    },
+    "frontend/jsfunction/array.prototype/Array.prototype.at.js": {
+      "hash": "2a11323f65df3a3c9795b38315f3b5035f163b5e1b191814f81ad0fd8241cab6",
+      "docRelative": "frontend/jsfunction/array.prototype/Array.prototype.at.mdx"
+    },
+    "frontend/jsfunction/array.prototype/Array.prototype.concat.js": {
+      "hash": "e32a4efe5992fd3f29612de60de546001414fcfb7a96222480802ba62235e5a9",
+      "docRelative": "frontend/jsfunction/array.prototype/Array.prototype.concat.mdx"
+    },
+    "frontend/jsfunction/array.prototype/Array.prototype.filter.js": {
+      "hash": "84e3860a2e6ea839ca526b5f35d15bc889c4ec91a9953bfa374f6bf17869b995",
+      "docRelative": "frontend/jsfunction/array.prototype/Array.prototype.filter.mdx"
+    },
+    "frontend/jsfunction/array.prototype/Array.prototype.map.js": {
+      "hash": "eced58dd8028bf194864466837b4a5e4dcb07269f56b5a762b3a5bcfa4040b2d",
+      "docRelative": "frontend/jsfunction/array.prototype/Array.prototype.map.mdx"
+    },
+    "frontend/jsfunction/array.prototype/Array.prototype.reduce.js": {
+      "hash": "0c0bffee1dae973497171e161ec6cb3b161684922899edd44be906f2db3a1e11",
+      "docRelative": "frontend/jsfunction/array.prototype/Array.prototype.reduce.mdx"
+    },
+    "frontend/jsfunction/array.prototype/Array.prototype.square.js": {
+      "hash": "26de7ca37ea8925d474db1ab13a3e4f3f8db3bc173252da704abf8ba90c13f36",
+      "docRelative": "frontend/jsfunction/array.prototype/Array.prototype.square.mdx"
+    },
+    "frontend/jsfunction/camelCaseKey.js": {
+      "hash": "4df4468d9f9b470e91158b123827ba6a57c581faeb52ec20ddbaf15ea3028bc9",
+      "docRelative": "frontend/jsfunction/camelCaseKey.mdx"
+    },
+    "frontend/jsfunction/cancellableInterval.js": {
+      "hash": "55df5848f5ab0868f19c011c3c6deed89c98632b90205ae268c56e1faa3d9175",
+      "docRelative": "frontend/jsfunction/cancellableInterval.mdx"
+    },
+    "frontend/jsfunction/cancellableTimeout.js": {
+      "hash": "0f98a76aeb659787673dffa276d865edf1c2d914be2a69069e8a034d82cb6c0d",
+      "docRelative": "frontend/jsfunction/cancellableTimeout.mdx"
+    },
+    "frontend/jsfunction/chunk.js": {
+      "hash": "a3b74520413ac4f031cb692202cfe07daf387b0a76737d781643e64d886e7d7d",
+      "docRelative": "frontend/jsfunction/chunk.mdx"
+    },
+    "frontend/jsfunction/clamp.js": {
+      "hash": "1df160903857a59683e9aad8d39f568c79efcbe9d93a40a216269a2a0dc916b4",
+      "docRelative": "frontend/jsfunction/clamp.mdx"
+    },
+    "frontend/jsfunction/closure/closure.mdx": {
+      "hash": "c9b6256690aa172b182bc8adae316038d2ab75da1fd9f952dbae4fbee842a115",
+      "docRelative": "frontend/jsfunction/closure/closure.mdx"
+    },
+    "frontend/jsfunction/compose.js": {
+      "hash": "5d0d9627f2870e968fdf5a3ccf077e5d91c20720322e8ced555edf31f55f4bc3",
+      "docRelative": "frontend/jsfunction/compose.mdx"
+    },
+    "frontend/jsfunction/consoleLogHistory.js": {
+      "hash": "417b896978e7e8a50f90b7c3cded04bd3d38f90e49e0a198e8bd59e3b7c91c2a",
+      "docRelative": "frontend/jsfunction/consoleLogHistory.mdx"
+    },
+    "frontend/jsfunction/createResumableInterval.js": {
+      "hash": "6a3168525fb8f2b46bd184f772597df06bf358867cf5bdf990778dec555183e6",
+      "docRelative": "frontend/jsfunction/createResumableInterval.mdx"
+    },
+    "frontend/jsfunction/curry/curry.js": {
+      "hash": "5419fd8f60b53cf20d83bab5ff68bdb51bcf9c0d0c5f248ce25e3d2081b7ea69",
+      "docRelative": "frontend/jsfunction/curry/curry.mdx"
+    },
+    "frontend/jsfunction/curry/curryII.js": {
+      "hash": "28bb37a061b8d14884a9b8eb263f4c0910ea153d694e217d5cbef2e1d841f826",
+      "docRelative": "frontend/jsfunction/curry/curryII.mdx"
+    },
+    "frontend/jsfunction/curry/curryIII.js": {
+      "hash": "5974455eede3d4efc5e88b0e4ef4f2b7dc99008474f78f4a62397ece9dc1bb76",
+      "docRelative": "frontend/jsfunction/curry/curryIII.mdx"
+    },
+    "frontend/jsfunction/cycle.js": {
+      "hash": "2699c459266f9ebb06117c892d9ec50d0fc04ec1a78ab87569b8965fe35ba775",
+      "docRelative": "frontend/jsfunction/cycle.mdx"
+    },
+    "frontend/jsfunction/cyclicJSON.js": {
+      "hash": "8332f76f616bec53ace7ad2c3cc51e7ebd6f126c9fa6dfe2208aeeaa9b72ac49",
+      "docRelative": "frontend/jsfunction/cyclicJSON.mdx"
+    },
+    "frontend/jsfunction/dataMerge.js": {
+      "hash": "771f3c5a2a8d5bb055ca0d849ad99c696d28fdcdb6deaf6fc3abc5b3292649d0",
+      "docRelative": "frontend/jsfunction/dataMerge.mdx"
+    },
+    "frontend/jsfunction/dataSelection.js": {
+      "hash": "3d390bd65d950287237007d9eb9e158df3012f6205e306478720ed8465b4d8c7",
+      "docRelative": "frontend/jsfunction/dataSelection.mdx"
+    },
+    "frontend/jsfunction/debounce/debounce.js": {
+      "hash": "a709c64cf34079a1d84f5c4a15de4022a9719d9072d5990d7e63575cf87d592e",
+      "docRelative": "frontend/jsfunction/debounce/debounce.mdx"
+    },
+    "frontend/jsfunction/debounce/debounceCancelFlush.js": {
+      "hash": "1c29f49f8f3f166ff2465f6bffd55eefdc74c07b16782e3f9c3373431065e01c",
+      "docRelative": "frontend/jsfunction/debounce/debounceCancelFlush.mdx"
+    },
+    "frontend/jsfunction/deepClone/deepClone.js": {
+      "hash": "0d002c4c32d8efc44a6a71c44a219713e99350e1e07f33197e6f0b9c712f6d9a",
+      "docRelative": "frontend/jsfunction/deepClone/deepClone.mdx"
+    },
+    "frontend/jsfunction/deepClone/deepCloneII.js": {
+      "hash": "a44ebeec279818b57373be9f4e017f8ba14d610735ef8ff5d4b4e5f8a6befc70",
+      "docRelative": "frontend/jsfunction/deepClone/deepCloneII.mdx"
+    },
+    "frontend/jsfunction/deepClone/deepEqual.js": {
+      "hash": "8556248905079cb97ae1bdacd6d7ea02037091017d04a721d0517790ba42c05e",
+      "docRelative": "frontend/jsfunction/deepClone/deepEqual.mdx"
+    },
+    "frontend/jsfunction/deepClone/deepMerge.js": {
+      "hash": "a8969aa3428f8d76659282d7216ddd75d23c3338295a22fd86f637c8473da644",
+      "docRelative": "frontend/jsfunction/deepClone/deepMerge.mdx"
+    },
+    "frontend/jsfunction/deepClone/deepOmit.js": {
+      "hash": "3a161f9bfb83b0fcc62ed5038a8767bd07eb94a4f23b775031800f360ece617b",
+      "docRelative": "frontend/jsfunction/deepClone/deepOmit.mdx"
+    },
+    "frontend/jsfunction/difference.js": {
+      "hash": "825c93e6cb53bcfd55a8e50f95940aca007aca45ba139bbdc96e260c43f78987",
+      "docRelative": "frontend/jsfunction/difference.mdx"
+    },
+    "frontend/jsfunction/domTreeTraverse.js": {
+      "hash": "a00be16f9bd8da75a89c13b06a0b3ed171dac8f0e1e9f129cc047503352b3ba4",
+      "docRelative": "frontend/jsfunction/domTreeTraverse.mdx"
+    },
+    "frontend/jsfunction/functionLength.js": {
+      "hash": "29f4d49bd589458b0e94ac52c29c39796a7fec1dc5c04d457205918507c14232",
+      "docRelative": "frontend/jsfunction/functionLength.mdx"
+    },
+    "frontend/jsfunction/get.js": {
+      "hash": "3d1f59f3b387970da2936dddcbe6c98b627c1cb63140e0800d21e82874743450",
+      "docRelative": "frontend/jsfunction/get.mdx"
+    },
+    "frontend/jsfunction/getElementBy/getElementByClassName.js": {
+      "hash": "c93cd58748115f5273accfbf556751b0ecf1b866fa60c1df53546b2caf5b1a50",
+      "docRelative": "frontend/jsfunction/getElementBy/getElementByClassName.mdx"
+    },
+    "frontend/jsfunction/getElementBy/getElementByStyles.js": {
+      "hash": "0cf728b0a09ba4c1d5c780c4ed15891784d7899fad76288e62cb5b9b9adda70a",
+      "docRelative": "frontend/jsfunction/getElementBy/getElementByStyles.mdx"
+    },
+    "frontend/jsfunction/getElementBy/getElementByTagName.js": {
+      "hash": "712891a47386c0fe77502a8847a85caa5835e34e82785e5c05fefaf9ad18298a",
+      "docRelative": "frontend/jsfunction/getElementBy/getElementByTagName.mdx"
+    },
+    "frontend/jsfunction/getElementBy/getElementByTagNameHiearchy.js": {
+      "hash": "cc3153950eb5e586a02a0a03c616704941082f722624ef1142804dda503b2ff8",
+      "docRelative": "frontend/jsfunction/getElementBy/getElementByTagNameHiearchy.mdx"
+    },
+    "frontend/jsfunction/hooks/useArray.js": {
+      "hash": "4e8b6145154d6809f25d1c1f23f7572308f45a609d842b1645ef5c5bbd0437ff",
+      "docRelative": "frontend/jsfunction/hooks/useArray.mdx"
+    },
+    "frontend/jsfunction/hooks/useBoolean.js": {
+      "hash": "c785101f93a2d2ed9ee786ad11b887990727534cfde65c9c0a44423b9f3bc997",
+      "docRelative": "frontend/jsfunction/hooks/useBoolean.mdx"
+    },
+    "frontend/jsfunction/hooks/useBreakpoint.js": {
+      "hash": "9f570dcbf7cb752273aee5510cef8b9d74ab16d5ca2cdc0e5ef97af48202b475",
+      "docRelative": "frontend/jsfunction/hooks/useBreakpoint.mdx"
+    },
+    "frontend/jsfunction/hooks/useClickAnywher.js": {
+      "hash": "e03f21b71300ad65260d90f6c6df53e26cf0a254baa5db226d7c256d0a56b9d1",
+      "docRelative": "frontend/jsfunction/hooks/useClickAnywher.mdx"
+    },
+    "frontend/jsfunction/hooks/useClickoutside.js": {
+      "hash": "18926ed9842715d5490509938e6bd1ea3122e0bf7185f82560ace1d396734c77",
+      "docRelative": "frontend/jsfunction/hooks/useClickoutside.mdx"
+    },
+    "frontend/jsfunction/hooks/useCountdown.js": {
+      "hash": "72f8cc6f3d5361f5fa7c328fee353821531235b0c6a79bd5200fe951a502e946",
+      "docRelative": "frontend/jsfunction/hooks/useCountdown.mdx"
+    },
+    "frontend/jsfunction/hooks/useCounter.js": {
+      "hash": "098a59c7d36f5c422d9fc52beb59cbfc6b5113e0e0f09515af1cb86d7732017d",
+      "docRelative": "frontend/jsfunction/hooks/useCounter.mdx"
+    },
+    "frontend/jsfunction/hooks/useCounterMemoize.js": {
+      "hash": "61c7593e359c7d045a8be6acb953b85332f9da9f799c30b93cf86a72e6dca163",
+      "docRelative": "frontend/jsfunction/hooks/useCounterMemoize.mdx"
+    },
+    "frontend/jsfunction/hooks/useCycle.js": {
+      "hash": "919c896f2a51110da998ca691fa44627cdf43504bdba2580050243b9fdc2606d",
+      "docRelative": "frontend/jsfunction/hooks/useCycle.mdx"
+    },
+    "frontend/jsfunction/hooks/useDebounce.js": {
+      "hash": "2c1d6b0162900754e6b3a7e00ea80fa9832280d94fb8f11c6ca4188c226be377",
+      "docRelative": "frontend/jsfunction/hooks/useDebounce.mdx"
+    },
+    "frontend/jsfunction/hooks/useDefault.js": {
+      "hash": "95b50784e8bc361a97006860f91e379d9fba2ebe74489305bcc9ba363b582a8e",
+      "docRelative": "frontend/jsfunction/hooks/useDefault.mdx"
+    },
+    "frontend/jsfunction/hooks/useEffectOnce.js": {
+      "hash": "00f78798bfca6b2deebdf729c3b12f14c6d1a15a6c272aac4452e2e81abfcab8",
+      "docRelative": "frontend/jsfunction/hooks/useEffectOnce.mdx"
+    },
+    "frontend/jsfunction/hooks/useEventListener.js": {
+      "hash": "dadfe23a98c2c2c239a5667a77eebbd0508a6bf45f7e9c077101f5fdaef78a90",
+      "docRelative": "frontend/jsfunction/hooks/useEventListener.mdx"
+    },
+    "frontend/jsfunction/hooks/useFocus.js": {
+      "hash": "f4069ede7b56698ade1526bda5b4d0a91134a44efc61ac639e8bf98cd4b64acb",
+      "docRelative": "frontend/jsfunction/hooks/useFocus.mdx"
+    },
+    "frontend/jsfunction/hooks/useHover.js": {
+      "hash": "4aad47bcda66b21686fd052934f2cc0bfd24d92df26668a5abd9733695bb58ba",
+      "docRelative": "frontend/jsfunction/hooks/useHover.mdx"
+    },
+    "frontend/jsfunction/hooks/useIdle.js": {
+      "hash": "521943f48f33200a1695cc8011b2f1063bf0e760df504358d3fe289fead04771",
+      "docRelative": "frontend/jsfunction/hooks/useIdle.mdx"
+    },
+    "frontend/jsfunction/hooks/useInputControl.js": {
+      "hash": "a83dcfce0deccd054bd86f432f6689b0c727d1914e757fa98b3abaf2835fb8f1",
+      "docRelative": "frontend/jsfunction/hooks/useInputControl.mdx"
+    },
+    "frontend/jsfunction/hooks/useInterval.js": {
+      "hash": "5d36630302ae157fb54fcbf7298a06851c7112f0d4ffaee0616c828b76607fc1",
+      "docRelative": "frontend/jsfunction/hooks/useInterval.mdx"
+    },
+    "frontend/jsfunction/hooks/useMap.js": {
+      "hash": "46fdd7abc87a2bd10def404498af07bc9d869cc8d30e91190381dcc009f3c6e4",
+      "docRelative": "frontend/jsfunction/hooks/useMap.mdx"
+    },
+    "frontend/jsfunction/hooks/useMediaQuery.js": {
+      "hash": "184783a6169696fd2486e0fc2471c56f11202d2a4662de028b9b01c3276b8789",
+      "docRelative": "frontend/jsfunction/hooks/useMediaQuery.mdx"
+    },
+    "frontend/jsfunction/hooks/useMediatedState.js": {
+      "hash": "bc04092a16b514795e3b5d84b3c30e0c2d0da70381ccebdc9e2bbdc469f45552",
+      "docRelative": "frontend/jsfunction/hooks/useMediatedState.mdx"
+    },
+    "frontend/jsfunction/hooks/useObject.js": {
+      "hash": "9cd8885c2c5b555a62f1de71ef0af9fe0b57e53050e062adfacafe6131b315bd",
+      "docRelative": "frontend/jsfunction/hooks/useObject.mdx"
+    },
+    "frontend/jsfunction/hooks/usePress.js": {
+      "hash": "7bb42294a06b2a4cf55a1cc9e49b1adb404d38fcebde14ec47cf7a9fb875ee70",
+      "docRelative": "frontend/jsfunction/hooks/usePress.mdx"
+    },
+    "frontend/jsfunction/hooks/usePrevious.js": {
+      "hash": "6be314781a7c78ad86174432db7978c70404c10636432c59b433595adaa05d97",
+      "docRelative": "frontend/jsfunction/hooks/usePrevious.mdx"
+    },
+    "frontend/jsfunction/hooks/useQuery.js": {
+      "hash": "1c2ab6259f8bf70a097ecf8a3c30ca62bc7c50db15aa750e3377d3821a2104c0",
+      "docRelative": "frontend/jsfunction/hooks/useQuery.mdx"
+    },
+    "frontend/jsfunction/hooks/useSet.js": {
+      "hash": "b5f2f5fa872beb6013024b4895b9a13cda7e2a5da8b40b8bee279952594253ef",
+      "docRelative": "frontend/jsfunction/hooks/useSet.mdx"
+    },
+    "frontend/jsfunction/hooks/useStateWithReset.js": {
+      "hash": "b9fdd555006381a364d1461d9e0e23fe2fd0aa0a9d2950b5808e83830b6f65c3",
+      "docRelative": "frontend/jsfunction/hooks/useStateWithReset.mdx"
+    },
+    "frontend/jsfunction/hooks/useStep.js": {
+      "hash": "9297a09042fef818762685c1eb2fed9ee7f192be0cf27a228a1019b46517b60b",
+      "docRelative": "frontend/jsfunction/hooks/useStep.mdx"
+    },
+    "frontend/jsfunction/hooks/useThrottle.js": {
+      "hash": "a6411335fd39b54e61176d4755c369cc14883d704ad2ea1e735e99dc8a2278bb",
+      "docRelative": "frontend/jsfunction/hooks/useThrottle.mdx"
+    },
+    "frontend/jsfunction/hooks/useTimeout.js": {
+      "hash": "d058d0da402adb34207625229eb16dc9f47afb08367395d771a94c60c01f4988",
+      "docRelative": "frontend/jsfunction/hooks/useTimeout.mdx"
+    },
+    "frontend/jsfunction/hooks/useToggle.js": {
+      "hash": "bb7f7823274bbf5391cf333722b624b6ee576d8068bb5f92d2e3ed2475c4bc88",
+      "docRelative": "frontend/jsfunction/hooks/useToggle.mdx"
+    },
+    "frontend/jsfunction/hooks/useWindowResize.js": {
+      "hash": "3776a1f72f7923be644432ebe519dbe02c597033db6117eb980fb9ab3f1345e7",
+      "docRelative": "frontend/jsfunction/hooks/useWindowResize.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/classNames.js": {
+      "hash": "93e39e6c7ab274f8a9f4c7d69f061a4ab9eaa5abb2cf87f89cdf3dedb1ae4224",
+      "docRelative": "frontend/jsfunction/htmlModifier/classNames.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/classNamesAdvance.js": {
+      "hash": "dcdbb34a0a9118b9e3f9ff3a4333028e8f37f392a11161a9e2ed48dab841280c",
+      "docRelative": "frontend/jsfunction/htmlModifier/classNamesAdvance.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/classVarianceAuthority.js": {
+      "hash": "f4f0d650899de46aff4f9230fec4f00cbf0b06b593882043551938e0bf37e003",
+      "docRelative": "frontend/jsfunction/htmlModifier/classVarianceAuthority.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/correspondingNode.js": {
+      "hash": "bafc54a5f0df296e478e1c1d417ff1a373e9782c84cb8799c331181d0f4e019e",
+      "docRelative": "frontend/jsfunction/htmlModifier/correspondingNode.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/htmlSerialize.js": {
+      "hash": "300038298c77b71b2b632bdc52cc738425f5921378d754f24e779e322dd1e425",
+      "docRelative": "frontend/jsfunction/htmlModifier/htmlSerialize.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/identicalDOMTree.js": {
+      "hash": "04ecfff0df2d11fb4328211f564c432ab6a6f4fbb7ca2d74053de8c8e2373ca6",
+      "docRelative": "frontend/jsfunction/htmlModifier/identicalDOMTree.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/lowestHidingElement.js": {
+      "hash": "f3d420071058bce6a0a24be5fb4695034a295758b4952afed7c17caaa5906fee",
+      "docRelative": "frontend/jsfunction/htmlModifier/lowestHidingElement.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/richText.js": {
+      "hash": "7cd475086b0f4975e9360ece65440c9224aa8f5585d7500e11180b7579d7f560",
+      "docRelative": "frontend/jsfunction/htmlModifier/richText.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/sanitizeHTML.js": {
+      "hash": "bad9db0e0445a76abe096dec866dfbabe4582e37afd0f63300ac335ab7c6113e",
+      "docRelative": "frontend/jsfunction/htmlModifier/sanitizeHTML.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/tableOfContent.js": {
+      "hash": "8cb87d259fce9cfa8bfa6edeb08f4169a513eb067dd69899bc5f16cac57cc7bf",
+      "docRelative": "frontend/jsfunction/htmlModifier/tableOfContent.mdx"
+    },
+    "frontend/jsfunction/htmlModifier/textBetweenNode.js": {
+      "hash": "f49c4582970a2527e3d611be707d227bfb9a90fc8b408ccf34164444543eb976",
+      "docRelative": "frontend/jsfunction/htmlModifier/textBetweenNode.mdx"
+    },
+    "frontend/jsfunction/inRange.js": {
+      "hash": "2d7e2ca6bfd24ed6f52cdb85c7f2ff7ecc2c4e125891f4c260dfcab4b7d1cc3a",
+      "docRelative": "frontend/jsfunction/inRange.mdx"
+    },
+    "frontend/jsfunction/isEmpty.js": {
+      "hash": "f34bfbae1aba747ce7edc899dda8a0bf400347f0a7d5bca61278004d6ba63abc",
+      "docRelative": "frontend/jsfunction/isEmpty.mdx"
+    },
+    "frontend/jsfunction/jQuery-manipulator/jQuery.class.js": {
+      "hash": "fd931b3a5afb044000d8975389a3a2396ab9030daa4781ee27b17637dd329a50",
+      "docRelative": "frontend/jsfunction/jQuery-manipulator/jQuery.class.mdx"
+    },
+    "frontend/jsfunction/jQuery-manipulator/jQuery.css.js": {
+      "hash": "0736c7a9c2af3adfc04b4eaf0ae4265e37f0d601dabd89c10b1d3388655b6bff",
+      "docRelative": "frontend/jsfunction/jQuery-manipulator/jQuery.css.mdx"
+    },
+    "frontend/jsfunction/jsonStringify/JSON.stringify.js": {
+      "hash": "18d8e7d3ade8aeb1fb3f2753d5262e05a76bbf8d48a7bb118572a3554a3af662",
+      "docRelative": "frontend/jsfunction/jsonStringify/JSON.stringify.mdx"
+    },
+    "frontend/jsfunction/jsonStringify/JSON.stringifyII.js": {
+      "hash": "fbe8971a7e76786b29bf201e70555aa102650ac617a5b764783fbcd97daee85d",
+      "docRelative": "frontend/jsfunction/jsonStringify/JSON.stringifyII.mdx"
+    },
+    "frontend/jsfunction/jsonStringify/superJSON.js": {
+      "hash": "4ad53b5c894f0aaa248561eb1ff8a85a2c7b53fc60bccdb2903c4b80069bfcb1",
+      "docRelative": "frontend/jsfunction/jsonStringify/superJSON.mdx"
+    },
+    "frontend/jsfunction/jsonStringify/superJSONAdvance.js": {
+      "hash": "40f9c85bb012374b5517a6662e087a360264b43d587174878dd1baae566112a4",
+      "docRelative": "frontend/jsfunction/jsonStringify/superJSONAdvance.mdx"
+    },
+    "frontend/jsfunction/limitConcurrency.js": {
+      "hash": "c3cc3ee5078b95d28a9a65c8e46173c8142480b6f001882120ac15a0ac783e86",
+      "docRelative": "frontend/jsfunction/limitConcurrency.mdx"
+    },
+    "frontend/jsfunction/limits.js": {
+      "hash": "be13606811109781f53f771435da9f09551fd1f512b9aee7602d984280e7f20b",
+      "docRelative": "frontend/jsfunction/limits.mdx"
+    },
+    "frontend/jsfunction/listFormat.js": {
+      "hash": "b470e5570e5a27097482d72446f55700d6cc7bb031df3d5707f8e68c914483aa",
+      "docRelative": "frontend/jsfunction/listFormat.mdx"
+    },
+    "frontend/jsfunction/localStorageWithExpiry.js": {
+      "hash": "7385cec9d31c6ac4daf59c072a9ea4211a5c28daba69e3163f8badfd269f136c",
+      "docRelative": "frontend/jsfunction/localStorageWithExpiry.mdx"
+    },
+    "frontend/jsfunction/makeCounter/makeCounter.js": {
+      "hash": "9d21f8c65ef25f28eb804db9c9c86084c44a3a0b04381ba85b0a5f7b77e7c816",
+      "docRelative": "frontend/jsfunction/makeCounter/makeCounter.mdx"
+    },
+    "frontend/jsfunction/makeCounter/makeCounterII.js": {
+      "hash": "2e52fcc25dcf9e823124427ccabd11aa922fb61efb097bf7f412ae0791aa4483",
+      "docRelative": "frontend/jsfunction/makeCounter/makeCounterII.mdx"
+    },
+    "frontend/jsfunction/map/deepMap.js": {
+      "hash": "e01f72752e71bf2d0eb05770099cddf92b4cc6b0b41af08f982e6c13858e93c0",
+      "docRelative": "frontend/jsfunction/map/deepMap.mdx"
+    },
+    "frontend/jsfunction/map/mapAsync.js": {
+      "hash": "18fa96f0c7883593ba0d04541b15909dd25bf1ed81a02e84e6b5b3255a075499",
+      "docRelative": "frontend/jsfunction/map/mapAsync.mdx"
+    },
+    "frontend/jsfunction/map/mapAsyncWithRateLimit.js": {
+      "hash": "5d1a1923fbbad1417ab34f387f424b99de4b82c1e09f0b6b0341da6cb89edc2f",
+      "docRelative": "frontend/jsfunction/map/mapAsyncWithRateLimit.mdx"
+    },
+    "frontend/jsfunction/map/mapWithHistory.js": {
+      "hash": "4304d1f418e3298a6ca4fc479117ba8ce8658d42564a2836f7bb2fe6473b1c2f",
+      "docRelative": "frontend/jsfunction/map/mapWithHistory.mdx"
+    },
+    "frontend/jsfunction/map/weakMap.js": {
+      "hash": "b876ae9cefa5bd64fbbe905d3b113525c9b129d255f58b95932a912daef45a59",
+      "docRelative": "frontend/jsfunction/map/weakMap.mdx"
+    },
+    "frontend/jsfunction/mean.js": {
+      "hash": "e7ce05e3f9613d7f69c57eee0b7dceb1796a28a0b62f63a4618366d2b3158a7c",
+      "docRelative": "frontend/jsfunction/mean.mdx"
+    },
+    "frontend/jsfunction/memoize/memoize.js": {
+      "hash": "9afbc811e92c80e900b6db6e3ee384141a9c589b3075c264afc9fef7473d58e3",
+      "docRelative": "frontend/jsfunction/memoize/memoize.mdx"
+    },
+    "frontend/jsfunction/memoize/memoizeII.js": {
+      "hash": "9ec077fb5dbad8a7268aee2a7b23b1d96496c6de47606594fa027bdb3c700c96",
+      "docRelative": "frontend/jsfunction/memoize/memoizeII.mdx"
+    },
+    "frontend/jsfunction/middleWares.js": {
+      "hash": "98306b16e8bbc0ab80da93f16696c55c737e2d353234c3acd881dd4a67dba41c",
+      "docRelative": "frontend/jsfunction/middleWares.mdx"
+    },
+    "frontend/jsfunction/monthCalendar.js": {
+      "hash": "c0fc7ff4e332343826e2cc8dd3c5dcceb6fa521a5ac3b8bbb98e7c0ed3db605c",
+      "docRelative": "frontend/jsfunction/monthCalendar.mdx"
+    },
+    "frontend/jsfunction/nodeRegistry.js": {
+      "hash": "53751976e6df98803cb8444ea72040c6063d2ec8671a1a645a66ee1917158218",
+      "docRelative": "frontend/jsfunction/nodeRegistry.mdx"
+    },
+    "frontend/jsfunction/numArguments.js": {
+      "hash": "bf9d655ddf66a9d06214ee95f01c4e32f6f3fe75c537d5938f5557a39de8ed01",
+      "docRelative": "frontend/jsfunction/numArguments.mdx"
+    },
+    "frontend/jsfunction/object/conformTo.js": {
+      "hash": "e3290d1e917b3cf56b2e52b1a4a09352255a700208134b4e81130fa822c76d09",
+      "docRelative": "frontend/jsfunction/object/conformTo.mdx"
+    },
+    "frontend/jsfunction/object/fromPairs.js": {
+      "hash": "03d76faeae4b0997f6f1e98982324d491d31310f43625e1aa61e536486ad09c4",
+      "docRelative": "frontend/jsfunction/object/fromPairs.mdx"
+    },
+    "frontend/jsfunction/object/objectMap.js": {
+      "hash": "3aca45e3a1d868fe5019c9fc6389f629915bc487b3172e946e9b7044b66c1a4b",
+      "docRelative": "frontend/jsfunction/object/objectMap.mdx"
+    },
+    "frontend/jsfunction/object/squashObject.js": {
+      "hash": "fb214f5acf17372b8c36c04150aeee9eaca0c9fb3ca72755c5f8273361aca980",
+      "docRelative": "frontend/jsfunction/object/squashObject.mdx"
+    },
+    "frontend/jsfunction/object/unsquashObject.js": {
+      "hash": "115e1661d31f90113f07dd12d721f8e96c5ebcf957d1e9f6dcd01af4cc16230f",
+      "docRelative": "frontend/jsfunction/object/unsquashObject.mdx"
+    },
+    "frontend/jsfunction/prismaORM/miniORM.js": {
+      "hash": "87a0468b2a9a5b1037cd55b94a9d1137d74788776a39a5294e652997dd122bab",
+      "docRelative": "frontend/jsfunction/prismaORM/miniORM.mdx"
+    },
+    "frontend/jsfunction/prismaORM/miniORMII.js": {
+      "hash": "5eb1dd44d438e38c1c7721c3b24618c21e1c0dc7fb63998b4e5b164f502f7a33",
+      "docRelative": "frontend/jsfunction/prismaORM/miniORMII.mdx"
+    },
+    "frontend/jsfunction/prismaORM/miniORMIII.js": {
+      "hash": "91c03ce91875497a9e9e035858160e8db424f690bc14421deb35c11ac2a3d887",
+      "docRelative": "frontend/jsfunction/prismaORM/miniORMIII.mdx"
+    },
+    "frontend/jsfunction/promise/Promise.js": {
+      "hash": "e462e032efa14c1ffc93bb3c1e26122542d3252368e14c5e0bc8de1b66b29fbf",
+      "docRelative": "frontend/jsfunction/promise/Promise.mdx"
+    },
+    "frontend/jsfunction/promise/PromiseMerge.js": {
+      "hash": "5ad3e9a189d340ada14ae0b59432c5c2e1d83a3aed193ce0e278be2cdff6c5d7",
+      "docRelative": "frontend/jsfunction/promise/PromiseMerge.mdx"
+    },
+    "frontend/jsfunction/promise/PromiseSchedular.js": {
+      "hash": "45caf5741f0130c186b4c15906e92e032346680af3d1d52ceaf0a95b0b74f433",
+      "docRelative": "frontend/jsfunction/promise/PromiseSchedular.mdx"
+    },
+    "frontend/jsfunction/promise/Promisify.js": {
+      "hash": "1cc7d6de47d52fe91e0fc9636a1b02f56c779e0bd83c6af6394aec14387661c2",
+      "docRelative": "frontend/jsfunction/promise/Promisify.mdx"
+    },
+    "frontend/jsfunction/promise/PromisifyII.js": {
+      "hash": "93c7e554ed0d7ad3ed8f45de877378f62a34e4bb9c3ff401dbcf9dd854759e8e",
+      "docRelative": "frontend/jsfunction/promise/PromisifyII.mdx"
+    },
+    "frontend/jsfunction/promise/promiseAll.js": {
+      "hash": "330bc6b4d9abbcc122ddce09e163d4236c952efb986cf7eaf771bca8776caca6",
+      "docRelative": "frontend/jsfunction/promise/promiseAll.mdx"
+    },
+    "frontend/jsfunction/promise/promiseAllSettle.js": {
+      "hash": "50aee25eb893bd019f70adf8d0f15fdb990a59046bac3cb964e1f4822dcfe0f6",
+      "docRelative": "frontend/jsfunction/promise/promiseAllSettle.mdx"
+    },
+    "frontend/jsfunction/promise/promiseAny.js": {
+      "hash": "85b590412ffd52fbd9eb638dc6f8e6c63d8e04e49f93db935843819518868658",
+      "docRelative": "frontend/jsfunction/promise/promiseAny.mdx"
+    },
+    "frontend/jsfunction/promise/promiseRace.js": {
+      "hash": "be06af7e40a8f9feb7047674dcd91539170dce8117f93bf2603fe442a9d5a4dd",
+      "docRelative": "frontend/jsfunction/promise/promiseRace.mdx"
+    },
+    "frontend/jsfunction/promise/promiseReduce.js": {
+      "hash": "40b63500bea3829ffede692eb978e29d59cb4b4be5ff44044fa11a8905fe11dd",
+      "docRelative": "frontend/jsfunction/promise/promiseReduce.mdx"
+    },
+    "frontend/jsfunction/promise/promiseReject.js": {
+      "hash": "ae34f19be6969b3b51051ca5774dfaa047288007e24e53e859bf7f792acdbdf9",
+      "docRelative": "frontend/jsfunction/promise/promiseReject.mdx"
+    },
+    "frontend/jsfunction/promise/promiseResolve.js": {
+      "hash": "299cb31913f499ad6b5fdb8ecdf6164d8c28f5de71143f3c026272dc83040567",
+      "docRelative": "frontend/jsfunction/promise/promiseResolve.mdx"
+    },
+    "frontend/jsfunction/promise/promiseSerial.js": {
+      "hash": "062949e3028fd217687124a558b5f52b2ba53f284ab1a034e58cb5b56915dcb3",
+      "docRelative": "frontend/jsfunction/promise/promiseSerial.mdx"
+    },
+    "frontend/jsfunction/promise/promiseTimeout.js": {
+      "hash": "188e28041b125958f44be4813ed8bffc5aba50a69739256ab8190e96d7475d6a",
+      "docRelative": "frontend/jsfunction/promise/promiseTimeout.mdx"
+    },
+    "frontend/jsfunction/promise/promiseWithResolvers.js": {
+      "hash": "e94de1eed358301d03d5693d610663c47da666943075648663c59cab2ad64720",
+      "docRelative": "frontend/jsfunction/promise/promiseWithResolvers.mdx"
+    },
+    "frontend/jsfunction/range/range.js": {
+      "hash": "29d7a5c1682259eddb4d9635eede39b77b81bca20d567c62a9627da5a75860b9",
+      "docRelative": "frontend/jsfunction/range/range.mdx"
+    },
+    "frontend/jsfunction/range/rangeRight.js": {
+      "hash": "c48717d866bb5ffec4fe3daea8ebe25dfe522e29163358a1dc66d39106fef019",
+      "docRelative": "frontend/jsfunction/range/rangeRight.mdx"
+    },
+    "frontend/jsfunction/rateLimiter.js": {
+      "hash": "cc046bfafdf392e0ab77bc06ab62b42e20bd414699d84cf36139207d0d4de89f",
+      "docRelative": "frontend/jsfunction/rateLimiter.mdx"
+    },
+    "frontend/jsfunction/schemaValidator/schemaValidator.js": {
+      "hash": "97eba8fef283cdc800a6726d79d92f7801b84811e338bc18044b7a78a7d697d9",
+      "docRelative": "frontend/jsfunction/schemaValidator/schemaValidator.mdx"
+    },
+    "frontend/jsfunction/schemaValidator/schemaValidatorII.js": {
+      "hash": "d11354faa03ed78e21e48f893adad6142da5731158aac770824aab359081ba9a",
+      "docRelative": "frontend/jsfunction/schemaValidator/schemaValidatorII.mdx"
+    },
+    "frontend/jsfunction/schemaValidator/schemaValidatorIII.js": {
+      "hash": "89b4e637a58779f7ab2342fce02ee559e5d143c9be109b87c284683a4255b09f",
+      "docRelative": "frontend/jsfunction/schemaValidator/schemaValidatorIII.mdx"
+    },
+    "frontend/jsfunction/singleton.js": {
+      "hash": "2556f7aeb30b5ffaad0cb2cb6f87409872880b1f357e50356527b27b90bb3265",
+      "docRelative": "frontend/jsfunction/singleton.mdx"
+    },
+    "frontend/jsfunction/size.js": {
+      "hash": "15fc0f32931d3a5a3449652e28d73fde844f4202332e9e289b35eb74da56beb7",
+      "docRelative": "frontend/jsfunction/size.mdx"
+    },
+    "frontend/jsfunction/sleep.js": {
+      "hash": "aa3b6cfe63e61a3fec2b462e4d43e3d29828e7f16f455150cbc108804d78ee94",
+      "docRelative": "frontend/jsfunction/sleep.mdx"
+    },
+    "frontend/jsfunction/spreadSheet/spreadSheetI.js": {
+      "hash": "2e6d6ef8aacfbe2772f7cd186395947db208c369eb67683ba743643f1e005ea9",
+      "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetI.mdx"
+    },
+    "frontend/jsfunction/spreadSheet/spreadSheetII.js": {
+      "hash": "b9a606530fde6aae67fba47fc604ef2ec747ff851d4bba6712916609e835cec9",
+      "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetII.mdx"
+    },
+    "frontend/jsfunction/spreadSheet/spreadSheetIII.js": {
+      "hash": "daa9e1e409296d1be4e7c4f5785445f01e53b3d70c4cb2cbf66e9f8613a5a219",
+      "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetIII.mdx"
+    },
+    "frontend/jsfunction/styledTextRange/styledTextRange.js": {
+      "hash": "b0a0caa50ff288b8d21893c8ab3f9ce93e24f22e2c27e41547ad723855f36285",
+      "docRelative": "frontend/jsfunction/styledTextRange/styledTextRange.mdx"
+    },
+    "frontend/jsfunction/styledTextRange/styledTextRangeII.js": {
+      "hash": "a008b7aad4b03a3d6c7a6fd29f2a080e4063848a569eb35077abc7cfa470dae0",
+      "docRelative": "frontend/jsfunction/styledTextRange/styledTextRangeII.mdx"
+    },
+    "frontend/jsfunction/styledTextRange/styledTextRangeIII.js": {
+      "hash": "1e0b221855f6b93c4f452a055e9954cf6279f335f8b6fa69b3e9c216ca63a85f",
+      "docRelative": "frontend/jsfunction/styledTextRange/styledTextRangeIII.mdx"
+    },
+    "frontend/jsfunction/styledTextRange/styledTextRangeIV.js": {
+      "hash": "6ca46dfcf5628d8ba445842662811f2c346b202c374bad04b6b9c5f44cac8362",
+      "docRelative": "frontend/jsfunction/styledTextRange/styledTextRangeIV.mdx"
+    },
+    "frontend/jsfunction/sum.js": {
+      "hash": "bd9e70e1747464b86c1a8aba37bb83afbf6d85b597deb1f260384f0f495eed74",
+      "docRelative": "frontend/jsfunction/sum.mdx"
+    },
+    "frontend/jsfunction/templateEngine.js": {
+      "hash": "9eeb31683f3e91bc7b6e83df2e63417784e8dca2799c11bebd39eec846af9920",
+      "docRelative": "frontend/jsfunction/templateEngine.mdx"
+    },
+    "frontend/jsfunction/testRunner/testRunner.js": {
+      "hash": "7566be739144044e64016602062abed4960c6587e25a6d4bfa2e1bd3f9967581",
+      "docRelative": "frontend/jsfunction/testRunner/testRunner.mdx"
+    },
+    "frontend/jsfunction/testRunner/testRunnerII.js": {
+      "hash": "d0c8553a24ed56e0a1f748c6e0613c42ec42620248afbf4c44c615d7f36a834c",
+      "docRelative": "frontend/jsfunction/testRunner/testRunnerII.mdx"
+    },
+    "frontend/jsfunction/testRunner/testRunnerIII.js": {
+      "hash": "1effb8a91e55237915a1628c664d1f94543a57e5ff8172d18ee923a302677034",
+      "docRelative": "frontend/jsfunction/testRunner/testRunnerIII.mdx"
+    },
+    "frontend/jsfunction/testRunner/testRunnerIV_Promise.js": {
+      "hash": "159cf625318d8d2d987a01e398f28b1f364b518497b9de9b0a04aeb3f56d1596",
+      "docRelative": "frontend/jsfunction/testRunner/testRunnerIV_Promise.mdx"
+    },
+    "frontend/jsfunction/textSearch/textSearch.js": {
+      "hash": "2ea58f19bd886b7671c09c75cc5f6221864cee720f5ba91bb15b169caaf46c4a",
+      "docRelative": "frontend/jsfunction/textSearch/textSearch.mdx"
+    },
+    "frontend/jsfunction/textSearch/textSearchII.js": {
+      "hash": "7d9fb2a93e0bb9a7bda66907edafb7c544968d5bc663975145af5eb20548b66b",
+      "docRelative": "frontend/jsfunction/textSearch/textSearchII.mdx"
+    },
+    "frontend/jsfunction/throttle.js": {
+      "hash": "5545f0fc482a2f23cb261640d1d485c4f4c4f7cd0a14171692dcc05120ed20e7",
+      "docRelative": "frontend/jsfunction/throttle.mdx"
+    },
+    "frontend/jsfunction/typeUtilities.js": {
+      "hash": "0ca5cec711440431021ca5fcdaa7203bb334b9cf7b7780280524ef42c180af44",
+      "docRelative": "frontend/jsfunction/typeUtilities.mdx"
+    },
+    "frontend/jsfunction/typeUtilitiesII.js": {
+      "hash": "91e87d59dd65de8f9df04e65e515ef249132a5f3a55e6068296a9ac92bcfb022",
+      "docRelative": "frontend/jsfunction/typeUtilitiesII.mdx"
+    },
+    "frontend/jsfunction/undoRedoManager/UndoRedoManager.js": {
+      "hash": "faf733ba57eb824daf960fe32c529fdb4049a1d7ea2be495492c084bf603de2c",
+      "docRelative": "frontend/jsfunction/undoRedoManager/UndoRedoManager.mdx"
+    },
+    "frontend/jsfunction/undoRedoManager/UndoRedoManagerWithDraftCommit.js": {
+      "hash": "0e1a49fd440c1e76c4d6f8c142d96c68a8685efc24e8122aca5299be3a57e2ed",
+      "docRelative": "frontend/jsfunction/undoRedoManager/UndoRedoManagerWithDraftCommit.mdx"
+    },
+    "frontend/uicoding/main.md": {
+      "hash": "74d55569a078c6c1015f33e19288a85583030ba068e54243c4614f00ac60cc89",
+      "docRelative": "frontend/uicoding/main.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/accordion/Accordion.js": {
+      "hash": "81c5706e675c04722df3f4253511df3e273e3c24579a9c0d0bdafadb9eac2185",
+      "docRelative": "frontend/uicoding/ui-prototype-js/accordion/Accordion.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/analog-clock/AnologClock.js": {
+      "hash": "7d1b884a64c9b5df128d0a674f02d65a02ad778534da483157a364a25c1c7841",
+      "docRelative": "frontend/uicoding/ui-prototype-js/analog-clock/AnologClock.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/analog-clock/Clock.module.css": {
+      "hash": "31746968ba7da5402bc3373a590ae2c70f244c54516a480a84fd7b9520d38b9f",
+      "docRelative": "frontend/uicoding/ui-prototype-js/analog-clock/Clock.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/analog-clock/DigitalClock.js": {
+      "hash": "522fd41ee29a5b67fc1582b8a4b0390c769c69b705368d1c5b2f15ac605061fa",
+      "docRelative": "frontend/uicoding/ui-prototype-js/analog-clock/DigitalClock.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/analog-clock/styles.module.css": {
+      "hash": "b078ae5004fb3aaec5b7c568b79776b1c9a52ef1c7aeb5f00d9b6da90688484d",
+      "docRelative": "frontend/uicoding/ui-prototype-js/analog-clock/styles.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/auth-input/AuthCodeInput.module.css": {
+      "hash": "ccd3736640c4e461ebc938081e8aa12886a49e48a794821be3bdebcc099face5",
+      "docRelative": "frontend/uicoding/ui-prototype-js/auth-input/AuthCodeInput.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/auth-input/AuthInput.js": {
+      "hash": "637bf0aa8644b83704489b71a0f40e11890e315c1e36fc9b81bbdccc6409de35",
+      "docRelative": "frontend/uicoding/ui-prototype-js/auth-input/AuthInput.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/birthyear-histogram/BirthYearHistogram.js": {
+      "hash": "bd00dea1eab38c1c6a95aae0f8594a76870a546454dd03293f93a41c21bbe454",
+      "docRelative": "frontend/uicoding/ui-prototype-js/birthyear-histogram/BirthYearHistogram.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/birthyear-histogram/styles.css": {
+      "hash": "b61e3ca36d58b62ce4313f19997023d467277d608301ba7932ee3983bd97b364",
+      "docRelative": "frontend/uicoding/ui-prototype-js/birthyear-histogram/styles.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/book-flight/BookFlight.js": {
+      "hash": "78ac20409df68971adabb6d4bcb90b4770b5d37f624e6073274952a0e093fc07",
+      "docRelative": "frontend/uicoding/ui-prototype-js/book-flight/BookFlight.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/carousel/Carousel.js": {
+      "hash": "1d23f2116f3429e044f4fd08d2d05ba777d2609b5cd535b7e8a891474b232569",
+      "docRelative": "frontend/uicoding/ui-prototype-js/carousel/Carousel.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/carousel/CarouselII.js": {
+      "hash": "aea4c3b34876d3abd6abb9206faa1812542bbfb7bb1049e23ab44a01539b5897",
+      "docRelative": "frontend/uicoding/ui-prototype-js/carousel/CarouselII.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/carousel/DogCarousel.js": {
+      "hash": "8f13c9ef010aedaf878604f316f7a60db0f77f5bfe77c4300e8e9b165129803a",
+      "docRelative": "frontend/uicoding/ui-prototype-js/carousel/DogCarousel.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/carousel/DogCarousel.module.css": {
+      "hash": "3348d4c61291fd1f60baf4f0f08d906b4581d5e984e14764f0c9bfb6569404bb",
+      "docRelative": "frontend/uicoding/ui-prototype-js/carousel/DogCarousel.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/carousel/ImageCarousel.module.css": {
+      "hash": "90c56c05ac3d902ce60b766ff8da6956e609086330b790266f7ac788925bc861",
+      "docRelative": "frontend/uicoding/ui-prototype-js/carousel/ImageCarousel.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/carousel/ImageCarouselII.module.css": {
+      "hash": "21251841df5c8f492d33eb2a6c8f6e85d747ac212b781821db1fe2bb25d8354b",
+      "docRelative": "frontend/uicoding/ui-prototype-js/carousel/ImageCarouselII.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/claude-clone-chat/ClaudeChat.js": {
+      "hash": "ffe8ad347c8ed6d2ba0c6e126c343d1b0009eadb21e953760c144183f52bfd48",
+      "docRelative": "frontend/uicoding/ui-prototype-js/claude-clone-chat/ClaudeChat.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/claude-clone-chat/icon.js": {
+      "hash": "3f37a49a538432fb51d20352a7963349d537cae7318f4ffb82d3ec7c421351d3",
+      "docRelative": "frontend/uicoding/ui-prototype-js/claude-clone-chat/icon.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/connect-four/ConnectFour.js": {
+      "hash": "eee0dc2571e7652ebe44adfe22f4cb77a0d43b83a3a964053e8da4c429366c83",
+      "docRelative": "frontend/uicoding/ui-prototype-js/connect-four/ConnectFour.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/connect-four/styles.module.css": {
+      "hash": "c2e53b73b6fcc10326df4025bdeda5165c0a1f182bad2da14a287f66effe59a2",
+      "docRelative": "frontend/uicoding/ui-prototype-js/connect-four/styles.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/counter/Counter.js": {
+      "hash": "290b8037da617eea21672e2f1bed1b9b10526cacfc99caaa25fef1b8b11b645d",
+      "docRelative": "frontend/uicoding/ui-prototype-js/counter/Counter.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/crypto-converter/CryptoConverter.js": {
+      "hash": "d3b1a77a03458cb4a54cc5cf96c69dc1abfb84689548310eb41a13e6da1dd30e",
+      "docRelative": "frontend/uicoding/ui-prototype-js/crypto-converter/CryptoConverter.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/crypto-converter/CryptoConverter.module.css": {
+      "hash": "a9f4541df6fdc4d548812e20ffc76843c61130954a351ad35babf4f17ab987e0",
+      "docRelative": "frontend/uicoding/ui-prototype-js/crypto-converter/CryptoConverter.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/data-table/App.js": {
+      "hash": "b10af6712d9de6d029f07be6dc30db2b0d72b737c6774e80f1c3e97f125e59c2",
+      "docRelative": "frontend/uicoding/ui-prototype-js/data-table/App.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/data-table/DataTable.js": {
+      "hash": "90f7c39ad8e26cfb3478056a2e442c8f0abbc97fccb25db87509b6ecaca94562",
+      "docRelative": "frontend/uicoding/ui-prototype-js/data-table/DataTable.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/data-table/DataTable.module.css": {
+      "hash": "ddd4887dcfde99ec2901ae8546e314911d206106a2c350c040e170d7a1ab79df",
+      "docRelative": "frontend/uicoding/ui-prototype-js/data-table/DataTable.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/draggable-cell/DraggableCell.js": {
+      "hash": "e0d354223f48a6fc59ad5a54adb5a2504de77c0d80b22422c1a07e2dafe4fdce",
+      "docRelative": "frontend/uicoding/ui-prototype-js/draggable-cell/DraggableCell.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/draggable-cell/styles.module.css": {
+      "hash": "7141ae5063e9268e0d60c3dc63ec83957c0e747294c2e34bbf802db9855c3d90",
+      "docRelative": "frontend/uicoding/ui-prototype-js/draggable-cell/styles.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/file-explorer/FileExplorer.js": {
+      "hash": "17198aae5f785081ba6a4408136b3b613717befcc56aa48f5c64e66007f915e2",
+      "docRelative": "frontend/uicoding/ui-prototype-js/file-explorer/FileExplorer.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/generate-table/GenerateTable.js": {
+      "hash": "4dd3ea0be7e5002d5d9623052573b53d7637b714b149877c8a379e647d39112e",
+      "docRelative": "frontend/uicoding/ui-prototype-js/generate-table/GenerateTable.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/grid-light/GridLight.js": {
+      "hash": "d128865c5742b685c1aadd6acd632e7f2e4e279bb178b189a689866537c2a777",
+      "docRelative": "frontend/uicoding/ui-prototype-js/grid-light/GridLight.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/grid-light/styles.module.css": {
+      "hash": "19f995fa97fd35402a2f0d04663938c923f77630521efbdf72ceb88bee37a9ba",
+      "docRelative": "frontend/uicoding/ui-prototype-js/grid-light/styles.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/hacker-news/HackerNews.js": {
+      "hash": "9a3d15beca053c1b2fe45e01ae6f2ce3b60299a28347c03c42b6df3374275a9b",
+      "docRelative": "frontend/uicoding/ui-prototype-js/hacker-news/HackerNews.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/hacker-news/InfiniteScroll.css": {
+      "hash": "d514e512f8c407c5d565fb999b7194e9fd0d443e651f0ea4f7f62cfc1fcc9daa",
+      "docRelative": "frontend/uicoding/ui-prototype-js/hacker-news/InfiniteScroll.css.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/hacker-news/InfiniteScroll.js": {
+      "hash": "e00f77bfd06d93c9d3a8b9bf613c39499358ed27ad0883b590d9b0d2b868e623",
+      "docRelative": "frontend/uicoding/ui-prototype-js/hacker-news/InfiniteScroll.js.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/hacker-news/JobBoard.js": {
+      "hash": "57b91a1d12f8bab69e9816acdedeeba32a38b466722a0a17d64a3666dba75680",
+      "docRelative": "frontend/uicoding/ui-prototype-js/hacker-news/JobBoard.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/hacker-news/JobBoard.module.css": {
+      "hash": "23e214a2261ba7ae0eff928457b053578a15c10951847316bebe8f433e727f9f",
+      "docRelative": "frontend/uicoding/ui-prototype-js/hacker-news/JobBoard.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/holigrail-layout/HoligrailLayout.js": {
+      "hash": "bc23f7de5fbece2a0c5ff2950e0fc777fc54e96e2c78ab5f43bde5c4260d6b7f",
+      "docRelative": "frontend/uicoding/ui-prototype-js/holigrail-layout/HoligrailLayout.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/holigrail-layout/styles.module.css": {
+      "hash": "e6cc0839fb530c0d49bf28c43b4b2a9db4a929c0a31c82f540301958d303d9f8",
+      "docRelative": "frontend/uicoding/ui-prototype-js/holigrail-layout/styles.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/like-button/LikeButton.js": {
+      "hash": "6267af2b2f54f75ad726b3bbea061a1a784445a957dbd522ac6a36aeb9bc4590",
+      "docRelative": "frontend/uicoding/ui-prototype-js/like-button/LikeButton.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/like-button/icons.js": {
+      "hash": "8d9c2989d67bed3bbd95e4636cc4fb68a2513f59b3b015398d263b4226151a4b",
+      "docRelative": "frontend/uicoding/ui-prototype-js/like-button/icons.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/like-button/styles.css": {
+      "hash": "17783ffca05457a7e207c92217bd677a1fa3c3714eacc918fbff74f97df536ee",
+      "docRelative": "frontend/uicoding/ui-prototype-js/like-button/styles.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/memory-game/MemoryGame.js": {
+      "hash": "f1aa73ba32fbf46d002254f3c35358c5d7000a8c40607706abbbee51b1c42591",
+      "docRelative": "frontend/uicoding/ui-prototype-js/memory-game/MemoryGame.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/memory-game/styles.css": {
+      "hash": "4f0a984e07abd899a0e75013c19dfd7642de1b76480c77cedbb0ea8ecaaaf5de",
+      "docRelative": "frontend/uicoding/ui-prototype-js/memory-game/styles.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/modal-dialog/AppModalDialog.js": {
+      "hash": "f27c59ba515e66e883b14be829b195c9095188fdcb694a53014ca15d1cf4f172",
+      "docRelative": "frontend/uicoding/ui-prototype-js/modal-dialog/AppModalDialog.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/modal-dialog/ModalDialog.js": {
+      "hash": "22c9011553e7b8bc67baa71aa769a2150eeb7269e259b598574814b433ba3d68",
+      "docRelative": "frontend/uicoding/ui-prototype-js/modal-dialog/ModalDialog.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/modal-dialog/styles.module.css": {
+      "hash": "d361e977e2c7037d809abb246594757b289d0229a435845793e4aec8f4119f77",
+      "docRelative": "frontend/uicoding/ui-prototype-js/modal-dialog/styles.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/mortgage-calculator/MortgageCalculator.js": {
+      "hash": "c3cedb040e05ef94e4b7a028ce12b3fcd9e789e9e747fd16b652cc24cf1b6bab",
+      "docRelative": "frontend/uicoding/ui-prototype-js/mortgage-calculator/MortgageCalculator.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/nested-checkbox/NestedCheckbox.js": {
+      "hash": "74ec9f4574f9a40628689c66293ace66a90de1718ba742b51ea30c15df863072",
+      "docRelative": "frontend/uicoding/ui-prototype-js/nested-checkbox/NestedCheckbox.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/nested-checkbox/NestedCheckbox.module.css": {
+      "hash": "2a1713e438a3e57a0d1ea392d3a64c4068cc39edf60d9f7d1f570381f9852b43",
+      "docRelative": "frontend/uicoding/ui-prototype-js/nested-checkbox/NestedCheckbox.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/pixel-art/PixelArt.css": {
+      "hash": "36ccd12439374db7540b326d7ac1a2c488a3f767e325ac7d2f907e316407a7df",
+      "docRelative": "frontend/uicoding/ui-prototype-js/pixel-art/PixelArt.css.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/pixel-art/PixelArt.js": {
+      "hash": "3fdd55c62b2d28167bba2ea77b766b4ddffcd7d1b785daec866b49428fafa9df",
+      "docRelative": "frontend/uicoding/ui-prototype-js/pixel-art/PixelArt.js.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBar.css": {
+      "hash": "886f7251381cbd32d592ec9fb2fb79c4d81e08782edfa0904c2f210d08ada400",
+      "docRelative": "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBar.css.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBar.js": {
+      "hash": "d1624e889be2cbe0e86a18f9905a44120a083d9b105a9d1878447eae2f5316ae",
+      "docRelative": "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBar.js.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarII.js": {
+      "hash": "c225d662545e3a7213f7a8fc400b07b9ebab2d86ca0894a8367b9ea079eb2ded",
+      "docRelative": "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarII.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarIII.js": {
+      "hash": "064ed177b9627d61ea0abdd704fa8221967e9d9ed3795ac0e11d4682f7ed7848",
+      "docRelative": "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarIII.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarIV.css": {
+      "hash": "648c1625dbd4f0ce9a72cdf3a4789b255c6785ebba58c42adf13994b75ba9130",
+      "docRelative": "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarIV.css.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarIV.js": {
+      "hash": "f8d9c14911f9b02723ddfecf83dc209524433b204bac15a285017a72b4026f03",
+      "docRelative": "frontend/uicoding/ui-prototype-js/progress-bar/ProgressBarIV.js.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/roll-dice/App.module.css": {
+      "hash": "0bda4f1c10eff1e97672a8388af58240f5bb7864c9ea4a563d5718553c10ff41",
+      "docRelative": "frontend/uicoding/ui-prototype-js/roll-dice/App.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/roll-dice/RollDice.js": {
+      "hash": "4018b59db21a478549e650581943bec7fd06164143f57d467ac89515a3951957",
+      "docRelative": "frontend/uicoding/ui-prototype-js/roll-dice/RollDice.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/signup-form/SignupForm.js": {
+      "hash": "c4aa2ef8da6275e70163909b0973b6f7f14617d273aafd4eedc9a139f390057d",
+      "docRelative": "frontend/uicoding/ui-prototype-js/signup-form/SignupForm.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/snake-game/SnakeGame.js": {
+      "hash": "4f315a21a612d89874ebc860577900439fef2ca9024431317a44d39f7277c2b3",
+      "docRelative": "frontend/uicoding/ui-prototype-js/snake-game/SnakeGame.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/snake-game/SnakeGame.module.css": {
+      "hash": "caa85551ce43b23758131f29bf5337618008f85bdd6b2b53fda700da68538630",
+      "docRelative": "frontend/uicoding/ui-prototype-js/snake-game/SnakeGame.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/star-rating/StarRating.css": {
+      "hash": "4902113a7839c951ea10d07242fa6fdd439a7257cc8f95e540b89a003a03d821",
+      "docRelative": "frontend/uicoding/ui-prototype-js/star-rating/StarRating.css.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/star-rating/StarRating.js": {
+      "hash": "d1556c2f9818eec06ab82257840775df00b64ae573fcc685f2178d4c2c8cd235",
+      "docRelative": "frontend/uicoding/ui-prototype-js/star-rating/StarRating.js.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/stop-watch/StopWatch.js": {
+      "hash": "9a2370beeecc435902c5379531c539ae435ad8b3568100aa8ba821ec84b0219e",
+      "docRelative": "frontend/uicoding/ui-prototype-js/stop-watch/StopWatch.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/stop-watch/StopWatchI.js": {
+      "hash": "156ef5ac75865ab8c722632afe0951eeeba07094dcb105d4a339111771b3ccbc",
+      "docRelative": "frontend/uicoding/ui-prototype-js/stop-watch/StopWatchI.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/stop-watch/Stopwatch.css": {
+      "hash": "80bf0cddbfc68c608a7a5e887ae78f9faa409ec061c77579e0d92e3d63b3273f",
+      "docRelative": "frontend/uicoding/ui-prototype-js/stop-watch/Stopwatch.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/tab/Tab.js": {
+      "hash": "d65c86b6abaf67d9eb92015b7d213d8a3641fef9033d99475135019b32eff041",
+      "docRelative": "frontend/uicoding/ui-prototype-js/tab/Tab.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/tic-tac-toe/Tictactoe.js": {
+      "hash": "afad03b5af077298d8bf4dba81976e4b44644c4c41a18ca8b3dd26bbdbf74393",
+      "docRelative": "frontend/uicoding/ui-prototype-js/tic-tac-toe/Tictactoe.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/tic-tac-toe/Tictactoe_dynamic.js": {
+      "hash": "f7560e3c5bafe1e119880e8305afa60e08e020f57f9b3c5ddafb34fe7b893380",
+      "docRelative": "frontend/uicoding/ui-prototype-js/tic-tac-toe/Tictactoe_dynamic.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/tic-tac-toe/styles.css": {
+      "hash": "d901826382b8c06d3b8581307b44b9954fa67416952a1020ea7c9097afaf44fd",
+      "docRelative": "frontend/uicoding/ui-prototype-js/tic-tac-toe/styles.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/todo/TodoList.js": {
+      "hash": "20f7cc18b241a7303aea57a9eaa094e8f1502c8b97aee560c35cf8cc0baa4169",
+      "docRelative": "frontend/uicoding/ui-prototype-js/todo/TodoList.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/toggle/App.js": {
+      "hash": "25f58ad65ba25ca93299def7a53a74548b96d805f1481868f24e080536d99f9d",
+      "docRelative": "frontend/uicoding/ui-prototype-js/toggle/App.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/toggle/Toggle.js": {
+      "hash": "88b456df15df5793523c1420d5a6808e3d51b3c7c706df9b8e5c0123f510d71d",
+      "docRelative": "frontend/uicoding/ui-prototype-js/toggle/Toggle.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/toggle/Toggle.module.css": {
+      "hash": "e4fe2adfee538cef88d9b35b1028e3563d877ac00ec6f574d02811056dd69d2c",
+      "docRelative": "frontend/uicoding/ui-prototype-js/toggle/Toggle.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/traffic-light/App.module.css": {
+      "hash": "11946c020e2268edc4177db069a93a4cadde1aa88a30b0e0db44f614a5c31254",
+      "docRelative": "frontend/uicoding/ui-prototype-js/traffic-light/App.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/traffic-light/TrafficLight.js": {
+      "hash": "38b29644e62855576b5eb4d8cf19f10c35126905ad5713f1a19b11140cde2c1b",
+      "docRelative": "frontend/uicoding/ui-prototype-js/traffic-light/TrafficLight.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/transfer-list/TransferList.js": {
+      "hash": "0092add950f398a1be1be93b1a27a798ca700b4b5b9565bbc33c5437a383016d",
+      "docRelative": "frontend/uicoding/ui-prototype-js/transfer-list/TransferList.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/transfer-list/TransferListII.js": {
+      "hash": "61ae68f87ce1fab0774a5d97085c2d8627a37ef58942cf0e49918549c15280bd",
+      "docRelative": "frontend/uicoding/ui-prototype-js/transfer-list/TransferListII.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/transfer-list/styles.css": {
+      "hash": "193243c730f98b89ca569ff474f04425e25a91a86a2fb30e824244b2c716282e",
+      "docRelative": "frontend/uicoding/ui-prototype-js/transfer-list/styles.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/undo-counter/UndoCounter.js": {
+      "hash": "228f8c8afa17b832a575437aa87de31a0b38c6ef26f5ab145a08e2811df40552",
+      "docRelative": "frontend/uicoding/ui-prototype-js/undo-counter/UndoCounter.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/undo-counter/UndoableCounter.module.css": {
+      "hash": "077c9a2979d8628de94c6c6a35646a74202afccbd747109b1e50e91dd7c5937c",
+      "docRelative": "frontend/uicoding/ui-prototype-js/undo-counter/UndoableCounter.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/user-database/App.module.css": {
+      "hash": "03f279d484570acaedb5de9fd23aed09b7b7994a03a2bf325d17f2ee245bc060",
+      "docRelative": "frontend/uicoding/ui-prototype-js/user-database/App.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/user-database/UserDatabase.js": {
+      "hash": "a1b1c3d640a1ca369d0f50f481d48bdc4097face1df685bd63cf840e67d12382",
+      "docRelative": "frontend/uicoding/ui-prototype-js/user-database/UserDatabase.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/whack-a-mole/WhackAMole.js": {
+      "hash": "0d62bf426a295f025eac729babd7ccec9d7c2458a5ca985644e816699e7c3045",
+      "docRelative": "frontend/uicoding/ui-prototype-js/whack-a-mole/WhackAMole.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/whack-a-mole/styles.module.css": {
+      "hash": "34fe8c319a13f11891f007b1ca0b5fe8c6ba2ce768cbc43a5b487af76f70231f",
+      "docRelative": "frontend/uicoding/ui-prototype-js/whack-a-mole/styles.module.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/wordle/Wordle.js": {
+      "hash": "1ed152ac434c9a8c2fcce76d51f111175fcc6ffc7c2f3fb58081806c9a6b1c81",
+      "docRelative": "frontend/uicoding/ui-prototype-js/wordle/Wordle.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/wordle/styles.module.css": {
+      "hash": "362023d89c5150438c4b140d5192674b7984730b570d7e951189243d5ee3d07c",
+      "docRelative": "frontend/uicoding/ui-prototype-js/wordle/styles.module.mdx"
+    },
+    "backend/quizzes/apollo_vs_relay_staff_frontend.mdx": {
+      "hash": "b0f003d9b18c36b9d23d09c19df98ff431524d3f8c5c2b544a3ac283d1789dd3",
+      "docRelative": "backend/quizzes/apollo_vs_relay_staff_frontend.mdx"
+    },
+    "backend/quizzes/backend-scaling-horizontal-vertical.mdx": {
+      "hash": "37b353ee9156200ce8807ae49e75d80eaed848056608df0cb97ff8641e4ed861",
+      "docRelative": "backend/quizzes/backend-scaling-horizontal-vertical.mdx"
+    },
+    "backend/quizzes/frontend_graphql_ecosystem_leadership_story.mdx": {
+      "hash": "92e35c17b27d469787c7783dc036f2241cd7268a8ff6134129faf62794ee0489",
+      "docRelative": "backend/quizzes/frontend_graphql_ecosystem_leadership_story.mdx"
+    },
+    "backend/quizzes/graphql_directives_conditional_modules_staff_frontend.mdx": {
+      "hash": "c93e9084fc9a63d7d7c0ba9c880a77d85dcb1f7db585510f033451a9dc418d39",
+      "docRelative": "backend/quizzes/graphql_directives_conditional_modules_staff_frontend.mdx"
+    },
+    "backend/quizzes/graphql_staff_engineer_interview_questions.mdx": {
+      "hash": "741e11d14f71cc531184f06f78cfc51d05aefb43deb1119fd40c56c1194efe9e",
+      "docRelative": "backend/quizzes/graphql_staff_engineer_interview_questions.mdx"
+    },
+    "backend/quizzes/linkedin-graphql-architecture-interview.mdx": {
+      "hash": "c286beb1ff4c79462717fac6741065d910e7c8a0024fb150a8c853b3dc78aad0",
+      "docRelative": "backend/quizzes/linkedin-graphql-architecture-interview.mdx"
+    },
+    "backend/quizzes/linkedin_graphql_leadership_story.mdx": {
+      "hash": "1a40de81bfd9d693e36321422ca2d72253c95b01d63d4267198fcdef90da7889",
+      "docRelative": "backend/quizzes/linkedin_graphql_leadership_story.mdx"
+    },
+    "backend/quizzes/rest-vs-graphql-vs-gRPC.md": {
+      "hash": "6cf09013fe35891c81f46501754420be13be2d0f2c92fee154f9f7795a8adb30",
+      "docRelative": "backend/quizzes/rest-vs-graphql-vs-gRPC.mdx"
+    },
+    "__nav__:backend": {
+      "hash": "5cb94ef79bcb0c4173f9ec7e2f77a696ffcce2450e57cf20194ad3a4b0520898",
+      "docRelative": "backend/_index.mdx"
+    },
+    "__nav__:backend/quizzes": {
+      "hash": "59ad4b19068d7b1db09562f202b1992b62c68edb8da58fcf46e4361f7cd89a32",
+      "docRelative": "backend/quizzes/_index.mdx"
+    },
+    "__nav__:frontend": {
+      "hash": "ce5c923f0bce290ef8ae7108869c673b64c4d20e3d0948210a2fcd507cfe3365",
+      "docRelative": "frontend/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction": {
+      "hash": "b31823fdf36772341b477a0095eac0945ca13b5e6708eb8808b723ee35e00b7f",
+      "docRelative": "frontend/jsfunction/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/2d-readingOrder": {
+      "hash": "f47565bfb01513e9609ae669cda6b41291212cd60cecc0671b53580b262f675a",
+      "docRelative": "frontend/jsfunction/2d-readingOrder/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/DrizzleORM": {
+      "hash": "bad181a3de7c6b6b35d86a522b2cf9be00ff2c8144a9cc516062b41e12cb0a07",
+      "docRelative": "frontend/jsfunction/DrizzleORM/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/Emitter": {
+      "hash": "19ccee1404d5bd8d4320969d52fa97df341cefe9de73106f57ad7687f1f21ad9",
+      "docRelative": "frontend/jsfunction/Emitter/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/UndoableDatabase": {
+      "hash": "c0b2fc45dad974da003d9ca05ad0962bb61e3404ada8f85e961c37b73a755bbf",
+      "docRelative": "frontend/jsfunction/UndoableDatabase/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/apply_call_bind": {
+      "hash": "fb78e365c9763e405530a2b4042f350f0d3c3b8b87ebc1da9558c52f5d08ccb8",
+      "docRelative": "frontend/jsfunction/apply_call_bind/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/array": {
+      "hash": "9b371373a8ea25d3ea45b833ef7f26055f6a00ca82fd0015a1c52e6eeec86b77",
+      "docRelative": "frontend/jsfunction/array/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/array.prototype": {
+      "hash": "fa566fd9f88c77693ea21ca2eeb3d3daeb070072870e10cdb0e2fb33d841b558",
+      "docRelative": "frontend/jsfunction/array.prototype/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/closure": {
+      "hash": "884ba077852c4282cf79417c4df0c84a360d347e89980d8fe31ac2593ab13a37",
+      "docRelative": "frontend/jsfunction/closure/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/curry": {
+      "hash": "a05591bcc9536628095f643263a661cb11ee549d58952bbad62de3ea5f8e8099",
+      "docRelative": "frontend/jsfunction/curry/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/debounce": {
+      "hash": "4e6a9bdefd00b61bd53fee544b23ee1b1dd641169f2477f825f49b727c72cd43",
+      "docRelative": "frontend/jsfunction/debounce/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/deepClone": {
+      "hash": "f4c3bb1bf487584cda05358a208913781d1b472d450abc63346ec6a762016a40",
+      "docRelative": "frontend/jsfunction/deepClone/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/getElementBy": {
+      "hash": "092afa458201949d4909ed9815e5562e9079a865167cac554f04c23eefab891d",
+      "docRelative": "frontend/jsfunction/getElementBy/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/hooks": {
+      "hash": "914900b9322529b7ef330f8ee3dbff0c046e2647c4b1fbf1f2ebaaea8258189f",
+      "docRelative": "frontend/jsfunction/hooks/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/htmlModifier": {
+      "hash": "a7d76be1a11dd7ebbc336083979f0b90a31baf5aa837d9538f110f75bdcd8619",
+      "docRelative": "frontend/jsfunction/htmlModifier/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/jQuery-manipulator": {
+      "hash": "35be2287de43186c83fc53b78f438a7d8093cd59cb067896360137356fd8ab8a",
+      "docRelative": "frontend/jsfunction/jQuery-manipulator/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/jsonStringify": {
+      "hash": "55245a69dcf715674d00d38bb9a1d698753bccad11fe6aa0eedc8b62f232c00a",
+      "docRelative": "frontend/jsfunction/jsonStringify/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/makeCounter": {
+      "hash": "9cf0d7333b8da5452e52efad330604f608b42fce2c86c6b9eaafad841fa0a65e",
+      "docRelative": "frontend/jsfunction/makeCounter/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/map": {
+      "hash": "168eb35a3fa06fea2b0fc9e9c20052c95e72bd39cc8f3ed9c56e6457c8bb85e6",
+      "docRelative": "frontend/jsfunction/map/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/memoize": {
+      "hash": "1f6330c21a9131ba1d16bca3284390cd5f7cb16f47e306813960423d0dc8106f",
+      "docRelative": "frontend/jsfunction/memoize/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/object": {
+      "hash": "8b85cd659b36c1fcfa4cc20f3fe466ce2009352e7a29b50cd64126da58fd0023",
+      "docRelative": "frontend/jsfunction/object/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/prismaORM": {
+      "hash": "8a4a19273873515148b69411814a233fa484107ea647d7dfb9137035469b434f",
+      "docRelative": "frontend/jsfunction/prismaORM/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/promise": {
+      "hash": "86e1c7ba6422e295a51e611685b3da02931bb61e242616c84a94684af2076a18",
+      "docRelative": "frontend/jsfunction/promise/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/range": {
+      "hash": "307fb27037470591f9c3973d39ed137e54da4b559d7d09874d1a0031f7298ecf",
+      "docRelative": "frontend/jsfunction/range/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/schemaValidator": {
+      "hash": "cd99e83255b0f2607c77758be3b256083aa20a98ce15312a8dfd63e32811ba1d",
+      "docRelative": "frontend/jsfunction/schemaValidator/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/spreadSheet": {
+      "hash": "71a61f136f12f624d49a251c8f83a6a39fc6c216aa14ecc33e9ab699ebcf3036",
+      "docRelative": "frontend/jsfunction/spreadSheet/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/styledTextRange": {
+      "hash": "7bbfffb66a42b55d3c32ff6acfd4b5ff20399b84734c91c3e809fb63fbffd4a9",
+      "docRelative": "frontend/jsfunction/styledTextRange/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/testRunner": {
+      "hash": "135bea93c7be842513713f10c0f2db48876cf3966e82c3aff506774e392554de",
+      "docRelative": "frontend/jsfunction/testRunner/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/textSearch": {
+      "hash": "29ed3c23e1fdf72db9e2bcba0f3d48feeb0d39a561134a95bbd116cbf36912e8",
+      "docRelative": "frontend/jsfunction/textSearch/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/undoRedoManager": {
+      "hash": "281e9ddbd2a9c9632d8687b4f41db3e7e27c846f7ddcbe2df776e8afe9f511c7",
+      "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
+    },
+    "__nav__:frontend/uicoding": {
+      "hash": "7ea76ce4b289bc5db134857157c4a12b44375f098d85d786a335c0b31bdf9f1c",
+      "docRelative": "frontend/uicoding/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js": {
+      "hash": "de508628c7f9a96451cdc04823858502caba5d46238c357010c6b4d4bf527db9",
+      "docRelative": "frontend/uicoding/ui-prototype-js/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/accordion": {
+      "hash": "55aa62797435bfa9a2f6d7e1cc6053d2d7728c57101d405e95dffa26364c1e0d",
+      "docRelative": "frontend/uicoding/ui-prototype-js/accordion/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/analog-clock": {
+      "hash": "9ba4aff28ffb3bf6da4b8e3013b372c40e8637e56a119b865590d063bcc58ceb",
+      "docRelative": "frontend/uicoding/ui-prototype-js/analog-clock/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/auth-input": {
+      "hash": "b96d7a550e627501043e0ae2deb479387517c5502ec446eaa15b229c51cb1b07",
+      "docRelative": "frontend/uicoding/ui-prototype-js/auth-input/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/birthyear-histogram": {
+      "hash": "3b6de6318059290fd69dc18c8a2641a74b9a4e68a4a1f2dbade6322650a6eead",
+      "docRelative": "frontend/uicoding/ui-prototype-js/birthyear-histogram/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/book-flight": {
+      "hash": "aa8fcde95f65c43bb34e9f856c6a59ad9b40ef10d3847729a42d44f227d4040f",
+      "docRelative": "frontend/uicoding/ui-prototype-js/book-flight/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/carousel": {
+      "hash": "a5c4c9607cac29438f325ef81c289e5593a31fceb32988cfba4c6fd2ef7de2b4",
+      "docRelative": "frontend/uicoding/ui-prototype-js/carousel/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/claude-clone-chat": {
+      "hash": "9c998cc1c4781451019b860a9bbba5ef4ebac69e55929120d9be646ed6c3bbba",
+      "docRelative": "frontend/uicoding/ui-prototype-js/claude-clone-chat/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/connect-four": {
+      "hash": "ee76f553ec853919c28c859457499ce4e9db4c8683e591767f40a4424bc1fe5c",
+      "docRelative": "frontend/uicoding/ui-prototype-js/connect-four/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/counter": {
+      "hash": "13538b114f00020c9f443daa0c3def74af94cadd6e81aed06bfa84ec6a404650",
+      "docRelative": "frontend/uicoding/ui-prototype-js/counter/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/crypto-converter": {
+      "hash": "29ce331ca20cd95acd1832c857ef045065eedcb173d341177b19780bd4b44800",
+      "docRelative": "frontend/uicoding/ui-prototype-js/crypto-converter/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/data-table": {
+      "hash": "70029ccd47b027d8be04bb2e5474708a4ae063b1ac9179204f59bde8d9853ba0",
+      "docRelative": "frontend/uicoding/ui-prototype-js/data-table/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/draggable-cell": {
+      "hash": "af86c706601f9856d2b2cd5da2503000adc779c6d7b7cbdf494c4999e6cfadb2",
+      "docRelative": "frontend/uicoding/ui-prototype-js/draggable-cell/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/file-explorer": {
+      "hash": "b8846cd33c154cbd7786cbd79f68146e82b2f7ba3067ad64fe0f48ce87db632b",
+      "docRelative": "frontend/uicoding/ui-prototype-js/file-explorer/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/generate-table": {
+      "hash": "13d7ebceb8b1be43287eefe5edf131fbef42de0c85d57941bc262d025cf0331c",
+      "docRelative": "frontend/uicoding/ui-prototype-js/generate-table/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/grid-light": {
+      "hash": "6b8b0a8b5908b7683a0bd9d41d23daca616b692d162b81d151b284bed1e39735",
+      "docRelative": "frontend/uicoding/ui-prototype-js/grid-light/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/hacker-news": {
+      "hash": "df55c6937d83bb700b213095c6958e538c72e07f1bde6defc2231c9a71b74224",
+      "docRelative": "frontend/uicoding/ui-prototype-js/hacker-news/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/holigrail-layout": {
+      "hash": "d7bc67f57f8d4f97d9bd46ba8f7c5ca971231014af1821d7d32a7dc2f71db171",
+      "docRelative": "frontend/uicoding/ui-prototype-js/holigrail-layout/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/like-button": {
+      "hash": "f7ff387710ba25362160516560a7bdddc8ced5d83b5955b9b82c44b535f513d2",
+      "docRelative": "frontend/uicoding/ui-prototype-js/like-button/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/memory-game": {
+      "hash": "92cda5f2ce08e612679d330afe4fb16be66c61e5d9a605000e79174ac2e2f004",
+      "docRelative": "frontend/uicoding/ui-prototype-js/memory-game/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/modal-dialog": {
+      "hash": "b47b186be7e49289d8235767a502290bb1534b4b0551a63193fca5809d5e3667",
+      "docRelative": "frontend/uicoding/ui-prototype-js/modal-dialog/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/mortgage-calculator": {
+      "hash": "162139077523b85761b2ddab853191c735a19cff7573f4c4580a547a73dcc57b",
+      "docRelative": "frontend/uicoding/ui-prototype-js/mortgage-calculator/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/nested-checkbox": {
+      "hash": "e4c42bdc08f212ed53eb603defe9484cb1b028447c4cba93ba811c4243fc9afa",
+      "docRelative": "frontend/uicoding/ui-prototype-js/nested-checkbox/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/pixel-art": {
+      "hash": "227298afb0973a35a6f225d11e3905b5b7e82ce9f3d800bf6ba9bb3798f40272",
+      "docRelative": "frontend/uicoding/ui-prototype-js/pixel-art/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/progress-bar": {
+      "hash": "704b7bf5b173097b2e93a2b250932b756997075a7b5b1ebbe58ea5c29372afa8",
+      "docRelative": "frontend/uicoding/ui-prototype-js/progress-bar/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/roll-dice": {
+      "hash": "3a301398548ed62127e1693d89eef8e179372f14ed3779a2c37ffcae1a50fc80",
+      "docRelative": "frontend/uicoding/ui-prototype-js/roll-dice/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/signup-form": {
+      "hash": "94fb904859905ab9ebcb55a769a30ed9a27dee4b6f785f14c867b757e912fea1",
+      "docRelative": "frontend/uicoding/ui-prototype-js/signup-form/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/snake-game": {
+      "hash": "d9c8d74e1261999d23ace8bbab5699b49c543d2a3a452761e49343f01b00d9fd",
+      "docRelative": "frontend/uicoding/ui-prototype-js/snake-game/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/star-rating": {
+      "hash": "1636424f0d2f3f4941f925392628ac874188662421c122d8891ad06780930b74",
+      "docRelative": "frontend/uicoding/ui-prototype-js/star-rating/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/stop-watch": {
+      "hash": "42ced71946c334cc578691653ae2d4c4573936108257c781abb15b2c77c34cd1",
+      "docRelative": "frontend/uicoding/ui-prototype-js/stop-watch/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/tab": {
+      "hash": "955a341b2b0919d6edd3a265c96d7c304bd1aa18f55823983dee50101a0f256e",
+      "docRelative": "frontend/uicoding/ui-prototype-js/tab/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/tic-tac-toe": {
+      "hash": "a08b5ac9085896e184b8f95c3e3e110d317e335d934459550b82f38ec841dfc5",
+      "docRelative": "frontend/uicoding/ui-prototype-js/tic-tac-toe/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/todo": {
+      "hash": "c9ecd78cc1f495c22410588ab8b42d3d14dff52236e89d60352512bb180005c0",
+      "docRelative": "frontend/uicoding/ui-prototype-js/todo/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/toggle": {
+      "hash": "8afc66fadaa70d11c948dd3ad7be5c033f514ef41b2db4a74937dc7a1051714e",
+      "docRelative": "frontend/uicoding/ui-prototype-js/toggle/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/traffic-light": {
+      "hash": "85e0aad48aa8cc0e234701a48c2d02fad26e57ef3a44e4ff9864a3a802162b34",
+      "docRelative": "frontend/uicoding/ui-prototype-js/traffic-light/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/transfer-list": {
+      "hash": "1ff7d6b3278972595ee1b945d5076508ef95aebdbb0c89fbda36c890531db736",
+      "docRelative": "frontend/uicoding/ui-prototype-js/transfer-list/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/undo-counter": {
+      "hash": "bf18ef2b2e0c47ee3b6be4c437b24add2c1eae8723b6b8bcd51564e8ac121a2d",
+      "docRelative": "frontend/uicoding/ui-prototype-js/undo-counter/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/user-database": {
+      "hash": "7128041c678536bdbd3d2cc68dcab697c93e4a3aebb51f9e7d8e9e4f36c3f254",
+      "docRelative": "frontend/uicoding/ui-prototype-js/user-database/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/whack-a-mole": {
+      "hash": "6d08ee194857bcfdde424acacd4520865b49970a9bb81c0faa41b3a615f3ef11",
+      "docRelative": "frontend/uicoding/ui-prototype-js/whack-a-mole/_index.mdx"
+    },
+    "__nav__:frontend/uicoding/ui-prototype-js/wordle": {
+      "hash": "4b9ce6952230d0814dd7055daeba7759a55f426fb2c63c45ce1c0438a528188e",
+      "docRelative": "frontend/uicoding/ui-prototype-js/wordle/_index.mdx"
+    }
+  }
+}

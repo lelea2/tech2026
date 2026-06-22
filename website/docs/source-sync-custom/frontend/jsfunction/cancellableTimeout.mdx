@@ -1,0 +1,31 @@
+---
+title: cancellableTimeout
+---
+
+# cancellableTimeout
+
+~~~javascript
+/**
+ * Implement a cancellable setTimeout wrapper.
+ *
+ * Signature mirrors setTimeout:
+ * setCancellableTimeout(callback);
+ * setCancellableTimeout(callback, delay);
+ * setCancellableTimeout(callback, delay, param1);
+ * setCancellableTimeout(callback, delay, param1, param2, ...paramN);
+ *
+ * @param {(...args: Array<unknown>) => void} callback
+ * @param {number} [delay]
+ * @param {...unknown} args
+ * @returns {() => void}
+ */
+export default function setCancellableTimeout(callback, delay, ...args) {
+  const timer = setTimeout(callback, delay, ...args);
+  return () => clearTimeout(timer);
+}
+
+// Example:
+// const cancel = setCancellableTimeout(() => console.log('run'), 1000);
+// cancel(); // callback will not run if still pending
+
+~~~

@@ -1,0 +1,33 @@
+---
+title: consoleLogHistory
+---
+
+# consoleLogHistory
+
+~~~javascript
+/**
+ * Installs console.log history tracking and returns a getter for entries.
+ *
+ * @returns {() => unknown[][]}
+ */
+export default function consoleLogHistory() {
+  const originalLog = console.log.bind(console);
+  const originalClear = console.clear.bind(console);
+  let history = [];
+
+  console.log = (...args) => {
+    history.push(args);
+    originalLog(...args);
+  };
+
+  console.clear = (...args) => {
+    history = [];
+    originalClear(...args);
+  };
+
+  return function getHistory() {
+    return history.slice();
+  };
+}
+
+~~~

@@ -1,0 +1,69 @@
+---
+title: classVarianceAuthority
+---
+
+# classVarianceAuthority
+
+~~~javascript
+/**
+ * Simplified Class Variance Authority (CVA)
+ *
+ * Data structure:
+ * - Nested object lookup table
+ *
+ * variants = {
+ *   intent: {
+ *     primary: 'btn-primary',
+ *     secondary: 'btn-secondary',
+ *   }
+ * }
+ *
+ * Idea:
+ * - Start with base classes
+ * - Merge user variants with defaultVariants
+ * - Lookup matching classes from variants map
+ * - Join truthy classes with spaces
+ *
+ * @param {string | null | undefined} base
+ * @param {Object} config
+ * @returns {(props?: Object) => string}
+ */
+export default function cva(base, config = {}) {
+  const {
+    variants = {},
+    defaultVariants = {},
+  } = config;
+
+  return function (props = {}) {
+    const classes = [];
+
+    // Add base class if truthy.
+    if (base) {
+      classes.push(base);
+    }
+
+    // Resolve final variant values:
+    // user props override defaultVariants.
+    const resolvedVariants = {
+      ...defaultVariants,
+      ...props,
+    };
+
+    // Iterate through known variants only.
+    for (const variantName of Object.keys(variants)) {
+      const variantMap = variants[variantName];
+
+      const variantValue = resolvedVariants[variantName];
+
+      // Variant keys in objects are strings.
+      const className = variantMap[String(variantValue)];
+
+      if (className) {
+        classes.push(className);
+      }
+    }
+
+    return classes.join(' ');
+  };
+}
+~~~

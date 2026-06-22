@@ -1,0 +1,77 @@
+---
+title: nodeRegistry
+---
+
+# nodeRegistry
+
+~~~javascript
+/**
+ * Interview-style question recap:
+ * - Design an in-memory registry keyed by DOM Node identity.
+ * - Different nodes that look the same must still map to different entries.
+ * - Support non-element nodes too (text/comment), as long as they are node objects.
+ *
+ * Why this approach:
+ * - WeakMap is ideal for object-identity keys (DOM nodes are objects).
+ * - Lookups are by reference identity, not by node content/attributes.
+ * - WeakMap allows garbage collection when nodes are no longer referenced elsewhere.
+ *
+ * API behavior:
+ * - set(node, value): store value for that exact node.
+ * - get(node): return stored value or undefined.
+ * - has(node): whether a value exists for the node.
+ * - delete(node): remove entry, returns boolean.
+ * - clear(): reset registry (extra utility, similar to Map-like stores).
+ */
+
+export default class NodeRegistry {
+  constructor() {
+    this._store = new WeakMap();
+  }
+
+  /**
+	 * @param {object} node
+	 * @param {*} value
+	 * @returns {void}
+	 */
+  set(node, value) {
+    this._store.set(node, value);
+  }
+
+  /**
+	 * @param {object} node
+	 * @returns {*}
+	 */
+  get(node) {
+    return this._store.get(node);
+  }
+
+  /**
+	 * @param {object} node
+	 * @returns {boolean}
+	 */
+  has(node) {
+    return this._store.has(node);
+  }
+
+  /**
+	 * @param {object} node
+	 * @returns {boolean}
+	 */
+  delete(node) {
+    return this._store.delete(node);
+  }
+
+  clear() {
+    this._store = new WeakMap();
+  }
+}
+
+// Example usage:
+// const registry = new NodeRegistry();
+// const button = document.createElement('button');
+// registry.set(button, { panel: 'styles', highlighted: true });
+// registry.has(button); // true
+// registry.get(button); // { panel: 'styles', highlighted: true }
+
+~~~

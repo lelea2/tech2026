@@ -1,0 +1,45 @@
+---
+title: getElementByClassName
+---
+
+# getElementByClassName
+
+~~~javascript
+/**
+ * @param {Element} element
+ * @param {string} classNames
+ * @return {Array<Element>}
+ */
+export default function getElementsByClassName(element, classNames) {
+  const results = [];
+
+  function traverse(node) {
+    if (!node) {
+      return;
+    }
+    // Split target classes into an array for multi-class support
+    const targetClasses = classNames.trim().split(/\s+/);
+
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      // const hasAllClasses = targetClasses.every(cls => node.classList.contains(cls)); <== current element should not be included
+      
+      // if (hasAllClasses) {
+      //   results.push(node);
+      // }
+      if (node.children) {
+        for (const child of node.children) {
+          const hasAllClasses = targetClasses.every(cls => child.classList.contains(cls));
+          if (hasAllClasses) {
+            results.push(child);
+          }
+          traverse(child);
+        }
+      }
+    }
+  }
+
+  traverse(element);
+  return results;
+}
+
+~~~

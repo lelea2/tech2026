@@ -1,0 +1,96 @@
+---
+title: styledTextRangeIII
+---
+
+# styledTextRangeIII
+
+~~~javascript
+/**
+ * Replace text in [start, end) and keep style ranges in sync.
+ *
+ * Idea:
+ * - Keep ranges before start unchanged.
+ * - Drop removed middle [start, end).
+ * - Insert replacement range if replacement text is non-empty.
+ * - Shift ranges after end by length delta.
+ * - Merge adjacent ranges with same style.
+ *
+ * @param {{
+ *   text: string,
+ *   ranges: { start: number, end: number, style: string }[],
+ * }} node
+ * @param {number} start
+ * @param {number} end
+ * @param {{ text: string, style: string }} replacement
+ * @returns {{
+ *   text: string,
+ *   ranges: { start: number, end: number, style: string }[],
+ * }}
+ */
+export default function replaceTextRange(node, start, end, replacement) {
+  const newText =
+    node.text.slice(0, start) +
+    replacement.text +
+    node.text.slice(end);
+
+  const insertLength = replacement.text.length;
+  const removedLength = end - start;
+  const delta = insertLength - removedLength;
+
+  const ranges = [];
+
+  for (const range of node.ranges) {
+    // Part before replacement.
+    if (range.start < start) {
+      ranges.push({
+        start: range.start,
+        end: Math.min(range.end, start),
+        style: range.style,
+      });
+    }
+
+    // Part after replacement.
+    if (range.end > end) {
+      ranges.push({
+        start: Math.max(range.start, end) + delta,
+        end: range.end + delta,
+        style: range.style,
+      });
+    }
+  }
+
+  // Insert replacement style range.
+  if (insertLength > 0) {
+    ranges.push({
+      start,
+      end: start + insertLength,
+      style: replacement.style,
+    });
+  }
+
+  ranges.sort((a, b) => a.start - b.start || a.end - b.end);
+
+  return {
+    text: newText,
+    ranges: mergeAdjacentRanges(ranges),
+  };
+}
+
+function mergeAdjacentRanges(ranges) {
+  const merged = [];
+
+  for (const range of ranges) {
+    if (range.start === range.end) continue;
+
+    const last = merged[merged.length - 1];
+
+    if (last && last.end === range.start && last.style === range.style) {
+      last.end = range.end;
+    } else {
+      merged.push({ ...range });
+    }
+  }
+
+  return merged;
+}
+~~~

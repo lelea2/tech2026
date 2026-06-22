@@ -1,15 +1,39 @@
 {
   "files": {
+    "backend/quizzes/apollo_vs_relay_staff_frontend.mdx": {
+      "hash": "b0f003d9b18c36b9d23d09c19df98ff431524d3f8c5c2b544a3ac283d1789dd3",
+      "docRelative": "quizzes/apollo_vs_relay_staff_frontend.mdx"
+    },
     "backend/quizzes/backend-scaling-horizontal-vertical.mdx": {
-      "hash": "90b41a9f9853e019fe0587784dbe57b1027857c8c4f87a1b8cc57d8078cbadb0",
+      "hash": "37b353ee9156200ce8807ae49e75d80eaed848056608df0cb97ff8641e4ed861",
       "docRelative": "quizzes/backend-scaling-horizontal-vertical.mdx"
     },
+    "backend/quizzes/frontend_graphql_ecosystem_leadership_story.mdx": {
+      "hash": "92e35c17b27d469787c7783dc036f2241cd7268a8ff6134129faf62794ee0489",
+      "docRelative": "quizzes/frontend_graphql_ecosystem_leadership_story.mdx"
+    },
+    "backend/quizzes/graphql_directives_conditional_modules_staff_frontend.mdx": {
+      "hash": "c93e9084fc9a63d7d7c0ba9c880a77d85dcb1f7db585510f033451a9dc418d39",
+      "docRelative": "quizzes/graphql_directives_conditional_modules_staff_frontend.mdx"
+    },
+    "backend/quizzes/graphql_staff_engineer_interview_questions.mdx": {
+      "hash": "741e11d14f71cc531184f06f78cfc51d05aefb43deb1119fd40c56c1194efe9e",
+      "docRelative": "quizzes/graphql_staff_engineer_interview_questions.mdx"
+    },
+    "backend/quizzes/linkedin-graphql-architecture-interview.mdx": {
+      "hash": "c286beb1ff4c79462717fac6741065d910e7c8a0024fb150a8c853b3dc78aad0",
+      "docRelative": "quizzes/linkedin-graphql-architecture-interview.mdx"
+    },
+    "backend/quizzes/linkedin_graphql_leadership_story.mdx": {
+      "hash": "1a40de81bfd9d693e36321422ca2d72253c95b01d63d4267198fcdef90da7889",
+      "docRelative": "quizzes/linkedin_graphql_leadership_story.mdx"
+    },
     "backend/quizzes/rest-vs-graphql-vs-gRPC.md": {
-      "hash": "f1b1fbce72d36362d219f21b77e5bfec5a6b07184f5a7582c124af78f4c99ce0",
+      "hash": "6cf09013fe35891c81f46501754420be13be2d0f2c92fee154f9f7795a8adb30",
       "docRelative": "quizzes/rest-vs-graphql-vs-gRPC.mdx"
     },
     "__nav__:quizzes": {
-      "hash": "c66995568665bbc221355a81747aae20066b9d56c1b070248a9aaba00edcfe88",
+      "hash": "59ad4b19068d7b1db09562f202b1992b62c68edb8da58fcf46e4361f7cd89a32",
       "docRelative": "quizzes/_index.mdx"
     }
   }

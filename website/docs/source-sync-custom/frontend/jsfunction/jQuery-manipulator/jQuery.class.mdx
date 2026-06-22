@@ -1,0 +1,126 @@
+---
+title: jQuery.class
+---
+
+# jQuery.class
+
+~~~javascript
+/**
+ * Lightweight jQuery-style class manipulation helper.
+ *
+ * Data structure:
+ * - Set for deduplicated class storage
+ *
+ * Core idea:
+ * - Read current className
+ * - Convert to Set
+ * - Mutate classes
+ * - Write back to className
+ *
+ * @param {string} selector
+ * @return {{toggleClass: Function, addClass: Function, removeClass: Function}}
+ */
+export default function $(selector) {
+  const element = document.querySelector(selector);
+
+  /**
+   * Convert element.className into Set.
+   *
+   * @returns {Set<string>}
+   */
+  function getClassSet() {
+    return new Set(
+      element.className
+        .split(/\s+/)
+        .filter(Boolean),
+    );
+  }
+
+  /**
+   * Write Set back to className string.
+   *
+   * @param {Set<string>} classes
+   */
+  function setClassSet(classes) {
+    element.className = [...classes].join(' ');
+  }
+
+  const api = {
+    /**
+     * Toggle one or more classes.
+     *
+     * Rules:
+     * - state === true  => always add
+     * - state === false => always remove
+     * - otherwise toggle based on existence
+     *
+     * @param {string} className
+     * @param {boolean} [state]
+     * @return {Object}
+     */
+    toggleClass: function (className, state) {
+      const classes = getClassSet();
+
+      for (const cls of className.split(/\s+/)) {
+        if (!cls) continue;
+
+        if (state === true) {
+          classes.add(cls);
+        } else if (state === false) {
+          classes.delete(cls);
+        } else {
+          if (classes.has(cls)) {
+            classes.delete(cls);
+          } else {
+            classes.add(cls);
+          }
+        }
+      }
+
+      setClassSet(classes);
+
+      return api;
+    },
+
+    /**
+     * Add one or more classes.
+     *
+     * @param {string} className
+     * @return {Object}
+     */
+    addClass: function (className) {
+      const classes = getClassSet();
+
+      for (const cls of className.split(/\s+/)) {
+        if (cls) {
+          classes.add(cls);
+        }
+      }
+
+      setClassSet(classes);
+
+      return api;
+    },
+
+    /**
+     * Remove one or more classes.
+     *
+     * @param {string} className
+     * @return {Object}
+     */
+    removeClass: function (className) {
+      const classes = getClassSet();
+
+      for (const cls of className.split(/\s+/)) {
+        classes.delete(cls);
+      }
+
+      setClassSet(classes);
+
+      return api;
+    },
+  };
+
+  return api;
+}
+~~~

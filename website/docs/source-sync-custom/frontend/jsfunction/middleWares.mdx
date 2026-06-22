@@ -1,0 +1,81 @@
+---
+title: middleWares
+---
+
+# middleWares
+
+~~~javascript
+/**
+ * Interview-style summary of the ask:
+ * - Build a function `middlewares(...fns)` that composes middleware into one callable.
+ * - The returned function takes `context` and runs middlewares in order.
+ * - Each middleware receives `(context, next)`.
+ * - Calling `await next()` continues to the next middleware.
+ * - If `next()` is never called, the chain stops at that middleware.
+ *
+ * Plan to solve:
+ * 1. Return a function that starts execution from middleware index 0.
+ * 2. Use a recursive `dispatch(i)` helper to run middleware `i`.
+ * 3. Pass `next` as `() => dispatch(i + 1)` so each middleware controls continuation.
+ * 4. Wrap results with `Promise.resolve(...)` so sync and async middleware both work.
+ * 5. Add a guard to prevent calling `next()` multiple times in one middleware.
+ *
+ * Why this works:
+ * - Middleware order is preserved because each `next()` advances exactly one step.
+ * - `await next()` creates the classic onion model (before/after behavior).
+ * - Promise chaining guarantees sequential async execution.
+ */
+
+/**
+ * @param {...Function} fns
+ * @returns {(context: object) => Promise<void>}
+ */
+export default function middlewares(...fns) {
+  return function composed(context) {
+    let index = -1;
+
+    function dispatch(i) {
+      if (i <= index) {
+        return Promise.reject(new Error('next() called multiple times'));
+      }
+
+      index = i;
+      const fn = fns[i];
+
+      if (!fn) {
+        return Promise.resolve();
+      }
+
+      return Promise.resolve(fn(context, () => dispatch(i + 1)));
+    }
+
+    return dispatch(0);
+  };
+}
+
+// Example usage:
+// async function fn1(ctx, next) {
+//   ctx.stack.push('fn1-start');
+//   await next();
+//   ctx.stack.push('fn1-end');
+// }
+//
+// async function fn2(ctx, next) {
+//   ctx.stack.push('fn2-start');
+//   await new Promise((resolve) => setTimeout(resolve, 10));
+//   await next();
+//   ctx.stack.push('fn2-end');
+// }
+//
+// function fn3(ctx, next) {
+//   ctx.stack.push('fn3-start');
+//   next();
+//   ctx.stack.push('fn3-end');
+// }
+//
+// const run = middlewares(fn1, fn2, fn3);
+// const ctx = { stack: [] };
+// await run(ctx);
+// ctx.stack => ['fn1-start', 'fn2-start', 'fn3-start', 'fn3-end', 'fn2-end', 'fn1-end']
+
+~~~

@@ -1,0 +1,41 @@
+---
+title: compose
+---
+
+# compose
+
+~~~javascript
+/**
+ * Compose functions from right to left.
+ *
+ * compose(f, g, h)(x) => f(g(h(x)))
+ *
+ * If no functions are provided, returns identity function.
+ *
+ * @param {...Function} functions
+ * @returns {(input: unknown) => unknown}
+ */
+export default function compose(...functions) {
+  if (functions.length === 0) {
+    return (input) => input;
+  }
+
+  return (input) =>
+    functions.reduceRight((accumulator, fn) => fn(accumulator), input);
+}
+
+/**
+Example:
+
+const add1 = (num) => num + 1;
+const double = (num) => num * 2;
+const subtract10 = (num) => num - 10;
+
+const composedFn = compose(subtract10, double, add1);
+composedFn(3); // -2
+
+const identity = compose();
+identity(7); // 7
+*/
+
+~~~

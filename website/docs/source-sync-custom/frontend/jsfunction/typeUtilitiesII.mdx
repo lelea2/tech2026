@@ -1,0 +1,44 @@
+---
+title: typeUtilitiesII
+---
+
+# typeUtilitiesII
+
+~~~javascript
+/**
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export function isArray(value) {
+  return Array.isArray(value);
+}
+
+/**
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export function isFunction(value) {
+  return typeof value === 'function';
+}
+
+/**
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export function isObject(value) {
+  return value !== null && (typeof value === 'object' || typeof value === 'function');
+}
+
+/**
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export function isPlainObject(value) {
+  if (value === null || typeof value !== 'object') {
+    return false;
+  }
+
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+}
+~~~
