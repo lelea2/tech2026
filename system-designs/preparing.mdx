@@ -1,0 +1,532 @@
+---
+title: 'How to Prepare for System Design Interviews'
+description: 'A staff-level checklist for building system design fundamentals, request-flow thinking, data modeling, scale, and reliability'
+tags:
+  - system-design
+  - interview-prep
+  - distributed-systems
+  - backend-system-design
+---
+
+# How to Prepare for System Design Interviews
+
+System design interviews are not only about memorizing famous architectures.
+They test whether you can reason from requirements to trade-offs: latency,
+scale, data ownership, correctness, failure modes, and product experience.
+
+Use this guide as a study map. For each area, learn the concept, explain where
+it shows up in a real system, and practice making trade-offs out loud.
+
+## 1. Core Technical Foundations
+
+### Networking and Latency
+
+Know the basic latency numbers and request-path costs well enough to reason
+without stopping the interview.
+
+- Basic numbers in your head:
+  - memory access
+  - SSD and disk access
+  - same-AZ network call
+  - cross-region network call
+  - CDN edge versus origin
+- DNS lookup and caching.
+- TCP handshake and connection setup.
+- TLS negotiation and termination.
+- HTTP request/response lifecycle.
+- HTTP/1.1 versus HTTP/2 versus HTTP/3 at a high level.
+- Keep-alive and connection pooling.
+- Load balancers and reverse proxies.
+- Timeouts, retries, and connection limits.
+
+Interview signal:
+
+- You can explain why one extra network hop matters.
+- You can decide when to cache, pool, batch, or move compute closer to users.
+
+### OS and Concurrency Basics
+
+You do not need to be a kernel engineer, but you should understand what limits
+a server under load.
+
+- Processes versus threads.
+- Blocking versus non-blocking I/O.
+- Event loops and worker pools.
+- Context switching overhead.
+- File descriptors and socket limits.
+- Connection backlog queues.
+- Memory pressure and garbage collection.
+- How slow clients can consume server resources.
+- CPU-bound versus I/O-bound workloads.
+
+Interview signal:
+
+- You can explain why a service runs out of connections before it runs out of
+  CPU.
+- You can reason about backpressure instead of only adding more machines.
+
+### Data Formats and APIs
+
+Know the trade-offs of common API and payload choices.
+
+- JSON:
+  - easy to debug
+  - broad browser support
+  - larger payloads
+- Protobuf:
+  - compact and typed
+  - better for internal RPC
+  - less human-readable
+- REST:
+  - resource-oriented
+  - cache-friendly
+  - simple public API model
+- gRPC:
+  - strong contracts
+  - streaming support
+  - common for service-to-service calls
+- WebSockets:
+  - full-duplex
+  - low-latency interactive communication
+- Long polling and SSE:
+  - simpler server-push options for browser clients
+
+API design basics:
+
+- Idempotent methods.
+- Pagination.
+- Filtering and sorting.
+- API versioning.
+- Rate limits and quotas.
+- Error response shape.
+- Backward compatibility.
+
+## 2. Request Flow and Boundaries
+
+### End-to-End Request Lifecycle
+
+Practice narrating a request from the user's device to the database and back.
+
+Example path:
+
+```text
+Client
+  -> DNS
+  -> CDN / edge
+  -> load balancer
+  -> API gateway
+  -> auth / rate limit
+  -> service
+  -> cache
+  -> database
+  -> response
+```
+
+At each layer, ask:
+
+- What work happens here?
+- Can this layer fail?
+- Can this layer cache?
+- Does this layer authenticate?
+- Does this layer enforce rate limits?
+- What timeout applies?
+- What logs and metrics are emitted?
+
+Interview signal:
+
+- You can draw boundaries cleanly and explain why each boundary exists.
+
+### Sync vs Async
+
+Not every request should block until all work is complete.
+
+Use synchronous flow when:
+
+- the user needs the result immediately,
+- correctness depends on the operation finishing,
+- the work is short and predictable.
+
+Use asynchronous flow when:
+
+- work is slow or expensive,
+- multiple downstream systems must be notified,
+- spikes should be smoothed,
+- retries are acceptable,
+- the user can continue without waiting.
+
+Patterns to know:
+
+- Job queue.
+- Event stream.
+- Background workers.
+- Fan-out.
+- Fan-in.
+- Scheduled jobs.
+- Dead letter queues.
+- Outbox pattern.
+
+Examples:
+
+- Checkout payment authorization is synchronous.
+- Sending a receipt email is asynchronous.
+- Upload commit is synchronous.
+- Thumbnail generation is asynchronous.
+
+### Service Decomposition
+
+Start simple. Split services only when there is a real reason.
+
+One service may be enough when:
+
+- scale is modest,
+- one team owns the domain,
+- data is tightly coupled,
+- transactions are important.
+
+Split services when:
+
+- teams need independent ownership,
+- scaling needs differ,
+- deployment cadence differs,
+- failure isolation matters,
+- data boundaries are clear.
+
+For each service, define:
+
+- owned data,
+- public API,
+- dependencies,
+- failure behavior,
+- scaling model,
+- operational owner.
+
+Interview signal:
+
+- You can resist premature microservices while still designing clear ownership.
+
+## 3. Data Modeling and Storage Choices
+
+### Data Modeling
+
+Start from access patterns, not from technology.
+
+Ask:
+
+- What are the core entities?
+- What relationships exist?
+- What queries are on the critical path?
+- What data is mutable?
+- What data is append-only?
+- What data must be strongly consistent?
+- What data can be eventually consistent?
+- What is the retention policy?
+
+Concepts to know:
+
+- Normalization versus denormalization.
+- Primary keys and composite keys.
+- Secondary indexes.
+- Unique constraints.
+- Soft delete.
+- Audit logs.
+- Materialized views.
+- Idempotency records.
+
+Interview signal:
+
+- You can explain why a schema supports the product's actual queries.
+
+### Storage Engines
+
+Pick storage based on access pattern and correctness needs.
+
+Relational database:
+
+- transactions,
+- constraints,
+- joins,
+- strong consistency,
+- great for core business entities.
+
+Key-value store:
+
+- simple lookup by key,
+- high throughput,
+- cache or session data,
+- direct ID-based access.
+
+Document store:
+
+- flexible schema,
+- nested objects,
+- product data with evolving shape.
+
+Wide-column store:
+
+- high write volume,
+- partitioned time or entity data,
+- large-scale event-like records.
+
+Time-series database:
+
+- metrics,
+- counters,
+- monitoring,
+- retention and rollups.
+
+Object storage:
+
+- files,
+- images,
+- videos,
+- backups,
+- immutable blobs.
+
+Also understand:
+
+- indexes,
+- partitions,
+- sharding,
+- federation,
+- hot partitions,
+- archival,
+- lifecycle policies,
+- backup and restore.
+
+### Caching
+
+Know where caching can happen:
+
+- browser cache,
+- mobile local cache,
+- CDN,
+- edge cache,
+- application memory cache,
+- distributed cache,
+- database buffer cache.
+
+Patterns:
+
+- Cache-aside.
+- Write-through.
+- Write-behind.
+- Read-through.
+- Stale-while-revalidate.
+
+Hard parts:
+
+- cache key design,
+- invalidation,
+- TTL selection,
+- negative caching,
+- cache stampede protection,
+- hot keys,
+- stale data behavior.
+
+Interview signal:
+
+- You can say exactly what can be stale and for how long.
+
+## 4. Scale and Performance Patterns
+
+### Throughput and Capacity
+
+Practice quick estimates:
+
+- requests per second,
+- peak versus average traffic,
+- p50, p95, p99 latency,
+- concurrent users,
+- connection count,
+- read/write ratio,
+- storage growth,
+- bandwidth,
+- queue depth.
+
+Scaling concepts:
+
+- vertical scaling,
+- horizontal scaling,
+- stateless services,
+- auto scaling,
+- partitioning,
+- replication,
+- read replicas,
+- connection pooling.
+
+Interview signal:
+
+- You can identify the bottleneck instead of blindly adding servers.
+
+### Protecting Systems
+
+Defensive design matters at staff level.
+
+- Rate limiting.
+- Quotas.
+- Backpressure.
+- Circuit breakers.
+- Timeouts.
+- Retries with jitter.
+- Bulkheads.
+- Load shedding.
+- Admission control.
+- Queues for smoothing spikes.
+- Dead letter queues.
+
+Explain:
+
+- what gets rejected,
+- what gets queued,
+- what gets degraded,
+- what gets retried,
+- what gets dropped.
+
+### Heavy Features
+
+Some features should not run directly in the request path.
+
+Examples:
+
+- search indexing,
+- feed generation,
+- recommendation,
+- reporting,
+- analytics aggregation,
+- media transcoding,
+- notification fan-out.
+
+Design choices:
+
+- precompute versus on demand,
+- batch versus streaming,
+- exact versus approximate,
+- online versus offline,
+- sampling,
+- ranking freshness,
+- materialized views.
+
+Interview signal:
+
+- You can keep the core user path fast while still supporting expensive
+  product features.
+
+## 5. Reliability and Correctness
+
+### Redundancy and Failover
+
+Know the basics:
+
+- replication,
+- leader/follower,
+- multi-AZ,
+- multi-region,
+- health checks,
+- failover triggers,
+- disaster recovery,
+- RPO and RTO,
+- graceful degradation.
+
+Ask:
+
+- What happens if one instance fails?
+- What happens if one AZ fails?
+- What happens if one region fails?
+- What data can be lost?
+- How long can the system be unavailable?
+- Can users continue with degraded functionality?
+
+### Consistency
+
+Know the major consistency models:
+
+- strong consistency,
+- eventual consistency,
+- read-your-writes,
+- monotonic reads,
+- causal consistency.
+
+Use strong consistency when:
+
+- money changes hands,
+- permissions change,
+- inventory is limited,
+- duplicate actions are harmful,
+- user trust depends on exactness.
+
+Use eventual consistency when:
+
+- feeds update,
+- analytics aggregate,
+- search indexes refresh,
+- notifications fan out,
+- counters are approximate.
+
+Correctness tools:
+
+- idempotency keys,
+- retry semantics,
+- deduplication,
+- sequence numbers,
+- version checks,
+- optimistic locking,
+- distributed locks only when necessary,
+- transactions,
+- outbox pattern.
+
+Interview signal:
+
+- You can say where consistency can be relaxed and where it cannot.
+
+## How to Use This in an Interview
+
+### Start with scope
+
+Clarify:
+
+- users,
+- core flows,
+- scale,
+- data,
+- latency,
+- consistency,
+- availability,
+- security.
+
+### Draw the happy path
+
+Show the main request path first. Keep it simple.
+
+Then add:
+
+- cache,
+- queue,
+- database,
+- async worker,
+- observability,
+- failure handling.
+
+### State trade-offs explicitly
+
+Strong answers sound like:
+
+- "I would keep this synchronous because the user needs immediate confirmation."
+- "This can be asynchronous because email delivery should not block checkout."
+- "This cache can be stale for 60 seconds because the UI can tolerate it."
+- "This write needs idempotency because clients may retry after timeout."
+- "This service should degrade before the core workflow fails."
+
+### Close with staff-level concerns
+
+Always mention:
+
+- failure modes,
+- operational controls,
+- metrics,
+- rollout plan,
+- security and privacy,
+- cost,
+- product experience.
+
+The goal is not to design the most complex system. The goal is to show that
+you can choose the right complexity for the product, scale, and risk.

@@ -140,6 +140,10 @@
       "hash": "3abc75467b09bec8311acccecb0398dba7d18cadad8c5e3a9d89664aaef64f1c",
       "docRelative": "news-feed.mdx"
     },
+    "system-designs/preparing.mdx": {
+      "hash": "ec97529d329b27a6cfb90bfb0075c4cbbc0afe9039b5f4d40cfaa99930b7a69a",
+      "docRelative": "preparing.mdx"
+    },
     "system-designs/prompt-playground.mdx": {
       "hash": "42a5e21e9187bc1b291f3034a3bc2d0f6010d85dc36421f7cacbe3a696bd4357",
       "docRelative": "prompt-playground.mdx"
