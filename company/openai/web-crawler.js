@@ -1,0 +1,283 @@
+/**
+ * Interview question:
+ * Build a web crawler that starts from one URL, crawls only pages from the same
+ * domain, avoids duplicate pages, and returns URLs in breadth-first search order.
+ *
+ * Follow-up requirement:
+ * The crawler should fetch multiple pages concurrently so it does not wait on
+ * one slow request at a time.
+ *
+ * High-level solution:
+ * - Normalize URLs so duplicates such as /about and /about/ are treated the same.
+ * - Track visited URLs so cycles do not cause infinite crawling.
+ * - Restrict crawling to the start URL's domain.
+ * - Crawl level by level to preserve BFS order.
+ * - Fetch URLs within the same BFS level concurrently using worker threads.
+ *
+ * Why BFS?
+ * BFS discovers pages by distance from the start page. This is useful when you
+ * want the most directly linked pages first, such as homepage -> category pages
+ * -> article/detail pages.
+ *
+ * Node.js BFS Web Crawler with worker_threads
+ *
+ * Run:
+ *   node crawler.js
+ */
+
+const { Worker, isMainThread, parentPort, workerData } = require("worker_threads");
+
+const MOCK_PAGES = {
+  "https://example.com/": [
+    "https://example.com/about",
+    "https://example.com/blog",
+  ],
+  "https://example.com/about": [
+    "https://example.com/contact",
+  ],
+  "https://example.com/blog": [
+    "https://example.com/about",
+    "https://external.com",
+  ],
+  "https://example.com/contact": [],
+};
+
+function getDomain(url) {
+  // URL parsing is safer than string splitting because it handles protocols,
+  // ports, paths, query strings, and invalid URL formats consistently.
+  return new URL(url).hostname;
+}
+
+function normalizeUrl(url) {
+  const parsed = new URL(url);
+
+  // Remove trailing slash for stable dedupe:
+  // https://example.com/about and https://example.com/about/ should not be
+  // crawled as two different pages.
+  if (parsed.pathname !== "/" && parsed.pathname.endsWith("/")) {
+    parsed.pathname = parsed.pathname.slice(0, -1);
+  }
+
+  // Ignore fragments because they point to sections within the same document,
+  // not a different page to crawl.
+  parsed.hash = "";
+
+  return parsed.toString();
+}
+
+function isSameDomain(url, rootDomain) {
+  try {
+    // Stay inside the original website. Without this check, one external link
+    // could send the crawler across the public internet.
+    return getDomain(url) === rootDomain;
+  } catch {
+    // Invalid URLs are skipped instead of failing the whole crawl.
+    return false;
+  }
+}
+
+async function mockFetchLinks(url) {
+  // Simulate network latency.
+  await new Promise((resolve) => setTimeout(resolve, Math.random() * 100));
+
+  return MOCK_PAGES[url] || [];
+}
+
+/**
+ * Worker thread code.
+ * It receives one URL, fetches links, and sends them back.
+ *
+ * Interview explanation:
+ * In a real crawler, this worker would perform HTTP fetch, parse HTML, extract
+ * href values, and return discovered links. The mock keeps the example
+ * deterministic and safe to run locally.
+ */
+if (!isMainThread) {
+  (async () => {
+    const { url } = workerData;
+    const links = await mockFetchLinks(url);
+
+    parentPort.postMessage({
+      url,
+      links,
+    });
+  })();
+
+  return;
+}
+
+/**
+ * Main-thread helper to fetch one URL using a worker.
+ *
+ * Why worker_threads?
+ * Fetching/parsing many pages can be slow or CPU-heavy if HTML parsing is large.
+ * Worker threads let the main thread coordinate work while workers process
+ * pages independently.
+ */
+function fetchWithWorker(url) {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(__filename, {
+      workerData: { url },
+    });
+
+    worker.on("message", resolve);
+    worker.on("error", reject);
+
+    worker.on("exit", (code) => {
+      if (code !== 0) {
+        reject(new Error(`Worker exited with code ${code}`));
+      }
+    });
+  });
+}
+
+/**
+ * Run a batch of tasks with max concurrency.
+ *
+ * Interview explanation:
+ * We do not start one worker for every URL because a large site could produce
+ * thousands of URLs. maxThreads bounds resource usage and prevents the crawler
+ * from overwhelming the machine or target website.
+ */
+async function runWithConcurrency(items, maxThreads, taskFn) {
+  const results = new Array(items.length);
+  let nextIndex = 0;
+
+  async function workerLoop() {
+    while (nextIndex < items.length) {
+      // Each loop claims the next available item. JavaScript runs this mutation
+      // on the main event loop, so two loops will not claim the same index.
+      const currentIndex = nextIndex++;
+
+      // Store by original index so results stay aligned with input order even
+      // when slower URLs finish after faster URLs.
+      results[currentIndex] = await taskFn(items[currentIndex]);
+    }
+  }
+
+  const workers = [];
+
+  for (let i = 0; i < Math.min(maxThreads, items.length); i++) {
+    // Start at most maxThreads async worker loops for this batch.
+    workers.push(workerLoop());
+  }
+
+  await Promise.all(workers);
+  return results;
+}
+
+/**
+ * BFS crawler.
+ *
+ * Important detail:
+ * To preserve BFS order while still fetching concurrently, we process the crawl
+ * level by level. All URLs at the current level are fetched concurrently.
+ * Newly discovered URLs are appended after the entire level completes.
+ */
+async function crawl(startUrl, maxThreads) {
+  // Normalize the start URL immediately so all future comparisons use the same
+  // canonical representation.
+  const normalizedStartUrl = normalizeUrl(startUrl);
+  const rootDomain = getDomain(normalizedStartUrl);
+
+  // visited prevents cycles. Example: /blog links to /about, and /about could
+  // link back to /blog. Without visited, the crawler may never finish.
+  const visited = new Set([normalizedStartUrl]);
+
+  // Store the final answer in the exact order pages are reached by BFS.
+  const crawledOrder = [];
+
+  // currentLevel is the BFS frontier. Each loop processes one distance from the
+  // starting URL.
+  let currentLevel = [normalizedStartUrl];
+
+  while (currentLevel.length > 0) {
+    // BFS order: add current level URLs in queue order.
+    for (const url of currentLevel) {
+      crawledOrder.push(url);
+    }
+
+    // Fetch all URLs in this level concurrently.
+    const fetchResults = await runWithConcurrency(
+      currentLevel,
+      maxThreads,
+      fetchWithWorker
+    );
+
+    const nextLevel = [];
+
+    // Preserve deterministic BFS discovery order by processing results
+    // in the same order as currentLevel.
+    for (const result of fetchResults) {
+      for (const rawLink of result.links) {
+        let normalizedLink;
+
+        try {
+          // Normalize each discovered link before domain checks and dedupe.
+          normalizedLink = normalizeUrl(rawLink);
+        } catch {
+          // Skip malformed links instead of failing the full crawl.
+          continue;
+        }
+
+        if (!isSameDomain(normalizedLink, rootDomain)) {
+          // External links are intentionally ignored for a same-domain crawler.
+          continue;
+        }
+
+        if (visited.has(normalizedLink)) {
+          // Already scheduled or crawled, so skip duplicates and cycles.
+          continue;
+        }
+
+        // Mark visited when discovered, not when fetched. This prevents the
+        // same URL from being added twice by two pages in the same level.
+        visited.add(normalizedLink);
+        nextLevel.push(normalizedLink);
+      }
+    }
+
+    currentLevel = nextLevel;
+  }
+
+  return crawledOrder;
+}
+
+/**
+ * Demo
+ *
+ * Expected input:
+ *   startUrl = "https://example.com"
+ *   maxThreads = 4
+ *
+ * Mock graph:
+ *   https://example.com -> /about, /blog
+ *   /about -> /contact
+ *   /blog -> /about, https://external.com
+ *   /contact -> []
+ *
+ * Expected output:
+ *   1. https://example.com/
+ *   2. https://example.com/about
+ *   3. https://example.com/blog
+ *   4. https://example.com/contact
+ *
+ * Why this output?
+ * - /about and /blog are one hop from the root, so they appear before /contact.
+ * - /about is not repeated when discovered again from /blog.
+ * - https://external.com is skipped because it is outside the root domain.
+ */
+(async () => {
+  const startUrl = "https://example.com";
+  const maxThreads = 4;
+
+  const crawledUrls = await crawl(startUrl, maxThreads);
+
+  console.log("Crawled URLs in BFS order:");
+
+  crawledUrls.forEach((url, index) => {
+    console.log(`${index + 1}. ${url}`);
+  });
+
+  console.log(`\nTotal pages crawled: ${crawledUrls.length}`);
+})();

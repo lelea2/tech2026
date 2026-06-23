@@ -112,6 +112,10 @@
       "hash": "6e0ef9664c9fbde91a5ce5388c65ae98db8e6726a990d0f77a219c35d933ae64",
       "docRelative": "video-netflix.png"
     },
+    "system-designs/webhook-callback-system.png": {
+      "hash": "cd217fc51f11d6553e654ff1af6d6f44c8eba17f4916c35834cb98cfdfc8bb40",
+      "docRelative": "webhook-callback-system.png"
+    },
     "system-designs/whatsapp-chat.png": {
       "hash": "1dcfcb6a205693ba8d5c4450babffc7845dd3a483b139fcd4b4757f94c6b7832",
       "docRelative": "whatsapp-chat.png"
@@ -227,6 +231,10 @@
     "system-designs/video-netflix.mdx": {
       "hash": "cb28452cce69166a89978e864ae67be516da7d9943dce37a3ed8f5464580bae5",
       "docRelative": "video-netflix.mdx"
+    },
+    "system-designs/webhook-callback-system.mdx": {
+      "hash": "d949b5ecf4ad0f0689373addc327f8883e5d4f0828c9bccad9f2f7fdefaa7899",
+      "docRelative": "webhook-callback-system.mdx"
     },
     "system-designs/websocket-vs.SSE-vs.polling.mdx": {
       "hash": "ca42927fb4a1f3d79da4d6e98ce4dcc19a41851fa26cc7c25364890ac27c0547",
