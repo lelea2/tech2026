@@ -1,6 +1,6 @@
 ---
-title: "Design a Sandboxed Cloud IDE"
-description: "Staff software engineer system design for a multi-tenant, browser-based cloud IDE/notebook with strong sandboxing, real-time output streaming, autoscaling, persistence, and FE/BE design."
+title: 'Design a Sandboxed Cloud IDE'
+description: 'Staff software engineer system design for a multi-tenant, browser-based cloud IDE/notebook with strong sandboxing, real-time output streaming, autoscaling, persistence, and FE/BE design.'
 sidebar_position: 1
 ---
 
@@ -11,6 +11,8 @@ sidebar_position: 1
 This is a **staff software engineer** answer. The central design principle is:
 
 > **Security is the product constraint.** Everything else — startup latency, density, cost, and UX — is optimized only after strong tenant isolation is preserved.
+
+![Sandboxed Cloud IDE architecture](./sandbox-cloud-ide.png)
 
 ![Sandboxed Cloud IDE architecture](./sandbox-cloud-ide-architecture.svg)
 
@@ -34,15 +36,15 @@ This is a **staff software engineer** answer. The central design principle is:
 
 ### Non-functional requirements
 
-| Requirement | Design target |
-|---|---|
-| Isolation | Strong tenant isolation; assume all user code is hostile. |
-| Startup latency | p95 fresh session interactive in single-digit seconds. |
-| Streaming | Near-real-time output with reconnect and replay. |
-| Durability | Workspace files survive host death. |
-| Autoscaling | Scale active compute separately from idle/suspended workspaces. |
-| Fairness | Enforce per-user and per-org quotas. |
-| Observability | Metrics, tracing, security audit logs, abuse signals. |
+| Requirement     | Design target                                                   |
+| --------------- | --------------------------------------------------------------- |
+| Isolation       | Strong tenant isolation; assume all user code is hostile.       |
+| Startup latency | p95 fresh session interactive in single-digit seconds.          |
+| Streaming       | Near-real-time output with reconnect and replay.                |
+| Durability      | Workspace files survive host death.                             |
+| Autoscaling     | Scale active compute separately from idle/suspended workspaces. |
+| Fairness        | Enforce per-user and per-org quotas.                            |
+| Observability   | Metrics, tracing, security audit logs, abuse signals.           |
 
 ---
 
@@ -96,19 +98,19 @@ flowchart LR
 
 ### Component responsibilities
 
-| Component | Responsibility |
-|---|---|
-| Browser IDE | Editor, notebook UI, terminal, file tree, logs, runtime controls. |
-| API Gateway | Auth, request validation, token minting, routing to services. |
-| Workspace Service | Workspace metadata, file index, object-store version pointers. |
-| Session Manager | Create, resume, idle, suspend, terminate; enforce quotas. |
-| Scheduler | Choose CPU/GPU/high-memory pool; bin-pack by resource requirements. |
-| Policy Engine | Runtime image policy, egress policy, resource caps, abuse response. |
-| Host Agent | Launch runtimes, attach overlays, snapshot/restore, health reporting. |
-| Runtime Agent | Executes code, manages files, captures output, reports health. |
-| Streaming Gateway | WSS auth, fan-out, replay, backpressure, durable output persistence. |
-| Object Store | Durable workspace files, snapshots, large rich-output blobs. |
-| Log Store | Durable output replay, audit/debug logs. |
+| Component         | Responsibility                                                        |
+| ----------------- | --------------------------------------------------------------------- |
+| Browser IDE       | Editor, notebook UI, terminal, file tree, logs, runtime controls.     |
+| API Gateway       | Auth, request validation, token minting, routing to services.         |
+| Workspace Service | Workspace metadata, file index, object-store version pointers.        |
+| Session Manager   | Create, resume, idle, suspend, terminate; enforce quotas.             |
+| Scheduler         | Choose CPU/GPU/high-memory pool; bin-pack by resource requirements.   |
+| Policy Engine     | Runtime image policy, egress policy, resource caps, abuse response.   |
+| Host Agent        | Launch runtimes, attach overlays, snapshot/restore, health reporting. |
+| Runtime Agent     | Executes code, manages files, captures output, reports health.        |
+| Streaming Gateway | WSS auth, fan-out, replay, backpressure, durable output persistence.  |
+| Object Store      | Durable workspace files, snapshots, large rich-output blobs.          |
+| Log Store         | Durable output replay, audit/debug logs.                              |
 
 The browser **never talks directly to a runtime**. All runtime access goes through controlled internal channels.
 
@@ -118,13 +120,13 @@ The browser **never talks directly to a runtime**. All runtime access goes throu
 
 For untrusted code, shared host kernel exposure is the primary risk. A container escape can compromise all tenants on a host. That pushes the default CPU substrate toward **microVMs**.
 
-| Option | Isolation | Cold start | Density | Fit |
-|---|---:|---:|---:|---|
-| Plain container | Weak | ms | Highest | Not acceptable alone for arbitrary untrusted code. |
-| Hardened container | Medium | ms | High | Useful for trusted/internal jobs, still shared kernel. |
-| gVisor | Stronger | 10s–100s ms | High | Good cheaper tier, but has syscall/perf tradeoffs. |
-| **microVM** | **Strong** | ~100 ms boot; faster with snapshot | High | **Default CPU sandbox.** |
-| Full VM | Strongest | seconds | Lower | Best for GPU passthrough or high-risk workloads. |
+| Option             |  Isolation |                         Cold start | Density | Fit                                                    |
+| ------------------ | ---------: | ---------------------------------: | ------: | ------------------------------------------------------ |
+| Plain container    |       Weak |                                 ms | Highest | Not acceptable alone for arbitrary untrusted code.     |
+| Hardened container |     Medium |                                 ms |    High | Useful for trusted/internal jobs, still shared kernel. |
+| gVisor             |   Stronger |                        10s–100s ms |    High | Good cheaper tier, but has syscall/perf tradeoffs.     |
+| **microVM**        | **Strong** | ~100 ms boot; faster with snapshot |    High | **Default CPU sandbox.**                               |
+| Full VM            |  Strongest |                            seconds |   Lower | Best for GPU passthrough or high-risk workloads.       |
 
 ### Default CPU path: microVM
 
@@ -275,13 +277,13 @@ GPU sessions:
 
 Do not conflate workspace files, runtime overlay, and live memory.
 
-| Data class | Source of truth | Durability | Purpose |
-|---|---|---|---|
-| Workspace files | Versioned object store | Durable | Code, notebooks, user files. |
-| Runtime overlay | Local disk + snapshot | Best-effort cache | Installed packages, temp cache. |
-| Live memory | microVM snapshot | Best-effort resume accelerator | Fast resume after idle. |
-| Rich output blobs | Object store | Durable or TTL-based | Large plots, images, tables. |
-| Output logs | Log store | Durable / TTL | Replay, debug, audit. |
+| Data class        | Source of truth        | Durability                     | Purpose                         |
+| ----------------- | ---------------------- | ------------------------------ | ------------------------------- |
+| Workspace files   | Versioned object store | Durable                        | Code, notebooks, user files.    |
+| Runtime overlay   | Local disk + snapshot  | Best-effort cache              | Installed packages, temp cache. |
+| Live memory       | microVM snapshot       | Best-effort resume accelerator | Fast resume after idle.         |
+| Rich output blobs | Object store           | Durable or TTL-based           | Large plots, images, tables.    |
+| Output logs       | Log store              | Durable / TTL                  | Replay, debug, audit.           |
 
 ### Workspace file flow
 
@@ -619,15 +621,15 @@ flowchart TD
 
 ### Frontend layers
 
-| Layer | Responsibility |
-|---|---|
-| App shell | Routing, auth, layout persistence, top-level error boundaries. |
-| Workspace domain | Workspace metadata, file tree, environment settings. |
-| Editor domain | Monaco model, notebook cells, dirty state, undo/redo, keyboard shortcuts. |
-| Execution domain | Execute requests, interrupt, execution state, output frames. |
-| Stream domain | WebSocket connection, reconnect, replay, dedupe, backpressure UI. |
-| Persistence domain | Autosave, conflict detection, upload/download. |
-| Observability | Frontend metrics, client logs, stream lag, user action traces. |
+| Layer              | Responsibility                                                            |
+| ------------------ | ------------------------------------------------------------------------- |
+| App shell          | Routing, auth, layout persistence, top-level error boundaries.            |
+| Workspace domain   | Workspace metadata, file tree, environment settings.                      |
+| Editor domain      | Monaco model, notebook cells, dirty state, undo/redo, keyboard shortcuts. |
+| Execution domain   | Execute requests, interrupt, execution state, output frames.              |
+| Stream domain      | WebSocket connection, reconnect, replay, dedupe, backpressure UI.         |
+| Persistence domain | Autosave, conflict detection, upload/download.                            |
+| Observability      | Frontend metrics, client logs, stream lag, user action traces.            |
 
 ---
 
@@ -645,7 +647,14 @@ type WorkspaceState = {
 
 type RuntimeState = {
   sessionId: string | null;
-  state: 'disconnected' | 'provisioning' | 'running' | 'idle' | 'suspended' | 'terminated' | 'error';
+  state:
+    | 'disconnected'
+    | 'provisioning'
+    | 'running'
+    | 'idle'
+    | 'suspended'
+    | 'terminated'
+    | 'error';
   substrate?: 'microvm' | 'gpu_vm' | 'gpu_container';
   cpuUsed?: number;
   memUsedGb?: number;
@@ -654,12 +663,15 @@ type RuntimeState = {
 
 type ExecutionState = {
   activeExecutionId: string | null;
-  executions: Record<string, {
-    status: 'queued' | 'running' | 'succeeded' | 'failed' | 'interrupted';
-    startedAt?: number;
-    finishedAt?: number;
-    exitCode?: number;
-  }>;
+  executions: Record<
+    string,
+    {
+      status: 'queued' | 'running' | 'succeeded' | 'failed' | 'interrupted';
+      startedAt?: number;
+      finishedAt?: number;
+      exitCode?: number;
+    }
+  >;
 };
 
 type StreamState = {
@@ -725,7 +737,7 @@ class OutputStreamClient {
   constructor(
     private readonly sessionId: string,
     private readonly getToken: () => Promise<string>,
-    private readonly onFrame: (frame: OutputFrame) => void,
+    private readonly onFrame: (frame: OutputFrame) => void
   ) {}
 
   async connect() {
@@ -863,19 +875,19 @@ GPU fleet scales separately because idle GPU sessions should usually be torn dow
 
 ### Metrics
 
-| Metric | Why it matters |
-|---|---|
-| Session start p50/p95/p99 | Measures user-perceived latency. |
-| Warm-pool hit rate | Explains cold-start regressions. |
-| Snapshot restore latency | Measures resume quality. |
-| Running/idle/suspended sessions | Capacity and cost visibility. |
-| CPU/memory/GPU utilization | Fleet scaling signals. |
-| Streaming lag | Output UX health. |
-| Dropped/truncated output frames | Backpressure and flood detection. |
-| Gateway reconnect/rehydration rate | Streaming reliability. |
-| Denied egress attempts | Security/audit signal. |
-| Metadata endpoint hits | High-severity security signal. |
-| Token mint/revoke events | Credential lifecycle audit. |
+| Metric                             | Why it matters                    |
+| ---------------------------------- | --------------------------------- |
+| Session start p50/p95/p99          | Measures user-perceived latency.  |
+| Warm-pool hit rate                 | Explains cold-start regressions.  |
+| Snapshot restore latency           | Measures resume quality.          |
+| Running/idle/suspended sessions    | Capacity and cost visibility.     |
+| CPU/memory/GPU utilization         | Fleet scaling signals.            |
+| Streaming lag                      | Output UX health.                 |
+| Dropped/truncated output frames    | Backpressure and flood detection. |
+| Gateway reconnect/rehydration rate | Streaming reliability.            |
+| Denied egress attempts             | Security/audit signal.            |
+| Metadata endpoint hits             | High-severity security signal.    |
+| Token mint/revoke events           | Credential lifecycle audit.       |
 
 ### Tracing
 
@@ -914,18 +926,18 @@ Audit events should include:
 
 ## 21. Failure modes and mitigations
 
-| Failure mode | Mitigation |
-|---|---|
-| Host dies mid-session | Workspace files are durable; recreate session and replay logs best-effort. |
-| Gateway shard dies | Client reconnects with `last_seq`; gateway rehydrates from log store. |
-| Infinite stdout loop | Agent output cap + gateway truncation + abuse policy. |
-| Fork bomb | PID cgroup limit; terminate session. |
-| User fills disk | Overlay disk quota; error in runtime, not host. |
-| Crypto mining | CPU/GPU sustained-use detection, egress denial, throttle/kill. |
-| Snapshot identity leak | Re-seed entropy and mint fresh tokens on restore. |
-| Metadata credential leak | Block link-local metadata endpoint and enforce tokenized metadata access. |
-| Cold start regression | Warm pools, base image caching, post-import snapshots. |
-| GPU demand spike | Separate queue, hard quota, clear pending state in UI. |
+| Failure mode             | Mitigation                                                                 |
+| ------------------------ | -------------------------------------------------------------------------- |
+| Host dies mid-session    | Workspace files are durable; recreate session and replay logs best-effort. |
+| Gateway shard dies       | Client reconnects with `last_seq`; gateway rehydrates from log store.      |
+| Infinite stdout loop     | Agent output cap + gateway truncation + abuse policy.                      |
+| Fork bomb                | PID cgroup limit; terminate session.                                       |
+| User fills disk          | Overlay disk quota; error in runtime, not host.                            |
+| Crypto mining            | CPU/GPU sustained-use detection, egress denial, throttle/kill.             |
+| Snapshot identity leak   | Re-seed entropy and mint fresh tokens on restore.                          |
+| Metadata credential leak | Block link-local metadata endpoint and enforce tokenized metadata access.  |
+| Cold start regression    | Warm pools, base image caching, post-import snapshots.                     |
+| GPU demand spike         | Separate queue, hard quota, clear pending state in UI.                     |
 
 ---
 

@@ -76,6 +76,10 @@
       "hash": "592701c33e1c48937a82965d23d439d3ee486403cb4a542bb40003df2e51c187",
       "docRelative": "richtexteditor.png"
     },
+    "system-designs/sanbox-cloud-ide.png": {
+      "hash": "ac1d4d241e2233fe784f6a7a723c524e224a9854ddcbf44fa38db5cd78a29fec",
+      "docRelative": "sanbox-cloud-ide.png"
+    },
     "system-designs/sandbox-cloud-ide-architecture.svg": {
       "hash": "d5408f61ecbc42342093ce1e8146a463301811b1e086baad983a1e48a306a08a",
       "docRelative": "sandbox-cloud-ide-architecture.svg"
@@ -181,7 +185,7 @@
       "docRelative": "rich-text-editor.mdx"
     },
     "system-designs/sandboxed-cloud-ide-system-design.mdx": {
-      "hash": "1a578b0164b90e064ac9faf5efac29cb4530b79c4906cb6a41a80c67992d2a13",
+      "hash": "5336c928b2a444cfd4ce01bdbdc1c12e40997dfd6551460226b5791cb9dab434",
       "docRelative": "sandboxed-cloud-ide-system-design.mdx"
     },
     "system-designs/short-url.mdx": {
