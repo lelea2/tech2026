@@ -144,6 +144,10 @@
       "hash": "2d2ab791c0042fc7295ecdb36981cd251488bc91a9f6b5b31837486a57cf052f",
       "docRelative": "figma.mdx"
     },
+    "system-designs/flink_vs_temporal_staff_engineer.mdx": {
+      "hash": "ee08dd90bb76a77d24e06b308bc9d5fadf305e19284e6461c7b01f999d9b7c5d",
+      "docRelative": "flink_vs_temporal_staff_engineer.mdx"
+    },
     "system-designs/github-actions-system-design.mdx": {
       "hash": "8b7228fa984e56358456d7e53fc2484433e81761db105f0c6f007e708e30c7a9",
       "docRelative": "github-actions-system-design.mdx"

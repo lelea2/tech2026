@@ -1,0 +1,773 @@
+---
+title: 'Flink vs. Temporal'
+description: 'Flink vs. Temporal decision'
+tags:
+  - system-design
+---
+
+# Flink vs. Temporal in System Design Interviews
+
+## Interview framing
+
+When an interviewer asks whether to use **Flink** or **Temporal**, they are usually testing whether you can distinguish between:
+
+- **Stream processing**: continuously compute over high-volume event streams.
+- **Workflow orchestration**: reliably coordinate long-running business processes with retries, timers, humans, and external services.
+
+A strong staff-engineer answer is:
+
+> Use **Flink** when the problem is about real-time event processing, aggregation, joins, windows, fraud/risk detection, anomaly detection, or materialized streaming views. Use **Temporal** when the problem is about durable business workflows, multi-step orchestration, retries, compensation, human approval, timers, and external API coordination.
+
+They can coexist, but they solve different layers of the system.
+
+---
+
+## Quick decision rule
+
+| Question                                                                  | Prefer Flink | Prefer Temporal |
+| ------------------------------------------------------------------------- | -----------: | --------------: |
+| Do we need to process thousands/millions of events per second?            |          Yes |              No |
+| Do we need event-time windows, joins, aggregations, or anomaly detection? |          Yes |              No |
+| Do we need to coordinate a multi-day business process?                    |           No |             Yes |
+| Do we need retries around flaky APIs?                                     |           No |             Yes |
+| Do we need human approval, document signing, KYC review, or timers?       |           No |             Yes |
+| Do we need stateful stream computation?                                   |          Yes |              No |
+| Do we need a durable state machine per investor/order/user?               |    Sometimes |             Yes |
+| Do we need compensation logic, such as undo or rollback steps?            |           No |             Yes |
+| Is the output a derived metric/view?                                      |          Yes |       Sometimes |
+| Is the output a completed business process?                               |           No |             Yes |
+
+---
+
+# What is Flink?
+
+**Apache Flink** is a distributed stream-processing engine. It continuously consumes events from systems like Kafka, computes stateful transformations, and emits derived outputs.
+
+Use Flink for:
+
+- Real-time aggregation
+- Sliding/tumbling/session windows
+- Stream joins
+- Deduplication at high throughput
+- Fraud detection
+- Risk scoring
+- Real-time dashboards
+- Anomaly detection
+- Event enrichment
+- Materialized views
+- Backfill/replay from Kafka topics
+
+Example mental model:
+
+```txt
+Kafka events -> Flink job -> real-time computed output
+```
+
+Flink is about continuously answering:
+
+> "Given this stream of events, what is the current computed result?"
+
+---
+
+# What is Temporal?
+
+**Temporal** is a durable workflow orchestration platform. It runs business workflows as code and persists workflow progress so that execution can survive worker crashes, retries, timers, and long waits.
+
+Use Temporal for:
+
+- Long-running workflows
+- External API orchestration
+- Human-in-the-loop approval
+- KYC/KYB review processes
+- E-signature processes
+- Payment/funding workflows
+- Retry with backoff
+- Timers and deadlines
+- Compensation logic
+- Saga-style distributed transactions
+- Durable state machines
+
+Example mental model:
+
+```txt
+Business event -> Temporal workflow -> durable multi-step process
+```
+
+Temporal is about reliably answering:
+
+> "What step is this business process on, and what should happen next?"
+
+---
+
+# Staff engineer distinction
+
+## Flink is a data-plane computation engine
+
+Flink is best when the system needs to continuously process data at scale.
+
+Examples:
+
+```txt
+Compute real-time payment fraud risk from transaction stream.
+Aggregate total funds received per SPV every minute.
+Detect duplicate wire transfers across multiple banking providers.
+Join KYC events, banking events, and user activity into a risk signal.
+Power real-time operational dashboards.
+```
+
+The core problem is **event volume + low-latency computation**.
+
+## Temporal is a control-plane orchestration engine
+
+Temporal is best when the system needs to reliably move a business entity through a lifecycle.
+
+Examples:
+
+```txt
+Investor onboarding workflow.
+SPV creation workflow.
+Subscription document signing workflow.
+Capital call workflow.
+Accreditation verification workflow.
+Payment retry and reconciliation workflow.
+```
+
+The core problem is **business correctness + durable coordination**.
+
+---
+
+# SPV platform example
+
+For an SPV creation and investor onboarding platform, both tools can be useful, but in different places.
+
+## Use Temporal for investor onboarding
+
+Investor onboarding is a long-running workflow:
+
+```txt
+Investor invited
+  -> KYC started
+  -> KYC approved or manual review
+  -> subscription docs generated
+  -> docs sent for e-signature
+  -> docs signed
+  -> bank account linked
+  -> funds received
+  -> funds settled
+  -> investor admitted to SPV
+```
+
+This is a strong Temporal use case because:
+
+- Steps may take days or weeks.
+- External APIs can fail.
+- Some steps require human review.
+- The workflow needs timers and reminders.
+- Every step must be auditable.
+- The system must resume correctly after worker crashes.
+- Some failures need compensation.
+
+Recommended design:
+
+```txt
+Webhook Event
+  -> Normalize Domain Event
+  -> Signal Temporal Workflow
+  -> Temporal advances investor onboarding state
+  -> Postgres stores authoritative investor/SPV state
+```
+
+Example Temporal workflow responsibilities:
+
+- Start KYC check.
+- Wait for KYC webhook.
+- If KYC requires review, wait for compliance approval.
+- Generate subscription documents.
+- Send documents to e-sign provider.
+- Wait for signature completion webhook.
+- Wait for funds received and settled.
+- Admit investor to SPV.
+- Send confirmation email.
+
+Do **not** use Flink as the primary orchestrator for this flow. Flink can compute signals, but it should not own the investor lifecycle.
+
+---
+
+## Use Flink for real-time risk and operational analytics
+
+Flink becomes useful if the SPV platform has high-volume events or real-time risk requirements.
+
+Example event streams:
+
+```txt
+banking.transaction.received
+banking.ach.failed
+kyc.verification.updated
+esign.document.completed
+investor.login
+investor.profile.changed
+spv.capital.commitment.updated
+```
+
+Flink can compute:
+
+```txt
+Total capital received per SPV in the last 5 minutes
+ACH failure rate by provider
+Investors with suspicious funding behavior
+Duplicate or near-duplicate bank transfers
+KYC approval latency by provider
+Webhook delay and provider reliability metrics
+Real-time closing dashboard aggregates
+```
+
+Recommended design:
+
+```txt
+Kafka domain events
+  -> Flink streaming jobs
+  -> Redis / Pinot / ClickHouse / Elasticsearch / Postgres read model
+  -> dashboard, alerts, risk engine
+```
+
+Flink should produce **signals**, not directly mutate critical onboarding state.
+
+Example:
+
+```txt
+Flink detects suspicious funding pattern
+  -> emits RISK_ALERT_CREATED
+  -> Temporal workflow receives signal
+  -> onboarding pauses for manual review
+```
+
+This separation keeps business workflow logic deterministic and auditable.
+
+---
+
+# Example: Webhook ingestion with both Flink and Temporal
+
+```txt
+External providers
+  Persona / Alloy / DocuSign / Plaid / Mercury
+        |
+        v
+Webhook Edge API
+  - verify signature
+  - persist raw payload
+  - dedupe
+        |
+        v
+Kafka: raw_webhook_events
+        |
+        +--------------------------+
+        |                          |
+        v                          v
+Webhook Processor            Flink Stream Jobs
+  - normalize events          - aggregate metrics
+  - resolve investor/SPV      - detect anomalies
+  - validate event            - compute provider SLA
+        |                      - emit risk signals
+        v                          |
+Kafka: domain_events              v
+        |                    Kafka: risk_events
+        |                          |
+        +------------+-------------+
+                     v
+              Temporal Workflows
+              - investor onboarding
+              - SPV creation
+              - document signing
+              - funding settlement
+                     |
+                     v
+              Postgres App State
+              - investor status
+              - document status
+              - funding status
+              - SPV closing status
+```
+
+Staff-level interpretation:
+
+> Flink computes real-time facts from event streams. Temporal decides what durable business action should happen next.
+
+---
+
+# Example systems that need Flink
+
+## 1. Real-time fraud detection system
+
+Use Flink when designing a system that consumes payment events and detects suspicious behavior in near real time.
+
+Why Flink:
+
+- Need event-time windows.
+- Need joins between card transactions, user profiles, device events, and historical behavior.
+- Need low-latency scoring.
+- Need high-throughput stream processing.
+
+Example:
+
+```txt
+Card transaction events
+  -> Flink joins with device/IP/user risk streams
+  -> Flink computes velocity features
+  -> Flink emits FRAUD_RISK_HIGH
+```
+
+Temporal may be used after the risk event to orchestrate manual review or account freeze, but Flink owns the streaming computation.
+
+---
+
+## 2. Real-time observability and metrics platform
+
+Use Flink for a system like Datadog, Grafana metrics, MLOps observability, or token usage monitoring.
+
+Why Flink:
+
+- Continuous metric aggregation.
+- Windowed computation.
+- High-cardinality event processing.
+- Stream enrichment.
+- Real-time anomaly detection.
+
+Example:
+
+```txt
+Inference events
+  -> Flink computes latency p95, error rate, token usage, cost by tenant
+  -> dashboard updates every few seconds
+```
+
+Temporal is not the right tool for computing p95 latency or rolling error rates.
+
+---
+
+## 3. Real-time capital dashboard for SPVs
+
+Use Flink if the SPV platform needs a real-time dashboard across many funds and providers.
+
+Why Flink:
+
+- Continuous aggregation of funding events.
+- Provider event normalization at scale.
+- Windowed metrics by SPV, bank, investor type, and closing date.
+
+Example outputs:
+
+```txt
+capital_received_last_5_min
+capital_settled_by_spv
+wire_failure_rate_by_bank_provider
+average_kyc_completion_latency
+```
+
+This is a Flink/read-model problem, not a workflow problem.
+
+---
+
+## 4. High-volume webhook analytics
+
+Use Flink when the platform ingests many webhook events and wants provider reliability analytics.
+
+Example:
+
+```txt
+Webhook received time - provider event occurred time = provider delay
+Webhook processed time - received time = internal processing latency
+Duplicate webhook count by provider
+Webhook failure rate by event type
+```
+
+Flink can continuously compute these metrics and emit alerts.
+
+---
+
+# Example systems that need Temporal
+
+## 1. SPV creation workflow
+
+Use Temporal for the end-to-end process of creating an SPV.
+
+Workflow:
+
+```txt
+Collect sponsor input
+  -> validate SPV configuration
+  -> generate legal docs
+  -> route docs for legal review
+  -> collect signatures
+  -> open bank account
+  -> configure investor onboarding portal
+  -> publish SPV offering
+```
+
+Why Temporal:
+
+- Long-running process.
+- Multiple external services.
+- Human approvals.
+- Retry and timeout logic.
+- Compensation if a later step fails.
+
+---
+
+## 2. Investor onboarding workflow
+
+Use Temporal for investor onboarding.
+
+Workflow:
+
+```txt
+Invite investor
+  -> collect profile
+  -> run KYC/KYB
+  -> verify accreditation
+  -> generate subscription docs
+  -> collect e-signature
+  -> collect funds
+  -> confirm settlement
+  -> admit investor
+```
+
+Why Temporal:
+
+- Each investor needs durable progress tracking.
+- Steps can pause for days.
+- External webhooks drive progress.
+- Manual review can be inserted.
+- System must be auditable.
+
+---
+
+## 3. Payment retry and reconciliation workflow
+
+Use Temporal when handling ACH failures, wire matching, or payment retries.
+
+Workflow:
+
+```txt
+Payment initiated
+  -> wait for provider confirmation
+  -> if failed, notify investor
+  -> retry or request new payment method
+  -> wait for settlement
+  -> reconcile against commitment
+```
+
+Why Temporal:
+
+- Needs timers.
+- Needs retries.
+- Needs human/user action.
+- Needs stateful business transitions.
+
+Flink could detect unusual failure rates, but Temporal should orchestrate the payment lifecycle.
+
+---
+
+## 4. Document signing workflow
+
+Use Temporal for subscription document signing.
+
+Workflow:
+
+```txt
+Generate document package
+  -> send to DocuSign
+  -> wait for signer completion
+  -> send reminder after 3 days
+  -> escalate after 7 days
+  -> store final signed document
+```
+
+Why Temporal:
+
+- Waiting is part of the business process.
+- Reminder timers matter.
+- External webhooks can be delayed or duplicated.
+- The workflow must resume after failures.
+
+---
+
+# Systems that may use both
+
+## 1. SPV investor onboarding platform
+
+Use both when the system needs durable onboarding plus real-time analytics.
+
+```txt
+Temporal:
+  Owns investor lifecycle and SPV workflow.
+
+Flink:
+  Computes risk signals, provider health metrics, funding dashboards, and anomaly alerts.
+```
+
+Example:
+
+```txt
+Flink detects that one investor has multiple failed ACH attempts in a short window.
+Flink emits RISK_ALERT_CREATED.
+Temporal receives the alert and pauses the investor onboarding workflow for manual review.
+```
+
+---
+
+## 2. Marketplace order and fraud system
+
+```txt
+Flink:
+  Real-time fraud scoring from clickstream, payment, and device events.
+
+Temporal:
+  Order fulfillment, payment capture, shipping coordination, refund workflow.
+```
+
+---
+
+## 3. Insurance claim processing
+
+```txt
+Flink:
+  Detects fraud patterns across claim streams.
+
+Temporal:
+  Coordinates claim intake, document review, adjuster assignment, payout approval, and payment.
+```
+
+---
+
+## 4. ML observability platform
+
+```txt
+Flink:
+  Computes real-time model latency, drift, error rates, and feature freshness.
+
+Temporal:
+  Coordinates retraining workflow, approval workflow, model promotion, or incident remediation.
+```
+
+---
+
+# Deep comparison
+
+| Dimension                      | Flink                                                 | Temporal                                 |
+| ------------------------------ | ----------------------------------------------------- | ---------------------------------------- |
+| Primary purpose                | Stream processing                                     | Workflow orchestration                   |
+| Main abstraction               | Event stream, window, operator, state                 | Workflow, activity, signal, timer        |
+| Best for                       | Continuous computation                                | Durable business processes               |
+| Handles high event volume      | Very well                                             | Not designed for analytics-scale streams |
+| Handles long-running workflows | Poorly                                                | Very well                                |
+| Handles human approval         | Not naturally                                         | Yes                                      |
+| Handles timers/reminders       | Window/timer operators, not business lifecycle timers | First-class durable timers               |
+| Handles external API retries   | Possible, but awkward                                 | First-class activity retries             |
+| State model                    | Operator state keyed by stream                        | Workflow state per business entity       |
+| Failure recovery               | Checkpoints/savepoints                                | Workflow history replay                  |
+| Common input                   | Kafka/Pulsar/Kinesis streams                          | API calls, events, workflow signals      |
+| Common output                  | Derived events, metrics, materialized views           | Business state transitions, side effects |
+| Example                        | Compute rolling fraud score                           | Onboard investor after KYC/docs/funding  |
+
+---
+
+# How to answer in an interview
+
+Use this structure:
+
+## 1. Clarify the core problem
+
+Ask:
+
+```txt
+Are we primarily computing over a high-volume event stream,
+or coordinating a long-running business process?
+```
+
+## 2. Pick the primary tool
+
+Say:
+
+```txt
+If the problem is streaming computation, I would use Flink.
+If the problem is durable workflow orchestration, I would use Temporal.
+```
+
+## 3. Explain why the other tool is not enough
+
+Example:
+
+```txt
+I would not use Temporal to compute rolling fraud windows across millions of events because it is not a stream processor.
+I would not use Flink to own investor onboarding because onboarding requires durable business state, human review, timers, retries, and compensation.
+```
+
+## 4. Show how they can work together
+
+Example:
+
+```txt
+Flink emits risk or metric events.
+Temporal consumes those events as workflow signals.
+Temporal decides whether to pause, continue, retry, or escalate the business process.
+```
+
+---
+
+# Interview-ready answer for SPV webhook design
+
+For the SPV webhook platform, I would use **Temporal as the primary orchestration system** because investor onboarding and SPV creation are long-running business workflows. A single investor may wait days for KYC approval, document signing, funds transfer, and settlement. Temporal gives us durable state, retries, timers, signals from webhooks, and clear auditability.
+
+I would use **Flink only if we need real-time streaming computation** across webhook, banking, investor, and provider events. For example, Flink is useful for computing provider SLA metrics, duplicate webhook rates, funding velocity, risk alerts, or suspicious investor behavior across many events. Flink should produce derived events like `RISK_ALERT_CREATED` or `PROVIDER_HEALTH_DEGRADED`, which can then signal Temporal workflows.
+
+The boundary I would draw is:
+
+```txt
+Temporal owns business lifecycle state.
+Flink owns real-time derived signals and analytics.
+```
+
+So for an SPV platform:
+
+```txt
+Investor onboarding state machine -> Temporal
+SPV creation workflow -> Temporal
+Document signing workflow -> Temporal
+Funding settlement workflow -> Temporal
+Real-time fraud/risk scoring -> Flink
+Provider webhook health dashboard -> Flink
+Capital raised real-time dashboard -> Flink
+KYC/funding anomaly detection -> Flink
+```
+
+This separation prevents us from misusing a stream processor as a workflow engine or misusing a workflow engine as an analytics system.
+
+---
+
+# Common interview questions
+
+## Q1. Can Temporal replace Kafka or Flink?
+
+No. Temporal is not a high-throughput stream processor. It is excellent for durable workflow execution, but it should not be used to compute rolling aggregates, joins, or real-time analytics over millions of events.
+
+Use Kafka/Flink for event streams and Temporal for business workflows.
+
+---
+
+## Q2. Can Flink replace Temporal?
+
+Usually no. Flink can maintain keyed state and timers, but it is not designed to model human-centered business workflows with external API retries, compensation, manual approval, and long-running process visibility.
+
+For example, Flink can detect that funds were received, but Temporal should decide whether the investor can be admitted.
+
+---
+
+## Q3. In webhook ingestion, should webhooks go directly to Temporal?
+
+Usually no.
+
+A safer design is:
+
+```txt
+Webhook Edge
+  -> verify signature
+  -> persist raw event
+  -> dedupe
+  -> enqueue
+  -> normalize domain event
+  -> signal Temporal workflow
+```
+
+This gives better auditability, replay, and provider-specific normalization.
+
+---
+
+## Q4. When would you add Flink to the SPV webhook design?
+
+I would add Flink when the platform needs real-time stream computation, such as:
+
+- Provider reliability dashboards
+- Rolling webhook failure rates
+- Funding velocity
+- Duplicate payment detection
+- Suspicious investor behavior
+- Cross-provider event correlation
+- Real-time compliance/risk scoring
+
+If the platform is low-volume and only needs workflow state updates, Temporal plus Postgres and a queue is enough.
+
+---
+
+## Q5. What is the simplest correct design for an early-stage SPV platform?
+
+For an early-stage platform, I would start with:
+
+```txt
+Webhook API
+  -> Postgres raw_webhook_events
+  -> SQS FIFO
+  -> webhook workers
+  -> Temporal workflows
+  -> Postgres application state
+```
+
+I would not introduce Flink unless there is a clear need for stream processing.
+
+---
+
+## Q6. What is the scale-up design?
+
+At larger scale:
+
+```txt
+Webhook API
+  -> S3 raw payload archive
+  -> Postgres metadata
+  -> Kafka domain event bus
+  -> Temporal for workflows
+  -> Flink for streaming analytics/risk
+  -> ClickHouse/Pinot/Elasticsearch for real-time dashboards
+```
+
+This separates ingestion, orchestration, analytics, and serving layers.
+
+---
+
+# Decision examples
+
+| System design prompt                                   | Use Flink | Use Temporal | Why                                                                      |
+| ------------------------------------------------------ | --------: | -----------: | ------------------------------------------------------------------------ |
+| Design real-time fraud detection for bank transactions |       Yes |        Maybe | Flink computes velocity/risk signals. Temporal may handle manual review. |
+| Design SPV investor onboarding                         |     Maybe |          Yes | Temporal owns long-running KYC/docs/funding lifecycle.                   |
+| Design webhook provider health dashboard               |       Yes |           No | Need rolling metrics and event stream aggregation.                       |
+| Design e-signature document workflow                   |        No |          Yes | Need reminders, waiting, retries, and durable document state.            |
+| Design token usage monitoring dashboard                |       Yes |           No | Need streaming aggregation and real-time metrics.                        |
+| Design payment retry workflow                          |     Maybe |          Yes | Temporal owns retry lifecycle; Flink can detect provider-wide issues.    |
+| Design ML model drift detection                        |       Yes |        Maybe | Flink computes drift metrics; Temporal may trigger retraining workflow.  |
+| Design legal document generation workflow              |        No |          Yes | Multi-step durable workflow with human review.                           |
+| Design real-time capital raised dashboard              |       Yes |        Maybe | Flink computes aggregates; Temporal owns investor admission.             |
+
+---
+
+# Final staff-engineer takeaway
+
+A staff engineer should not choose tools by popularity. Choose based on the dominant failure mode.
+
+Use **Flink** when the failure mode is:
+
+```txt
+We cannot compute real-time results correctly or fast enough from a large event stream.
+```
+
+Use **Temporal** when the failure mode is:
+
+```txt
+We cannot reliably complete a long-running business process across retries, timeouts, human actions, and external systems.
+```
+
+For SPV webhook ingestion:
+
+```txt
+Temporal is the default for investor/SPV workflow correctness.
+Flink is added when real-time stream analytics, fraud/risk signals, or provider health metrics become important.
+```
