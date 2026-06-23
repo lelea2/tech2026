@@ -1,5 +1,9 @@
 {
   "files": {
+    "system-designs/SPV-webhook.png": {
+      "hash": "bfd4e7de18eb1b3aac540742c62bd0986ab5cba7df0edd4c8df7ef1bc86e43fb",
+      "docRelative": "SPV-webhook.png"
+    },
     "system-designs/assets/ml_lifecycle_feedback_loop_chart.png": {
       "hash": "b080d3e5fb2d1eab6830a319f1b0ce464e122d830e3fbb215d59884fbe064f1d",
       "docRelative": "assets/ml_lifecycle_feedback_loop_chart.png"
@@ -68,6 +72,10 @@
       "hash": "7c32bed9378a970683aa76380ad349cac4434cec781db46acf6504823a8b8857",
       "docRelative": "newsfeed.png"
     },
+    "system-designs/payment-system.png": {
+      "hash": "d589f93fdf1e90354c534928bcad8fba3b68eeed5f170a1491848cb771f113b0",
+      "docRelative": "payment-system.png"
+    },
     "system-designs/rate-limiter.png": {
       "hash": "3e345492223338e5e3cc87a55e5f89f6e8caf4865f8c40e791d0ae9100c0ad45",
       "docRelative": "rate-limiter.png"
@@ -87,6 +95,10 @@
     "system-designs/sandbox-cloud-ide.png": {
       "hash": "ac1d4d241e2233fe784f6a7a723c524e224a9854ddcbf44fa38db5cd78a29fec",
       "docRelative": "sandbox-cloud-ide.png"
+    },
+    "system-designs/spv.png": {
+      "hash": "177f823568ee4950eae55eac4852aeb7f2097fcf1cc80cc70aea028f954add92",
+      "docRelative": "spv.png"
     },
     "system-designs/tiny-url.png": {
       "hash": "164a210d53184162bb64e904a39d084eec6ca4a501bd3f0c261fa664313183ed",
@@ -168,6 +180,10 @@
       "hash": "3abc75467b09bec8311acccecb0398dba7d18cadad8c5e3a9d89664aaef64f1c",
       "docRelative": "news-feed.mdx"
     },
+    "system-designs/payment-system.mdx": {
+      "hash": "e137fd2d0e9e8e54e0709923ff00644b8fbcd0d18cfa17ce556ae4517a605f8f",
+      "docRelative": "payment-system.mdx"
+    },
     "system-designs/preparing.mdx": {
       "hash": "ec97529d329b27a6cfb90bfb0075c4cbbc0afe9039b5f4d40cfaa99930b7a69a",
       "docRelative": "preparing.mdx"
@@ -191,6 +207,14 @@
     "system-designs/short-url.mdx": {
       "hash": "0a9680404611639e40324ac18c0103ad963b71f12145435f5ed6e2ea443ef70d",
       "docRelative": "short-url.mdx"
+    },
+    "system-designs/spv-onboarding.mdx": {
+      "hash": "b38ec90fa5138542b7c7c41e54ecaf16693a3b6662e9f6bfbffed728a2e1fef8",
+      "docRelative": "spv-onboarding.mdx"
+    },
+    "system-designs/spv-webhook.mdx": {
+      "hash": "292e3eb6bb2eeb501d3409be2437ca67c945f6fa4deebc3b32dc2d95be282636",
+      "docRelative": "spv-webhook.mdx"
     },
     "system-designs/theme-design.mdx": {
       "hash": "c35fef2d017608b2d534dc8a89fc496bfb0aedbaec24f9adc02be22955065e7a",
