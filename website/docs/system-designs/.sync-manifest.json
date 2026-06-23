@@ -148,6 +148,10 @@
       "hash": "eff03e929e4631eb3a26fc263ad8080e3660914b272256afee3a4b22dc944c34",
       "docRelative": "multimodal-file-ingestion-retrieval.mdx"
     },
+    "system-designs/news-aggregator.mdx": {
+      "hash": "0ef13c09123cd9ea56b24c29a4eb013e55cd630c42b835549407ba63d14dbbc5",
+      "docRelative": "news-aggregator.mdx"
+    },
     "system-designs/news-feed.mdx": {
       "hash": "3abc75467b09bec8311acccecb0398dba7d18cadad8c5e3a9d89664aaef64f1c",
       "docRelative": "news-feed.mdx"
