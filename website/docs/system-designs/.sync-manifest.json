@@ -112,6 +112,10 @@
       "hash": "6e0ef9664c9fbde91a5ce5388c65ae98db8e6726a990d0f77a219c35d933ae64",
       "docRelative": "video-netflix.png"
     },
+    "system-designs/web-crawler.png": {
+      "hash": "c8459830c65893b3b3129075cb4be566079e7c55ff5838142f23a6067e77574a",
+      "docRelative": "web-crawler.png"
+    },
     "system-designs/webhook-callback-system.png": {
       "hash": "cd217fc51f11d6553e654ff1af6d6f44c8eba17f4916c35834cb98cfdfc8bb40",
       "docRelative": "webhook-callback-system.png"
@@ -231,6 +235,10 @@
     "system-designs/video-netflix.mdx": {
       "hash": "cb28452cce69166a89978e864ae67be516da7d9943dce37a3ed8f5464580bae5",
       "docRelative": "video-netflix.mdx"
+    },
+    "system-designs/web-crawler.mdx": {
+      "hash": "d0a52b1a218472326456aac68a6b2183eef09a7d41bca84b69d52f6e13e08d51",
+      "docRelative": "web-crawler.mdx"
     },
     "system-designs/webhook-callback-system.mdx": {
       "hash": "d949b5ecf4ad0f0689373addc327f8883e5d4f0828c9bccad9f2f7fdefaa7899",

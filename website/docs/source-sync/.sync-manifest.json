@@ -816,6 +816,10 @@
       "hash": "0e1a49fd440c1e76c4d6f8c142d96c68a8685efc24e8122aca5299be3a57e2ed",
       "docRelative": "frontend/jsfunction/undoRedoManager/UndoRedoManagerWithDraftCommit.mdx"
     },
+    "frontend/react_hooks_bug_fix_interview_guide.mdx": {
+      "hash": "bb5e29cb954bd8d70b210256aff5763cc4f4c53d97f67fbfcda355f2bd693e84",
+      "docRelative": "frontend/react_hooks_bug_fix_interview_guide.mdx"
+    },
     "frontend/uicoding/main.md": {
       "hash": "74d55569a078c6c1015f33e19288a85583030ba068e54243c4614f00ac60cc89",
       "docRelative": "frontend/uicoding/main.mdx"
@@ -1633,7 +1637,7 @@
       "docRelative": "backend/quizzes/_index.mdx"
     },
     "__nav__:frontend": {
-      "hash": "8902372e9528841f2ac43d42dc9384c01beeb192416922e1b54502961a116fa6",
+      "hash": "5e919e1ef0009819973034d3f48b2ddf23afa89659c1844052d8873d85fe6fa9",
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/css": {

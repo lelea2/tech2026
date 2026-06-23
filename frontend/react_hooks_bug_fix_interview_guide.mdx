@@ -1,0 +1,1993 @@
+---
+title: React Hooks and Bug Fix Patterns for Interviews
+description: Interview-ready guide to React hooks, common bugs, debugging patterns, and practical fixes.
+tags:
+  - React
+  - Frontend Interview
+  - Hooks
+  - Debugging
+  - JavaScript
+---
+
+# React Hooks and Bug Fix Patterns for Interviews
+
+This guide explains React hooks through the lens interviewers care about most: **how hooks behave, what bugs they can create, and how to fix those bugs cleanly**.
+
+The goal is not just to memorize hooks. The goal is to explain trade-offs like a senior frontend engineer: state ownership, rendering behavior, stale closures, effects, cleanup, memoization, refs, and performance.
+
+---
+
+## 1. Mental Model: What Are React Hooks?
+
+React hooks let function components use React features such as state, lifecycle behavior, refs, context, memoization, and external subscriptions.
+
+Before hooks, these patterns usually required class components:
+
+```jsx
+class Counter extends React.Component {
+  state = { count: 0 };
+
+  componentDidMount() {
+    document.title = `Count: ${this.state.count}`;
+  }
+
+  componentDidUpdate() {
+    document.title = `Count: ${this.state.count}`;
+  }
+
+  render() {
+    return <button onClick={() => this.setState({ count: this.state.count + 1 })}>{this.state.count}</button>;
+  }
+}
+```
+
+With hooks:
+
+```jsx
+import { useEffect, useState } from "react";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    document.title = `Count: ${count}`;
+  }, [count]);
+
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+}
+```
+
+### Interview explanation
+
+> Hooks let function components hold state and synchronize with external systems. The most important thing to understand is that each render has its own values. A hook does not magically update values inside old closures; it follows JavaScript closure rules.
+
+---
+
+## 2. Rules of Hooks
+
+React hooks must follow two major rules:
+
+1. Call hooks only at the top level of a function component or custom hook.
+2. Do not call hooks conditionally, inside loops, or inside nested functions.
+
+Bad:
+
+```jsx
+function Profile({ userId }) {
+  if (userId) {
+    const [user, setUser] = useState(null); // ❌ invalid
+  }
+}
+```
+
+Good:
+
+```jsx
+function Profile({ userId }) {
+  const [user, setUser] = useState(null);
+
+  if (!userId) return null;
+
+  return <div>{user?.name}</div>;
+}
+```
+
+### Why this matters
+
+React relies on hook call order to associate state with the correct hook. Conditional hooks break that order and cause unpredictable bugs.
+
+### Interview phrase
+
+> Hooks are indexed by call order. If the order changes between renders, React cannot reliably match state to the correct hook.
+
+---
+
+# Core Hooks
+
+---
+
+## 3. `useState`
+
+`useState` stores reactive component state. Updating state triggers a re-render.
+
+```jsx
+const [count, setCount] = useState(0);
+```
+
+Use it for values that affect rendering.
+
+### Common bug: stale state update
+
+Bad:
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  function incrementTwice() {
+    setCount(count + 1);
+    setCount(count + 1);
+  }
+
+  return <button onClick={incrementTwice}>{count}</button>;
+}
+```
+
+Expected: count increases by 2.
+
+Actual: count increases by 1.
+
+Why? Both updates read the same `count` value from the current render.
+
+Fix:
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  function incrementTwice() {
+    setCount(prev => prev + 1);
+    setCount(prev => prev + 1);
+  }
+
+  return <button onClick={incrementTwice}>{count}</button>;
+}
+```
+
+### Interview explanation
+
+> When the next state depends on the previous state, use the functional updater form. It avoids stale reads and works correctly with batched updates.
+
+---
+
+## 4. `useEffect`
+
+`useEffect` runs after render and is used to synchronize React with external systems.
+
+Examples:
+
+- Fetching data
+- Subscribing to events
+- Updating document title
+- Connecting to WebSocket
+- Setting timers
+- Reading from browser APIs
+
+```jsx
+useEffect(() => {
+  document.title = `Count: ${count}`;
+}, [count]);
+```
+
+### Important mental model
+
+`useEffect` is not simply “componentDidMount.” It runs after render when dependencies change.
+
+```jsx
+useEffect(() => {
+  // runs after first render and whenever userId changes
+}, [userId]);
+```
+
+---
+
+## 5. Common `useEffect` Bug: Missing Dependency
+
+Bad:
+
+```jsx
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/users/${userId}`)
+      .then(res => res.json())
+      .then(setUser);
+  }, []); // ❌ userId is missing
+
+  return <div>{user?.name}</div>;
+}
+```
+
+Bug: if `userId` changes, the effect does not refetch.
+
+Fix:
+
+```jsx
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/users/${userId}`)
+      .then(res => res.json())
+      .then(setUser);
+  }, [userId]);
+
+  return <div>{user?.name}</div>;
+}
+```
+
+### Interview explanation
+
+> Dependency arrays should describe the values used inside the effect. If the effect reads `userId`, the dependency list should include `userId`, unless there is a deliberate reason not to.
+
+---
+
+## 6. Common `useEffect` Bug: Infinite Render Loop
+
+Bad:
+
+```jsx
+function SearchResults({ query }) {
+  const [results, setResults] = useState([]);
+
+  useEffect(() => {
+    setResults([]);
+  }); // ❌ no dependency array
+
+  return <ResultsList results={results} />;
+}
+```
+
+Without a dependency array, the effect runs after every render. Since it updates state, it causes another render, which runs the effect again.
+
+Fix:
+
+```jsx
+function SearchResults({ query }) {
+  const [results, setResults] = useState([]);
+
+  useEffect(() => {
+    setResults([]);
+  }, [query]);
+
+  return <ResultsList results={results} />;
+}
+```
+
+### Interview explanation
+
+> Effects that update state need carefully scoped dependencies. Otherwise, the component can enter a render-effect-update loop.
+
+---
+
+## 7. Common `useEffect` Bug: Race Condition in Fetching
+
+Bad:
+
+```jsx
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/users/${userId}`)
+      .then(res => res.json())
+      .then(data => setUser(data));
+  }, [userId]);
+
+  return <div>{user?.name}</div>;
+}
+```
+
+Bug scenario:
+
+1. User opens profile `A`.
+2. Request `A` starts.
+3. User quickly switches to profile `B`.
+4. Request `B` finishes first.
+5. Request `A` finishes later and overwrites the UI with stale data.
+
+Fix with ignore flag:
+
+```jsx
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadUser() {
+      const res = await fetch(`/api/users/${userId}`);
+      const data = await res.json();
+
+      if (!ignore) {
+        setUser(data);
+      }
+    }
+
+    loadUser();
+
+    return () => {
+      ignore = true;
+    };
+  }, [userId]);
+
+  return <div>{user?.name}</div>;
+}
+```
+
+Fix with `AbortController`:
+
+```jsx
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadUser() {
+      try {
+        const res = await fetch(`/api/users/${userId}`, {
+          signal: controller.signal,
+        });
+        const data = await res.json();
+        setUser(data);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          setError(err);
+        }
+      }
+    }
+
+    loadUser();
+
+    return () => {
+      controller.abort();
+    };
+  }, [userId]);
+
+  if (error) return <div>Failed to load user.</div>;
+  return <div>{user?.name}</div>;
+}
+```
+
+### Interview explanation
+
+> Effects that start async work need cleanup. Otherwise, older requests can update state after newer requests, causing stale UI.
+
+---
+
+## 8. Common `useEffect` Bug: Memory Leak from Event Listener
+
+Bad:
+
+```jsx
+function WindowSize() {
+  const [width, setWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    function handleResize() {
+      setWidth(window.innerWidth);
+    }
+
+    window.addEventListener("resize", handleResize);
+  }, []); // ❌ no cleanup
+
+  return <div>{width}</div>;
+}
+```
+
+Bug: if the component unmounts and remounts, event listeners can accumulate.
+
+Fix:
+
+```jsx
+function WindowSize() {
+  const [width, setWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    function handleResize() {
+      setWidth(window.innerWidth);
+    }
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  return <div>{width}</div>;
+}
+```
+
+### Interview explanation
+
+> Any effect that subscribes to something should usually return a cleanup function. Setup and cleanup should be symmetrical.
+
+---
+
+## 9. `useRef`
+
+`useRef` stores a mutable value that persists across renders without causing a re-render.
+
+```jsx
+const inputRef = useRef(null);
+```
+
+Common uses:
+
+- Access DOM elements
+- Store timer IDs
+- Store previous values
+- Store mutable values that do not affect render
+- Avoid stale closures in event handlers
+
+### Example: focusing an input
+
+```jsx
+function SearchBox() {
+  const inputRef = useRef(null);
+
+  function focusInput() {
+    inputRef.current?.focus();
+  }
+
+  return (
+    <>
+      <input ref={inputRef} />
+      <button onClick={focusInput}>Focus</button>
+    </>
+  );
+}
+```
+
+---
+
+## 10. `useRef` Bug Fix: Timer ID Lost Between Renders
+
+Bad:
+
+```jsx
+function Timer() {
+  let timerId;
+
+  function start() {
+    timerId = setInterval(() => {
+      console.log("tick");
+    }, 1000);
+  }
+
+  function stop() {
+    clearInterval(timerId);
+  }
+
+  return (
+    <>
+      <button onClick={start}>Start</button>
+      <button onClick={stop}>Stop</button>
+    </>
+  );
+}
+```
+
+Bug: `timerId` is recreated on every render.
+
+Fix:
+
+```jsx
+function Timer() {
+  const timerRef = useRef(null);
+
+  function start() {
+    if (timerRef.current !== null) return;
+
+    timerRef.current = setInterval(() => {
+      console.log("tick");
+    }, 1000);
+  }
+
+  function stop() {
+    clearInterval(timerRef.current);
+    timerRef.current = null;
+  }
+
+  useEffect(() => {
+    return () => {
+      clearInterval(timerRef.current);
+    };
+  }, []);
+
+  return (
+    <>
+      <button onClick={start}>Start</button>
+      <button onClick={stop}>Stop</button>
+    </>
+  );
+}
+```
+
+### Interview explanation
+
+> Use `useRef` when you need a mutable value to survive renders but changing it should not update the UI.
+
+---
+
+## 11. `useState` vs `useRef`
+
+| Question | `useState` | `useRef` |
+|---|---|---|
+| Does update trigger render? | Yes | No |
+| Is value preserved across renders? | Yes | Yes |
+| Should it affect UI? | Yes | Usually no |
+| Good for form input? | Yes | Sometimes |
+| Good for timer ID? | No | Yes |
+| Good for DOM access? | No | Yes |
+
+### Interview answer
+
+> I use `useState` for reactive values that should re-render the UI. I use `useRef` for mutable values that need to persist across renders but do not belong in the render output, like DOM nodes, timeout IDs, or latest callback references.
+
+---
+
+## 12. `useMemo`
+
+`useMemo` memoizes a computed value.
+
+```jsx
+const filteredItems = useMemo(() => {
+  return items.filter(item => item.name.includes(query));
+}, [items, query]);
+```
+
+Use it when:
+
+- Computation is expensive
+- Referential stability matters
+- You pass derived arrays or objects into memoized children
+
+Do not use it everywhere. Memoization has overhead and can make code harder to read.
+
+---
+
+## 13. `useMemo` Bug Fix: Expensive Recalculation
+
+Bad:
+
+```jsx
+function ProductList({ products, query }) {
+  const filtered = products.filter(product => {
+    return product.name.toLowerCase().includes(query.toLowerCase());
+  });
+
+  return <List items={filtered} />;
+}
+```
+
+If `products` is large, filtering on every render can be expensive.
+
+Fix:
+
+```jsx
+function ProductList({ products, query }) {
+  const filtered = useMemo(() => {
+    const normalizedQuery = query.toLowerCase();
+
+    return products.filter(product => {
+      return product.name.toLowerCase().includes(normalizedQuery);
+    });
+  }, [products, query]);
+
+  return <List items={filtered} />;
+}
+```
+
+### Interview explanation
+
+> `useMemo` is useful when a derived value is expensive or when referential equality prevents unnecessary child renders. I would first measure or identify a real performance issue before adding it broadly.
+
+---
+
+## 14. `useCallback`
+
+`useCallback` memoizes a function reference.
+
+```jsx
+const handleClick = useCallback(() => {
+  onSelect(id);
+}, [onSelect, id]);
+```
+
+It is useful when:
+
+- Passing callbacks to memoized child components
+- Using callbacks as dependencies in effects
+- Avoiding unnecessary subscriptions or renders
+
+---
+
+## 15. `useCallback` Bug Fix: Child Re-renders Too Often
+
+Bad:
+
+```jsx
+const Row = React.memo(function Row({ item, onSelect }) {
+  console.log("render row", item.id);
+  return <button onClick={() => onSelect(item.id)}>{item.name}</button>;
+});
+
+function List({ items }) {
+  const [selectedId, setSelectedId] = useState(null);
+
+  function handleSelect(id) {
+    setSelectedId(id);
+  }
+
+  return items.map(item => (
+    <Row key={item.id} item={item} onSelect={handleSelect} />
+  ));
+}
+```
+
+Bug: `handleSelect` is recreated on every render, so `React.memo` may not help.
+
+Fix:
+
+```jsx
+const Row = React.memo(function Row({ item, onSelect }) {
+  console.log("render row", item.id);
+  return <button onClick={() => onSelect(item.id)}>{item.name}</button>;
+});
+
+function List({ items }) {
+  const [selectedId, setSelectedId] = useState(null);
+
+  const handleSelect = useCallback((id) => {
+    setSelectedId(id);
+  }, []);
+
+  return items.map(item => (
+    <Row key={item.id} item={item} onSelect={handleSelect} />
+  ));
+}
+```
+
+### Interview explanation
+
+> `useCallback` does not make function execution faster. It makes the function identity stable, which helps when referential equality matters.
+
+---
+
+## 16. `useCallback` Bug: Stale Closure
+
+Bad:
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  const increment = useCallback(() => {
+    setCount(count + 1);
+  }, []); // ❌ count missing
+
+  return <button onClick={increment}>{count}</button>;
+}
+```
+
+Bug: `increment` always sees the initial `count`.
+
+Fix option 1: include dependency.
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  const increment = useCallback(() => {
+    setCount(count + 1);
+  }, [count]);
+
+  return <button onClick={increment}>{count}</button>;
+}
+```
+
+Fix option 2: use functional update.
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  const increment = useCallback(() => {
+    setCount(prev => prev + 1);
+  }, []);
+
+  return <button onClick={increment}>{count}</button>;
+}
+```
+
+### Interview explanation
+
+> If a callback depends on state, either include that state in the dependency array or use a functional state update. Functional updates often let us keep callbacks stable safely.
+
+---
+
+## 17. `useReducer`
+
+`useReducer` is useful when state transitions are complex or related.
+
+```jsx
+function reducer(state, action) {
+  switch (action.type) {
+    case "loading":
+      return { status: "loading", data: null, error: null };
+    case "success":
+      return { status: "success", data: action.data, error: null };
+    case "error":
+      return { status: "error", data: null, error: action.error };
+    default:
+      return state;
+  }
+}
+
+function UserProfile({ userId }) {
+  const [state, dispatch] = useReducer(reducer, {
+    status: "idle",
+    data: null,
+    error: null,
+  });
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadUser() {
+      dispatch({ type: "loading" });
+
+      try {
+        const res = await fetch(`/api/users/${userId}`);
+        const data = await res.json();
+
+        if (!ignore) {
+          dispatch({ type: "success", data });
+        }
+      } catch (error) {
+        if (!ignore) {
+          dispatch({ type: "error", error });
+        }
+      }
+    }
+
+    loadUser();
+
+    return () => {
+      ignore = true;
+    };
+  }, [userId]);
+
+  if (state.status === "loading") return <div>Loading...</div>;
+  if (state.status === "error") return <div>Failed to load user.</div>;
+  return <div>{state.data?.name}</div>;
+}
+```
+
+### When to use `useReducer`
+
+Use `useReducer` when:
+
+- State has multiple related fields
+- State transitions are event-driven
+- Logic is becoming hard to manage with multiple `useState` calls
+- You want easier testing of state transitions
+
+### Interview explanation
+
+> `useReducer` makes state transitions explicit. It is useful when multiple pieces of state change together, such as loading, success, error, and data.
+
+---
+
+## 18. `useContext`
+
+`useContext` reads shared data from a React context.
+
+```jsx
+const ThemeContext = React.createContext("light");
+
+function Button() {
+  const theme = useContext(ThemeContext);
+  return <button className={theme}>Click</button>;
+}
+```
+
+Use it for values many components need:
+
+- Theme
+- Locale
+- Auth user
+- Feature flags
+- App shell configuration
+
+Do not use context as a replacement for every state management problem. Context updates can cause many consumers to re-render.
+
+---
+
+## 19. `useContext` Bug Fix: Unnecessary Re-renders
+
+Bad:
+
+```jsx
+const AppContext = React.createContext(null);
+
+function AppProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState("light");
+
+  const value = {
+    user,
+    setUser,
+    theme,
+    setTheme,
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+}
+```
+
+Bug: every render creates a new `value` object, causing all consumers to re-render.
+
+Fix with `useMemo`:
+
+```jsx
+function AppProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState("light");
+
+  const value = useMemo(() => {
+    return {
+      user,
+      setUser,
+      theme,
+      setTheme,
+    };
+  }, [user, theme]);
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+}
+```
+
+Better fix: split contexts.
+
+```jsx
+const UserContext = React.createContext(null);
+const ThemeContext = React.createContext(null);
+
+function AppProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState("light");
+
+  return (
+    <UserContext.Provider value={{ user, setUser }}>
+      <ThemeContext.Provider value={{ theme, setTheme }}>
+        {children}
+      </ThemeContext.Provider>
+    </UserContext.Provider>
+  );
+}
+```
+
+### Interview explanation
+
+> If unrelated values share one context, every update can re-render unrelated consumers. Splitting context by update frequency and responsibility often improves performance.
+
+---
+
+## 20. `useLayoutEffect`
+
+`useLayoutEffect` runs synchronously after DOM mutations but before the browser paints.
+
+Use it when you need to measure layout and update synchronously to avoid visual flicker.
+
+Example:
+
+```jsx
+function Tooltip({ text }) {
+  const ref = useRef(null);
+  const [height, setHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    const rect = ref.current.getBoundingClientRect();
+    setHeight(rect.height);
+  }, []);
+
+  return <div ref={ref}>{text} height: {height}</div>;
+}
+```
+
+### Interview explanation
+
+> Prefer `useEffect` by default. Use `useLayoutEffect` only when the user would see a visual bug or flicker if the effect ran after paint.
+
+---
+
+# Practical Bug Fix Patterns
+
+---
+
+## 21. Bug Pattern: Stale Closure in Interval
+
+Bad:
+
+```jsx
+function Stopwatch() {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setSeconds(seconds + 1);
+    }, 1000);
+
+    return () => clearInterval(id);
+  }, []); // ❌ seconds is stale
+
+  return <div>{seconds}</div>;
+}
+```
+
+Bug: `seconds` stays stuck at `1`.
+
+Fix:
+
+```jsx
+function Stopwatch() {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setSeconds(prev => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(id);
+  }, []);
+
+  return <div>{seconds}</div>;
+}
+```
+
+### What to say
+
+> The interval callback captures values from the render where it was created. A functional state update avoids reading stale state from that closure.
+
+---
+
+## 22. Bug Pattern: Event Listener Reads Old State
+
+Bad:
+
+```jsx
+function KeyboardCounter() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    function onKeyDown(event) {
+      if (event.key === "ArrowUp") {
+        setCount(count + 1);
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []); // ❌ count is stale
+
+  return <div>{count}</div>;
+}
+```
+
+Fix with functional update:
+
+```jsx
+function KeyboardCounter() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    function onKeyDown(event) {
+      if (event.key === "ArrowUp") {
+        setCount(prev => prev + 1);
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  return <div>{count}</div>;
+}
+```
+
+Fix with ref when you need latest value:
+
+```jsx
+function KeyboardCounter() {
+  const [count, setCount] = useState(0);
+  const countRef = useRef(count);
+
+  useEffect(() => {
+    countRef.current = count;
+  }, [count]);
+
+  useEffect(() => {
+    function onKeyDown(event) {
+      if (event.key === "ArrowUp") {
+        const next = countRef.current + 1;
+        setCount(next);
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  return <div>{count}</div>;
+}
+```
+
+### What to say
+
+> For simple increments, functional updates are cleaner. For long-lived event listeners that need the latest value, a ref can hold the latest state without resubscribing on every render.
+
+---
+
+## 23. Bug Pattern: Derived State Stored Incorrectly
+
+Bad:
+
+```jsx
+function Cart({ items }) {
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    setTotal(items.reduce((sum, item) => sum + item.price, 0));
+  }, [items]);
+
+  return <div>Total: {total}</div>;
+}
+```
+
+This works, but it creates unnecessary state and an extra render.
+
+Better:
+
+```jsx
+function Cart({ items }) {
+  const total = items.reduce((sum, item) => sum + item.price, 0);
+
+  return <div>Total: {total}</div>;
+}
+```
+
+If expensive:
+
+```jsx
+function Cart({ items }) {
+  const total = useMemo(() => {
+    return items.reduce((sum, item) => sum + item.price, 0);
+  }, [items]);
+
+  return <div>Total: {total}</div>;
+}
+```
+
+### What to say
+
+> If a value can be derived from props or state during render, I avoid storing it as separate state. Separate derived state can become out of sync.
+
+---
+
+## 24. Bug Pattern: Form State Reset Accidentally
+
+Bad:
+
+```jsx
+function ProfileForm({ user }) {
+  const [name, setName] = useState(user.name);
+
+  return <input value={name} onChange={e => setName(e.target.value)} />;
+}
+```
+
+Bug: if `user` changes, the local state does not update.
+
+Fix when form should reset on user change:
+
+```jsx
+function ProfileForm({ user }) {
+  const [name, setName] = useState(user.name);
+
+  useEffect(() => {
+    setName(user.name);
+  }, [user.id, user.name]);
+
+  return <input value={name} onChange={e => setName(e.target.value)} />;
+}
+```
+
+Alternative: key the component by user ID.
+
+```jsx
+function Page({ user }) {
+  return <ProfileForm key={user.id} user={user} />;
+}
+```
+
+### What to say
+
+> Initial state only runs on the first render. If props should reset local state, we need an effect or a key-based remount depending on the desired UX.
+
+---
+
+## 25. Bug Pattern: Debounced Search with Stale Query
+
+Bad:
+
+```jsx
+function SearchBox() {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+
+  const debouncedSearch = useMemo(() => {
+    return debounce(() => {
+      fetch(`/api/search?q=${query}`)
+        .then(res => res.json())
+        .then(setResults);
+    }, 300);
+  }, []); // ❌ query is stale
+
+  function handleChange(e) {
+    setQuery(e.target.value);
+    debouncedSearch();
+  }
+
+  return <input value={query} onChange={handleChange} />;
+}
+```
+
+Fix by passing the value into the debounced function:
+
+```jsx
+function SearchBox() {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+
+  const debouncedSearch = useMemo(() => {
+    return debounce((nextQuery) => {
+      fetch(`/api/search?q=${encodeURIComponent(nextQuery)}`)
+        .then(res => res.json())
+        .then(setResults);
+    }, 300);
+  }, []);
+
+  function handleChange(e) {
+    const nextQuery = e.target.value;
+    setQuery(nextQuery);
+    debouncedSearch(nextQuery);
+  }
+
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel?.();
+    };
+  }, [debouncedSearch]);
+
+  return <input value={query} onChange={handleChange} />;
+}
+```
+
+Simple debounce helper:
+
+```jsx
+function debounce(fn, delay) {
+  let timerId;
+
+  function debounced(...args) {
+    clearTimeout(timerId);
+    timerId = setTimeout(() => fn(...args), delay);
+  }
+
+  debounced.cancel = () => clearTimeout(timerId);
+
+  return debounced;
+}
+```
+
+### What to say
+
+> A debounced function is often created once, so it can capture stale values. Passing the latest value as an argument avoids stale closure bugs.
+
+---
+
+## 26. Bug Pattern: Fetch Runs Too Often Because Object Dependency Changes
+
+Bad:
+
+```jsx
+function ProductPage({ category, sort }) {
+  const [products, setProducts] = useState([]);
+
+  const filters = { category, sort };
+
+  useEffect(() => {
+    fetchProducts(filters).then(setProducts);
+  }, [filters]); // ❌ new object every render
+
+  return <ProductGrid products={products} />;
+}
+```
+
+Fix option 1: depend on primitive values.
+
+```jsx
+function ProductPage({ category, sort }) {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetchProducts({ category, sort }).then(setProducts);
+  }, [category, sort]);
+
+  return <ProductGrid products={products} />;
+}
+```
+
+Fix option 2: memoize the object.
+
+```jsx
+function ProductPage({ category, sort }) {
+  const [products, setProducts] = useState([]);
+
+  const filters = useMemo(() => {
+    return { category, sort };
+  }, [category, sort]);
+
+  useEffect(() => {
+    fetchProducts(filters).then(setProducts);
+  }, [filters]);
+
+  return <ProductGrid products={products} />;
+}
+```
+
+### What to say
+
+> Dependency arrays compare by reference. Objects and arrays created during render are new references each time, so effects can run more often than intended.
+
+---
+
+## 27. Bug Pattern: Component State Not Preserved Due to Bad Key
+
+Bad:
+
+```jsx
+function TodoList({ todos }) {
+  return todos.map((todo, index) => (
+    <TodoItem key={index} todo={todo} />
+  ));
+}
+```
+
+Bug: using index as key can cause state to move to the wrong row when items reorder, insert, or delete.
+
+Fix:
+
+```jsx
+function TodoList({ todos }) {
+  return todos.map(todo => (
+    <TodoItem key={todo.id} todo={todo} />
+  ));
+}
+```
+
+### What to say
+
+> Keys define component identity. If the key is unstable, React can reuse the wrong component instance and preserve state in the wrong place.
+
+---
+
+## 28. Bug Pattern: Previous Value Needed
+
+Custom hook:
+
+```jsx
+function usePrevious(value) {
+  const ref = useRef();
+
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+
+  return ref.current;
+}
+```
+
+Usage:
+
+```jsx
+function Price({ price }) {
+  const previousPrice = usePrevious(price);
+
+  const direction =
+    previousPrice == null
+      ? "same"
+      : price > previousPrice
+        ? "up"
+        : price < previousPrice
+          ? "down"
+          : "same";
+
+  return <div>{direction}: {price}</div>;
+}
+```
+
+### What to say
+
+> `useRef` is good for storing previous values because updating it does not trigger a render.
+
+---
+
+## 29. Bug Pattern: Click Outside Hook
+
+This is a common frontend interview hook.
+
+```jsx
+function useClickOutside(ref, onOutsideClick) {
+  const callbackRef = useRef(onOutsideClick);
+
+  useEffect(() => {
+    callbackRef.current = onOutsideClick;
+  }, [onOutsideClick]);
+
+  useEffect(() => {
+    function handlePointerDown(event) {
+      const element = ref.current;
+
+      if (!element) return;
+      if (element.contains(event.target)) return;
+
+      callbackRef.current(event);
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [ref]);
+}
+```
+
+Usage:
+
+```jsx
+function Dropdown() {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useClickOutside(menuRef, () => {
+    setOpen(false);
+  });
+
+  return (
+    <div ref={menuRef}>
+      <button onClick={() => setOpen(prev => !prev)}>Menu</button>
+      {open && <div>Dropdown content</div>}
+    </div>
+  );
+}
+```
+
+### What to say
+
+> The hook uses a ref to keep the latest callback without repeatedly adding and removing document listeners.
+
+---
+
+## 30. Bug Pattern: `useEffect` Cleanup in React Strict Mode
+
+In development, React Strict Mode may intentionally run effect setup and cleanup more than once to catch unsafe side effects.
+
+Bad pattern:
+
+```jsx
+useEffect(() => {
+  socket.connect();
+}, []);
+```
+
+Better:
+
+```jsx
+useEffect(() => {
+  socket.connect();
+
+  return () => {
+    socket.disconnect();
+  };
+}, []);
+```
+
+### What to say
+
+> Effects should be resilient to setup-cleanup-setup sequences. If Strict Mode exposes a bug, the effect probably does not have symmetrical cleanup.
+
+---
+
+# Custom Hooks
+
+---
+
+## 31. Why Custom Hooks Matter
+
+Custom hooks let you extract reusable stateful logic.
+
+Good custom hooks:
+
+- Hide implementation details
+- Encapsulate subscriptions
+- Centralize cleanup
+- Make components easier to read
+- Improve testability
+
+---
+
+## 32. Custom Hook: `useDebouncedValue`
+
+```jsx
+function useDebouncedValue(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(id);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+```
+
+Usage:
+
+```jsx
+function SearchPage() {
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebouncedValue(query, 300);
+  const [results, setResults] = useState([]);
+
+  useEffect(() => {
+    if (!debouncedQuery) {
+      setResults([]);
+      return;
+    }
+
+    let ignore = false;
+
+    async function search() {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(debouncedQuery)}`);
+      const data = await res.json();
+
+      if (!ignore) {
+        setResults(data);
+      }
+    }
+
+    search();
+
+    return () => {
+      ignore = true;
+    };
+  }, [debouncedQuery]);
+
+  return (
+    <>
+      <input value={query} onChange={e => setQuery(e.target.value)} />
+      <ResultsList results={results} />
+    </>
+  );
+}
+```
+
+### Interview explanation
+
+> I prefer `useDebouncedValue` when I want rendering to stay simple. The input updates immediately, but side effects like API calls wait for the debounced value.
+
+---
+
+## 33. Custom Hook: `useAsync`
+
+```jsx
+function useAsync(asyncFn, dependencies) {
+  const [state, setState] = useState({
+    status: "idle",
+    data: null,
+    error: null,
+  });
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function run() {
+      setState({ status: "loading", data: null, error: null });
+
+      try {
+        const data = await asyncFn();
+
+        if (!ignore) {
+          setState({ status: "success", data, error: null });
+        }
+      } catch (error) {
+        if (!ignore) {
+          setState({ status: "error", data: null, error });
+        }
+      }
+    }
+
+    run();
+
+    return () => {
+      ignore = true;
+    };
+  }, dependencies);
+
+  return state;
+}
+```
+
+Usage:
+
+```jsx
+function UserProfile({ userId }) {
+  const state = useAsync(() => {
+    return fetch(`/api/users/${userId}`).then(res => res.json());
+  }, [userId]);
+
+  if (state.status === "loading") return <div>Loading...</div>;
+  if (state.status === "error") return <div>Error</div>;
+
+  return <div>{state.data?.name}</div>;
+}
+```
+
+### Interview note
+
+This is useful for interviews, but in production you may choose a data-fetching library such as React Query, SWR, Relay, or Apollo depending on the app architecture.
+
+---
+
+# Debugging Playbook
+
+---
+
+## 34. How to Debug Hook Bugs in an Interview
+
+When given a broken React component, use this checklist.
+
+### Step 1: Identify the symptom
+
+Ask:
+
+- Is the UI stale?
+- Is it re-rendering too often?
+- Is it not re-rendering?
+- Is an effect running too often?
+- Is an effect not running when props change?
+- Is state preserved incorrectly?
+- Is cleanup missing?
+
+### Step 2: Check state ownership
+
+Ask:
+
+- Should this be state?
+- Can it be derived from props/state?
+- Should the parent own it?
+- Should it be a ref instead?
+
+### Step 3: Check closures
+
+Ask:
+
+- Does this callback read old state?
+- Does this interval/listener capture old values?
+- Should I use functional update?
+- Should I use a ref for the latest value?
+
+### Step 4: Check effect dependencies
+
+Ask:
+
+- What values are read inside the effect?
+- Are they all listed as dependencies?
+- Are dependencies unstable objects/functions?
+- Can object creation move inside the effect?
+
+### Step 5: Check cleanup
+
+Ask:
+
+- Is this effect subscribing to something?
+- Is there a timer?
+- Is there a fetch that can finish after unmount?
+- Is there a WebSocket or event listener?
+
+### Step 6: Check identity
+
+Ask:
+
+- Are list keys stable?
+- Are memoized children receiving stable props?
+- Are context values recreated every render?
+
+---
+
+## 35. Interview Bug Fix Template
+
+Use this answer structure:
+
+```txt
+1. The bug is caused by ____.
+2. It happens because React renders create closures over values from that render.
+3. The fix is to ____.
+4. This works because ____.
+5. I would also add cleanup / tests / dependency correction to prevent regressions.
+```
+
+Example:
+
+```txt
+The bug is caused by a stale closure inside setInterval.
+The interval callback captures the initial count value because the effect only runs once.
+The fix is to use setCount(prev => prev + 1).
+This works because React passes the latest committed state into the updater.
+I would also keep the cleanup function to clear the interval on unmount.
+```
+
+---
+
+# Common Interview Questions
+
+---
+
+## 36. What is the difference between `useState` and `useRef`?
+
+`useState` stores reactive state. Updating it causes a re-render.
+
+`useRef` stores mutable data that survives renders. Updating it does not cause a re-render.
+
+Use `useState` when the UI should update.
+
+Use `useRef` when you need to keep a value around but it should not directly affect rendering.
+
+Examples:
+
+```jsx
+const [count, setCount] = useState(0); // UI value
+const timerRef = useRef(null); // mutable timer ID
+```
+
+---
+
+## 37. What is the difference between `useEffect` and `useLayoutEffect`?
+
+`useEffect` runs after the browser paints.
+
+`useLayoutEffect` runs after DOM updates but before paint.
+
+Use `useEffect` for most side effects.
+
+Use `useLayoutEffect` when you need layout measurement or synchronous DOM updates before the user sees the screen.
+
+---
+
+## 38. What causes stale closures in React?
+
+A stale closure happens when a callback uses values from an older render.
+
+Example:
+
+```jsx
+useEffect(() => {
+  const id = setInterval(() => {
+    setCount(count + 1); // stale count
+  }, 1000);
+
+  return () => clearInterval(id);
+}, []);
+```
+
+Fix:
+
+```jsx
+setCount(prev => prev + 1);
+```
+
+---
+
+## 39. When should you use `useMemo`?
+
+Use `useMemo` when:
+
+- A calculation is expensive
+- A derived object or array needs stable identity
+- A memoized child component depends on referential equality
+
+Do not use it for every calculation.
+
+---
+
+## 40. When should you use `useCallback`?
+
+Use `useCallback` when function identity matters.
+
+Common cases:
+
+- Passing callbacks to `React.memo` children
+- Stable effect dependencies
+- Avoiding unnecessary subscription teardown/setup
+
+Do not use it just because a function exists.
+
+---
+
+## 41. How do you prevent race conditions in data fetching?
+
+Use cleanup logic.
+
+Option 1: ignore stale result.
+
+```jsx
+useEffect(() => {
+  let ignore = false;
+
+  async function load() {
+    const data = await fetchData(id);
+    if (!ignore) setData(data);
+  }
+
+  load();
+
+  return () => {
+    ignore = true;
+  };
+}, [id]);
+```
+
+Option 2: abort request.
+
+```jsx
+useEffect(() => {
+  const controller = new AbortController();
+
+  fetch(url, { signal: controller.signal });
+
+  return () => controller.abort();
+}, [url]);
+```
+
+---
+
+## 42. Why should effects include dependencies?
+
+Dependencies tell React when the effect needs to resynchronize.
+
+If a value is read inside an effect but missing from the dependency array, the effect can use stale data.
+
+```jsx
+useEffect(() => {
+  fetch(`/api/users/${userId}`);
+}, [userId]);
+```
+
+---
+
+## 43. How do you avoid unnecessary re-renders from context?
+
+Options:
+
+1. Split context by responsibility.
+2. Memoize provider values.
+3. Keep frequently changing state closer to where it is used.
+4. Use selector-based state management when needed.
+
+---
+
+## 44. How do you build a custom hook?
+
+A custom hook is a function whose name starts with `use` and may call other hooks.
+
+```jsx
+function useOnlineStatus() {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    function handleOnline() {
+      setIsOnline(true);
+    }
+
+    function handleOffline() {
+      setIsOnline(false);
+    }
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  return isOnline;
+}
+```
+
+---
+
+# Hook Bug Fix Cheat Sheet
+
+| Symptom | Likely Cause | Fix |
+|---|---|---|
+| State only updates once in interval | Stale closure | Use functional state update |
+| Effect does not react to prop change | Missing dependency | Add dependency |
+| Effect runs forever | Missing or unstable dependency array | Scope dependencies correctly |
+| Old fetch overwrites new data | Async race condition | Cleanup with ignore flag or abort |
+| Event listener keeps old value | Listener closure stale | Functional update or latest-value ref |
+| Child re-renders despite `React.memo` | Unstable function/object prop | `useCallback` / `useMemo` |
+| Context consumers re-render too often | Provider value recreated or context too broad | Memoize value or split context |
+| State appears on wrong list row | Bad key | Use stable unique key |
+| Form does not reset when selected item changes | Initial state only used once | Effect reset or key remount |
+| Timer cannot be cleared | Timer ID lost between renders | Store ID in `useRef` |
+
+---
+
+# Interview Practice Problems
+
+## Problem 1: Fix stale interval
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCount(count + 1);
+    }, 1000);
+
+    return () => clearInterval(id);
+  }, []);
+
+  return <div>{count}</div>;
+}
+```
+
+Expected fix:
+
+```jsx
+setCount(prev => prev + 1);
+```
+
+---
+
+## Problem 2: Fix fetch race
+
+```jsx
+useEffect(() => {
+  fetch(`/api/users/${userId}`)
+    .then(res => res.json())
+    .then(setUser);
+}, [userId]);
+```
+
+Expected fix:
+
+```jsx
+useEffect(() => {
+  let ignore = false;
+
+  async function load() {
+    const res = await fetch(`/api/users/${userId}`);
+    const data = await res.json();
+    if (!ignore) setUser(data);
+  }
+
+  load();
+
+  return () => {
+    ignore = true;
+  };
+}, [userId]);
+```
+
+---
+
+## Problem 3: Fix unnecessary effect reruns
+
+```jsx
+const options = { page, pageSize };
+
+useEffect(() => {
+  fetchPage(options);
+}, [options]);
+```
+
+Expected fix:
+
+```jsx
+useEffect(() => {
+  fetchPage({ page, pageSize });
+}, [page, pageSize]);
+```
+
+---
+
+## Problem 4: Fix bad context provider value
+
+```jsx
+<AuthContext.Provider value={{ user, login, logout }}>
+  {children}
+</AuthContext.Provider>
+```
+
+Expected fix:
+
+```jsx
+const value = useMemo(() => {
+  return { user, login, logout };
+}, [user, login, logout]);
+
+return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+```
+
+Also make sure `login` and `logout` are stable if needed:
+
+```jsx
+const login = useCallback(async (credentials) => {
+  // login logic
+}, []);
+
+const logout = useCallback(() => {
+  // logout logic
+}, []);
+```
+
+---
+
+# Strong Final Interview Summary
+
+Use this when asked to summarize hooks:
+
+> React hooks are a way to model state, side effects, memoization, refs, context, and reusable stateful logic inside function components. The hardest bugs usually come from misunderstanding renders and closures. Each render has its own values, so intervals, event listeners, async callbacks, and memoized callbacks can accidentally read stale data. My debugging approach is to check whether the value should be state, ref, or derived; verify effect dependencies; make cleanup symmetrical; and use functional updates or refs when long-lived callbacks need the latest value.
+
+---
+
+# Key Takeaways
+
+- Use `useState` for values that should update the UI.
+- Use `useRef` for mutable values that persist but do not trigger rendering.
+- Use `useEffect` to synchronize with external systems.
+- Always clean up subscriptions, timers, sockets, and async work when needed.
+- Use functional state updates to avoid stale state.
+- Use `useMemo` for expensive derived values or stable object identity.
+- Use `useCallback` for stable function identity, not faster execution.
+- Use `useReducer` when state transitions are complex.
+- Use `useContext` carefully because provider updates can re-render many consumers.
+- Prefer deriving values during render instead of duplicating derived state.
+- Debug hook bugs by checking closures, dependencies, cleanup, identity, and state ownership.
