@@ -56,6 +56,10 @@
       "hash": "fd6d2e9fd5a69d3c6947665db4ad8c5ba879e38af192f7896612c2b95d8c2583",
       "docRelative": "i18n.png"
     },
+    "system-designs/metrics-monitoring.png": {
+      "hash": "a07d37937a19f64a26371965e0b7614f86a088f72f80fd52cb0f39d7ea5abc84",
+      "docRelative": "metrics-monitoring.png"
+    },
     "system-designs/multimodal-file-ingestion.png": {
       "hash": "f09a4178656b7fcd39c80d3dbca33476d19a7a27b6b897b096dd41d5e173c8c9",
       "docRelative": "multimodal-file-ingestion.png"
@@ -129,7 +133,7 @@
       "docRelative": "github-actions-system-design.mdx"
     },
     "system-designs/google-docs-design.mdx": {
-      "hash": "21ec09f8eb195fb1b48833b5e6fd8b134f0d66ea4212619caebf77390fe19633",
+      "hash": "2ff6893d1cb231f6107db66183c4ca7752196180ad3682c968ddac2e598bbd9d",
       "docRelative": "google-docs-design.mdx"
     },
     "system-designs/i18n-design.mdx": {
@@ -139,6 +143,10 @@
     "system-designs/masonry-layout-system-design.mdx": {
       "hash": "1c8d4bb7f33b751429b77c3448c7694039d0112d39b27cc305067bd8dac94927",
       "docRelative": "masonry-layout-system-design.mdx"
+    },
+    "system-designs/metrics-monitoring.mdx": {
+      "hash": "dc00f4a891daf3b106aa0dacdee206d256acb926e4fb8ed2ba5962f2d79e06ce",
+      "docRelative": "metrics-monitoring.mdx"
     },
     "system-designs/model_eval_training_llm_design.mdx": {
       "hash": "2701d90c227a9c1f0df21dc0fa0632941e73da2c4e077b93ff7499e0a4f74d60",
