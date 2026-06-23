@@ -76,10 +76,6 @@
       "hash": "592701c33e1c48937a82965d23d439d3ee486403cb4a542bb40003df2e51c187",
       "docRelative": "richtexteditor.png"
     },
-    "system-designs/sanbox-cloud-ide.png": {
-      "hash": "ac1d4d241e2233fe784f6a7a723c524e224a9854ddcbf44fa38db5cd78a29fec",
-      "docRelative": "sanbox-cloud-ide.png"
-    },
     "system-designs/sandbox-cloud-ide-architecture.svg": {
       "hash": "d5408f61ecbc42342093ce1e8146a463301811b1e086baad983a1e48a306a08a",
       "docRelative": "sandbox-cloud-ide-architecture.svg"
@@ -87,6 +83,10 @@
     "system-designs/sandbox-cloud-ide-fe-wireframe.svg": {
       "hash": "0e102b9bad09f0f8aff39edf6bc771472d4f8495ae58038f642d3f871a2f0165",
       "docRelative": "sandbox-cloud-ide-fe-wireframe.svg"
+    },
+    "system-designs/sandbox-cloud-ide.png": {
+      "hash": "ac1d4d241e2233fe784f6a7a723c524e224a9854ddcbf44fa38db5cd78a29fec",
+      "docRelative": "sandbox-cloud-ide.png"
     },
     "system-designs/tiny-url.png": {
       "hash": "164a210d53184162bb64e904a39d084eec6ca4a501bd3f0c261fa664313183ed",
@@ -185,7 +185,7 @@
       "docRelative": "rich-text-editor.mdx"
     },
     "system-designs/sandboxed-cloud-ide-system-design.mdx": {
-      "hash": "5336c928b2a444cfd4ce01bdbdc1c12e40997dfd6551460226b5791cb9dab434",
+      "hash": "ad64b85af53d18b86b8c57d1c1b307ac0fcea4e946589d7b928835d0692b837c",
       "docRelative": "sandboxed-cloud-ide-system-design.mdx"
     },
     "system-designs/short-url.mdx": {
