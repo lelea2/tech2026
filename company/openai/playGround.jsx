@@ -1,0 +1,498 @@
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState
+} from "react";
+
+const API_BASE_URL = "http://localhost:4000";
+
+const initialState = {
+  runId: null,
+  status: "idle",
+  output: "",
+  error: null,
+  metadata: null
+};
+
+/**
+ * Interview question:
+ * Build a React prompt playground that streams model output through SSE.
+ * Explain how to keep the streaming UI responsive without re-rendering the
+ * entire component tree for every token.
+ *
+ * High-level answer:
+ * - Store long-lived mutable streaming objects in refs, not state.
+ * - Buffer incoming tokens in a ref so token arrival does not trigger render.
+ * - Flush the buffered text into React state on a short interval.
+ * - Split the page into memoized child components.
+ * - Pass stable callbacks with useCallback so memoized children can skip work.
+ *
+ * Important tradeoff:
+ * We still need some re-renders because the visible output must update. The goal
+ * is not zero renders; the goal is to avoid one React render per streamed token.
+ */
+function reducer(state, action) {
+  switch (action.type) {
+    case "RUN_STARTED": {
+      return {
+        runId: action.runId,
+        status: "streaming",
+        output: "",
+        error: null,
+        metadata: null
+      };
+    }
+
+    case "METADATA_RECEIVED": {
+      return {
+        ...state,
+        metadata: action.metadata
+      };
+    }
+
+    case "TOKENS_FLUSHED": {
+      return {
+        ...state,
+        output: state.output + action.text
+      };
+    }
+
+    case "RUN_COMPLETED": {
+      return {
+        ...state,
+        status: "completed"
+      };
+    }
+
+    case "RUN_CANCELLED": {
+      return {
+        ...state,
+        status: "cancelled"
+      };
+    }
+
+    case "RUN_ERROR": {
+      return {
+        ...state,
+        status: "error",
+        error: action.error
+      };
+    }
+
+    case "RESET": {
+      return initialState;
+    }
+
+    default:
+      return state;
+  }
+}
+
+export function PromptPlayground() {
+  // Form controls live in state because typing should immediately update the UI.
+  const [prompt, setPrompt] = useState("");
+  const [model, setModel] = useState("placeholder-model");
+  const [temperature, setTemperature] = useState(0.7);
+  const [maxTokens, setMaxTokens] = useState(256);
+
+  // Streaming run state is centralized in a reducer so each transition is
+  // explicit and easy to explain in an interview.
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  // Refs are the key to reducing render pressure:
+  // - eventSourceRef stores the live SSE connection.
+  // - tokenBufferRef stores tokens that arrived but are not yet painted.
+  // - flushTimerRef prevents scheduling multiple flush timers at once.
+  // - currentRunIdRef keeps the current run ID available to cancel handlers.
+  //
+  // Updating refs does not re-render React components.
+  const eventSourceRef = useRef(null);
+  const tokenBufferRef = useRef("");
+  const flushTimerRef = useRef(null);
+  const currentRunIdRef = useRef(null);
+
+  const isStreaming = state.status === "streaming";
+
+  const flushTokenBuffer = useCallback(() => {
+    const bufferedText = tokenBufferRef.current;
+
+    if (!bufferedText) {
+      return;
+    }
+
+    tokenBufferRef.current = "";
+
+    // This is the controlled render point for streaming output. Instead of
+    // dispatching on every token event, we batch many token events into one
+    // state update.
+    dispatch({
+      type: "TOKENS_FLUSHED",
+      text: bufferedText
+    });
+  }, []);
+
+  const scheduleTokenFlush = useCallback(() => {
+    if (flushTimerRef.current) {
+      // A flush is already scheduled, so new tokens can keep accumulating in
+      // tokenBufferRef without creating extra timers or extra renders.
+      return;
+    }
+
+    flushTimerRef.current = window.setTimeout(() => {
+      flushTimerRef.current = null;
+      flushTokenBuffer();
+    }, 50);
+  }, [flushTokenBuffer]);
+
+  const closeEventSource = useCallback(() => {
+    if (eventSourceRef.current) {
+      // Closing the SSE connection from a ref avoids keeping EventSource in
+      // React state, which would cause unnecessary renders and serialization
+      // concerns.
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+  }, []);
+
+  const startSSE = useCallback(
+    (runId) => {
+      closeEventSource();
+
+      const eventSource = new EventSource(
+        `${API_BASE_URL}/api/runs/${runId}/events`
+      );
+
+      eventSourceRef.current = eventSource;
+
+      eventSource.addEventListener("metadata", (event) => {
+        const data = JSON.parse(event.data);
+
+        dispatch({
+          type: "METADATA_RECEIVED",
+          metadata: data
+        });
+      });
+
+      eventSource.addEventListener("token", (event) => {
+        const data = JSON.parse(event.data);
+
+        /**
+         * Interview explanation:
+         * This is the most important performance detail.
+         *
+         * Bad approach:
+         *   dispatch({ type: "TOKENS_FLUSHED", text: data.token })
+         *
+         * That would cause React to re-render for every token. For fast model
+         * streams, that can mean dozens or hundreds of renders per second.
+         *
+         * Better approach:
+         *   Append the token to a ref, then flush every 50ms.
+         *
+         * tokenBufferRef.current changes synchronously but does not trigger a
+         * render. scheduleTokenFlush controls how often React state updates.
+         */
+        tokenBufferRef.current += data.token;
+        scheduleTokenFlush();
+      });
+
+      eventSource.addEventListener("done", () => {
+        // Flush one final time so no buffered tokens are lost before marking
+        // the run complete.
+        flushTokenBuffer();
+        closeEventSource();
+
+        dispatch({
+          type: "RUN_COMPLETED"
+        });
+      });
+
+      eventSource.addEventListener("cancelled", () => {
+        // Same final flush rule applies when the server reports cancellation.
+        flushTokenBuffer();
+        closeEventSource();
+
+        dispatch({
+          type: "RUN_CANCELLED"
+        });
+      });
+
+      eventSource.onerror = () => {
+        // On errors, flush any text already received so the user keeps useful
+        // partial output instead of losing the whole stream.
+        flushTokenBuffer();
+        closeEventSource();
+
+        dispatch({
+          type: "RUN_ERROR",
+          error: "SSE connection failed"
+        });
+      };
+    },
+    [closeEventSource, flushTokenBuffer, scheduleTokenFlush]
+  );
+
+  const handleSubmit = useCallback(
+    async (event) => {
+      event.preventDefault();
+
+      const trimmedPrompt = prompt.trim();
+
+      if (!trimmedPrompt || isStreaming) {
+        return;
+      }
+
+      dispatch({
+        type: "RESET"
+      });
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/runs`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            prompt: trimmedPrompt,
+            model,
+            temperature: Number(temperature),
+            maxTokens: Number(maxTokens)
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to create prompt run");
+        }
+
+        const data = await response.json();
+
+        currentRunIdRef.current = data.runId;
+
+        dispatch({
+          type: "RUN_STARTED",
+          runId: data.runId
+        });
+
+        startSSE(data.runId);
+      } catch (error) {
+        dispatch({
+          type: "RUN_ERROR",
+          error: error.message
+        });
+      }
+    },
+    [prompt, model, temperature, maxTokens, isStreaming, startSSE]
+  );
+
+  const handleCancel = useCallback(async () => {
+    const runId = currentRunIdRef.current;
+
+    if (!runId) {
+      return;
+    }
+
+    try {
+      await fetch(`${API_BASE_URL}/api/runs/${runId}/cancel`, {
+        method: "POST"
+      });
+    } finally {
+      flushTokenBuffer();
+      closeEventSource();
+
+      dispatch({
+        type: "RUN_CANCELLED"
+      });
+    }
+  }, [closeEventSource, flushTokenBuffer]);
+
+  useEffect(() => {
+    return () => {
+      // Cleanup prevents memory leaks if the component unmounts while a stream
+      // or timer is still active.
+      closeEventSource();
+
+      if (flushTimerRef.current) {
+        window.clearTimeout(flushTimerRef.current);
+      }
+    };
+  }, [closeEventSource]);
+
+  return (
+    <main className="page">
+      <section className="playground">
+        <Header />
+
+        <div className="layout">
+          <PromptPanel
+            prompt={prompt}
+            model={model}
+            temperature={temperature}
+            maxTokens={maxTokens}
+            isStreaming={isStreaming}
+            onPromptChange={setPrompt}
+            onModelChange={setModel}
+            onTemperatureChange={setTemperature}
+            onMaxTokensChange={setMaxTokens}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+          />
+
+          <OutputPanel
+            status={state.status}
+            output={state.output}
+            error={state.error}
+            metadata={state.metadata}
+          />
+        </div>
+      </section>
+    </main>
+  );
+}
+
+// Header never receives changing props, so React.memo lets it render once and
+// skip future parent updates caused by streaming output.
+const Header = memo(function Header() {
+  return (
+    <header className="header">
+      <div>
+        <h1>Prompt Playground</h1>
+        <p>React + Node.js SSE streaming playground</p>
+      </div>
+    </header>
+  );
+});
+
+// PromptPanel is memoized so streaming output updates do not force the prompt
+// controls to re-render unless one of their own props changes.
+const PromptPanel = memo(function PromptPanel({
+  prompt,
+  model,
+  temperature,
+  maxTokens,
+  isStreaming,
+  onPromptChange,
+  onModelChange,
+  onTemperatureChange,
+  onMaxTokensChange,
+  onSubmit,
+  onCancel
+}) {
+  return (
+    <form className="panel prompt-panel" onSubmit={onSubmit}>
+      <div className="field">
+        <label htmlFor="model">Model</label>
+        <select
+          id="model"
+          value={model}
+          disabled={isStreaming}
+          onChange={(event) => onModelChange(event.target.value)}
+        >
+          <option value="placeholder-model">placeholder-model</option>
+          <option value="fast-model">fast-model</option>
+          <option value="reasoning-model">reasoning-model</option>
+        </select>
+      </div>
+
+      <div className="field">
+        <label htmlFor="temperature">
+          Temperature: {Number(temperature).toFixed(1)}
+        </label>
+        <input
+          id="temperature"
+          type="range"
+          min="0"
+          max="2"
+          step="0.1"
+          value={temperature}
+          disabled={isStreaming}
+          onChange={(event) => onTemperatureChange(event.target.value)}
+        />
+      </div>
+
+      <div className="field">
+        <label htmlFor="maxTokens">Max tokens</label>
+        <input
+          id="maxTokens"
+          type="number"
+          min="1"
+          max="4096"
+          value={maxTokens}
+          disabled={isStreaming}
+          onChange={(event) => onMaxTokensChange(event.target.value)}
+        />
+      </div>
+
+      <div className="field field-grow">
+        <label htmlFor="prompt">Prompt</label>
+        <textarea
+          id="prompt"
+          value={prompt}
+          disabled={isStreaming}
+          placeholder="Ask the model to explain, generate, summarize, or reason..."
+          onChange={(event) => onPromptChange(event.target.value)}
+        />
+      </div>
+
+      <div className="actions">
+        <button
+          type="submit"
+          disabled={isStreaming || prompt.trim().length === 0}
+        >
+          {isStreaming ? "Streaming..." : "Run"}
+        </button>
+
+        <button
+          type="button"
+          className="secondary"
+          disabled={!isStreaming}
+          onClick={onCancel}
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+});
+
+// OutputPanel is the only major panel that should re-render during streaming,
+// because `output` changes when buffered tokens are flushed into state.
+const OutputPanel = memo(function OutputPanel({
+  status,
+  output,
+  error,
+  metadata
+}) {
+  return (
+    <section className="panel output-panel">
+      <div className="output-header">
+        <div>
+          <h2>Response</h2>
+          <StatusBadge status={status} />
+        </div>
+
+        {metadata ? (
+          <div className="metadata">
+            <span>{metadata.model}</span>
+            <span>temp {metadata.temperature}</span>
+            <span>max {metadata.maxTokens}</span>
+          </div>
+        ) : null}
+      </div>
+
+      {error ? <div className="error">{error}</div> : null}
+
+      <pre className="output">
+        {output || "The streamed response will appear here..."}
+      </pre>
+    </section>
+  );
+});
+
+// StatusBadge is tiny, but memo keeps the same pattern: children update only
+// when their own props change.
+const StatusBadge = memo(function StatusBadge({ status }) {
+  return <span className={`status status-${status}`}>{status}</span>;
+});
