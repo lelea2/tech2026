@@ -40,6 +40,10 @@
       "hash": "7f05c54311c5622788ca9680b97f0ed747bbd0641c228f785a22565aba20a930",
       "docRelative": "dropbox.png"
     },
+    "system-designs/feature-flag.png": {
+      "hash": "b3fe895bd9c82aa8879b476907876c8a4fce936147138b02625263e184253a53",
+      "docRelative": "feature-flag.png"
+    },
     "system-designs/figma.png": {
       "hash": "2c37c162b2abbc878aa7d6d29d601de73f232b0500d50ab43136f716b6304229",
       "docRelative": "figma.png"
@@ -163,6 +167,10 @@
     "system-designs/dropbox.mdx": {
       "hash": "0450fc35ce2bda469463f17aa7345103aa52e56f777d7cc579761d3d2f00893c",
       "docRelative": "dropbox.mdx"
+    },
+    "system-designs/feature-flag-system.mdx": {
+      "hash": "309a1903eabc03ac762cd41e3d0c31f20f768547a08966af0efb7c266b15609a",
+      "docRelative": "feature-flag-system.mdx"
     },
     "system-designs/figma.mdx": {
       "hash": "2d2ab791c0042fc7295ecdb36981cd251488bc91a9f6b5b31837486a57cf052f",
