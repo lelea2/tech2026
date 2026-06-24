@@ -208,6 +208,10 @@
       "hash": "c2c20a8c58d7145293135b4c31ab75b293ed4ba8386abaf22a7894fff9463a0c",
       "docRelative": "job-scheduler.mdx"
     },
+    "system-designs/leaderboard-realtime-system.mdx": {
+      "hash": "d1877ce0c34b4f0c67637984449312f24887079db126345387a6407d8fb6c10b",
+      "docRelative": "leaderboard-realtime-system.mdx"
+    },
     "system-designs/masonry-layout-system-design.mdx": {
       "hash": "1c8d4bb7f33b751429b77c3448c7694039d0112d39b27cc305067bd8dac94927",
       "docRelative": "masonry-layout-system-design.mdx"

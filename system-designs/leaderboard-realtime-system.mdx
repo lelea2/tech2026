@@ -1,0 +1,750 @@
+---
+title: 'Leaderboard System Design'
+description: 'Leaderboard system design'
+---
+
+> Prompt: Design a real-time leaderboard score system for a gaming platform. Support global, country, and tournament leaderboards, deterministic tie-breaking, high read traffic, concurrent score updates, and near-real-time UI updates.
+
+## 1. Clarify the Problem
+
+### Functional Requirements
+
+1. **Leaderboard scopes**
+   - Global leaderboard.
+   - Country leaderboard.
+   - Tournament leaderboard.
+
+2. **Score updates**
+   - Game service emits match-completed events.
+   - Each match can update multiple players.
+   - Multiple score update channels can exist, but the scoring system must be idempotent and durable.
+
+3. **Ranking behavior**
+   - Higher score ranks better.
+   - If two players tie, the player who reached the score earlier ranks higher.
+   - Users can view top N players.
+   - Users can view their own rank.
+   - Users can jump near another player's rank.
+
+4. **Real-time user experience**
+   - Leaderboard page should render quickly.
+   - Rank and score updates should appear within a small delay window.
+   - After a match, the user should see their latest score immediately and rank shortly after.
+
+5. **Admin / operations**
+   - Rebuild a leaderboard from source of truth.
+   - Backfill corrupted cache state.
+   - Detect lag between source-of-truth score DB and Redis materialized views.
+
+### Non-Functional Requirements
+
+| Requirement      |                                                                           Target |
+| ---------------- | -------------------------------------------------------------------------------: |
+| Read latency     |                                             p95 < 100 ms for top-N and user rank |
+| Update freshness |                                                 Usually < 1–5 seconds end-to-end |
+| Availability     |              Prefer availability for reads; stale by a few seconds is acceptable |
+| Durability       |                                                      No score update can be lost |
+| Consistency      |  Strong consistency in score DB; eventual consistency in Redis leaderboard views |
+| Scale            | 100M users, 10M DAU, 50K peak score updates/sec, 100K peak leaderboard reads/sec |
+| Multi-region     |         Optional active-active reads, single-writer or region-partitioned writes |
+
+## 2. Key Design Decision
+
+The most important distinction is:
+
+- **Source of truth**: durable, transactional score store such as Spanner, CockroachDB, DynamoDB with transactions, or sharded Postgres at smaller scale.
+- **Serving view**: Redis sorted sets, bucketed sorted sets, and local in-memory caches for low-latency reads.
+
+Do **not** synchronously dual-write to both the database and Redis. Redis should be a derived materialized view updated through CDC or an outbox pipeline. This avoids split-brain states where the database commit succeeds but the Redis write fails.
+
+## 3. High-Level Architecture
+
+```text
+Game Service
+   |
+   | MatchFinished event
+   v
+Kafka: match_finished
+   |
+   v
+Score Ingestor / Enricher
+   | - validates match event
+   | - deduplicates by matchId/eventId
+   | - expands one match into per-player updates
+   | - enriches country/tournament metadata
+   v
+Kafka: player_score_updates
+   |
+   +-----------------------------+
+   |                             |
+   v                             v
+Global/Country Score Processor   Tournament Score Processor
+   |                             |
+   | ACID transaction             | ACID transaction
+   v                             v
+Score DB / NewSQL                Tournament Score DB / NewSQL
+   |                             |
+   | CDC / outbox                 | CDC / outbox
+   +--------------+--------------+
+                  v
+            CDC Materializer
+                  |
+                  | atomic Lua updates
+                  v
+          Redis Leaderboard Views
+          - tournament ZSETs
+          - country ZSETs or bucketed ZSETs
+          - global score buckets
+          - user routing hash
+          - bucket count metadata
+                  |
+                  v
+          Leaderboard API Service
+          - top N
+          - rank by user
+          - around me
+          - SSE/WebSocket update stream
+                  |
+                  v
+          Frontend Leaderboard UI
+```
+
+## 4. Write Flow
+
+### Step-by-Step
+
+1. **Game ends**
+   - Game Service emits `MatchFinished` to Kafka.
+   - Event includes `matchId`, `gameMode`, `tournamentId`, players, score deltas, match result, and `endedAt`.
+
+2. **Ingestor validates and enriches**
+   - Validates schema and signature.
+   - Deduplicates by `matchId` or event id.
+   - Expands the match into one `PlayerScoreUpdate` per player.
+   - Enriches with `countryCode`, `tournamentId`, season, game mode.
+
+3. **Processors update source-of-truth DB**
+   - Global/country processor updates cumulative user score.
+   - Tournament processor updates tournament-specific score.
+   - Each write is transactional and idempotent.
+
+4. **CDC materializes Redis views**
+   - CDC worker reads committed DB changes.
+   - Worker computes `compositeScore` for deterministic ranking.
+   - Worker updates Redis ZSETs, bucket counts, and user routing hash atomically.
+
+5. **Leaderboard API serves reads from Redis**
+   - API never needs to call the source-of-truth DB in the hot path except for fallback or cache rebuild.
+
+### Why CDC Instead of Direct Redis Write?
+
+The DB commit is the durable decision. Redis is a projection. If Redis is down, the event is not lost; CDC resumes and catches up. This also gives operations a clean way to rebuild Redis from the database.
+
+## 5. Read Flow
+
+### Top-N Leaderboard
+
+```http
+GET /v1/leaderboards/{scope}/{scopeId}/top?limit=50&cursor=...
+```
+
+1. API checks local in-memory cache for hot leaderboards.
+2. API queries Redis ZSET or bucketed Redis ZSETs.
+3. API hydrates display metadata from profile cache.
+4. API returns rows with rank, user, display name, avatar, score, and achieved timestamp.
+
+### User Rank
+
+```http
+GET /v1/leaderboards/{scope}/{scopeId}/users/{userId}/rank
+```
+
+For tournament leaderboards:
+
+```text
+rank = ZREVRANK Tournament:{tournamentId}:Leaderboard userId + 1
+```
+
+For global leaderboard with score buckets:
+
+```text
+1. HGET User:Profile:{userId} global_bucket
+2. ZREVRANK Global:Bucket:{bucketId} userId
+3. HGETALL Global:Metadata:Counts
+4. rank = sum(counts of all higher buckets) + localRank + 1
+```
+
+### Around-Me Leaderboard
+
+```http
+GET /v1/leaderboards/{scope}/{scopeId}/around-me?userId=u123&window=25
+```
+
+1. Find user's rank.
+2. Fetch `rank - window` to `rank + window`.
+3. Return the centered window.
+
+## 6. Data Model
+
+### MatchFinished Event
+
+```ts
+export type MatchFinishedEvent = {
+  eventId: string;
+  matchId: string;
+  gameMode: 'blitz' | 'rapid' | 'bullet';
+  tournamentId?: string;
+  endedAt: string;
+  players: Array<{
+    userId: string;
+    scoreDelta: number;
+    result: 'win' | 'loss' | 'draw';
+  }>;
+};
+```
+
+### PlayerScoreUpdate Event
+
+```ts
+export type PlayerScoreUpdate = {
+  eventId: string;
+  matchId: string;
+  userId: string;
+  countryCode: string;
+  tournamentId?: string;
+  gameMode: string;
+  scoreDelta: number;
+  eventTime: string;
+};
+```
+
+### User Scores Table
+
+```sql
+CREATE TABLE user_scores (
+  user_id STRING NOT NULL,
+  game_mode STRING NOT NULL,
+  country_code STRING NOT NULL,
+  absolute_score INT64 NOT NULL,
+  achieved_at TIMESTAMP NOT NULL,
+  composite_score FLOAT64 NOT NULL,
+  last_match_id STRING NOT NULL,
+  updated_at TIMESTAMP NOT NULL,
+  PRIMARY KEY (user_id, game_mode)
+);
+```
+
+### Tournament Scores Table
+
+```sql
+CREATE TABLE tournament_scores (
+  tournament_id STRING NOT NULL,
+  user_id STRING NOT NULL,
+  score INT64 NOT NULL,
+  achieved_at TIMESTAMP NOT NULL,
+  composite_score FLOAT64 NOT NULL,
+  last_match_id STRING NOT NULL,
+  updated_at TIMESTAMP NOT NULL,
+  PRIMARY KEY (tournament_id, user_id)
+);
+```
+
+### Idempotency Table
+
+```sql
+CREATE TABLE score_events (
+  event_id STRING NOT NULL,
+  match_id STRING NOT NULL,
+  user_id STRING NOT NULL,
+  status STRING NOT NULL,
+  created_at TIMESTAMP NOT NULL,
+  PRIMARY KEY (event_id, user_id)
+);
+```
+
+## 7. Tie-Breaking
+
+Requirement: if two players have the same score, the player who reached the score first ranks higher.
+
+Use a composite score:
+
+```text
+compositeScore = absoluteScore + tieBreakerFraction
+```
+
+Where `tieBreakerFraction` rewards earlier achievement time without overpowering the absolute score.
+
+Example:
+
+```text
+tieBreakerFraction = 1 - normalize(achievedAtMillis)
+```
+
+In production, avoid fragile floating point precision for very large timestamps. Safer options:
+
+1. Store score and achieved timestamp as separate fields in a DB index.
+2. Encode into a fixed-width integer if score ranges are bounded.
+3. Use Redis member payload or secondary tie-break structure when exact ordering is required.
+
+For interview purposes, explain the tradeoff: Redis ZSET sorts by score first and lexicographically by member for equal scores, so deterministic time-based tie-breaking must be encoded into the ZSET score or handled by a secondary structure.
+
+## 8. Redis Serving Model
+
+### Tournament Leaderboard
+
+Most tournaments can use one ZSET:
+
+```text
+Tournament:{tournamentId}:Leaderboard
+member = userId
+score = compositeScore
+```
+
+Operations:
+
+```text
+ZADD Tournament:{id}:Leaderboard compositeScore userId
+ZREVRANGE Tournament:{id}:Leaderboard 0 49 WITHSCORES
+ZREVRANK Tournament:{id}:Leaderboard userId
+```
+
+### Global Leaderboard
+
+A single global ZSET is risky for 100M users. It creates memory, CPU, and hot-shard problems.
+
+Use score-range buckets:
+
+```text
+Global:Bucket:2400+
+Global:Bucket:2000-2399
+Global:Bucket:1600-1999
+Global:Bucket:1200-1599
+Global:Bucket:0-1199
+```
+
+Also maintain:
+
+```text
+Global:Metadata:Counts
+  2400+      -> 50000
+  2000-2399  -> 1950000
+  1600-1999  -> 18000000
+  1200-1599  -> 50000000
+  0-1199     -> 30000000
+
+User:Profile:{userId}
+  current_score  -> 2150
+  global_bucket  -> 2000-2399
+  country_bucket -> US:2000-2399
+```
+
+### Country Leaderboard
+
+Hybrid approach:
+
+- Small countries: one ZSET per country.
+- Large countries: score-range bucketed ZSETs like global.
+
+## 9. Atomic Redis Update with Lua
+
+When a user moves from one bucket to another, the CDC worker must atomically:
+
+1. Remove user from old bucket.
+2. Add user to new bucket.
+3. Decrement old bucket count.
+4. Increment new bucket count.
+5. Update user routing hash.
+6. Update CDC watermark.
+
+Pseudo-Lua flow:
+
+```lua
+-- KEYS:
+-- 1 oldBucketZset
+-- 2 newBucketZset
+-- 3 metadataCountsHash
+-- 4 userProfileHash
+-- 5 cdcWatermarkKey
+
+-- ARGV:
+-- 1 userId
+-- 2 compositeScore
+-- 3 oldBucket
+-- 4 newBucket
+-- 5 currentScore
+-- 6 commitTimestamp
+
+if ARGV[3] ~= ARGV[4] then
+  redis.call('ZREM', KEYS[1], ARGV[1])
+  redis.call('HINCRBY', KEYS[3], ARGV[3], -1)
+end
+
+redis.call('ZADD', KEYS[2], ARGV[2], ARGV[1])
+redis.call('HINCRBY', KEYS[3], ARGV[4], 1)
+redis.call('HSET', KEYS[4], 'current_score', ARGV[5], 'global_bucket', ARGV[4])
+redis.call('SET', KEYS[5], ARGV[6])
+```
+
+In production, guard against double increments by comparing old bucket value from the user routing hash before applying count updates.
+
+## 10. Read-Your-Writes UX
+
+Problem: DB commit succeeds, but Redis CDC may lag by 200 ms to a few seconds. A player may finish a game and immediately see stale score/rank.
+
+### Solution: Score Receipt + Watermark
+
+1. Score processor commits to DB and returns a commit timestamp or sequence number.
+2. Client includes it in the next leaderboard request:
+
+```http
+X-Min-Leaderboard-Version: 2026-06-24T10:01:02.123Z
+```
+
+3. Leaderboard API checks Redis watermark:
+
+```text
+Leaderboard:Watermark:{scope} = last materialized commit timestamp
+```
+
+4. If watermark is behind, API performs a bounded wait, for example 250–500 ms.
+5. If still behind, API returns a response with:
+
+```json
+{
+  "freshness": "pending",
+  "scoreUpdated": true,
+  "rankMayLag": true
+}
+```
+
+### Frontend Behavior
+
+- Show the player's new score immediately from the game result receipt.
+- Show rank as “updating…” until the leaderboard watermark catches up.
+- Do not show a stale rank as final.
+
+## 11. Hot Key and Mega Tournament Strategy
+
+Mega tournaments can create a hot Redis key and hot API route.
+
+Mitigations:
+
+1. **API local cache**
+   - Cache top 50 for 1–2 seconds in each API instance.
+   - Most spectator traffic hits page one.
+
+2. **CDN / edge cache for anonymous top-N**
+   - Cache public top-N responses for 1 second.
+
+3. **Precomputed snapshots**
+   - Materializer periodically writes `top_50_snapshot` into Redis string or object store.
+
+4. **Fanout service for live viewers**
+   - Instead of every browser polling, clients subscribe to a stream.
+   - API pushes diff updates every 1 second.
+
+5. **Degraded mode**
+   - During peak, show top 50 and “around me” while disabling arbitrary deep pagination.
+
+## 12. Frontend Product Design
+
+### UI Layout
+
+```text
++--------------------------------------------------------------------------------+
+| Tournament Leaderboard                                      Live • 1.2s behind  |
++--------------------------------------------------------------------------------+
+| Tabs: Global | Country | Tournament                                            |
+| Filters: game mode, country, tournament, friends                                |
++--------------------------------------------------------------------------------+
+| Your Rank                                                                      |
+| #1,284    Score 2,150    +15 from last game    Rank updating...                |
++--------------------------------------------------------------------------------+
+| Top Players                                                                    |
+| Rank | Player        | Country | Score | Change | Last Updated                 |
+| 1    | GrandmasterA  | US      | 2850  | +8     | just now                     |
+| 2    | KnightB       | IN      | 2841  | +2     | 2s ago                       |
++--------------------------------------------------------------------------------+
+| Around Me                                                                      |
+| 1279 | ...                                                                         |
+| 1284 | You          | US      | 2150  | +15    | pending rank                 |
++--------------------------------------------------------------------------------+
+```
+
+### FE Data Requirements
+
+The frontend needs more than rows. It needs freshness and rank confidence.
+
+```ts
+export type LeaderboardResponse = {
+  leaderboardId: string;
+  scope: 'global' | 'country' | 'tournament';
+  scopeId?: string;
+  generatedAt: string;
+  materializedVersion: string;
+  freshness: 'fresh' | 'bounded_stale' | 'pending';
+  players: LeaderboardRow[];
+  currentUser?: {
+    rank?: number;
+    score: number;
+    scorePending?: boolean;
+    rankPending?: boolean;
+    lastReceiptVersion?: string;
+  };
+  pagination: {
+    nextCursor?: string;
+    hasMore: boolean;
+  };
+};
+```
+
+### FE State Machine
+
+```text
+idle
+  -> loading initial leaderboard
+  -> ready fresh
+  -> receiving live diffs
+  -> reconnecting
+  -> stale but usable
+  -> degraded polling
+  -> error with retry
+```
+
+### FE Real-Time Strategy
+
+Use a layered approach:
+
+1. Initial page load uses REST.
+2. Live updates use SSE or WebSocket.
+3. On disconnect, keep the last known leaderboard visible.
+4. Fallback to polling every 3–5 seconds.
+5. Use optimistic score display for the current user after a match.
+
+### Why SSE vs WebSocket?
+
+SSE is usually enough because leaderboard updates are mostly server-to-client. WebSocket is useful if the client sends interactive subscription changes frequently or if the same socket powers chat/game updates.
+
+For an interview, choose SSE for simplicity and operational fit:
+
+```http
+GET /v1/leaderboards/{leaderboardId}/stream
+```
+
+Events:
+
+```text
+event: leaderboard.diff
+data: { "version": "123", "updates": [...] }
+
+event: leaderboard.watermark
+data: { "materializedVersion": "124" }
+```
+
+### FE Performance
+
+1. Virtualize rows for long lists.
+2. Memoize row rendering by `userId + score + rank`.
+3. Animate only changed rows, not the entire table.
+4. Keep stable row keys.
+5. Batch diff updates once per animation frame or once per second.
+6. Avoid re-sorting huge lists on the client; server owns rank ordering.
+7. Use skeletons for initial load and stale badges for reconnect.
+
+## 13. API Design
+
+### Top Leaderboard
+
+```http
+GET /v1/leaderboards/global?gameMode=blitz&limit=50&cursor=...
+GET /v1/leaderboards/country/US?gameMode=blitz&limit=50&cursor=...
+GET /v1/leaderboards/tournament/{tournamentId}?limit=50&cursor=...
+```
+
+### Around Me
+
+```http
+GET /v1/leaderboards/global/around-me?userId=u123&window=25
+```
+
+### User Rank
+
+```http
+GET /v1/leaderboards/global/users/u123/rank
+```
+
+### Live Stream
+
+```http
+GET /v1/leaderboards/global/stream?gameMode=blitz
+Accept: text/event-stream
+Last-Event-ID: 12345
+```
+
+### Score Receipt Header
+
+```http
+X-Min-Leaderboard-Version: 2026-06-24T10:01:02.123Z
+```
+
+## 14. Deep Dive: Ranking Algorithms
+
+### Tournament Ranking
+
+For a tournament of 10K–50K users, one ZSET is simple and fast.
+
+```text
+Top 50: ZREVRANGE key 0 49 WITHSCORES
+User rank: ZREVRANK key userId
+Around user: ZREVRANGE key rank-25 rank+25 WITHSCORES
+```
+
+### Global Ranking with Buckets
+
+Because 100M users do not fit cleanly into one hot sorted set, bucket by score range.
+
+Top 50:
+
+1. Start from highest score bucket.
+2. Fetch top rows.
+3. If fewer than limit, continue to next lower bucket.
+4. Merge results, preserving bucket order.
+
+User rank:
+
+1. Read user's bucket from `User:Profile:{userId}`.
+2. Get local rank from that bucket.
+3. Sum all higher bucket counts.
+4. Return `higherCount + localRank + 1`.
+
+Deep pagination:
+
+- Avoid arbitrary offset pagination for huge boards.
+- Use cursor with bucket id + local offset.
+- For “jump to player,” use rank lookup + around-me query.
+
+## 15. Deep Dive: Cache Rebuild
+
+Redis is not source of truth. Rebuild plan:
+
+1. Start shadow Redis cluster.
+2. Scan score DB by partition.
+3. Write ZSETs, bucket counts, and user routing hashes.
+4. Compare sampled ranks between old and new clusters.
+5. Switch reads by config flag.
+6. Keep CDC dual-writing to old and new clusters during migration window.
+
+## 16. Deep Dive: Multi-Tenancy
+
+If this leaderboard platform supports multiple games or tenants:
+
+```text
+Tenant:{tenantId}:GameMode:{mode}:Global:Bucket:{bucketId}
+Tenant:{tenantId}:Tournament:{tournamentId}:Leaderboard
+Tenant:{tenantId}:Country:{countryCode}:Bucket:{bucketId}
+```
+
+Isolation controls:
+
+- Kafka partitioning by `tenantId + leaderboardScope`.
+- Per-tenant rate limits.
+- Per-tenant Redis memory quota.
+- Separate large tenants onto dedicated Redis clusters.
+- Tenant-aware observability dashboards.
+- Blast-radius-aware deployments.
+
+## 17. Deep Dive: Observability
+
+Track:
+
+| Metric                    | Why it matters                    |
+| ------------------------- | --------------------------------- |
+| Score ingestion lag       | Detect Kafka backlog              |
+| DB commit latency         | Protect game-end flow             |
+| CDC lag                   | Determines leaderboard freshness  |
+| Redis command p99         | Read path health                  |
+| Hot key QPS               | Detect mega tournament bottleneck |
+| Rank mismatch sample rate | Catch cache corruption            |
+| SSE connected clients     | Capacity planning                 |
+| Client reconnect rate     | Frontend/network health           |
+
+Alerts:
+
+- CDC lag > 5 seconds for 5 minutes.
+- Redis p99 > 50 ms.
+- Hot key QPS above threshold.
+- Rank mismatch between Redis and DB sample above threshold.
+- SSE reconnect spike.
+
+## 18. Failure Modes and Responses
+
+| Failure               | Impact                        | Mitigation                                     |
+| --------------------- | ----------------------------- | ---------------------------------------------- |
+| Kafka lag             | Scores delayed                | Show pending freshness, autoscale consumers    |
+| Redis node failure    | Leaderboard shard unavailable | Redis cluster replicas, rebuild from DB        |
+| CDC worker crash      | Stale views                   | Resume from checkpoint                         |
+| Hot tournament        | High Redis/API CPU            | local cache, snapshots, stream fanout          |
+| Profile cache miss    | Missing display name          | Return userId fallback and hydrate later       |
+| Duplicate match event | Double score risk             | idempotency table by eventId/userId            |
+| Client disconnect     | UI stops updating             | SSE resume via Last-Event-ID, polling fallback |
+
+## 19. Staff-Level Tradeoffs
+
+### Separate Processors vs Single Processor
+
+**Separate processors**
+
+Pros:
+
+- Independently scale global/country and tournament paths.
+- Different latency and storage strategies per scope.
+- Better blast-radius isolation.
+
+Cons:
+
+- Tournament and global views may update at slightly different times.
+- Requires freshness metadata so UI can explain lag.
+
+**Single processor**
+
+Pros:
+
+- Easier atomicity across all leaderboard scopes.
+- Simpler reasoning for small systems.
+
+Cons:
+
+- Harder to scale independently.
+- One hot path can slow all leaderboard updates.
+
+Recommendation: choose separate processors for large-scale systems, with explicit freshness, watermarking, and observability.
+
+### Redis ZSET vs Database Index
+
+Redis ZSET:
+
+- Excellent low-latency rank operations.
+- Good for high QPS reads.
+- Not durable source of truth.
+
+Database index:
+
+- Durable and consistent.
+- Expensive for high-frequency top-N and rank queries at large scale.
+- Better for backfills, audits, and reconciliation.
+
+Recommendation: DB as source of truth, Redis as serving projection.
+
+### Polling vs SSE vs WebSocket
+
+| Option    | Best for                             | Tradeoff                     |
+| --------- | ------------------------------------ | ---------------------------- |
+| Polling   | Simple, lower scale                  | More waste, slower freshness |
+| SSE       | Server-to-client leaderboard updates | One-way only, but simple     |
+| WebSocket | Bidirectional real-time systems      | More operational complexity  |
+
+Recommendation: REST + SSE, fallback to polling.
+
+## 20. Interview Summary
+
+The core of the design is to separate durable scoring from fast ranking views. Game events are ingested through Kafka, processed idempotently into a transactional source-of-truth database, and materialized asynchronously into Redis sorted sets through CDC. Tournament leaderboards use simple ZSETs, while global leaderboards use score-range buckets plus metadata counts and user routing hashes to avoid scanning 100M users. The frontend treats freshness as a first-class concept: it shows optimistic score updates, rank-pending states, SSE-based diffs, and graceful stale/degraded modes. This gives users a real-time experience without compromising durability or creating dangerous dual-write paths.
