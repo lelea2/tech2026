@@ -120,6 +120,10 @@
       "hash": "164a210d53184162bb64e904a39d084eec6ca4a501bd3f0c261fa664313183ed",
       "docRelative": "tiny-url.png"
     },
+    "system-designs/uber.png": {
+      "hash": "cc28f7fcaee1f7909d048567bb40f52bdece18299457cff6f97b5b7c67e4e8a3",
+      "docRelative": "uber.png"
+    },
     "system-designs/ux-mock.svg": {
       "hash": "9172b514e9baeb4015517f804a34328a2bfce59c5a9dbdb7b4fda0c051ad1c72",
       "docRelative": "ux-mock.svg"
@@ -263,6 +267,10 @@
     "system-designs/ticketmaster.mdx": {
       "hash": "d662f2fd0247f984733ef8cac66bf2bf9ed0f58b37bf4e83c4a610a33ff145b2",
       "docRelative": "ticketmaster.mdx"
+    },
+    "system-designs/uber.mdx": {
+      "hash": "ba18df651de88956a12d8077edaadafee04151c9b05f20feda3a9c6129f1a0bd",
+      "docRelative": "uber.mdx"
     },
     "system-designs/video-netflix.mdx": {
       "hash": "cb28452cce69166a89978e864ae67be516da7d9943dce37a3ed8f5464580bae5",
