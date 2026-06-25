@@ -1,4 +1,28 @@
 /**
+ * Interview question:
+ * Design a small spreadsheet engine.
+ *
+ * Requirements:
+ * - setCell(cellId, input) stores either a number or a formula string.
+ * - getCell(cellId) returns the computed value for that cell.
+ * - Formulas start with "=" and may reference other cells.
+ * - Support numeric literals and +, -, *, / operators.
+ * - Detect self, direct, and indirect cycles.
+ *
+ * Example:
+ *   A1 = 10
+ *   B1 = "=A1 + 5"
+ *   getCell("B1") returns 15
+ *
+ * Core idea:
+ * Treat formulas as a dependency graph. Each cell can depend on other cells.
+ * Evaluating a cell is a DFS through that graph. `memo` avoids recomputing
+ * cells during one read, and `activePath` detects cycles in the current DFS path.
+ *
+ * Important simplification:
+ * This implementation evaluates formulas strictly left-to-right. It does not
+ * implement normal math precedence where * and / happen before + and -.
+ *
  * Spreadsheet III: supports numeric literals and formulas with +, -, *, /,
  * and detects direct/indirect/self cycles.
  *
@@ -6,11 +30,19 @@
  */
 export default class Spreadsheet {
   constructor() {
-    // Stores raw inputs (number or formula string) by cell id.
+    // Stores raw inputs by cell id. We store the original formula string instead
+    // of only the computed value because dependencies may change later.
     this.cells = new Map();
   }
 
   /**
+	 * Store or overwrite one cell.
+	 *
+	 * Interview explanation:
+	 * setCell does not eagerly recompute dependent cells. We use lazy evaluation:
+	 * values are calculated when getCell is called. This keeps writes simple and
+	 * avoids needing a reverse dependency graph for invalidation.
+	 *
 	 * @param {string} cellId
 	 * @param {number | string} input
 	 * @returns {void}
@@ -20,6 +52,12 @@ export default class Spreadsheet {
   }
 
   /**
+	 * Return the current computed value of a cell.
+	 *
+	 * Interview explanation:
+	 * Each getCell call creates fresh memo and activePath structures so the result
+	 * always reflects the current spreadsheet state.
+	 *
 	 * @param {string} cellId
 	 * @returns {number | '#CYCLE!'}
 	 */
@@ -29,6 +67,20 @@ export default class Spreadsheet {
   }
 
   /**
+	 * DFS evaluator for a cell.
+	 *
+	 * memo:
+	 *   Caches values already computed during this getCell call.
+	 *
+	 * activePath:
+	 *   Tracks the recursion stack. If we try to evaluate a cell already in this
+	 *   set, we found a cycle.
+	 *
+	 * Example cycle:
+	 *   A1 -> B1 -> C1 -> A1
+	 * When evaluating C1 and resolving A1, A1 is still in activePath, so the
+	 * engine returns '#CYCLE!'.
+	 *
 	 * @param {string} cellId
 	 * @param {Map<string, number | '#CYCLE!'>} memo
 	 * @param {Set<string>} activePath
@@ -52,13 +104,15 @@ export default class Spreadsheet {
     const raw = this.cells.get(cellId);
 
     if (raw === undefined) {
-      // Unset cells behave as 0.
+      // Interview choice: unset cells behave as 0, similar to many spreadsheet
+      // coding interview variants.
       memo.set(cellId, 0);
       activePath.delete(cellId);
       return 0;
     }
 
     if (typeof raw === 'number') {
+      // Numeric literals are base cases in the dependency graph.
       memo.set(cellId, raw);
       activePath.delete(cellId);
       return raw;
@@ -74,9 +128,11 @@ export default class Spreadsheet {
     }
 
     // Tokenize formula and evaluate strictly left-to-right.
+    // Example: "=A1 - 2 * 3" becomes ["A1", "-", "2", "*", "3"].
     const expression = raw.slice(1).replace(/\s+/g, '');
     const tokens = expression.match(/[A-Z]+\d+|\d+(?:\.\d+)?|[+\-*/]/g) || [];
 
+    // Resolve the first operand, then apply operator/right-operand pairs.
     let result = this.#resolveOperand(tokens[0], memo, activePath);
 
     if (result === '#CYCLE!') {
@@ -108,6 +164,8 @@ export default class Spreadsheet {
       }
     }
 
+    // Cache the computed result before returning so another cell in this same
+    // getCell call can reuse it.
     memo.set(cellId, result);
     // Done evaluating this branch.
     activePath.delete(cellId);
@@ -115,6 +173,12 @@ export default class Spreadsheet {
   }
 
   /**
+	 * Convert one formula token into a number.
+	 *
+	 * A token can be:
+	 * - a numeric literal like "10" or "3.5"
+	 * - a cell reference like "A1"
+	 *
 	 * @param {string} token
 	 * @param {Map<string, number | '#CYCLE!'>} memo
 	 * @param {Set<string>} activePath

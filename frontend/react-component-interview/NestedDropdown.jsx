@@ -1,0 +1,221 @@
+// https://app.coderpad.io/JKXWYXKX
+import React, {useState, useMemo, useRef, useEffect} from "react";
+
+const options = [
+  {
+    id: "frontend",
+    label: "Frontend",
+    children: [
+      { id: "react", label: "React" },
+      { id: "vue", label: "Vue" },
+      { id: "angular", label: "Angular" },
+    ],
+  },
+  {
+    id: "backend",
+    label: "Backend",
+    children: [
+      { id: "node", label: "Node.js" },
+      { id: "java", label: "Java" },
+      { id: "python", label: "Python" },
+    ],
+  },
+  {
+    id: "design",
+    label: "Design",
+  },
+];
+
+function getAllChildIds(option) {
+  if (!option.children) {
+    return [option.id];
+  }
+  return option.children.flatMap(getAllChildIds);
+}
+
+// flatten to get all ids
+function flattenOptions(options) {
+  const result = [];
+  function walk(option, parentId = null) {
+    result.push({
+      id: option.id,
+      label: option.label,
+      parentId,
+      hasChildren: Boolean(option.children?.length)
+    });
+    option.children?.forEach((child) => walk(child, option.id));
+  }
+  options.forEach((option) => walk(option));
+  return result;
+}
+
+function Checkbox({
+  checked,
+  isdeterminate,
+  onChange
+}) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.isdeterminate = isdeterminate;
+    }
+  });
+
+  return (
+    <input
+      ref={ref}
+      type="checkbox"
+      checked={checked}
+      onChange={onChange}
+    />
+  );
+}
+
+function NestedOption({
+  option,
+  selectedIds,
+  expandedIds,
+  onToggleSelect,
+  onToggleExpand,
+  depth = 0
+}) {
+  const hasChildren = Boolean(option.children?.length);
+  const childIds = getAllChildIds(option);
+
+  const selectedChildCount = childIds.filter((id) => selectedIds.has(id)).length;
+  const isdeterminate = selectedChildCount > 0 && selectedChildCount < childIds.length; 
+
+  const isExpanded = expandedIds.has(option.id);
+  const isChecked = selectedChildCount === childIds.length;
+
+  return (
+    <div>
+      <div style={{padding: depth * 16 + 8}}>
+        {hasChildren ? (
+          <button onClick={() => onToggleExpand(option.id)}>
+            {isExpanded ? '<' : '>'}
+          </button>
+        ) : <></>}
+        <Checkbox
+          checked={isChecked}
+          isdeterminate={isdeterminate}
+          onChange={() => onToggleSelect(option)}
+        />
+        <span onClick={() => onToggleSelect(option)}>{option.label}</span>
+      </div>
+      {hasChildren && isExpanded && (
+        <div>
+          {option.children.map((child) => (
+            <NestedOption
+              key={child.id}
+              option={child}
+              selectedIds={selectedIds}
+              expandedIds={expandedIds}
+              onToggleExpand={onToggleExpand}
+              onToggleSelect={onToggleSelect}
+              depth={depth+1}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+
+export default function NestedMultiSelected() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set([]));
+  const [expandedIds, setExpandedIds] = useState(new Set([]));
+
+  const flatOptions = useMemo(() => flattenOptions(options), []);
+
+  const selectItems = useMemo(() => {
+    return flatOptions.filter((item) => {
+      const isLeaf = !item.hasChildren;
+      return isLeaf && selectedIds.has(item.id);
+    });
+  }, [flatOptions, selectedIds]);
+
+  function toggleExpand(id) {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
+  function toggleSelect(option) {
+    const idsToToggle = getAllChildIds(option);
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      const allSelected = idsToToggle.every(id => next.has(id));
+      if (allSelected) {
+        idsToToggle.forEach((id) => next.delete(id));
+      } else {
+        idsToToggle.forEach((id) => next.add(id));
+      }
+      return next;
+    })
+  };
+  
+  function removeSelected(id) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }
+
+  function clearAll() {
+    setSelectedIds(new Set());
+  }
+
+  return (
+    <div>
+      Hello
+      <div 
+        onClick={() => setIsOpen(prev => !prev)}
+        style={{
+          cursor: "pointer"
+        }}
+      >
+        {selectItems.length === 0 ? (
+          <span>Select items...</span>
+        ) :(
+          selectItems.map(item => (
+            <span
+              key={item.id}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {item.label}
+              <button
+                type="button"
+                onClick={() => removeSelected(item.id)}
+              >x</button>
+            </span>
+          ))
+        )}
+      </div>
+      {isOpen && (
+        <div>
+          {options.map(option => (
+            <NestedOption
+              key={option.id}
+              option={option}
+              selectedIds={selectedIds}
+              expandedIds={expandedIds}
+              onToggleExpand={toggleExpand}
+              onToggleSelect={toggleSelect}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

@@ -745,7 +745,7 @@
       "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetII.mdx"
     },
     "frontend/jsfunction/spreadSheet/spreadSheetIII.js": {
-      "hash": "daa9e1e409296d1be4e7c4f5785445f01e53b3d70c4cb2cbf66e9f8613a5a219",
+      "hash": "ad5d8504c61dddf9583a21cde564ed0a7503cbb51d916b8758beeeb88130fb1c",
       "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetIII.mdx"
     },
     "frontend/jsfunction/styledTextRange/styledTextRange.js": {
@@ -815,6 +815,22 @@
     "frontend/jsfunction/undoRedoManager/UndoRedoManagerWithDraftCommit.js": {
       "hash": "0e1a49fd440c1e76c4d6f8c142d96c68a8685efc24e8122aca5299be3a57e2ed",
       "docRelative": "frontend/jsfunction/undoRedoManager/UndoRedoManagerWithDraftCommit.mdx"
+    },
+    "frontend/react-component/CodeDiff.jsx": {
+      "hash": "0df535b4becdd6247f0cb8c1fa4bf736f04a4805c9addc386ddae4902f9831c4",
+      "docRelative": "frontend/react-component/CodeDiff.mdx"
+    },
+    "frontend/react-component/FileExplorer.jsx": {
+      "hash": "72efd9c4927cd9e1187adf93bc18477aeb3b2af0bfe0b0251ee6da677e3fb123",
+      "docRelative": "frontend/react-component/FileExplorer.mdx"
+    },
+    "frontend/react-component/NestedDropdown.jsx": {
+      "hash": "d665aad6c2fe5863eaee8b859ff5a9cb23dbdf23d5ef0858ca693f8b46de8988",
+      "docRelative": "frontend/react-component/NestedDropdown.mdx"
+    },
+    "frontend/react-component/VirtualList.jsx": {
+      "hash": "d597f5abc8e1d7ddd4b4e0fc88744468087b31ed0c4322e7408f8a2eb6a09dad",
+      "docRelative": "frontend/react-component/VirtualList.mdx"
     },
     "frontend/react_hooks_bug_fix_interview_guide.mdx": {
       "hash": "bb5e29cb954bd8d70b210256aff5763cc4f4c53d97f67fbfcda355f2bd693e84",
@@ -939,6 +955,10 @@
     "frontend/uicoding/ui-prototype-js/file-explorer/FileExplorer.js": {
       "hash": "17198aae5f785081ba6a4408136b3b613717befcc56aa48f5c64e66007f915e2",
       "docRelative": "frontend/uicoding/ui-prototype-js/file-explorer/FileExplorer.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/file-explorer/data.js": {
+      "hash": "0b0e638dad9318a9c9d54d2f6785523fa461a58a562d73dfd115e5e01d571789",
+      "docRelative": "frontend/uicoding/ui-prototype-js/file-explorer/data.mdx"
     },
     "frontend/uicoding/ui-prototype-js/generate-table/GenerateTable.js": {
       "hash": "4dd3ea0be7e5002d5d9623052573b53d7637b714b149877c8a379e647d39112e",
@@ -1637,7 +1657,7 @@
       "docRelative": "backend/quizzes/_index.mdx"
     },
     "__nav__:frontend": {
-      "hash": "5e919e1ef0009819973034d3f48b2ddf23afa89659c1844052d8873d85fe6fa9",
+      "hash": "3c39d5874b822727f27fe9744da15f495f43ad7bf0e25cdca9420ce14e193e76",
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/css": {
@@ -1764,6 +1784,10 @@
       "hash": "281e9ddbd2a9c9632d8687b4f41db3e7e27c846f7ddcbe2df776e8afe9f511c7",
       "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
     },
+    "__nav__:frontend/react-component": {
+      "hash": "86280b3503d0435b15fe671a9c9a16740b7c45a98d55c4cac8d9ac63f9652363",
+      "docRelative": "frontend/react-component/_index.mdx"
+    },
     "__nav__:frontend/uicoding": {
       "hash": "7ea76ce4b289bc5db134857157c4a12b44375f098d85d786a335c0b31bdf9f1c",
       "docRelative": "frontend/uicoding/_index.mdx"
@@ -1821,7 +1845,7 @@
       "docRelative": "frontend/uicoding/ui-prototype-js/draggable-cell/_index.mdx"
     },
     "__nav__:frontend/uicoding/ui-prototype-js/file-explorer": {
-      "hash": "b8846cd33c154cbd7786cbd79f68146e82b2f7ba3067ad64fe0f48ce87db632b",
+      "hash": "bbb4a57cc12b6161b547d25abdef23924d2e2974dfdf5591badc6ad7b8eab285",
       "docRelative": "frontend/uicoding/ui-prototype-js/file-explorer/_index.mdx"
     },
     "__nav__:frontend/uicoding/ui-prototype-js/generate-table": {
