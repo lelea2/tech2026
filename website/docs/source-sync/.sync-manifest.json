@@ -365,7 +365,7 @@
       "docRelative": "frontend/jsfunction/hooks/useCycle.mdx"
     },
     "frontend/jsfunction/hooks/useDebounce.js": {
-      "hash": "2c1d6b0162900754e6b3a7e00ea80fa9832280d94fb8f11c6ca4188c226be377",
+      "hash": "09b04ea71f90c40b2afce0a575de4377a975274781ac0f9383e21ce16aaf6014",
       "docRelative": "frontend/jsfunction/hooks/useDebounce.mdx"
     },
     "frontend/jsfunction/hooks/useDefault.js": {
@@ -816,21 +816,61 @@
       "hash": "0e1a49fd440c1e76c4d6f8c142d96c68a8685efc24e8122aca5299be3a57e2ed",
       "docRelative": "frontend/jsfunction/undoRedoManager/UndoRedoManagerWithDraftCommit.mdx"
     },
-    "frontend/react-component/CodeDiff.jsx": {
-      "hash": "0df535b4becdd6247f0cb8c1fa4bf736f04a4805c9addc386ddae4902f9831c4",
-      "docRelative": "frontend/react-component/CodeDiff.mdx"
+    "frontend/react-component-interview/CodeDiff.jsx": {
+      "hash": "33831f66efdc9cf94a29131e9319ab9843fb4ac080460a747fa052d79fc817e3",
+      "docRelative": "frontend/react-component-interview/CodeDiff.mdx"
     },
-    "frontend/react-component/FileExplorer.jsx": {
-      "hash": "72efd9c4927cd9e1187adf93bc18477aeb3b2af0bfe0b0251ee6da677e3fb123",
-      "docRelative": "frontend/react-component/FileExplorer.mdx"
+    "frontend/react-component-interview/FileExplorer.jsx": {
+      "hash": "a0921a38d43bf529dc6488f551a0b1ef2dd7e756cc8edd2a3780466afc52eb48",
+      "docRelative": "frontend/react-component-interview/FileExplorer.mdx"
     },
-    "frontend/react-component/NestedDropdown.jsx": {
-      "hash": "d665aad6c2fe5863eaee8b859ff5a9cb23dbdf23d5ef0858ca693f8b46de8988",
-      "docRelative": "frontend/react-component/NestedDropdown.mdx"
+    "frontend/react-component-interview/GenericForm.jsx": {
+      "hash": "893c0c017d1be1ffd2197cc733699e77bdb2de2f326e158723d0187668f3ce7f",
+      "docRelative": "frontend/react-component-interview/GenericForm.mdx"
     },
-    "frontend/react-component/VirtualList.jsx": {
-      "hash": "d597f5abc8e1d7ddd4b4e0fc88744468087b31ed0c4322e7408f8a2eb6a09dad",
-      "docRelative": "frontend/react-component/VirtualList.mdx"
+    "frontend/react-component-interview/NestedDropdown.jsx": {
+      "hash": "f38c8205692e201522e3fe64604f2623f4bb79e4153a6006d61f3be82679a98e",
+      "docRelative": "frontend/react-component-interview/NestedDropdown.mdx"
+    },
+    "frontend/react-component-interview/VirtualList.jsx": {
+      "hash": "9b0f73554476e26ddca8ef161402c7bd44ab5583a4c2d4cfc60fff050b0cab8e",
+      "docRelative": "frontend/react-component-interview/VirtualList.mdx"
+    },
+    "frontend/react-component-interview/hooks/useAsync.js": {
+      "hash": "7ee1853e60a3ebef31ac87619bcecc8ab277f8d72ab5e2c345c6e58fc11dbeea",
+      "docRelative": "frontend/react-component-interview/hooks/useAsync.mdx"
+    },
+    "frontend/react-component-interview/hooks/useDebouncedValue.js": {
+      "hash": "e60d209371fbaa3785a8602f52f3b3f44a4703be6c85b3fa66f7cc2d33b042bc",
+      "docRelative": "frontend/react-component-interview/hooks/useDebouncedValue.mdx"
+    },
+    "frontend/react-component-interview/hooks/useForm.js": {
+      "hash": "f376561852117aef0de6d6738373786d70a37fca039daa78e938000e35666eeb",
+      "docRelative": "frontend/react-component-interview/hooks/useForm.mdx"
+    },
+    "frontend/react-component-interview/hooks/useInfiniteScroll.js": {
+      "hash": "779b87968e586199a0f6315452f00791e38ec016bfccfb3c1ec7e6d5a4930bc6",
+      "docRelative": "frontend/react-component-interview/hooks/useInfiniteScroll.mdx"
+    },
+    "frontend/react-component-interview/hooks/useLocalStorage.js": {
+      "hash": "424424baeab4c628296f785d94360c9469df5f08d8050f8557cac3d27891d21d",
+      "docRelative": "frontend/react-component-interview/hooks/useLocalStorage.mdx"
+    },
+    "frontend/react-component-interview/hooks/useOptimisticMutation.js": {
+      "hash": "9530261cbf3fba1efcb881660171a6c5dfed13aa0ec0c46ef8c49bc540ffa6a6",
+      "docRelative": "frontend/react-component-interview/hooks/useOptimisticMutation.mdx"
+    },
+    "frontend/react-component-interview/hooks/usePolling.js": {
+      "hash": "c5af1a9c4e8863d1919c156fe7c2f64f057cf313fde64a8ea3d1ce253837fe9e",
+      "docRelative": "frontend/react-component-interview/hooks/usePolling.mdx"
+    },
+    "frontend/react-component-interview/hooks/usePrevious.js": {
+      "hash": "53f55b2ea32066da7db25429d1f952f4dd50616e69bd9882088ec50b490a98e8",
+      "docRelative": "frontend/react-component-interview/hooks/usePrevious.mdx"
+    },
+    "frontend/react-component-interview/hooks/useUndoRedo.js": {
+      "hash": "83a28c103650b500aef7cf257f8260221f921da67b85a203d83c106995c9bd10",
+      "docRelative": "frontend/react-component-interview/hooks/useUndoRedo.mdx"
     },
     "frontend/react_hooks_bug_fix_interview_guide.mdx": {
       "hash": "bb5e29cb954bd8d70b210256aff5763cc4f4c53d97f67fbfcda355f2bd693e84",
@@ -1657,7 +1697,7 @@
       "docRelative": "backend/quizzes/_index.mdx"
     },
     "__nav__:frontend": {
-      "hash": "3c39d5874b822727f27fe9744da15f495f43ad7bf0e25cdca9420ce14e193e76",
+      "hash": "c929be07265cbc56211c9c903d58fb88ae79baec5b8ecbc1139ae38aed6ede55",
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/css": {
@@ -1784,9 +1824,13 @@
       "hash": "281e9ddbd2a9c9632d8687b4f41db3e7e27c846f7ddcbe2df776e8afe9f511c7",
       "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
     },
-    "__nav__:frontend/react-component": {
-      "hash": "86280b3503d0435b15fe671a9c9a16740b7c45a98d55c4cac8d9ac63f9652363",
-      "docRelative": "frontend/react-component/_index.mdx"
+    "__nav__:frontend/react-component-interview": {
+      "hash": "c6b16881205e1808ca787fd0b7581bf52284cc01af1649805211e1c630bad7a6",
+      "docRelative": "frontend/react-component-interview/_index.mdx"
+    },
+    "__nav__:frontend/react-component-interview/hooks": {
+      "hash": "01cc068cce9983e7630fe3e0c586b9292bddd629cbfc5d260fa1915c82fd2785",
+      "docRelative": "frontend/react-component-interview/hooks/_index.mdx"
     },
     "__nav__:frontend/uicoding": {
       "hash": "7ea76ce4b289bc5db134857157c4a12b44375f098d85d786a335c0b31bdf9f1c",

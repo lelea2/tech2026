@@ -6,7 +6,6 @@ import {useRef, useEffect} from 'react';
  * @param {T} value
  * @param {number} delay
  */
-import {useRef, useEffect, useState} from 'react';
 
 export default function useDebounce(value, delay) {
   const timeoutRef = useRef();

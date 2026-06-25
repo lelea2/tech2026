@@ -1,0 +1,135 @@
+import React, {useState, useRef, useCallback} from "react";
+
+export function useOptimisticMutation({
+  initialData,
+  updateOptimistically,
+  mutationFn,
+  mergeServerData,
+  onSuccess,
+  onError,
+}) {
+  const [data, setData] = useState(initialData);
+  const [error, setError] = useState(null);
+  const [isMutating, setIsMutating] = useState(false);
+
+  const latestDataRef = useRef(data);
+
+  useEffect(() => {
+    latestDataRef.current = data;
+  }, [data]);
+
+  const mutate = useCallback(
+    async (variables) => {
+      const previousData = latestDataRef.current;
+      const optimisticData = updateOptimistically(previousData, variables);
+
+      setData(optimisticData);
+      setError(null);
+      setIsMutating(true);
+
+      try {
+        const serverData = await mutationFn(variables);
+
+        const nextData = mergeServerData
+          ? mergeServerData(optimisticData, serverData)
+          : serverData;
+
+        setData(nextData);
+
+        if (onSuccess) {
+          onSuccess(nextData);
+        }
+
+        return nextData;
+      } catch (err) {
+        const normalizedError =
+          err instanceof Error ? err : new Error(String(err));
+
+        setData(previousData);
+        setError(normalizedError);
+
+        if (onError) {
+          onError(normalizedError, previousData);
+        }
+
+        throw normalizedError;
+      } finally {
+        setIsMutating(false);
+      }
+    },
+    [
+      updateOptimistically,
+      mutationFn,
+      mergeServerData,
+      onSuccess,
+      onError,
+    ]
+  );
+
+  const reset = useCallback(
+    (nextData = initialData) => {
+      setData(nextData);
+      setError(null);
+      setIsMutating(false);
+    },
+    [initialData]
+  );
+
+  return {
+    data,
+    setData,
+    mutate,
+    reset,
+    error,
+    isMutating,
+  };
+}
+
+// Example usage
+function TodoList() {
+  const todos = useOptimisticMutation({
+    initialData: [],
+
+    updateOptimistically(currentTodos, variables) {
+      return [
+        ...currentTodos,
+        {
+          id: `temp-${Date.now()}`,
+          text: variables.text,
+          completed: false,
+        },
+      ];
+    },
+
+    async mutationFn(variables) {
+      const response = await fetch("/api/todos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(variables),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create todo");
+      }
+
+      return response.json();
+    },
+  });
+
+  return (
+    <div>
+      <button onClick={() => todos.mutate({ text: "New todo" })}>
+        Add Todo
+      </button>
+
+      {todos.isMutating && <p>Saving...</p>}
+      {todos.error && <p>{todos.error.message}</p>}
+
+      {todos.data.map((todo) => (
+        <div key={todo.id}>{todo.text}</div>
+      ))}
+    </div>
+  );
+}
