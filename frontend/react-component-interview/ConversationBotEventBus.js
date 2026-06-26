@@ -1,0 +1,378 @@
+/**
+ * ============================================================
+ * VERSION 2: Improved version with EventBus
+ * ============================================================
+ *
+ * Adds:
+ * - EventBus
+ * - Multi-channel support
+ * - Bots subscribe to COMMAND_RECEIVED
+ * - Bots publish domain events
+ */
+
+/**
+ * ============================================================
+ * STEP 1: Reuse parseCommand
+ * ============================================================
+ */
+
+function parseCommandV2(input) {
+  const trimmed = input.trim();
+
+  if (!trimmed.startsWith("/")) {
+    return null;
+  }
+
+  const [name, ...args] = trimmed.slice(1).split(/\s+/);
+
+  return {
+    name,
+    args,
+    raw: input,
+    handled: false,
+  };
+}
+
+/**
+ * ============================================================
+ * STEP 2: EventBus
+ Without eventBus
+ * User types /givetaco Sarah
+        ↓
+Conversation parses command
+        ↓
+Conversation finds TacoBot
+        ↓
+TacoBot updates Sarah's taco count
+        ↓
+TacoBot adds message
+// With EventBus, handle mutiple things with same actions
+ * ============================================================
+ */
+
+class EventBus {
+  constructor() {
+    this.listeners = new Map();
+  }
+
+  subscribe(eventType, handler) {
+    if (!this.listeners.has(eventType)) {
+      this.listeners.set(eventType, new Set());
+    }
+
+    this.listeners.get(eventType).add(handler);
+
+    return () => {
+      this.listeners.get(eventType).delete(handler);
+    };
+  }
+
+  publish(event) {
+    const handlers = this.listeners.get(event.type) || [];
+
+    for (const handler of handlers) {
+      handler(event);
+    }
+  }
+}
+
+/**
+ * ============================================================
+ * STEP 3: Multi-channel Conversation
+ * ============================================================
+ */
+
+class EventedConversation {
+  constructor({ currentUser, bots = [], eventBus = new EventBus() }) {
+    this.currentUser = currentUser;
+    this.bots = bots;
+    this.eventBus = eventBus;
+
+    this.users = new Map();
+    this.channels = new Map();
+
+    this.addUser(currentUser);
+    this.registerBots();
+  }
+
+  registerBots() {
+    for (const bot of this.bots) {
+      bot.register(this.eventBus, this);
+    }
+  }
+
+  addUser(name) {
+    if (!this.users.has(name)) {
+      this.users.set(name, {
+        name,
+        awayMessage: null,
+        tacos: 0,
+      });
+    }
+
+    return this.users.get(name);
+  }
+
+  addChannel(channelId) {
+    if (!this.channels.has(channelId)) {
+      this.channels.set(channelId, []);
+    }
+  }
+
+  addMessage(channelId, message) {
+    this.addChannel(channelId);
+    this.channels.get(channelId).push(message);
+
+    this.eventBus.publish({
+      type: "MESSAGE_ADDED",
+      channelId,
+      message,
+    });
+  }
+
+  send(channelId, input) {
+    this.addChannel(channelId);
+
+    const command = parseCommandV2(input);
+
+    if (!command) {
+      this.addMessage(channelId, {
+        type: "message",
+        from: this.currentUser,
+        text: input,
+      });
+
+      return this.snapshot(channelId);
+    }
+
+    this.eventBus.publish({
+      type: "COMMAND_RECEIVED",
+      channelId,
+      user: this.currentUser,
+      command,
+    });
+
+    if (!command.handled) {
+      this.addMessage(channelId, {
+        type: "error",
+        text: `Unknown command: /${command.name}`,
+      });
+    }
+
+    return this.snapshot(channelId);
+  }
+
+  markHandled(command) {
+    command.handled = true;
+  }
+
+  snapshot(channelId) {
+    this.addChannel(channelId);
+
+    return {
+      currentUser: this.currentUser,
+      channelId,
+      users: Array.from(this.users.values()),
+      messages: [...this.channels.get(channelId)],
+    };
+  }
+}
+
+/**
+ * ============================================================
+ * STEP 4: Evented Bots
+ * ============================================================
+ */
+
+class EventedAwayBot {
+  register(eventBus, conversation) {
+    eventBus.subscribe("COMMAND_RECEIVED", (event) => {
+      if (event.command.name !== "away") return;
+
+      conversation.markHandled(event.command);
+
+      const awayMessage = event.command.args.join(" ") || "away";
+
+      const user = conversation.addUser(event.user);
+      user.awayMessage = awayMessage;
+
+      conversation.addMessage(event.channelId, {
+        type: "bot",
+        bot: "AwayBot",
+        text: `${event.user} is away: ${awayMessage}`,
+      });
+
+      eventBus.publish({
+        type: "AWAY_SET",
+        channelId: event.channelId,
+        user: event.user,
+        awayMessage,
+      });
+    });
+  }
+}
+
+class EventedMeetBot {
+  register(eventBus, conversation) {
+    eventBus.subscribe("COMMAND_RECEIVED", (event) => {
+      if (event.command.name !== "meet") return;
+
+      conversation.markHandled(event.command);
+
+      const person = event.command.args[0];
+
+      if (!person) {
+        conversation.addMessage(event.channelId, {
+          type: "error",
+          text: "Usage: /meet <person>",
+        });
+        return;
+      }
+
+      conversation.addUser(person);
+
+      conversation.addMessage(event.channelId, {
+        type: "bot",
+        bot: "MeetBot",
+        text: `Meeting scheduled with ${person}`,
+      });
+
+      eventBus.publish({
+        type: "MEETING_CREATED",
+        channelId: event.channelId,
+        createdBy: event.user,
+        person,
+      });
+    });
+  }
+}
+
+class EventedTacoBot {
+  register(eventBus, conversation) {
+    eventBus.subscribe("COMMAND_RECEIVED", (event) => {
+      if (event.command.name !== "givetaco") return;
+
+      conversation.markHandled(event.command);
+
+      const person = event.command.args[0];
+
+      if (!person) {
+        conversation.addMessage(event.channelId, {
+          type: "error",
+          text: "Usage: /givetaco <person>",
+        });
+        return;
+      }
+
+      const user = conversation.addUser(person);
+      user.tacos += 1;
+
+      conversation.addMessage(event.channelId, {
+        type: "bot",
+        bot: "TacoBot",
+        text: `${person} received a taco 🌮`,
+      });
+
+      eventBus.publish({
+        type: "TACO_GIVEN",
+        channelId: event.channelId,
+        from: event.user,
+        to: person,
+      });
+    });
+  }
+}
+
+/**
+ * ============================================================
+ * STEP 5: Tests for EventBus version
+ * ============================================================
+ */
+function assertEqual(actual, expected, label) {
+  const pass = JSON.stringify(actual) === JSON.stringify(expected);
+
+  if (!pass) {
+    console.error(`❌ ${label}`);
+    console.error("Expected:", expected);
+    console.error("Actual:", actual);
+    return;
+  }
+
+  console.log(`✅ ${label}`);
+}
+
+function assert(condition, label) {
+  if (!condition) {
+    console.error(`❌ ${label}`);
+    return;
+  }
+
+  console.log(`✅ ${label}`);
+}
+
+function runVersion2Tests() {
+  console.log("\nRunning Version 2 EventBus tests...\n");
+
+  const eventBus = new EventBus();
+
+  let tacoEventSeen = false;
+
+  eventBus.subscribe("TACO_GIVEN", (event) => {
+    tacoEventSeen = event.to === "Sarah";
+  });
+
+  const conversation = new EventedConversation({
+    currentUser: "Khanh",
+    eventBus,
+    bots: [new EventedAwayBot(), new EventedMeetBot(), new EventedTacoBot()],
+  });
+
+  let state = conversation.send("general", "/givetaco Sarah");
+
+  assertEqual(
+    state.users.find((user) => user.name === "Sarah").tacos,
+    1,
+    "EventBus version increments tacos"
+  );
+
+  assertEqual(
+    tacoEventSeen,
+    true,
+    "EventBus publishes TACO_GIVEN event"
+  );
+
+  conversation.send("random", "hello random");
+
+  const generalState = conversation.snapshot("general");
+  const randomState = conversation.snapshot("random");
+
+  assertEqual(
+    generalState.messages.at(-1).text,
+    "Sarah received a taco 🌮",
+    "general channel keeps taco message"
+  );
+
+  assertEqual(
+    randomState.messages.at(-1).text,
+    "hello random",
+    "random channel keeps its own message"
+  );
+
+  state = conversation.send("general", "/away lunch");
+
+  assertEqual(
+    state.users.find((user) => user.name === "Khanh").awayMessage,
+    "lunch",
+    "EventBus version supports /away"
+  );
+
+  state = conversation.send("general", "/unknown");
+
+  assertEqual(
+    state.messages.at(-1).text,
+    "Unknown command: /unknown",
+    "EventBus version handles unknown commands"
+  );
+}
+
+runVersion2Tests();

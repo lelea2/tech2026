@@ -840,6 +840,14 @@
       "hash": "33831f66efdc9cf94a29131e9319ab9843fb4ac080460a747fa052d79fc817e3",
       "docRelative": "frontend/react-component-interview/CodeDiff.mdx"
     },
+    "frontend/react-component-interview/ConversationBotEventBus.js": {
+      "hash": "8b3ad76028f976444e4fea9b71b6a5ab048c72b5752d7057b4df70f53679f0c0",
+      "docRelative": "frontend/react-component-interview/ConversationBotEventBus.mdx"
+    },
+    "frontend/react-component-interview/CoversationBot.js": {
+      "hash": "bc25b67a8a34d8d1325273f25cfffdb036bce8b3a108a03ff5291676d0661b39",
+      "docRelative": "frontend/react-component-interview/CoversationBot.mdx"
+    },
     "frontend/react-component-interview/FileExplorer.jsx": {
       "hash": "a0921a38d43bf529dc6488f551a0b1ef2dd7e756cc8edd2a3780466afc52eb48",
       "docRelative": "frontend/react-component-interview/FileExplorer.mdx"
@@ -1865,7 +1873,7 @@
       "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
     },
     "__nav__:frontend/react-component-interview": {
-      "hash": "06eb6277efb4b505f2cdbcee8c6efcc13c4a701f47cbfd173848e7238db65792",
+      "hash": "78389e3b418594123fd8a3965f4a5ce458e6e25a329a124c8d42baaf5b19903f",
       "docRelative": "frontend/react-component-interview/_index.mdx"
     },
     "__nav__:frontend/react-component-interview/hooks": {
