@@ -872,6 +872,10 @@
       "hash": "0c54fa018e3f8f58f9b4b2fc3535f6f194b89418cdfb59c2b9b41501fc9c01d9",
       "docRelative": "frontend/react-component-interview/PlayGround.mdx"
     },
+    "frontend/react-component-interview/PlaygroundReducer.jsx": {
+      "hash": "1f5043db31f8b7bff6f4b4adfcb90dae312e1ce7a7d8237d42813bde0ec17292",
+      "docRelative": "frontend/react-component-interview/PlaygroundReducer.mdx"
+    },
     "frontend/react-component-interview/SimpleChatReducer.jsx": {
       "hash": "f0a8619c2f217f15f3d8bea91ffb17cb2a05e357320224ac36dc511c99e47978",
       "docRelative": "frontend/react-component-interview/SimpleChatReducer.mdx"
@@ -1873,7 +1877,7 @@
       "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
     },
     "__nav__:frontend/react-component-interview": {
-      "hash": "78389e3b418594123fd8a3965f4a5ce458e6e25a329a124c8d42baaf5b19903f",
+      "hash": "7e9dae95a187ba2d2618dae9653cf16cb29fa8e87a5661a2a87dea150274b2f4",
       "docRelative": "frontend/react-component-interview/_index.mdx"
     },
     "__nav__:frontend/react-component-interview/hooks": {
