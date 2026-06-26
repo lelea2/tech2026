@@ -5,97 +5,102 @@ title: useAsync
 # useAsync
 
 ~~~javascript
-import React, {useState, useCallback} from "react";
+import React, {useEffect, useState, useCallback, useRef} from "react";
 
-export function useAsync(asyncFunction, options = {}) {
-  const { immediate = false, initialArgs = [] } = options;
+function useAsync(asyncFunction) {
+  const [state, setState] = React.useState({
+    status: "idle",
+    data: null,
+    error: null,
+  });
 
-  const [status, setStatus] = useState("idle");
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
+  const requestIdRef = React.useRef(0);
+  const abortControllerRef = React.useRef(null);
 
-  const requestIdRef = useRef(0);
-
-  const execute = useCallback(
+  const execute = React.useCallback(
     async (...args) => {
+      // Cancel previous request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
       const requestId = ++requestIdRef.current;
 
-      setStatus("loading");
-      setData(null);
-      setError(null);
+      setState({
+        status: "loading",
+        data: null,
+        error: null,
+      });
 
       try {
-        const result = await asyncFunction(...args);
+        const data = await asyncFunction(...args, controller.signal);
 
-        // Ignore stale responses.
-        if (requestId === requestIdRef.current) {
-          setStatus("success");
-          setData(result);
+        // Ignore stale response
+        if (requestId !== requestIdRef.current) {
+          return;
         }
 
-        return result;
-      } catch (err) {
-        const normalizedError =
-          err instanceof Error ? err : new Error(String(err));
+        setState({
+          status: "success",
+          data,
+          error: null,
+        });
 
-        if (requestId === requestIdRef.current) {
-          setStatus("error");
-          setError(normalizedError);
+        return data;
+      } catch (error) {
+        if (error.name === "AbortError") {
+          return;
         }
 
-        throw normalizedError;
+        if (requestId !== requestIdRef.current) {
+          return;
+        }
+
+        setState({
+          status: "error",
+          data: null,
+          error,
+        });
+
+        throw error;
       }
     },
     [asyncFunction]
   );
 
-  const reset = useCallback(() => {
+  const reset = React.useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
     requestIdRef.current += 1;
-    setStatus("idle");
-    setData(null);
-    setError(null);
+
+    setState({
+      status: "idle",
+      data: null,
+      error: null,
+    });
   }, []);
 
-  useEffect(() => {
-    if (immediate) {
-      execute(...initialArgs);
-    }
-  }, [immediate, execute]);
+  React.useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   return {
-    status,
-    data,
-    error,
+    ...state,
     execute,
     reset,
-    isIdle: status === "idle",
-    isLoading: status === "loading",
-    isSuccess: status === "success",
-    isError: status === "error",
+    isIdle: state.status === "idle",
+    isLoading: state.status === "loading",
+    isSuccess: state.status === "success",
+    isError: state.status === "error",
   };
-}
-
-// Example usage
-function UserProfile({ userId }) {
-  const fetchUser = useCallback(async (id) => {
-    const response = await fetch(`/api/users/${id}`);
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch user");
-    }
-
-    return response.json();
-  }, []);
-
-  const userRequest = useAsync(fetchUser);
-
-  useEffect(() => {
-    userRequest.execute(userId);
-  }, [userId]);
-
-  if (userRequest.isLoading) return <p>Loading...</p>;
-  if (userRequest.isError) return <p>{userRequest.error.message}</p>;
-
-  return <p>{userRequest.data?.name}</p>;
 }
 ~~~

@@ -816,6 +816,22 @@
       "hash": "0e1a49fd440c1e76c4d6f8c142d96c68a8685efc24e8122aca5299be3a57e2ed",
       "docRelative": "frontend/jsfunction/undoRedoManager/UndoRedoManagerWithDraftCommit.mdx"
     },
+    "frontend/react-component-interview/AutoComplete.jsx": {
+      "hash": "1ee453cbd45dd12a3f23a3b31381e882283e119ff320cbc7ff5677532b47007e",
+      "docRelative": "frontend/react-component-interview/AutoComplete.mdx"
+    },
+    "frontend/react-component-interview/ChatBox.jsx": {
+      "hash": "1b12d7de81949bd41e801bea207192a0aede06aad1254ac32981edd453b63930",
+      "docRelative": "frontend/react-component-interview/ChatBox.mdx"
+    },
+    "frontend/react-component-interview/ChatBoxMockServer.jsx": {
+      "hash": "58e2f5b389361a93085c3fe6e65e4ff3a63bb3f7d28036737d9f6bbbab3ac5ec",
+      "docRelative": "frontend/react-component-interview/ChatBoxMockServer.mdx"
+    },
+    "frontend/react-component-interview/ChatStreamable.jsx": {
+      "hash": "a7741cc5980c0659f2834d84cf6759c2f31dcf76a94882fc484444b4bf5aaeed",
+      "docRelative": "frontend/react-component-interview/ChatStreamable.mdx"
+    },
     "frontend/react-component-interview/CodeDiff.jsx": {
       "hash": "33831f66efdc9cf94a29131e9319ab9843fb4ac080460a747fa052d79fc817e3",
       "docRelative": "frontend/react-component-interview/CodeDiff.mdx"
@@ -837,7 +853,7 @@
       "docRelative": "frontend/react-component-interview/VirtualList.mdx"
     },
     "frontend/react-component-interview/hooks/useAsync.js": {
-      "hash": "7ee1853e60a3ebef31ac87619bcecc8ab277f8d72ab5e2c345c6e58fc11dbeea",
+      "hash": "e8820613f4a99f109d7126f57b56b85ff7af1c5fd1e93adff723840f10bf8336",
       "docRelative": "frontend/react-component-interview/hooks/useAsync.mdx"
     },
     "frontend/react-component-interview/hooks/useDebouncedValue.js": {
@@ -1825,7 +1841,7 @@
       "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
     },
     "__nav__:frontend/react-component-interview": {
-      "hash": "c6b16881205e1808ca787fd0b7581bf52284cc01af1649805211e1c630bad7a6",
+      "hash": "1361c1181378b9e46ed3a4b335790a062a75c4279d42bcdc8a1ddca374a83204",
       "docRelative": "frontend/react-component-interview/_index.mdx"
     },
     "__nav__:frontend/react-component-interview/hooks": {
