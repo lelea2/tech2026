@@ -816,6 +816,10 @@
       "hash": "0e1a49fd440c1e76c4d6f8c142d96c68a8685efc24e8122aca5299be3a57e2ed",
       "docRelative": "frontend/jsfunction/undoRedoManager/UndoRedoManagerWithDraftCommit.mdx"
     },
+    "frontend/react-component-interview/AirbnbLoading.jsx": {
+      "hash": "6018416a7ce3f57ee3e5bf40f44da22d65322b82420c6009a8d5b3fbcf9b2362",
+      "docRelative": "frontend/react-component-interview/AirbnbLoading.mdx"
+    },
     "frontend/react-component-interview/AutoComplete.jsx": {
       "hash": "1ee453cbd45dd12a3f23a3b31381e882283e119ff320cbc7ff5677532b47007e",
       "docRelative": "frontend/react-component-interview/AutoComplete.mdx"
@@ -1877,7 +1881,7 @@
       "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
     },
     "__nav__:frontend/react-component-interview": {
-      "hash": "7e9dae95a187ba2d2618dae9653cf16cb29fa8e87a5661a2a87dea150274b2f4",
+      "hash": "20ce10cac1066b6be0e972551868f93400baddb2b220cff30fe2d393f714b0ca",
       "docRelative": "frontend/react-component-interview/_index.mdx"
     },
     "__nav__:frontend/react-component-interview/hooks": {
