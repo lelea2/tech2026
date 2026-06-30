@@ -129,17 +129,17 @@ const config = {
             label: 'ML',
           },
           {
-            to: '/docs/behavioral',
+            to: '/docs/category/behavioral',
             position: 'left',
             label: 'Behavioral',
           },
           {
-            to: '/docs/system-designs',
+            to: '/docs/category/system-design',
             position: 'left',
             label: 'System Design',
           },
           {
-            to: '/docs/company',
+            to: '/docs/category/company',
             position: 'left',
             label: 'Company',
           },

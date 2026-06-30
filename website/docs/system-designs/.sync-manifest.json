@@ -80,6 +80,10 @@
       "hash": "eb26e2b6b2a312ee8ebdd835075ab2fcb475d6a782f57cb4f54cf3dcd1d6bf9c",
       "docRelative": "job-scheduler.png"
     },
+    "system-designs/leetcode.png": {
+      "hash": "7a9dbbd8d9db0c73ee2241963b2b3719219b366398d666e16afec2ca33d0b638",
+      "docRelative": "leetcode.png"
+    },
     "system-designs/metrics-monitoring.png": {
       "hash": "a07d37937a19f64a26371965e0b7614f86a088f72f80fd52cb0f39d7ea5abc84",
       "docRelative": "metrics-monitoring.png"
@@ -219,6 +223,10 @@
     "system-designs/leaderboard-realtime-system.mdx": {
       "hash": "d1877ce0c34b4f0c67637984449312f24887079db126345387a6407d8fb6c10b",
       "docRelative": "leaderboard-realtime-system.mdx"
+    },
+    "system-designs/leetcode_execution_leaderboard.mdx": {
+      "hash": "260731cc0219ad96021a4cfab559d981ffb7a3cd06150a749329a36e2d2e4897",
+      "docRelative": "leetcode_execution_leaderboard.mdx"
     },
     "system-designs/masonry-layout-system-design.mdx": {
       "hash": "1c8d4bb7f33b751429b77c3448c7694039d0112d39b27cc305067bd8dac94927",

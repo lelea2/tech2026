@@ -8,6 +8,26 @@
       "hash": "7a33264f2c9f3ed50504ed353b0c8c87473da21ce4ac26aaa7efcba6ed3d5e8a",
       "docRelative": "frontend/css/position.mdx"
     },
+    "frontend/interview/InMemoryTable.js": {
+      "hash": "d2796b7c76617cbc8165d45fd5e3cdd296bbf948ac4821950808f0aba8d2040e",
+      "docRelative": "frontend/interview/InMemoryTable.mdx"
+    },
+    "frontend/interview/batchRequest.js": {
+      "hash": "c26a5a2db11e6bdaaa895d110aae816f26be45bccaa401c3c2d0ec37a273f9f9",
+      "docRelative": "frontend/interview/batchRequest.mdx"
+    },
+    "frontend/interview/calendarDaysNeed.js": {
+      "hash": "7ef8e15afba7cb65d43f8a4ed076a345e3ea6fd1d66e050c68eeff14987aa82d",
+      "docRelative": "frontend/interview/calendarDaysNeed.mdx"
+    },
+    "frontend/interview/cycleInDependencies.js": {
+      "hash": "07dbe2bd705fe558d333205e6284d5034451c3c27fba477d6be4c3776243b497",
+      "docRelative": "frontend/interview/cycleInDependencies.mdx"
+    },
+    "frontend/interview/inferColumnTypes.js": {
+      "hash": "9dd22ca848e218c09b3f6d90f8caf68ce6f929f8cf7df48ff506ae8f229ef414",
+      "docRelative": "frontend/interview/inferColumnTypes.mdx"
+    },
     "frontend/jsfunction/2d-readingOrder/readingOrder.js": {
       "hash": "c42c87f044399a8a2e7c253d00d0ca93ff7686198624dfb78063e18e59aeca15",
       "docRelative": "frontend/jsfunction/2d-readingOrder/readingOrder.mdx"
@@ -37,7 +57,7 @@
       "docRelative": "frontend/jsfunction/Emitter/EventEmitter.mdx"
     },
     "frontend/jsfunction/Emitter/EventEmitterII.js": {
-      "hash": "6bb87d9878ed8c7b53c3f1906c8556730a79daa1f3cce05129b4aff0e14732d8",
+      "hash": "a72c5b6decb5c03abbe9fac40eead37769efd54efac7f5b31af92aeffb0bd75b",
       "docRelative": "frontend/jsfunction/Emitter/EventEmitterII.mdx"
     },
     "frontend/jsfunction/IntersectionObserver.js": {
@@ -203,6 +223,10 @@
     "frontend/jsfunction/array.prototype/Array.prototype.square.js": {
       "hash": "26de7ca37ea8925d474db1ab13a3e4f3f8db3bc173252da704abf8ba90c13f36",
       "docRelative": "frontend/jsfunction/array.prototype/Array.prototype.square.mdx"
+    },
+    "frontend/jsfunction/calendarDaysNeed.js": {
+      "hash": "6e3991af3bcca3e3f2f82e40c58ef309a4e21774412fb570def739bb20c47d83",
+      "docRelative": "frontend/jsfunction/calendarDaysNeed.mdx"
     },
     "frontend/jsfunction/camelCaseKey.js": {
       "hash": "4df4468d9f9b470e91158b123827ba6a57c581faeb52ec20ddbaf15ea3028bc9",
@@ -1753,15 +1777,19 @@
       "docRelative": "backend/quizzes/_index.mdx"
     },
     "__nav__:frontend": {
-      "hash": "c929be07265cbc56211c9c903d58fb88ae79baec5b8ecbc1139ae38aed6ede55",
+      "hash": "4e57197cef6389b764d2ea8afdd1e6ef2d1d8a72da68e866beebbc640e351db8",
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/css": {
       "hash": "3c5b08ae58788670e283f186852b1c4fa5e382b60f712865e1f893e8e8bdbec6",
       "docRelative": "frontend/css/_index.mdx"
     },
+    "__nav__:frontend/interview": {
+      "hash": "6f6054e8414a1e29136d667050df06b2714abfe4ef96f9eb9acf08acc195b857",
+      "docRelative": "frontend/interview/_index.mdx"
+    },
     "__nav__:frontend/jsfunction": {
-      "hash": "b31823fdf36772341b477a0095eac0945ca13b5e6708eb8808b723ee35e00b7f",
+      "hash": "080543c9bfee0fa143339e72ecae5f90be81b7c2d0055ec91f300fc2275e3ced",
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/2d-readingOrder": {

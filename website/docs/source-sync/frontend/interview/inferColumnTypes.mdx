@@ -1,0 +1,90 @@
+---
+title: inferColumnTypes
+---
+
+# inferColumnTypes
+
+~~~javascript
+/**
+ * Infer column types from a 2D table.
+ *
+ * Types:
+ * - Integer: all non-empty values are digits
+ * - Checkbox: all non-empty values are true/false
+ * - Select: limited number of unique non-empty values
+ * - Text: fallback
+ *
+ * @param {string[][]} grid
+ * @param {number} maxSelectOptions
+ * @returns {string[]}
+ */
+function inferColumnTypes(grid, maxSelectOptions = 10) {
+  if (!grid || grid.length === 0) return [];
+
+  const rowCount = grid.length;
+  const colCount = Math.max(...grid.map(row => row.length));
+  const result = [];
+
+  for (let col = 0; col < colCount; col++) {
+    const values = [];
+
+    for (let row = 0; row < rowCount; row++) {
+      const value = grid[row][col] ?? "";
+      values.push(String(value).trim());
+    }
+
+    result.push(inferOneColumn(values, maxSelectOptions));
+  }
+
+  return result;
+}
+
+function inferOneColumn(values, maxSelectOptions) {
+  const nonEmpty = values.filter(value => value !== "");
+
+  // If column is completely empty, choose Text as safest fallback.
+  if (nonEmpty.length === 0) {
+    return "Text";
+  }
+
+  if (isIntegerColumn(nonEmpty)) {
+    return "Integer";
+  }
+
+  if (isCheckboxColumn(nonEmpty)) {
+    return "Checkbox";
+  }
+
+  if (isSelectColumn(nonEmpty, maxSelectOptions)) {
+    return "Select";
+  }
+
+  return "Text";
+}
+
+function isIntegerColumn(values) {
+  return values.every(value => /^[0-9]+$/.test(value));
+}
+
+function isCheckboxColumn(values) {
+  return values.every(value => {
+    const normalized = value.toLowerCase();
+    return normalized === "true" || normalized === "false";
+  });
+}
+
+function isSelectColumn(values, maxSelectOptions) {
+  const uniqueValues = new Set(values);
+  return uniqueValues.size <= maxSelectOptions;
+}
+
+// const grid = [
+//   ["123", "hello", "true",  "red"],
+//   ["456", "world", "false", "blue"],
+//   ["",    "foo",   "",      "red"],
+//   ["789", "bar",   "true",  "green"],
+// ];
+
+// console.log(inferColumnTypes(grid, 3));
+// // ["Integer", "Text", "Checkbox", "Select"]
+~~~

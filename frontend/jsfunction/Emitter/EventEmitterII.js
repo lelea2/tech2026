@@ -3,6 +3,8 @@
 // default export is correct.
 export default class EventEmitter {
   constructor() {
+    // eventName -> [listener1, listener2, ...]
+    // Map gives O(1)-ish lookup by event name.
     this.events = new Map();
   }
 
@@ -17,13 +19,16 @@ export default class EventEmitter {
     }
 
     const listeners = this.events.get(eventName);
+    // Keep insertion order so listeners run in subscribe order.
     listeners.push(listener);
 
-    // Return an object with an off method to unsubscribe
+    // Common interview API shape: return a handle with `off()`.
+    // This closure keeps access to the exact listeners array.
     return {
       off: () => {
         const index = listeners.indexOf(listener);
         if (index !== -1) {
+          // Remove only this listener instance.
           listeners.splice(index, 1);
         }
       },
@@ -36,6 +41,7 @@ export default class EventEmitter {
    * @returns boolean
    */
   emit(eventName, ...args) {
+    // Match common EventEmitter behavior: return false if nothing is emitted.
     if (!this.events.has(eventName)) {
       return false;
     }
@@ -45,11 +51,12 @@ export default class EventEmitter {
       return false;
     }
 
-    // Call all listeners with the provided arguments
+    // Fan out payload to each subscriber.
     for (const listener of listeners) {
       listener(...args);
     }
 
+    // At least one listener ran.
     return true;
   }
 }
