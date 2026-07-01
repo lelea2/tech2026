@@ -1,0 +1,63 @@
+/**
+Given multiple BUILD files and their dependencies, return a valid build order.
+Input:
+An integer n representing the number of BUILD files.
+A 2D array dependencies, where dependencies[i] = [a, b] indicates that file a depends on file b.
+Output:
+An array representing a valid build order. If no such order exists, return an empty array.
+Example:
+Input: n = 4, dependencies = [[1, 0], [2, 0], [3, 1], [3, 2]]
+Output: [0, 1, 2, 3] or [0, 2, 1, 3]
+ */
+// This is topological sort
+function buildOrder(n, dependencies) {
+  const graph = Array.from({ length: n }, () => []);
+  const indegree = Array(n).fill(0);
+
+  // a depends on b, so b must come before a
+  for (const [a, b] of dependencies) {
+    graph[b].push(a);
+    indegree[a]++;
+  }
+
+  const queue = [];
+
+  // Files with no dependencies can be built first
+  for (let i = 0; i < n; i++) {
+    if (indegree[i] === 0) {
+      queue.push(i);
+    }
+  }
+
+  const order = [];
+
+  while (queue.length > 0) {
+    const file = queue.shift();
+    order.push(file);
+
+    for (const nextFile of graph[file]) {
+      indegree[nextFile]--;
+
+      if (indegree[nextFile] === 0) {
+        queue.push(nextFile);
+      }
+    }
+  }
+
+  // If we could not build every file, there is a cycle
+  if (order.length !== n) {
+    return [];
+  }
+
+  return order;
+}
+
+// console.log(
+//   buildOrder(4, [
+//     [1, 0],
+//     [2, 0],
+//     [3, 1],
+//     [3, 2],
+//   ])
+// );
+// Output: [0, 1, 2, 3] or [0, 2, 1, 3]

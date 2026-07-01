@@ -1,0 +1,92 @@
+/**
+ * Highest hydration score
+ */
+function highestHydrationScore(cansConsumed, manager) {
+  // Goal:
+  // Find the highest average hydration score among all valid teams.
+  // A manager's team = all employees in that manager's subtree EXCLUDING the manager.
+  // Only teams with at least 2 members are considered valid.
+  const n = cansConsumed.length;
+
+  // Convert manager array into adjacency list: manager -> direct reports.
+  const reports = Array.from({ length: n }, () => []);
+
+  for (let employee = 0; employee < n; employee++) {
+    const boss = manager[employee];
+
+    if (boss !== -1) {
+      reports[boss].push(employee);
+    }
+  }
+
+  let bestAverage = -Infinity;
+
+  // DFS returns aggregate info for each subtree:
+  // - sum of cans in subtree
+  // - number of employees in subtree
+  function dfs(employee) {
+    let subtreeSum = cansConsumed[employee];
+    let subtreeCount = 1;
+
+    for (const report of reports[employee]) {
+      const child = dfs(report);
+      subtreeSum += child.sum;
+      subtreeCount += child.count;
+    }
+
+    // Team = everyone below this manager, excluding the manager.
+    const teamSum = subtreeSum - cansConsumed[employee];
+    const teamCount = subtreeCount - 1;
+
+    // Evaluate this manager's team as a candidate answer.
+    if (teamCount >= 2) {
+      const average = teamSum / teamCount;
+      bestAverage = Math.max(bestAverage, average);
+    }
+
+    return {
+      sum: subtreeSum,
+      count: subtreeCount,
+    };
+  }
+
+  // Forest support: multiple employees can have manager = -1.
+  for (let employee = 0; employee < n; employee++) {
+    if (manager[employee] === -1) {
+      dfs(employee);
+    }
+  }
+
+  // If no valid team exists, decide based on interviewer requirement.
+  // Common choices: return 0, -1, or null.
+  if (bestAverage === -Infinity) return 0;
+
+  // Requirement here: return integer answer.
+  return Math.floor(bestAverage);
+}
+
+const cansConsumed = [5, 2, 8, 4, 6, 10];
+const manager = [-1, 0, 0, 1, 1, 2]; // manager index employee belong to
+
+/*
+Org:
+0
+├── 1
+│   ├── 3
+│   └── 4
+└── 2
+    └── 5
+
+Team under 0: employees [1,2,3,4,5]
+Average = (2 + 8 + 4 + 6 + 10) / 5 = 6
+
+Team under 1: employees [3,4]
+Average = (4 + 6) / 2 = 5
+
+Team under 2: employees [5]
+Ignored because team size < 2
+
+Answer = 6
+*/
+
+console.log(highestHydrationScore(cansConsumed, manager)); // 6

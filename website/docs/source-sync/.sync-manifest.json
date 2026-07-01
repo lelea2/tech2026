@@ -8,13 +8,33 @@
       "hash": "7a33264f2c9f3ed50504ed353b0c8c87473da21ce4ac26aaa7efcba6ed3d5e8a",
       "docRelative": "frontend/css/position.mdx"
     },
+    "frontend/interview/ConnectionPool.js": {
+      "hash": "ae60d7953a5283afa27cb684b895a390fc70172fbd29abe80af2dfb796777109",
+      "docRelative": "frontend/interview/ConnectionPool.mdx"
+    },
     "frontend/interview/InMemoryTable.js": {
       "hash": "d2796b7c76617cbc8165d45fd5e3cdd296bbf948ac4821950808f0aba8d2040e",
       "docRelative": "frontend/interview/InMemoryTable.mdx"
     },
+    "frontend/interview/JSONDeserialize.js": {
+      "hash": "9440896fc7a7c92652573d9ddf5514ff8ea788da2797c3c9f275cd39a0c388e1",
+      "docRelative": "frontend/interview/JSONDeserialize.mdx"
+    },
+    "frontend/interview/Percentiles.js": {
+      "hash": "7e9223e5be70c14e7587861c01b91129fce1722834e2decf36725da4ffab1fc0",
+      "docRelative": "frontend/interview/Percentiles.mdx"
+    },
+    "frontend/interview/backupFiles.js": {
+      "hash": "fbe72365d3fb6e9deaef903e4f0183cf4818d2e8bb2a4bbf5939e23e6fd726d3",
+      "docRelative": "frontend/interview/backupFiles.mdx"
+    },
     "frontend/interview/batchRequest.js": {
       "hash": "c26a5a2db11e6bdaaa895d110aae816f26be45bccaa401c3c2d0ec37a273f9f9",
       "docRelative": "frontend/interview/batchRequest.mdx"
+    },
+    "frontend/interview/buildOrder.js": {
+      "hash": "8f9a4c9b9f01ffa1d4e283303a9559f10e0b080277d9442ebe7d64eb368448c3",
+      "docRelative": "frontend/interview/buildOrder.mdx"
     },
     "frontend/interview/calendarDaysNeed.js": {
       "hash": "7ef8e15afba7cb65d43f8a4ed076a345e3ea6fd1d66e050c68eeff14987aa82d",
@@ -23,6 +43,18 @@
     "frontend/interview/cycleInDependencies.js": {
       "hash": "07dbe2bd705fe558d333205e6284d5034451c3c27fba477d6be4c3776243b497",
       "docRelative": "frontend/interview/cycleInDependencies.mdx"
+    },
+    "frontend/interview/duplicateFiles.js": {
+      "hash": "17a0b3e651bf7098108195a13fd1695605dfb1a494c58d0f062332db02266cd1",
+      "docRelative": "frontend/interview/duplicateFiles.mdx"
+    },
+    "frontend/interview/getAvailableTime.js": {
+      "hash": "4e1f05ee24200c73b47c9aadad5790e82d1acd8834a5bc2de9f8e20226d8f118",
+      "docRelative": "frontend/interview/getAvailableTime.mdx"
+    },
+    "frontend/interview/highestHydrationScore.js": {
+      "hash": "2f38429c3bf6305f1638df37e594647812db17290e827d083b4469ecff1d2a1d",
+      "docRelative": "frontend/interview/highestHydrationScore.mdx"
     },
     "frontend/interview/inferColumnTypes.js": {
       "hash": "9dd22ca848e218c09b3f6d90f8caf68ce6f929f8cf7df48ff506ae8f229ef414",
@@ -1785,7 +1817,7 @@
       "docRelative": "frontend/css/_index.mdx"
     },
     "__nav__:frontend/interview": {
-      "hash": "6f6054e8414a1e29136d667050df06b2714abfe4ef96f9eb9acf08acc195b857",
+      "hash": "b9b6a179ad90cc1e4bc56bf2b3bbf42ef6fb76db20769d644a6aaaffc130e47d",
       "docRelative": "frontend/interview/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
