@@ -5,36 +5,6 @@ title: spreadSheetIII
 # spreadSheetIII
 
 ~~~javascript
-/**
- * Interview question:
- * Design a small spreadsheet engine.
- *
- * Requirements:
- * - setCell(cellId, input) stores either a number or a formula string.
- * - getCell(cellId) returns the computed value for that cell.
- * - Formulas start with "=" and may reference other cells.
- * - Support numeric literals and +, -, *, / operators.
- * - Detect self, direct, and indirect cycles.
- *
- * Example:
- *   A1 = 10
- *   B1 = "=A1 + 5"
- *   getCell("B1") returns 15
- *
- * Core idea:
- * Treat formulas as a dependency graph. Each cell can depend on other cells.
- * Evaluating a cell is a DFS through that graph. `memo` avoids recomputing
- * cells during one read, and `activePath` detects cycles in the current DFS path.
- *
- * Important simplification:
- * This implementation evaluates formulas strictly left-to-right. It does not
- * implement normal math precedence where * and / happen before + and -.
- *
- * Spreadsheet III: supports numeric literals and formulas with +, -, *, /,
- * and detects direct/indirect/self cycles.
- *
- * If a cell is in a cycle, or depends on a cycle, getCell returns '#CYCLE!'.
- */
 export default class Spreadsheet {
   constructor() {
     // Stores raw inputs by cell id. We store the original formula string instead
@@ -238,4 +208,35 @@ s5.setCell('C1', '=A1 + 10');
 s5.getCell('C1'); // '#CYCLE!'
 */
 
+
+/**
+ * Interview question:
+ * Design a small spreadsheet engine.
+ *
+ * Requirements:
+ * - setCell(cellId, input) stores either a number or a formula string.
+ * - getCell(cellId) returns the computed value for that cell.
+ * - Formulas start with "=" and may reference other cells.
+ * - Support numeric literals and +, -, *, / operators.
+ * - Detect self, direct, and indirect cycles.
+ *
+ * Example:
+ *   A1 = 10
+ *   B1 = "=A1 + 5"
+ *   getCell("B1") returns 15
+ *
+ * Core idea:
+ * Treat formulas as a dependency graph. Each cell can depend on other cells.
+ * Evaluating a cell is a DFS through that graph. `memo` avoids recomputing
+ * cells during one read, and `activePath` detects cycles in the current DFS path.
+ *
+ * Important simplification:
+ * This implementation evaluates formulas strictly left-to-right. It does not
+ * implement normal math precedence where * and / happen before + and -.
+ *
+ * Spreadsheet III: supports numeric literals and formulas with +, -, *, /,
+ * and detects direct/indirect/self cycles.
+ *
+ * If a cell is in a cycle, or depends on a cycle, getCell returns '#CYCLE!'.
+ */
 ~~~

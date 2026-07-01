@@ -24,8 +24,12 @@
       "hash": "7e9223e5be70c14e7587861c01b91129fce1722834e2decf36725da4ffab1fc0",
       "docRelative": "frontend/interview/Percentiles.mdx"
     },
+    "frontend/interview/Underground.js": {
+      "hash": "59235e7e54b2c76a565452b1e762a5ccc3e12231bbf4346b81a06288d23cc520",
+      "docRelative": "frontend/interview/Underground.mdx"
+    },
     "frontend/interview/backupFiles.js": {
-      "hash": "fbe72365d3fb6e9deaef903e4f0183cf4818d2e8bb2a4bbf5939e23e6fd726d3",
+      "hash": "18aaad931be5148209c2730694c20cccb215adcb754707b78562cad820be6b4a",
       "docRelative": "frontend/interview/backupFiles.mdx"
     },
     "frontend/interview/batchRequest.js": {
@@ -59,6 +63,10 @@
     "frontend/interview/inferColumnTypes.js": {
       "hash": "9dd22ca848e218c09b3f6d90f8caf68ce6f929f8cf7df48ff506ae8f229ef414",
       "docRelative": "frontend/interview/inferColumnTypes.mdx"
+    },
+    "frontend/interview/spreadsheet.js": {
+      "hash": "b3e9c218898773caa745a982605d38ca2979359ec01464c7bc1f87a85aae0eed",
+      "docRelative": "frontend/interview/spreadsheet.mdx"
     },
     "frontend/jsfunction/2d-readingOrder/readingOrder.js": {
       "hash": "c42c87f044399a8a2e7c253d00d0ca93ff7686198624dfb78063e18e59aeca15",
@@ -801,7 +809,7 @@
       "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetII.mdx"
     },
     "frontend/jsfunction/spreadSheet/spreadSheetIII.js": {
-      "hash": "ad5d8504c61dddf9583a21cde564ed0a7503cbb51d916b8758beeeb88130fb1c",
+      "hash": "4ad8022f70d61c547705f900e2e9cbedcc042851c1a45d322f2bfeba690f7cc0",
       "docRelative": "frontend/jsfunction/spreadSheet/spreadSheetIII.mdx"
     },
     "frontend/jsfunction/styledTextRange/styledTextRange.js": {
@@ -1817,7 +1825,7 @@
       "docRelative": "frontend/css/_index.mdx"
     },
     "__nav__:frontend/interview": {
-      "hash": "b9b6a179ad90cc1e4bc56bf2b3bbf42ef6fb76db20769d644a6aaaffc130e47d",
+      "hash": "0a9a4f8eaca9f69247afa893aa6bb252713b1e791f4e08e6c6266b3747c7411b",
       "docRelative": "frontend/interview/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
