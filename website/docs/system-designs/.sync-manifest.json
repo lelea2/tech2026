@@ -92,6 +92,10 @@
       "hash": "f09a4178656b7fcd39c80d3dbca33476d19a7a27b6b897b096dd41d5e173c8c9",
       "docRelative": "multimodal-file-ingestion.png"
     },
+    "system-designs/netflix.png": {
+      "hash": "66118e22ec250382cb26428c4f1f3ed668cf3969e64ee0c805b22e9bad48367e",
+      "docRelative": "netflix.png"
+    },
     "system-designs/newsfeed.png": {
       "hash": "7c32bed9378a970683aa76380ad349cac4434cec781db46acf6504823a8b8857",
       "docRelative": "newsfeed.png"
@@ -301,7 +305,7 @@
       "docRelative": "uber.mdx"
     },
     "system-designs/video-netflix.mdx": {
-      "hash": "cb28452cce69166a89978e864ae67be516da7d9943dce37a3ed8f5464580bae5",
+      "hash": "7b6d85541f1bed21262b1e45f6422579534c7212b0e2d5a4f1571a1656354ec8",
       "docRelative": "video-netflix.mdx"
     },
     "system-designs/web-crawler.mdx": {
