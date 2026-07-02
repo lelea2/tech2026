@@ -32,6 +32,10 @@
       "hash": "1ad1d075457a5e01ed043194f0455c65f60aa944b96a31e1bed844b121b98557",
       "docRelative": "cicd.png"
     },
+    "system-designs/compliance-collection.png": {
+      "hash": "20db616aba743d55ace3c6cf26f1ab156e16000ad66274f935ca269e8cb35b03",
+      "docRelative": "compliance-collection.png"
+    },
     "system-designs/dau-mau.png": {
       "hash": "8dc6fee05ef0b5e013b0225ea56a47b155c6628e9c8a1d60daba745f934bc8e9",
       "docRelative": "dau-mau.png"
@@ -191,6 +195,10 @@
     "system-designs/cicd-workflow-design.mdx": {
       "hash": "13249e3aa86f91282305e5d377d6c065aa6e1fa494e3d840fd0333f9b8025dc4",
       "docRelative": "cicd-workflow-design.mdx"
+    },
+    "system-designs/compliance_evidence_collection_system.mdx": {
+      "hash": "8935ca5ea8de92acb10461aabab724eeeb55411fb625fae9c0a4ddb8c2a8b166",
+      "docRelative": "compliance_evidence_collection_system.mdx"
     },
     "system-designs/dau_mau_metrics_system_design.mdx": {
       "hash": "6610548ee17ae13a0f5d285a5701c4e3bf2b3b39113b523b5cdf00eab298c28f",
