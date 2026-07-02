@@ -32,6 +32,10 @@
       "hash": "1ad1d075457a5e01ed043194f0455c65f60aa944b96a31e1bed844b121b98557",
       "docRelative": "cicd.png"
     },
+    "system-designs/dau-mau.png": {
+      "hash": "8dc6fee05ef0b5e013b0225ea56a47b155c6628e9c8a1d60daba745f934bc8e9",
+      "docRelative": "dau-mau.png"
+    },
     "system-designs/design_tool_architecture.svg": {
       "hash": "b3ec4614290d01ea5b7ce8a8c58821e13886e004ccbffd48ea522c1b482c00ca",
       "docRelative": "design_tool_architecture.svg"
@@ -99,6 +103,10 @@
     "system-designs/newsfeed.png": {
       "hash": "7c32bed9378a970683aa76380ad349cac4434cec781db46acf6504823a8b8857",
       "docRelative": "newsfeed.png"
+    },
+    "system-designs/pastebin.png": {
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docRelative": "pastebin.png"
     },
     "system-designs/payment-system.png": {
       "hash": "d589f93fdf1e90354c534928bcad8fba3b68eeed5f170a1491848cb771f113b0",
@@ -184,6 +192,10 @@
       "hash": "13249e3aa86f91282305e5d377d6c065aa6e1fa494e3d840fd0333f9b8025dc4",
       "docRelative": "cicd-workflow-design.mdx"
     },
+    "system-designs/dau_mau_metrics_system_design.mdx": {
+      "hash": "6610548ee17ae13a0f5d285a5701c4e3bf2b3b39113b523b5cdf00eab298c28f",
+      "docRelative": "dau_mau_metrics_system_design.mdx"
+    },
     "system-designs/design-google-calendar-frontend-system-design.mdx": {
       "hash": "8cfb24589b9ed47388cb2a4e755fb051dd1cc3664eced56a900533acb5f151f8",
       "docRelative": "design-google-calendar-frontend-system-design.mdx"
@@ -255,6 +267,10 @@
     "system-designs/news-feed.mdx": {
       "hash": "3abc75467b09bec8311acccecb0398dba7d18cadad8c5e3a9d89664aaef64f1c",
       "docRelative": "news-feed.mdx"
+    },
+    "system-designs/pastebin.mdx": {
+      "hash": "2fdb4849b46135dd829aec572f9b52290c3e885e746a1d8bf1113a42af2e4ff6",
+      "docRelative": "pastebin.mdx"
     },
     "system-designs/payment-system.mdx": {
       "hash": "e137fd2d0e9e8e54e0709923ff00644b8fbcd0d18cfa17ce556ae4517a605f8f",
