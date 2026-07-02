@@ -240,6 +240,10 @@
       "hash": "19b247dbf720c63bcbab360fe12e3cfd6742d76ed9036c5d27665e1734787aef",
       "docRelative": "i18n-design.mdx"
     },
+    "system-designs/immutable_audit_log_system.mdx": {
+      "hash": "5dc2cc3fcb80f528d08ae0eb2c4530ad5aba4b22d1ff1a3ad4a22e72c9b28bc2",
+      "docRelative": "immutable_audit_log_system.mdx"
+    },
     "system-designs/job-scheduler.mdx": {
       "hash": "c2c20a8c58d7145293135b4c31ab75b293ed4ba8386abaf22a7894fff9463a0c",
       "docRelative": "job-scheduler.mdx"
