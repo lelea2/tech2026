@@ -241,7 +241,7 @@
       "docRelative": "i18n-design.mdx"
     },
     "system-designs/immutable_audit_log_system.mdx": {
-      "hash": "5dc2cc3fcb80f528d08ae0eb2c4530ad5aba4b22d1ff1a3ad4a22e72c9b28bc2",
+      "hash": "7d34245d9b1ae8ed4e4757c63e72e7ec8580804ed3db6709c1f1e7ea63faabbc",
       "docRelative": "immutable_audit_log_system.mdx"
     },
     "system-designs/job-scheduler.mdx": {

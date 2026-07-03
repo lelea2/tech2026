@@ -1,7 +1,7 @@
 ---
-title: "Design an Immutable Audit Log System for a Multi-Tenant Compliance Product"
-description: "Interview-ready system design notes for append-only, tamper-evident audit logging in a Vanta-style compliance product."
-tags: ["system-design", "audit-log", "compliance", "multi-tenant", "vanta"]
+title: 'Immutable Audit Log System'
+description: 'Interview-ready system design notes for append-only, tamper-evident audit logging in a Vanta-style compliance product.'
+tags: ['system-design', 'audit-log', 'compliance', 'multi-tenant', 'vanta']
 ---
 
 # Design an Immutable Audit Log System for a Multi-Tenant Compliance Product
@@ -69,12 +69,7 @@ Ask these before designing:
 ## 4. Core Event Model
 
 ```ts
-export type ActorType =
-  | "user"
-  | "service_account"
-  | "api_key"
-  | "integration"
-  | "system";
+export type ActorType = 'user' | 'service_account' | 'api_key' | 'integration' | 'system';
 
 export type AuditEvent = {
   event_id: string;
@@ -111,24 +106,24 @@ export type AuditEvent = {
 
 ### Required Fields
 
-| Field | Purpose |
-|---|---|
-| `event_id` | Idempotency and unique event identity |
-| `tenant_id` | Tenant isolation and authorization boundary |
-| `actor_id` | Who performed the action |
-| `actor_type` | User, system, integration, API key, service account |
-| `action` | What happened, for example `control.override.created` |
-| `target_type` | Object type affected, for example `control`, `evidence`, `integration` |
-| `target_id` | Object identifier affected |
-| `timestamp` | Event time |
-| `request_id` | Correlates product logs, API logs, and audit events |
-| `ip_address` | Security investigation metadata |
-| `user_agent` | Security investigation metadata |
-| `metadata` | Action-specific details |
-| `previous_value_hash` | Tamper-aware before-state fingerprint |
-| `new_value_hash` | Tamper-aware after-state fingerprint |
-| `event_hash` | Hash of canonical event payload |
-| `previous_event_hash` | Hash-chain pointer for tamper evidence |
+| Field                 | Purpose                                                                |
+| --------------------- | ---------------------------------------------------------------------- |
+| `event_id`            | Idempotency and unique event identity                                  |
+| `tenant_id`           | Tenant isolation and authorization boundary                            |
+| `actor_id`            | Who performed the action                                               |
+| `actor_type`          | User, system, integration, API key, service account                    |
+| `action`              | What happened, for example `control.override.created`                  |
+| `target_type`         | Object type affected, for example `control`, `evidence`, `integration` |
+| `target_id`           | Object identifier affected                                             |
+| `timestamp`           | Event time                                                             |
+| `request_id`          | Correlates product logs, API logs, and audit events                    |
+| `ip_address`          | Security investigation metadata                                        |
+| `user_agent`          | Security investigation metadata                                        |
+| `metadata`            | Action-specific details                                                |
+| `previous_value_hash` | Tamper-aware before-state fingerprint                                  |
+| `new_value_hash`      | Tamper-aware after-state fingerprint                                   |
+| `event_hash`          | Hash of canonical event payload                                        |
+| `previous_event_hash` | Hash-chain pointer for tamper evidence                                 |
 
 ---
 
@@ -184,19 +179,19 @@ Product Services
 
 ### Components
 
-| Component | Responsibility |
-|---|---|
-| Product Services | Perform business actions and emit audit events |
-| Audit SDK / Middleware | Enrich events with actor, tenant, request ID, IP, user agent |
-| Outbox Table | Reliably couples business mutation with audit event creation |
-| Publisher Worker | Publishes pending audit events to the ingestion layer |
-| Audit Ingestion API | Validates schema, enforces idempotency, writes to durable log |
-| Durable Log | Kafka/Kinesis/PubSub source for downstream consumers |
-| Immutable Archive | S3/GCS/Object Lock source of truth |
-| Query Index | ClickHouse/OpenSearch/Postgres for fast filtering |
-| Audit Query API | Enforces tenant-scoped queries and authorization |
-| Export Worker | Generates auditor exports from archive or reconciled query store |
-| Retention Service | Applies retention policy, legal hold, and field redaction |
+| Component              | Responsibility                                                   |
+| ---------------------- | ---------------------------------------------------------------- |
+| Product Services       | Perform business actions and emit audit events                   |
+| Audit SDK / Middleware | Enrich events with actor, tenant, request ID, IP, user agent     |
+| Outbox Table           | Reliably couples business mutation with audit event creation     |
+| Publisher Worker       | Publishes pending audit events to the ingestion layer            |
+| Audit Ingestion API    | Validates schema, enforces idempotency, writes to durable log    |
+| Durable Log            | Kafka/Kinesis/PubSub source for downstream consumers             |
+| Immutable Archive      | S3/GCS/Object Lock source of truth                               |
+| Query Index            | ClickHouse/OpenSearch/Postgres for fast filtering                |
+| Audit Query API        | Enforces tenant-scoped queries and authorization                 |
+| Export Worker          | Generates auditor exports from archive or reconciled query store |
+| Retention Service      | Applies retention policy, legal hold, and field redaction        |
 
 ---
 
@@ -271,12 +266,12 @@ The immutable archive is optimized for:
 
 Options:
 
-| Store | Best For | Trade-Off |
-|---|---|---|
-| OpenSearch | Flexible filtering and text search | Higher operational cost at large volume |
-| ClickHouse | High-volume analytical filtering | Less natural full-text search |
-| Postgres | Simplicity for smaller scale | May hit scale limits |
-| BigQuery/Snowflake | Historical analytics and exports | Higher latency / cost for interactive UI |
+| Store              | Best For                           | Trade-Off                                |
+| ------------------ | ---------------------------------- | ---------------------------------------- |
+| OpenSearch         | Flexible filtering and text search | Higher operational cost at large volume  |
+| ClickHouse         | High-volume analytical filtering   | Less natural full-text search            |
+| Postgres           | Simplicity for smaller scale       | May hit scale limits                     |
+| BigQuery/Snowflake | Historical analytics and exports   | Higher latency / cost for interactive UI |
 
 Recommended interview answer:
 
@@ -394,13 +389,13 @@ Do not blindly store full payloads. Audit logs are long-lived and may contain se
 
 Recommended strategy:
 
-| Data Type | Storage Strategy |
-|---|---|
-| Non-sensitive fields | Redacted before/after diff |
-| Sensitive fields | Hash only |
+| Data Type                | Storage Strategy                                       |
+| ------------------------ | ------------------------------------------------------ |
+| Non-sensitive fields     | Redacted before/after diff                             |
+| Sensitive fields         | Hash only                                              |
 | Secrets/tokens/passwords | Never store raw value or hash if hash enables guessing |
-| Large objects | Store object reference and content hash |
-| Deleted users | Store stable deleted actor reference, not full PII |
+| Large objects            | Store object reference and content hash                |
+| Deleted users            | Store stable deleted actor reference, not full PII     |
 
 Example redacted diff:
 
@@ -456,13 +451,13 @@ Export filters:
 
 Use retention tiers.
 
-| Data | Hot Retention | Cold Retention | Notes |
-|---|---:|---:|---|
-| Query index | 1-2 years | N/A | Fast UI queries |
-| Immutable archive | N/A | 7 years | Compliance/audit evidence |
-| IP address/user agent | 30-365 days | Optional hash/redaction | Depends on customer policy |
-| Debug metadata | 30-90 days | Remove or redact | Avoid retaining unnecessary PII |
-| Export files | 7-30 days | Optional | Regenerate from archive when possible |
+| Data                  | Hot Retention |          Cold Retention | Notes                                 |
+| --------------------- | ------------: | ----------------------: | ------------------------------------- |
+| Query index           |     1-2 years |                     N/A | Fast UI queries                       |
+| Immutable archive     |           N/A |                 7 years | Compliance/audit evidence             |
+| IP address/user agent |   30-365 days | Optional hash/redaction | Depends on customer policy            |
+| Debug metadata        |    30-90 days |        Remove or redact | Avoid retaining unnecessary PII       |
+| Export files          |     7-30 days |                Optional | Regenerate from archive when possible |
 
 Important principle:
 
@@ -517,16 +512,16 @@ User can view audit events only if:
 
 ### Mitigations
 
-| Failure | Mitigation |
-|---|---|
-| Product mutation without audit event | Transactional outbox |
-| Duplicate events | Idempotency by `event_id` |
-| Ingestion failure | Retry with exponential backoff |
-| Malformed events | Dead-letter queue |
-| Archive failure | Alert and pause checkpoint advancement |
-| Query index corruption | Rebuild from immutable archive |
-| Export failure | Async retry and failure audit event |
-| Delayed indexing | Show freshness timestamp in UI |
+| Failure                              | Mitigation                             |
+| ------------------------------------ | -------------------------------------- |
+| Product mutation without audit event | Transactional outbox                   |
+| Duplicate events                     | Idempotency by `event_id`              |
+| Ingestion failure                    | Retry with exponential backoff         |
+| Malformed events                     | Dead-letter queue                      |
+| Archive failure                      | Alert and pause checkpoint advancement |
+| Query index corruption               | Rebuild from immutable archive         |
+| Export failure                       | Async retry and failure audit event    |
+| Delayed indexing                     | Show freshness timestamp in UI         |
 
 ---
 
@@ -563,28 +558,28 @@ Alert on:
 
 Define guarantees explicitly:
 
-| Area | Guarantee |
-|---|---|
-| Write durability | Critical events are captured through outbox and durable log |
-| Query freshness | Events searchable within seconds to minutes |
-| Source of truth | Immutable archive, not query index |
-| Idempotency | Duplicate event IDs are ignored |
-| Tenant isolation | All reads and writes are tenant-scoped |
-| Tamper evidence | Hash chain + immutable archive + checkpoints |
-| Export correctness | Exports generated from archive or reconciled query store |
+| Area               | Guarantee                                                   |
+| ------------------ | ----------------------------------------------------------- |
+| Write durability   | Critical events are captured through outbox and durable log |
+| Query freshness    | Events searchable within seconds to minutes                 |
+| Source of truth    | Immutable archive, not query index                          |
+| Idempotency        | Duplicate event IDs are ignored                             |
+| Tenant isolation   | All reads and writes are tenant-scoped                      |
+| Tamper evidence    | Hash chain + immutable archive + checkpoints                |
+| Export correctness | Exports generated from archive or reconciled query store    |
 
 ---
 
 ## 18. Design Trade-Offs
 
-| Decision | Option A | Option B | Recommendation |
-|---|---|---|---|
-| Write mode | Synchronous audit write | Async outbox | Use outbox for reliability without adding user-facing latency |
-| Before/after storage | Full payload | Redacted diff + hash | Prefer redacted diff + hash |
-| Query store | OpenSearch | ClickHouse | Choose based on query shape; OpenSearch for flexible search, ClickHouse for analytics |
-| Immutability | Application-level insert-only | WORM archive | Use both |
-| Retention | Keep everything | Tiered retention | Tiered retention with PII minimization |
-| Tamper evidence | Hash each event | Hash chain per tenant | Hash chain per tenant with checkpoints |
+| Decision             | Option A                      | Option B              | Recommendation                                                                        |
+| -------------------- | ----------------------------- | --------------------- | ------------------------------------------------------------------------------------- |
+| Write mode           | Synchronous audit write       | Async outbox          | Use outbox for reliability without adding user-facing latency                         |
+| Before/after storage | Full payload                  | Redacted diff + hash  | Prefer redacted diff + hash                                                           |
+| Query store          | OpenSearch                    | ClickHouse            | Choose based on query shape; OpenSearch for flexible search, ClickHouse for analytics |
+| Immutability         | Application-level insert-only | WORM archive          | Use both                                                                              |
+| Retention            | Keep everything               | Tiered retention      | Tiered retention with PII minimization                                                |
+| Tamper evidence      | Hash each event               | Hash chain per tenant | Hash chain per tenant with checkpoints                                                |
 
 ---
 
