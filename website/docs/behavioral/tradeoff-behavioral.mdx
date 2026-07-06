@@ -1,0 +1,64 @@
+---
+title: 'How do you make tradeoffs in decision-making?'
+category: Behavioral
+tags: [decision-making, tradeoffs, engineering-mindset, leadership]
+difficulty: Medium
+lastUpdated: 2026-06-25
+---
+
+# How do you make tradeoffs in decision-making?
+
+## Core Principles
+
+### 1. Clarify what you're actually optimizing for
+
+Most tradeoff debates are really disagreements about goals, not solutions. Before comparing options, name the primary constraint — is this about speed to ship, long-term maintainability, user experience, or cost? The "right" answer changes completely depending on which one matters most right now.
+
+### 2. Distinguish reversible from irreversible decisions
+
+For decisions that are easy to undo (how to structure a component, what to name a variable, which color to use), bias toward acting fast and iterating. For decisions that are hard to walk back (API contracts, database schemas, architectural patterns), slow down and pressure-test assumptions more carefully.
+
+> Most decisions people agonize over are more reversible than they think.
+
+### 3. Look for asymmetric downside risk
+
+When one option has a catastrophic failure mode and another has a merely bad one, weight the catastrophic heavily — even if the probability is low. Good tradeoffs aren't just about expected value; they're about what you can recover from.
+
+### 4. Talk to the people closest to the problem
+
+Be skeptical of tradeoff analysis done entirely in the abstract. The person who will maintain the code, use the feature, or support the customer usually has information that changes the calculus.
+
+### 5. Make the tradeoff explicit and name it
+
+Rather than just picking an option, say: **"We're choosing X, which means we're accepting Y."** That makes the decision auditable later. If assumptions change, you know exactly why you made the call and can revisit it cleanly.
+
+### 6. Accept that perfect information rarely exists
+
+At some point you commit, ship, and learn. The cost of indefinite deliberation is real — it's not free to keep a decision open. Make a well-reasoned call with 70% of the information and remain open to being wrong, rather than waiting for certainty that won't come.
+
+---
+
+## The Meta-Skill
+
+Knowing which of these lenses applies to the specific decision in front of you — they're not all equally relevant every time.
+
+---
+
+## Example Answer (STAR format)
+
+**Situation:** At [Company], we had to choose between building a reusable component library vs shipping features directly into the product codebase.
+
+**Task:** I needed to make a recommendation to the team with a tight deadline approaching.
+
+**Action:** I first clarified what we were optimizing for — short-term velocity vs long-term consistency. I named the tradeoff explicitly: "If we skip the library now, we accept design drift and future refactor cost." I also checked with the designers and engineers who'd be affected most. Given that we had 3 more products planned in 6 months, the asymmetric risk of not building the library was high.
+
+**Result:** We built a lightweight component library first. It added 2 weeks upfront but saved an estimated 6+ weeks across the next two product launches.
+
+---
+
+## Related Questions
+
+- How do you prioritize competing features?
+- Tell me about a time you made a decision with incomplete information.
+- How do you handle disagreements with your manager about technical direction?
+- Describe a time you changed your mind after getting new information.

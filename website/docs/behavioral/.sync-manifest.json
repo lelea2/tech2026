@@ -1,20 +1,28 @@
 {
   "files": {
     "behavorial/em-difficult-stakeholder-framework.mdx": {
-      "hash": "39a05da8e5e981a93412eb3fb11d71a7dd6789004ec1255a8a46f254c3d0c2cc",
+      "hash": "9f5b537d8bfe6754f30e5a74b2997262c8674eccc46480b061f04c210d0bb90a",
       "docRelative": "em-difficult-stakeholder-framework.mdx"
     },
     "behavorial/em-product-design-vision-platform-interview.mdx": {
-      "hash": "66c845246ebdc61479aabfd6d3c22898d53711a6b7832bf87638173d62eb8cb2",
+      "hash": "6dc1f38b39d7bb45176c8e9e7dd47bea7be2e4eec2ea221c402b61b1db517a09",
       "docRelative": "em-product-design-vision-platform-interview.mdx"
     },
     "behavorial/engineering-manager-behavioral-interview.mdx": {
-      "hash": "2ffb688111a2a252efc51f2c780cc37c61a719b5e92e351c91bc93a6b994941c",
+      "hash": "b7ed56fadb08ab07ccc948ec2540fce6607eb0cc770e9f9194ed001c2234d3ec",
       "docRelative": "engineering-manager-behavioral-interview.mdx"
     },
+    "behavorial/staff_frontend_platform_interview_prep.mdx": {
+      "hash": "fd8b456172e8dee013461a93cf638afb7fd35e6b0edeff9693f5834ae424ff69",
+      "docRelative": "staff_frontend_platform_interview_prep.mdx"
+    },
     "behavorial/strength-vs-weakness.mdx": {
-      "hash": "6c16a0f6be4850afbc795e655c6dd4b5672f37e0076926f287dcc09996c99934",
+      "hash": "7b5aa30ebd7422aa3b2e9af01d6c8038a0ce6e15d2aee0470426e87297977c77",
       "docRelative": "strength-vs-weakness.mdx"
+    },
+    "behavorial/tradeoff-behavioral.mdx": {
+      "hash": "b3de7641108f76b6fd9323ad043aa30cf09a715e134bc02b6427876e98534cb2",
+      "docRelative": "tradeoff-behavioral.mdx"
     }
   }
 }
