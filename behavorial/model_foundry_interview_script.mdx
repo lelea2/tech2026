@@ -1,0 +1,691 @@
+---
+title: "Model Foundry / MLOps Observability Interview Script"
+description: "Interview narrative, metrics impact, frontend optimization techniques, visualization strategy, Core Web Vitals framing, and scenario Q&A."
+---
+
+# Model Foundry / MLOps Observability Interview Script
+
+> Goal: present the project as a Staff/Lead Engineer story that connects product ambiguity, organizational alignment, system design, frontend performance, metrics quality, and measurable business impact.
+
+Demo reference: [Model Foundry MLOps Observability Demo](https://project-slide-demo.vercel.app/mlops-observability-demo.html)
+
+---
+
+## 1. Thirty-Second Version
+
+I led the delivery of **Model Foundry**, an MLOps observability platform that gave ML teams a unified way to discover, monitor, and govern production models across their lifecycle.
+
+Before this work, model health, ownership, feature drift, dataset freshness, and compliance metadata were fragmented across multiple internal systems. Engineers had to manually stitch together model registry data, inference metrics, feature telemetry, ownership records, and compliance cards to answer basic questions like: “Is this model active?”, “Who owns it?”, “Are its input features drifting?”, and “Is the dataset fresh enough to trust?”
+
+My role was to turn those fragmented signals into a fast, reliable, and actionable product surface. I led the architecture and frontend optimization work, partnered across MLOps, data quality, compliance, CI/CD, model serving, and legal stakeholders, and drove performance improvements such as reducing key model observability page loads from roughly **12–15 seconds to under 4 seconds**, with registered model pages reaching approximately **1 second** response time.
+
+The impact was faster incident investigation, clearer ownership, better compliance readiness, and a single source of truth for model observability.
+
+---
+
+## 2. Two-Minute Interview Script
+
+### Situation
+
+At LinkedIn, our ML ecosystem had grown across multiple serving platforms, offline pipelines, model registries, compliance workflows, and telemetry stores. This created a visibility problem. A model owner, compliance reviewer, or platform engineer could not easily answer:
+
+- Which models are active in production?
+- Which model versions are serving traffic?
+- What features does a model depend on?
+- Are those features fresh and available?
+- Is the model drifting?
+- Does the model have the required compliance metadata?
+- Who owns the model when something goes wrong?
+
+The data existed, but it lived across different systems and was not optimized for interactive investigation.
+
+### Task
+
+I was responsible for helping build **Model Foundry**, a unified MLOps observability platform. The goal was not just to build dashboards. The goal was to create a trusted operational layer where teams could discover models, debug issues, understand lineage, review compliance posture, and monitor feature/data health in one place.
+
+### Action
+
+I approached the project across four layers.
+
+First, I worked on the **metrics model**. We standardized core signals such as model activity, inference count, online/offline latency, dataset freshness, feature availability, ownership, lineage, and compliance metadata coverage. Instead of rendering raw high-cardinality telemetry directly in the UI, we created pre-aggregated and query-friendly metrics that matched the main user journeys.
+
+Second, I helped shape the **product experience**. The UI was organized around model groups, model versions, feature health, dataset freshness, ownership, and compliance signals. The goal was to make investigation progressive: start from a high-level health view, then drill into model version, feature, dataset, or lineage detail.
+
+Third, I drove **frontend performance optimization**. The original observability pages were slow because they pulled too much data synchronously, over-fetched deeply nested records, and rendered expensive tables/charts before the user had enough context. We improved this through API shape changes, server-side aggregation, caching, query parallelization, progressive loading, virtualization, memoization, chart downsampling, and route-level code splitting. This moved key page loads from roughly **12–15 seconds to under 4 seconds**, and the registered model page to about **1 second**.
+
+Fourth, I worked through the **organizational complexity**. This required alignment across model serving, data quality, compliance, CI/CD, lineage, registry, and product stakeholders. I helped define ownership boundaries: platform teams produced reliable telemetry contracts, MLOps owned the observability experience, compliance teams owned policy interpretation, and model owners consumed the insights to take action.
+
+### Result
+
+The result was a faster and more trusted Model Foundry experience. Teams had clearer ownership, faster root-cause analysis, better compliance readiness, and a single source of truth for model observability. The measurable result I highlight is the page performance improvement: **12–15 seconds down to under 4 seconds**, with important model detail pages reaching around **1 second** response time. More importantly, the product changed behavior: instead of asking several teams or querying multiple systems manually, engineers could investigate model health from one consistent interface.
+
+---
+
+## 3. Metrics and Impact Framing
+
+| Area | Before | After | Impact |
+|---|---|---|---|
+| Model discovery | Fragmented across registry, serving, ownership, and compliance systems | Unified model group and model version views | Faster discovery and fewer manual lookups |
+| Page performance | Key pages took roughly 12–15 seconds | Optimized pages loaded under 4 seconds; registered model pages around 1 second | Better developer experience and faster debugging |
+| Ownership | Unclear or inconsistent owner mapping | Ownership surfaced at model/group level | Faster escalation during incidents |
+| Feature health | Feature availability and drift signals required separate investigation | Feature availability, drift, and freshness surfaced in model context | Faster diagnosis of data quality issues |
+| Compliance metadata | Compliance information lived outside the operational model view | Compliance metadata connected to model-level observability | Better audit readiness |
+| Dataset freshness | Offline and online data freshness were not consistently visible | Freshness became part of the observability workflow | Earlier detection of stale data risk |
+
+---
+
+## 4. How I Optimized Metrics
+
+### Problem
+
+The initial temptation in observability products is to show every metric. That does not scale. ML observability data can be high-cardinality because every model, model version, feature, dataset, owner, deployment environment, and time window can multiply the number of series.
+
+The core problem was not simply storing metrics. It was deciding which metrics were actionable, how they should be aggregated, and how to make them queryable in an interactive UI.
+
+### Strategy
+
+I used a few principles:
+
+1. **Define user-facing metrics first**
+
+   I started from the questions users needed to answer:
+
+   - Is the model active?
+   - Is it serving traffic?
+   - Did latency regress?
+   - Are features missing or stale?
+   - Did feature distribution drift?
+   - Is compliance metadata complete?
+   - Who owns the model?
+
+   Then I mapped those questions to metrics and data contracts.
+
+2. **Separate raw telemetry from serving aggregates**
+
+   Raw telemetry is useful for offline analysis, but it is too expensive for every page view. For UI serving, we used precomputed aggregates such as:
+
+   - Latest active model status
+   - Last online inference timestamp
+   - Last offline inference timestamp
+   - Rolling inference counts
+   - P50/P95/P99 latency buckets
+   - Feature availability status
+   - Dataset freshness status
+   - Compliance coverage status
+
+3. **Use time windows that match the product experience**
+
+   For example, model activity did not need second-by-second precision on every page. A 7-day or daily active signal was enough for discovery, while detailed latency views could use narrower time windows when debugging.
+
+4. **Reduce cardinality before it reaches the UI**
+
+   Instead of sending every feature × model × version × timestamp series to the browser, the backend produced summaries:
+
+   - Healthy / warning / critical counts
+   - Top drifting features
+   - Most recent freshness violation
+   - Aggregated model version health
+   - Latest compliance coverage state
+
+5. **Make metrics explainable**
+
+   Every metric needed a definition. For example:
+
+   - Active model: model with inference activity in a defined recent window.
+   - Feature drift: distribution shift between baseline and current feature values.
+   - Dataset freshness: difference between expected update time and observed latest data partition/event.
+   - Compliance coverage: required metadata present at model or model-version granularity.
+
+### Interview phrasing
+
+I would say:
+
+> “The biggest metric optimization was moving from raw telemetry thinking to product-serving metrics thinking. We did not want every page load to become a distributed analytics query. We defined the user questions first, precomputed the right aggregates, reduced high-cardinality dimensions, and exposed metrics that were fast enough for an interactive investigation workflow.”
+
+---
+
+## 5. Visualization Strategy
+
+### Design goal
+
+The visualizations were not meant to be generic dashboards. They were designed to support investigation.
+
+The page hierarchy followed a progressive disclosure pattern:
+
+1. **Overview** — health summary, ownership, activity, compliance posture.
+2. **Model group** — group-level trends, active versions, feature/dataset health.
+3. **Model version** — serving metrics, latency, inference activity, lineage.
+4. **Feature tab** — feature availability, drift, freshness, and diagnostics.
+5. **Compliance view** — required metadata and governance signals.
+
+### Visualization techniques
+
+| Visualization need | Technique |
+|---|---|
+| Show model health quickly | Status cards and summary badges |
+| Show trend over time | Line charts with downsampled points |
+| Show latency distribution | P50/P95/P99 percentile trend instead of raw traces |
+| Show feature drift | Severity-ranked feature list and distribution comparison |
+| Show ownership | Owner and crew metadata surfaced near health signals |
+| Show compliance readiness | Coverage summary with missing fields/actions |
+| Show dataset freshness | Latest partition/event freshness with threshold state |
+
+### Why this mattered
+
+A slow or overloaded observability UI creates operational risk. During an incident, users do not want a dashboard full of raw data. They want a guided path from symptom to likely cause.
+
+The visualization strategy was: **summary first, anomaly second, drilldown third**.
+
+### Interview phrasing
+
+> “I treated visualization as an incident workflow, not just a reporting layer. The goal was to reduce time-to-understanding. We used summaries for the first paint, severity ranking for attention, and drilldowns only when the user needed details.”
+
+---
+
+## 6. Frontend Performance Optimization
+
+### Initial bottlenecks
+
+The slow pages had several common bottlenecks:
+
+- Large API payloads with deeply nested data.
+- Sequential requests where independent requests could be parallelized.
+- UI waiting for all data before rendering anything useful.
+- Expensive table rendering with many rows and columns.
+- Chart components rendering too many data points.
+- Repeated recalculation of derived view models on each render.
+- Bundle size growth from heavy visualization and utility libraries.
+- Lack of clear loading strategy between critical and non-critical content.
+
+### Techniques used
+
+#### 1. API payload shaping
+
+Instead of returning a full model object with every metric and relationship, the page used purpose-built API shapes:
+
+```ts
+type ModelOverviewResponse = {
+  modelGroupId: string;
+  modelGroupName: string;
+  owner: OwnerSummary;
+  health: HealthSummary;
+  activity: ActivitySummary;
+  compliance: ComplianceSummary;
+  featureHealthSummary: FeatureHealthSummary;
+  datasetFreshnessSummary: DatasetFreshnessSummary;
+};
+```
+
+This kept the first page response focused on what was needed for the initial view.
+
+#### 2. Server-side aggregation
+
+The backend produced summaries and rollups rather than asking the browser to process raw telemetry.
+
+Examples:
+
+```ts
+type LatencySummary = {
+  p50Ms: number;
+  p95Ms: number;
+  p99Ms: number;
+  window: "1h" | "24h" | "7d";
+};
+
+type FeatureHealthSummary = {
+  totalFeatures: number;
+  healthyCount: number;
+  warningCount: number;
+  criticalCount: number;
+  topIssues: FeatureIssue[];
+};
+```
+
+#### 3. Progressive loading
+
+The first paint showed the most important information:
+
+- Title and ownership
+- Activity status
+- Health summary
+- Compliance summary
+- Key freshness state
+
+Secondary data loaded after the initial render:
+
+- Full feature table
+- Detailed drift chart
+- Historical latency trend
+- Lineage graph
+- Export/audit details
+
+#### 4. Query parallelization
+
+Independent data requests were executed in parallel rather than chained.
+
+```ts
+const [overview, latency, freshness, compliance] = await Promise.all([
+  fetchModelOverview(modelId),
+  fetchLatencySummary(modelId),
+  fetchFreshnessSummary(modelId),
+  fetchComplianceSummary(modelId),
+]);
+```
+
+#### 5. Caching and stale-while-revalidate
+
+For observability pages, not every field needs to be real-time. We used cache-friendly data boundaries:
+
+- Ownership metadata: longer cache
+- Compliance metadata: moderate cache
+- Dataset freshness: shorter cache
+- Active inference status: shorter cache
+- Historical charts: cacheable by time window
+
+This made the UI faster while still keeping operationally important signals fresh.
+
+#### 6. Virtualized tables
+
+Feature-level and model-level tables can grow large. Rendering thousands of DOM rows creates poor interaction performance. Virtualization keeps only visible rows mounted.
+
+```tsx
+function FeatureTable({ rows }: { rows: FeatureRow[] }) {
+  return (
+    <VirtualizedTable
+      rowCount={rows.length}
+      rowHeight={44}
+      renderRow={(index) => <FeatureRowView row={rows[index]} />}
+    />
+  );
+}
+```
+
+#### 7. Chart downsampling
+
+For charts, the browser does not need every raw point when the visual width is only a few hundred pixels. We downsampled time series data based on the selected range and chart width.
+
+```ts
+function downsample(points: MetricPoint[], maxPoints: number) {
+  if (points.length <= maxPoints) return points;
+
+  const bucketSize = Math.ceil(points.length / maxPoints);
+  const result: MetricPoint[] = [];
+
+  for (let i = 0; i < points.length; i += bucketSize) {
+    const bucket = points.slice(i, i + bucketSize);
+    result.push({
+      timestamp: bucket[0].timestamp,
+      value: Math.max(...bucket.map((p) => p.value)),
+    });
+  }
+
+  return result;
+}
+```
+
+For operational views, preserving spikes was more important than preserving every point, so max/percentile aggregation was preferred over simple averaging in some charts.
+
+#### 8. Memoized derived state
+
+The UI derived view-specific state from API responses, such as severity groups, filtered rows, and sorted issue lists. These transformations were memoized.
+
+```tsx
+const criticalFeatures = useMemo(() => {
+  return features
+    .filter((feature) => feature.status === "critical")
+    .sort((a, b) => b.severityScore - a.severityScore);
+}, [features]);
+```
+
+#### 9. Route-level code splitting
+
+Heavy views such as lineage graph, drift detail, or export flows were loaded only when needed.
+
+```tsx
+const LineageGraph = lazy(() => import("./LineageGraph"));
+const DriftDetail = lazy(() => import("./DriftDetail"));
+```
+
+#### 10. Rendering priority
+
+The page prioritized visible, actionable content. Expensive below-the-fold charts were delayed until after the main content loaded.
+
+---
+
+## 7. Core Web Vitals Framing
+
+Even though this was an internal enterprise platform, I used Core Web Vitals as a practical language for performance because it connects engineering work to user experience.
+
+| Core Web Vital | What I optimized | Example technique |
+|---|---|---|
+| LCP — Largest Contentful Paint | Time until the main model summary was visible | Smaller initial payload, server-side summary, progressive loading |
+| INP — Interaction to Next Paint | Responsiveness when filtering, sorting, expanding, or switching tabs | Virtualized tables, memoized selectors, avoiding large synchronous render work |
+| CLS — Cumulative Layout Shift | Stability of cards/charts/tables while data loaded | Skeleton dimensions, reserved chart/table space, predictable layout containers |
+| TTFB — Time to First Byte | Backend response start time | Pre-aggregation, indexed queries, cacheable summaries |
+| Bundle cost | JavaScript parse and execution time | Route splitting, lazy-loading charts, avoiding unnecessary libraries |
+
+### Interview phrasing
+
+> “I used Core Web Vitals as a shared language even for an internal tool. LCP mapped to how quickly a model owner could see the health summary. INP mapped to whether large metric tables and filters stayed responsive. CLS mattered because observability pages often load asynchronously, and layout jumping makes incident investigation harder.”
+
+---
+
+## 8. Architecture Talking Points
+
+### High-level architecture
+
+```text
+ML Platforms / Serving Systems / Feature Stores / Data Pipelines / Compliance Sources
+        |
+        v
+Telemetry + Metadata Ingestion
+        |
+        v
+Normalization + Ownership Mapping + Metric Aggregation
+        |
+        v
+Serving Stores / Query APIs / Cache Layer
+        |
+        v
+Model Foundry UI
+        |
+        v
+Model owners, platform engineers, compliance reviewers, incident responders
+```
+
+### Key design decisions
+
+1. **Normalize telemetry contracts**
+
+   Different systems produce different identifiers and schemas. We needed consistent keys across model group, model version, feature, dataset, owner, and deployment environment.
+
+2. **Create serving-optimized read models**
+
+   The UI should not reconstruct operational state from raw pipelines on every request. We created read models optimized around page-level queries.
+
+3. **Separate freshness-sensitive and freshness-tolerant data**
+
+   Model activity and freshness data needed tighter freshness windows than ownership metadata or compliance metadata.
+
+4. **Make ownership a first-class entity**
+
+   Observability without ownership does not create action. Every alert or health signal needed a path to the responsible team.
+
+5. **Design for high-cardinality ML data**
+
+   Feature-level and version-level metrics can explode in size. Aggregation, ranking, filtering, and pagination were necessary from the start.
+
+---
+
+## 9. Organizational Depth
+
+This project required more than engineering execution. The hard part was aligning multiple teams around a shared source of truth.
+
+### Stakeholders
+
+| Stakeholder | Concern |
+|---|---|
+| Model owners | Need to know health, activity, drift, ownership, and action items |
+| MLOps platform | Need reliable model lifecycle visibility |
+| Data quality teams | Need freshness and feature availability surfaced in context |
+| Compliance/legal | Need model-level metadata and audit readiness |
+| CI/CD teams | Need model metadata and manifest integration |
+| Serving infrastructure | Need telemetry contracts and operational metrics |
+| Leadership | Need platform adoption, reliability, and measurable impact |
+
+### Leadership behaviors demonstrated
+
+- Translated ambiguous observability needs into concrete product metrics.
+- Defined ownership boundaries across platform, compliance, and product teams.
+- Drove performance as a product requirement, not a cleanup task.
+- Created shared language around health, freshness, drift, and compliance.
+- Balanced short-term page speed wins with longer-term data model improvements.
+- Helped engineers reason about tradeoffs between real-time accuracy, cost, and usability.
+
+### Interview phrasing
+
+> “The organizational challenge was that every team owned one piece of the truth. My job was to help create the connective tissue: shared identifiers, shared metric definitions, ownership mapping, and a product experience that made the data actionable.”
+
+---
+
+## 10. Scenario Questions and Strong Answers
+
+## Question 1: “Why was the page slow originally?”
+
+Strong answer:
+
+The page was slow because it was doing too much work at request time and render time. The backend was assembling data from multiple systems, and the frontend was receiving large nested payloads that included more information than the initial view needed. The UI also rendered expensive tables and charts too early.
+
+The fix was not one optimization. We improved the system end-to-end: pre-aggregated metrics, shaped APIs around page needs, parallelized independent requests, cached less volatile metadata, split critical and non-critical data, virtualized large tables, downsampled charts, and memoized derived state.
+
+---
+
+## Question 2: “How did you decide which metrics to show?”
+
+Strong answer:
+
+I started from user questions instead of available data. For model owners, the questions were: is my model active, healthy, compliant, and owned correctly? For platform engineers, the questions were: where is the issue coming from — serving, feature data, dataset freshness, or metadata? For compliance partners, the question was: does this model have required documentation and ownership?
+
+From those questions, we defined a small set of core metrics: activity, inference volume, latency percentiles, feature availability, feature drift, dataset freshness, ownership, and compliance coverage.
+
+---
+
+## Question 3: “How did you handle high-cardinality metrics?”
+
+Strong answer:
+
+We avoided exposing raw high-cardinality telemetry directly to the UI. Instead, we used aggregation and ranking. For example, instead of sending every feature time series for every model version, we showed health counts, top drifting features, critical freshness issues, and then allowed drilldown when needed.
+
+The key was to preserve the debugging path without making the first page load pay the cost of every possible investigation.
+
+---
+
+## Question 4: “How did you optimize charts?”
+
+Strong answer:
+
+We optimized charts in three ways.
+
+First, we reduced the data before it reached the browser. The backend returned time-windowed summaries or percentile series instead of raw events.
+
+Second, we downsampled chart points based on the time range and chart width. For observability charts, preserving spikes was important, so we often used max or percentile-based aggregation rather than simple averages.
+
+Third, we lazy-loaded heavy chart components and rendered below-the-fold visualizations after the critical summary content.
+
+---
+
+## Question 5: “How did you use Core Web Vitals?”
+
+Strong answer:
+
+I used Core Web Vitals as a practical performance vocabulary. For LCP, I focused on making the model summary visible quickly. For INP, I optimized large table interactions, filtering, sorting, and tab switching. For CLS, I ensured async-loaded cards and charts had reserved space and stable skeletons.
+
+For an internal tool, the goal was not SEO. The goal was operational speed: during debugging, users needed a stable and responsive interface.
+
+---
+
+## Question 6: “What tradeoff did you make between freshness and performance?”
+
+Strong answer:
+
+Not all data needed the same freshness. Active serving status and dataset freshness needed short refresh windows. Ownership and compliance metadata could be cached longer. Historical trends could be cached by time range.
+
+That let us keep the operationally important signals fresh while avoiding expensive full-page recomputation for metadata that changed slowly.
+
+---
+
+## Question 7: “How did you measure success?”
+
+Strong answer:
+
+I measured success across performance, usability, and platform trust.
+
+Performance-wise, key page loads improved from about 12–15 seconds to under 4 seconds, and registered model pages reached roughly 1 second. Usability-wise, model owners could answer questions from one place instead of manually querying multiple systems. Platform-wise, teams had clearer ownership and more consistent metric definitions.
+
+The most important impact was reducing time-to-understanding during model investigation.
+
+---
+
+## Question 8: “How did you work with other teams?”
+
+Strong answer:
+
+I treated cross-team alignment as part of the system design. Serving teams owned inference telemetry. Data quality teams owned freshness and availability signals. Compliance teams owned policy requirements. CI/CD teams owned metadata integration. MLOps owned the product experience and aggregation layer.
+
+My role was to connect those systems into a coherent workflow, clarify ownership boundaries, and make sure the UI reflected trusted definitions instead of becoming another fragmented dashboard.
+
+---
+
+## Question 9: “What would you improve next?”
+
+Strong answer:
+
+I would invest in three areas.
+
+First, stronger alert-to-investigation workflows, where an alert links directly to the relevant model, feature, dataset, and owner.
+
+Second, richer lineage integration, so teams can move from model symptom to upstream data or training artifact root cause faster.
+
+Third, adaptive metric loading, where the UI changes query depth based on user intent. For example, overview pages stay lightweight, but debugging mode fetches deeper high-resolution metrics.
+
+---
+
+## Question 10: “What makes this Staff-level?”
+
+Strong answer:
+
+The Staff-level aspect was not just building pages. It was defining the operating model for ML observability: common metric definitions, shared ownership mapping, performance targets, cross-system data contracts, and an experience that multiple teams could trust.
+
+The work required technical depth in frontend performance, data aggregation, and observability architecture, but also organizational depth across compliance, serving, data quality, CI/CD, and model owners.
+
+---
+
+## 11. STAR Story: Page Performance Optimization
+
+### Situation
+
+Model observability pages were becoming too slow as more models, features, versions, and compliance metadata were added. Some key pages took roughly 12–15 seconds to load, which made the product hard to use during investigation.
+
+### Task
+
+I needed to improve page response time while preserving the depth of information users needed for model health, ownership, compliance, and debugging.
+
+### Action
+
+I profiled the page end-to-end and found bottlenecks across API latency, payload size, render cost, and chart/table complexity. I worked with backend and data teams to create serving-optimized summaries, moved expensive aggregation out of the browser, split critical and non-critical data, cached slower-changing metadata, and improved the frontend with virtualization, memoization, lazy loading, and chart downsampling.
+
+### Result
+
+We reduced key page loads from roughly 12–15 seconds to under 4 seconds, and some registered model detail pages reached around 1 second. This improved the user experience and made the product more useful during real operational investigations.
+
+---
+
+## 12. STAR Story: Organizational Alignment
+
+### Situation
+
+Model observability depended on many systems: model registry, serving telemetry, feature tracking, dataset freshness, compliance metadata, ownership systems, and CI/CD workflows. Each team had partial context and different definitions.
+
+### Task
+
+I needed to help create a unified source of truth that teams could trust.
+
+### Action
+
+I aligned stakeholders around core definitions: active model, model version, feature health, dataset freshness, ownership, and compliance coverage. I clarified which team produced each signal, which team owned policy interpretation, and which layer was responsible for the product experience.
+
+### Result
+
+The platform became more than a dashboard. It became an operational workflow for model owners, compliance reviewers, and platform engineers. Teams could investigate model health and ownership from one place instead of stitching together multiple systems manually.
+
+---
+
+## 13. Technical Deep-Dive: Example API Design
+
+```ts
+type ModelHealthStatus = "healthy" | "warning" | "critical" | "unknown";
+
+type ModelFoundryOverview = {
+  modelGroup: {
+    id: string;
+    name: string;
+    owner: {
+      teamName: string;
+      primaryContact: string;
+    };
+  };
+
+  activity: {
+    isActive: boolean;
+    lastOnlineInferenceAt?: string;
+    lastOfflineInferenceAt?: string;
+    sevenDayInferenceCount: number;
+  };
+
+  latency: {
+    p50Ms: number;
+    p95Ms: number;
+    p99Ms: number;
+    status: ModelHealthStatus;
+  };
+
+  featureHealth: {
+    totalFeatures: number;
+    healthy: number;
+    warning: number;
+    critical: number;
+    topIssues: Array<{
+      featureName: string;
+      issueType: "missing" | "stale" | "drift";
+      severity: ModelHealthStatus;
+    }>;
+  };
+
+  datasetFreshness: {
+    status: ModelHealthStatus;
+    latestObservedAt?: string;
+    expectedFrequency: string;
+  };
+
+  compliance: {
+    coverageStatus: ModelHealthStatus;
+    missingFields: string[];
+  };
+};
+```
+
+### Why this API shape helps
+
+- It is optimized for first render.
+- It avoids forcing the UI to join multiple raw datasets.
+- It keeps high-cardinality details behind drilldown APIs.
+- It makes page ownership and health visible immediately.
+- It provides stable contracts for frontend performance work.
+
+---
+
+## 14. Frontend Checklist to Mention in Interview
+
+- Profile first: API time, payload size, JavaScript execution, render cost, chart cost.
+- Split critical and non-critical data.
+- Create page-specific API response shapes.
+- Use server-side aggregation for expensive metrics.
+- Use caching based on data freshness needs.
+- Parallelize independent requests.
+- Use virtualization for large tables.
+- Downsample chart data.
+- Lazy-load heavy views.
+- Memoize derived state.
+- Reserve layout space to avoid CLS.
+- Track LCP/INP/CLS for internal tools, not only public websites.
+- Define performance budgets for page load and interaction latency.
+
+---
+
+## 15. Final Interview Closing Statement
+
+The reason I like this project is that it shows the kind of work I enjoy most: taking a complex, fragmented technical domain and turning it into a product experience that is fast, understandable, and operationally useful.
+
+The frontend work mattered because performance directly affected trust. The metrics work mattered because inaccurate or overloaded metrics create confusion. And the organizational work mattered because observability only works when the underlying definitions and ownership boundaries are clear.
+
+So when I describe Model Foundry, I frame it as more than an MLOps dashboard. It was a platform effort that connected model lifecycle data, health metrics, feature and dataset signals, ownership, and compliance into one workflow — with measurable performance improvements and clearer operational ownership.
