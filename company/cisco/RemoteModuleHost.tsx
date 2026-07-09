@@ -1,0 +1,122 @@
+import type { ComponentType } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
+
+export type RemotePanelProps = {
+  tenantId: string;
+  onNavigate: (path: string) => void;
+};
+
+export type RemoteModule = {
+  default: ComponentType<RemotePanelProps>;
+};
+
+type Props = RemotePanelProps & {
+  name: string;
+  loadRemote: () => Promise<RemoteModule>;
+};
+
+type LoadState = {
+  status: string;
+  RemoteComponent: React.ComponentType<RemotePanelProps> | null;
+  error: Error | null;
+};
+
+export function RemoteModuleHost({
+  name,
+  loadRemote,
+  tenantId,
+  onNavigate,
+}: Props) {
+  const [state, setState] = useState<LoadState>({
+    status: 'loading',
+    RemoteComponent: null, // component state.
+    error: null,
+  });
+  const requestIdRef = useRef(0);
+  const isMountedRef = useRef(false);
+
+  const load = useCallback(() => {
+    // let cancelled = false;
+    const requestId = ++requestIdRef.current;
+
+    setState({
+      status: 'loading',
+      RemoteComponent: null,
+      error: null,
+    });
+
+    loadRemote()
+      .then((remoteModule) => {
+        // if (cancelled) {
+        //   return; // do not do anaything
+        // }
+        const isObsolete = requestId !== requestIdRef.current;
+        if (!isMountedRef.current || isObsolete) {
+          return;
+        }
+        console.log('>>> remoteMoule', remoteModule);
+        setState({
+          status: 'success',
+          RemoteComponent: remoteModule.default,
+          error: null,
+        });
+      })
+      .catch((err) => {
+        // if (cancelled) {
+        //   return;
+        // }
+        const isObsolete = requestId !== requestIdRef.current;
+        if (!isMountedRef.current || isObsolete) {
+          return;
+        }
+        setState({
+          status: 'error',
+          RemoteComponent: null,
+          error: err,
+        });
+      });
+  }, [loadRemote]);
+
+  // const handleRetry = useCallback(() => {
+  //   console.log('>>>> retry button');
+  //   load();
+  // }, []);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    load();
+    return () => {
+      isMountedRef.current = false;
+      requestIdRef.current += 1;
+    };
+  }, [load]);
+
+  if (state.status === 'loading') {
+    return (
+      <section>
+        <p role="status">loading settings</p>
+      </section>
+    );
+  }
+
+  if (state.status === 'error') {
+    return (
+      <section role="alert">
+        <p>unable to load settings</p>
+        <p>{state.error?.message}</p>
+        <button onClick={load}>Retry</button>
+      </section>
+    );
+  }
+
+  const RemoteComponent = state.RemoteComponent;
+
+  return (
+    <section aria-labelledby="remote-heading">
+      <h1 id="remote-heading">{name}</h1>
+      {RemoteComponent && (
+        <RemoteComponent tenantId={tenantId} onNavigate={onNavigate} />
+      )}
+    </section>
+  );
+}

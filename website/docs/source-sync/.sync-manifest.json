@@ -992,6 +992,174 @@
       "hash": "83a28c103650b500aef7cf257f8260221f921da67b85a203d83c106995c9bd10",
       "docRelative": "frontend/react-component-interview/hooks/useUndoRedo.mdx"
     },
+    "frontend/react-interview/Accordion/Accordion.css": {
+      "hash": "1679f357ad532cf50ef0871a01c26cf9263d9809831e54ef024bf434ac1e6d91",
+      "docRelative": "frontend/react-interview/Accordion/Accordion.css.mdx"
+    },
+    "frontend/react-interview/Accordion/Accordion.jsx": {
+      "hash": "2422fde992fdffb8c6bb10f5526dba229e0f8ec975f665bc8ca87563511826ce",
+      "docRelative": "frontend/react-interview/Accordion/Accordion.jsx.mdx"
+    },
+    "frontend/react-interview/AutocompleteTypeahead/AutocompleteTypeahead.css": {
+      "hash": "1613b6246ef119bd024092605bf9431d9b24df455ce9d404672cb76612b166ff",
+      "docRelative": "frontend/react-interview/AutocompleteTypeahead/AutocompleteTypeahead.css.mdx"
+    },
+    "frontend/react-interview/AutocompleteTypeahead/AutocompleteTypeahead.jsx": {
+      "hash": "627a8e32f508f3fcc64d98ec9998684b396096a30506bdd992da9bee5d92a33c",
+      "docRelative": "frontend/react-interview/AutocompleteTypeahead/AutocompleteTypeahead.jsx.mdx"
+    },
+    "frontend/react-interview/CalendarAvailabilityPicker/CalendarAvailabilityPicker.css": {
+      "hash": "9e99792f3bed4e793dac00bf98db76a367958a6fa23395d4a537f4505354f4ad",
+      "docRelative": "frontend/react-interview/CalendarAvailabilityPicker/CalendarAvailabilityPicker.css.mdx"
+    },
+    "frontend/react-interview/CalendarAvailabilityPicker/CalendarAvailabilityPicker.jsx": {
+      "hash": "cb4167df076985aa2720bbf843cfb96e9d7bcf1585adcf9ae1ee686f590a0ed6",
+      "docRelative": "frontend/react-interview/CalendarAvailabilityPicker/CalendarAvailabilityPicker.jsx.mdx"
+    },
+    "frontend/react-interview/DateRangePicker/DateRangePicker.css": {
+      "hash": "12bdb2db061295f09d2f560fd0ba1736c8f9e9dad95397d5753813dbbe44d796",
+      "docRelative": "frontend/react-interview/DateRangePicker/DateRangePicker.css.mdx"
+    },
+    "frontend/react-interview/DateRangePicker/DateRangePicker.jsx": {
+      "hash": "c97f2eaa84ca241c5169cb488cafdd1ebde593a799ad0f78d2592305f3defa27",
+      "docRelative": "frontend/react-interview/DateRangePicker/DateRangePicker.jsx.mdx"
+    },
+    "frontend/react-interview/FilterSidebar/FilterSidebar.css": {
+      "hash": "abe12726521c7fdb496ea78a053d91804c5d1d53bb725ba59114cfb663a3a2a7",
+      "docRelative": "frontend/react-interview/FilterSidebar/FilterSidebar.css.mdx"
+    },
+    "frontend/react-interview/FilterSidebar/FilterSidebar.jsx": {
+      "hash": "2f0d5544f6d7e2d67154ea123e7e3069925dadf9ab7c28533caffc7ccc82b0d7",
+      "docRelative": "frontend/react-interview/FilterSidebar/FilterSidebar.jsx.mdx"
+    },
+    "frontend/react-interview/GuestCounter/GuestCounter.css": {
+      "hash": "cb0d5ca1633760f326907615e41c2487a1a612f97c0a436346c412691919463b",
+      "docRelative": "frontend/react-interview/GuestCounter/GuestCounter.css.mdx"
+    },
+    "frontend/react-interview/GuestCounter/GuestCounter.jsx": {
+      "hash": "7c03af8f67eb8078590c4cc601ad98368ea8476ae777c88ba8dfe16d8ae02d9f",
+      "docRelative": "frontend/react-interview/GuestCounter/GuestCounter.jsx.mdx"
+    },
+    "frontend/react-interview/ImageCarousel/ImageCarousel.css": {
+      "hash": "ecd3e7d6bf591d31aad83b9b1b00546b9ac480444b79798c25eef93760e9293e",
+      "docRelative": "frontend/react-interview/ImageCarousel/ImageCarousel.css.mdx"
+    },
+    "frontend/react-interview/ImageCarousel/ImageCarousel.jsx": {
+      "hash": "b1801d10bba41994f91d062dc197c6b63d3979072757495e11c47cbbb256c28c",
+      "docRelative": "frontend/react-interview/ImageCarousel/ImageCarousel.jsx.mdx"
+    },
+    "frontend/react-interview/InfiniteScrollList/InfiniteScrollList.css": {
+      "hash": "ac94b7ddb1760daed13897cfde43ad47533e3da3ea375d9b2ae4ab5e31a456ab",
+      "docRelative": "frontend/react-interview/InfiniteScrollList/InfiniteScrollList.css.mdx"
+    },
+    "frontend/react-interview/InfiniteScrollList/InfiniteScrollList.jsx": {
+      "hash": "9ccf92c85e8e6d9261dfe161058e9d2b3db5afe86b9a41713c4c8aa6e76c8d1d",
+      "docRelative": "frontend/react-interview/InfiniteScrollList/InfiniteScrollList.jsx.mdx"
+    },
+    "frontend/react-interview/MapListingSync/MapListingSync.css": {
+      "hash": "1b24b474228408a3ddfe1b224c64fa1d87283151ff5da54621fff8a210f41288",
+      "docRelative": "frontend/react-interview/MapListingSync/MapListingSync.css.mdx"
+    },
+    "frontend/react-interview/MapListingSync/MapListingSync.jsx": {
+      "hash": "4707d0a5c215ab6eb6c8e866c67861acb9277be098aec95763f77c9cf4cd7a10",
+      "docRelative": "frontend/react-interview/MapListingSync/MapListingSync.jsx.mdx"
+    },
+    "frontend/react-interview/ModalSystem/ModalSystem.css": {
+      "hash": "07dd8c61188e2f92a985fdda5288e2e94731aa5c611361ae22199a832423a2c9",
+      "docRelative": "frontend/react-interview/ModalSystem/ModalSystem.css.mdx"
+    },
+    "frontend/react-interview/ModalSystem/ModalSystem.jsx": {
+      "hash": "e53b90930d2430b8c6f73d4a87eba8e01d24395fd802692d311755e377f595e9",
+      "docRelative": "frontend/react-interview/ModalSystem/ModalSystem.jsx.mdx"
+    },
+    "frontend/react-interview/MultiSelectFilter/MultiSelectFilter.css": {
+      "hash": "69785f4f40f2d57f6b451f781b99daa2593e28e14d6f593bf4c6690a1b2559ae",
+      "docRelative": "frontend/react-interview/MultiSelectFilter/MultiSelectFilter.css.mdx"
+    },
+    "frontend/react-interview/MultiSelectFilter/MultiSelectFilter.jsx": {
+      "hash": "db8d3dd0ecb86a5287764c36dbab4a29648740060201c1aac83a47a14035ccd4",
+      "docRelative": "frontend/react-interview/MultiSelectFilter/MultiSelectFilter.jsx.mdx"
+    },
+    "frontend/react-interview/Pagination/Pagination.css": {
+      "hash": "3d501b7c848ea8425cc427c7c33d08cbf9ff5ac9e509a6262953b132e1383159",
+      "docRelative": "frontend/react-interview/Pagination/Pagination.css.mdx"
+    },
+    "frontend/react-interview/Pagination/Pagination.jsx": {
+      "hash": "7c2267e081598bb7d124259057c6691ec43d3abb87075fc991b25ef6ae04d9d2",
+      "docRelative": "frontend/react-interview/Pagination/Pagination.jsx.mdx"
+    },
+    "frontend/react-interview/PriceBreakdown/PriceBreakdown.css": {
+      "hash": "7bdf89f876318a8716fe527f888a48c6936a523c29a1e52c3900ec56410892ef",
+      "docRelative": "frontend/react-interview/PriceBreakdown/PriceBreakdown.css.mdx"
+    },
+    "frontend/react-interview/PriceBreakdown/PriceBreakdown.jsx": {
+      "hash": "b602f3cbb665d7f23e38859db2c4e79e7c51bdeb282f9f75bb8ee53775f07c23",
+      "docRelative": "frontend/react-interview/PriceBreakdown/PriceBreakdown.jsx.mdx"
+    },
+    "frontend/react-interview/README.md": {
+      "hash": "3310cd803dd6d49b21831452a757ba51f39332562daa3f9094e682e5e20bb0cf",
+      "docRelative": "frontend/react-interview/README.mdx"
+    },
+    "frontend/react-interview/ReservationForm/ReservationForm.css": {
+      "hash": "f86bcff3e0e544d493dd7d514fcc45192075b692d820dbfea4662889d5405a17",
+      "docRelative": "frontend/react-interview/ReservationForm/ReservationForm.css.mdx"
+    },
+    "frontend/react-interview/ReservationForm/ReservationForm.jsx": {
+      "hash": "dec3b54964b69c571c455f9dd6b1744199ca5b7c00565ea966e0a1d5af325618",
+      "docRelative": "frontend/react-interview/ReservationForm/ReservationForm.jsx.mdx"
+    },
+    "frontend/react-interview/ResponsivePhotoGrid/ResponsivePhotoGrid.css": {
+      "hash": "ff4adeb784d7583ac6039594de30269529cd6ec06d318a76efc97ce65931a36a",
+      "docRelative": "frontend/react-interview/ResponsivePhotoGrid/ResponsivePhotoGrid.css.mdx"
+    },
+    "frontend/react-interview/ResponsivePhotoGrid/ResponsivePhotoGrid.jsx": {
+      "hash": "dc5937f938074aa9980881f4ef39ea2f7ef124d4344b933044176f2df2276ad9",
+      "docRelative": "frontend/react-interview/ResponsivePhotoGrid/ResponsivePhotoGrid.jsx.mdx"
+    },
+    "frontend/react-interview/SearchableDropdown/SearchableDropdown.css": {
+      "hash": "77548bb8e76f09b8550979f53f96eaf597125787b2ea4f30c142d3978d9ad417",
+      "docRelative": "frontend/react-interview/SearchableDropdown/SearchableDropdown.css.mdx"
+    },
+    "frontend/react-interview/SearchableDropdown/SearchableDropdown.jsx": {
+      "hash": "edae9b31316c629c0548f669f0032470bc201dcddfcc86bf14b184a4cdb00e43",
+      "docRelative": "frontend/react-interview/SearchableDropdown/SearchableDropdown.jsx.mdx"
+    },
+    "frontend/react-interview/TabsAria/TabsAria.css": {
+      "hash": "52f618f05c01b301dec5cbcf7c045034a7568d088955acf9cc509c76462e9c60",
+      "docRelative": "frontend/react-interview/TabsAria/TabsAria.css.mdx"
+    },
+    "frontend/react-interview/TabsAria/TabsAria.jsx": {
+      "hash": "441b43f55596ea6089fa699f43b53e798870782aafdee7bea7ff6976b61a79f9",
+      "docRelative": "frontend/react-interview/TabsAria/TabsAria.jsx.mdx"
+    },
+    "frontend/react-interview/ToastSystem/ToastSystem.css": {
+      "hash": "f7e039448580b74137bc1826ba89f7361fd977ec73f80ba9c38898e3433a12a3",
+      "docRelative": "frontend/react-interview/ToastSystem/ToastSystem.css.mdx"
+    },
+    "frontend/react-interview/ToastSystem/ToastSystem.jsx": {
+      "hash": "fe551f6cf5ec76d17a4f387dfe0e4430082652268a3466c9931ae3236a7df0ed",
+      "docRelative": "frontend/react-interview/ToastSystem/ToastSystem.jsx.mdx"
+    },
+    "frontend/react-interview/TooltipPopover/TooltipPopover.css": {
+      "hash": "06e62791e6a32d4a3e3dc7fa4525c3a5a5dcb583eeb86aa30fd7e0582a563b3d",
+      "docRelative": "frontend/react-interview/TooltipPopover/TooltipPopover.css.mdx"
+    },
+    "frontend/react-interview/TooltipPopover/TooltipPopover.jsx": {
+      "hash": "8874d8d395b31fb80b54ab52c4979f365789ef51dc8f53970978478eb5e92aac",
+      "docRelative": "frontend/react-interview/TooltipPopover/TooltipPopover.jsx.mdx"
+    },
+    "frontend/react-interview/VirtualizedGrid/VirtualizedGrid.css": {
+      "hash": "e69ab784dab76e967ca396cbe57934bda614734a0eea8c2114b5bb377b223586",
+      "docRelative": "frontend/react-interview/VirtualizedGrid/VirtualizedGrid.css.mdx"
+    },
+    "frontend/react-interview/VirtualizedGrid/VirtualizedGrid.jsx": {
+      "hash": "8b0572651008ad322d0c8da6cc3c7e527d812ccc26d0bca8f389bbe103d070e3",
+      "docRelative": "frontend/react-interview/VirtualizedGrid/VirtualizedGrid.jsx.mdx"
+    },
+    "frontend/react-interview/index.js": {
+      "hash": "2cfb25e5cba00a0cfab8878edea205ea19d75862a52bf9c68d2e8d2bf706b7c7",
+      "docRelative": "frontend/react-interview/index.mdx"
+    },
     "frontend/react_hooks_bug_fix_interview_guide.mdx": {
       "hash": "bb5e29cb954bd8d70b210256aff5763cc4f4c53d97f67fbfcda355f2bd693e84",
       "docRelative": "frontend/react_hooks_bug_fix_interview_guide.mdx"
@@ -1817,7 +1985,7 @@
       "docRelative": "backend/quizzes/_index.mdx"
     },
     "__nav__:frontend": {
-      "hash": "4e57197cef6389b764d2ea8afdd1e6ef2d1d8a72da68e866beebbc640e351db8",
+      "hash": "aa04f559033203c9f710041c378016b2cbe9ee26e05b6d66c728a4935c2a0b43",
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/css": {
@@ -1955,6 +2123,90 @@
     "__nav__:frontend/react-component-interview/hooks": {
       "hash": "01cc068cce9983e7630fe3e0c586b9292bddd629cbfc5d260fa1915c82fd2785",
       "docRelative": "frontend/react-component-interview/hooks/_index.mdx"
+    },
+    "__nav__:frontend/react-interview": {
+      "hash": "c6f448779a84a81eeeec4aaf65432cf5c9b0787e2d464daf59de44a3f0567614",
+      "docRelative": "frontend/react-interview/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/Accordion": {
+      "hash": "d1e039063446d07847d7dfb39f2066dd8b3a006682226a2987c6327ef6c4a8e7",
+      "docRelative": "frontend/react-interview/Accordion/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/AutocompleteTypeahead": {
+      "hash": "35d4754eee6512f138d3e86949d69c3badce2fa907bc10ba6baa074ad878976d",
+      "docRelative": "frontend/react-interview/AutocompleteTypeahead/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/CalendarAvailabilityPicker": {
+      "hash": "e0c2564e3a2e026c00410c8d14f3e049ce367c7797898bce5373136f093a2280",
+      "docRelative": "frontend/react-interview/CalendarAvailabilityPicker/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/DateRangePicker": {
+      "hash": "3770cdf1ae3ec2effe0aaa5689fa5bfb45c40469a37c61c5197212aaeb3a95fa",
+      "docRelative": "frontend/react-interview/DateRangePicker/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/FilterSidebar": {
+      "hash": "42f180753f74ecea243bf67844cbea9f1b3804376b3cbba5585cc584ff4d9370",
+      "docRelative": "frontend/react-interview/FilterSidebar/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/GuestCounter": {
+      "hash": "5de787145e1910ca1f356f5d748bae4e5599879a3a1f77ff453a1891f4dc3368",
+      "docRelative": "frontend/react-interview/GuestCounter/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/ImageCarousel": {
+      "hash": "1e63161042be51e38f6fa34b02ed1776ad42800ea38c348f79837d87e4daf399",
+      "docRelative": "frontend/react-interview/ImageCarousel/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/InfiniteScrollList": {
+      "hash": "9e532cf12113046b2439ee4cc12e4342c59d115677aa301f05233776cfe93efd",
+      "docRelative": "frontend/react-interview/InfiniteScrollList/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/MapListingSync": {
+      "hash": "8c910631de61bf5ce3850f43ea3ce26c3716c80a3a9142b4dd61076fdcc929db",
+      "docRelative": "frontend/react-interview/MapListingSync/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/ModalSystem": {
+      "hash": "35c03a130183a00adb2f4c50e73049efd5012c8d5eda7349ca65620bce5d640f",
+      "docRelative": "frontend/react-interview/ModalSystem/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/MultiSelectFilter": {
+      "hash": "92f04e8a380d47e5bf15fefc69e49ccb8897f21c6299b6ab316b09599022a285",
+      "docRelative": "frontend/react-interview/MultiSelectFilter/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/Pagination": {
+      "hash": "fe6d975c055de63f31b7c799b3e059776804fef31b0a4a4236df985e4b40cdc4",
+      "docRelative": "frontend/react-interview/Pagination/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/PriceBreakdown": {
+      "hash": "4cc5a8d37d5ada022ad3fe8ace5a43b43c7f611caa52975ca7b8c4270141c285",
+      "docRelative": "frontend/react-interview/PriceBreakdown/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/ReservationForm": {
+      "hash": "b5620b6b6addb5e80b4caa15c4485dd3e8b56c2a9e9fe1881ccfd76413f08be2",
+      "docRelative": "frontend/react-interview/ReservationForm/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/ResponsivePhotoGrid": {
+      "hash": "4ba6af3a9647cee9463e1d1cb987320926a9064469512b7da5e5edde9ed76326",
+      "docRelative": "frontend/react-interview/ResponsivePhotoGrid/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/SearchableDropdown": {
+      "hash": "cf195847a0c54bf7e6787d85a31f0d98510082d8f64e4421da5b3bc5b4a9f645",
+      "docRelative": "frontend/react-interview/SearchableDropdown/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/TabsAria": {
+      "hash": "d252807abec66bc72cb4b382fec4e1e405e0c00b7c70b9a8042a483d655bb282",
+      "docRelative": "frontend/react-interview/TabsAria/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/ToastSystem": {
+      "hash": "4784ccfa5bbc0c2288ea073c53927452255db3fa3f44f57fc3d42c2d37a6d5a5",
+      "docRelative": "frontend/react-interview/ToastSystem/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/TooltipPopover": {
+      "hash": "6ccbe4999f4c15e85dae1ab348743e4e97e9526a317204da59dcc517a31c14cb",
+      "docRelative": "frontend/react-interview/TooltipPopover/_index.mdx"
+    },
+    "__nav__:frontend/react-interview/VirtualizedGrid": {
+      "hash": "2c591e1ef03ac2b39f245b5863fa323c8204aec3bf4a8a5ddac0b32ec510e8ce",
+      "docRelative": "frontend/react-interview/VirtualizedGrid/_index.mdx"
     },
     "__nav__:frontend/uicoding": {
       "hash": "7ea76ce4b289bc5db134857157c4a12b44375f098d85d786a335c0b31bdf9f1c",
