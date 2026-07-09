@@ -7,6 +7,7 @@
     "start": "docusaurus start",
     "build": "docusaurus build",
     "sync:source-docs": "node ./scripts/sync-source-docs.mjs",
+    "sync:frontend-system-design": "node ./scripts/sync-frontend-system-design.mjs",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",

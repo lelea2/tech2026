@@ -1,0 +1,1090 @@
+---
+title: Autocomplete Frontend System Design
+sidebar_label: Autocomplete System Design
+description: Staff-level frontend system design guide for building a reusable autocomplete component.
+tags:
+  - frontend-system-design
+  - react
+  - architecture
+  - accessibility
+  - performance
+---
+
+![Autocomplete component architecture and request flow](./autocomplete.png)
+
+# Autocomplete Frontend System Design
+
+## Interview Prompt
+
+Design an **Autocomplete UI component** that allows users to enter a search term into a text box. As the user types, a list of search results appears in a popup. The user can navigate through the results and select one.
+
+The component should be generic enough to be reused across different websites and product surfaces. Both the input field UI and the search result UI should be customizable.
+
+Real-world examples include:
+
+- Google Search suggestions.
+- Facebook Search with rich results such as people, pages, groups, and posts.
+- LinkedIn global search.
+- E-commerce product search.
+- Internal admin search tools.
+
+---
+
+## Requirements
+
+### Functional Requirements
+
+1. Render a text input where users can type a search query.
+2. Show a popup list of matching results.
+3. Fetch results from a backend API based on the query.
+4. Allow users to select a result.
+5. Support keyboard navigation.
+6. Support mouse and touch interactions.
+7. Allow callers to customize:
+   - Input rendering.
+   - Result item rendering.
+   - Loading state.
+   - Empty state.
+   - Error state.
+8. Cache previous query results to avoid unnecessary network calls.
+9. Prevent race conditions when multiple requests are in flight.
+10. Support accessibility semantics for screen readers.
+
+### Non-Functional Requirements
+
+1. Work across desktop, tablet, and mobile devices.
+2. Be reusable across different products.
+3. Be performant under fast typing.
+4. Avoid unnecessary re-renders.
+5. Be resilient to API latency and failures.
+6. Be easy to test.
+7. Be easy to theme for different design systems.
+
+### Out of Scope for Initial Version
+
+1. Server-side fuzzy search implementation.
+2. Full offline search.
+3. Ranking algorithm design.
+4. Multi-select autocomplete.
+5. Complex natural-language query understanding.
+
+These can be discussed as follow-up extensions.
+
+---
+
+## Requirements Exploration
+
+A staff-level answer should not jump directly into implementation. Start by clarifying the product and technical constraints.
+
+### What kind of results should be supported?
+
+The safest design is to treat results as generic data. The autocomplete component should not assume every result is text-only.
+
+Possible result types:
+
+- Plain text suggestion.
+- Entity result with image and subtitle.
+- Product card.
+- User profile.
+- Group, page, document, or media result.
+- Custom React-rendered result.
+
+The component should expose a `renderItem` API so product teams can decide how each result is displayed.
+
+### What devices should be supported?
+
+The component should work on:
+
+- Desktop browsers.
+- Mobile browsers.
+- Tablets.
+- Touch devices.
+- Keyboard-only environments.
+- Screen readers.
+
+Mobile support affects popup positioning, touch target size, keyboard behavior, and viewport resizing.
+
+### Do we need fuzzy search?
+
+For the initial version, no. The backend API can own matching, ranking, typo tolerance, and personalization. The frontend should focus on query handling, caching, rendering, and interaction.
+
+### What should happen for an empty query?
+
+Options:
+
+1. Show nothing.
+2. Show recent searches.
+3. Show trending suggestions.
+4. Show default suggestions passed by the caller.
+
+The component should support `initialResults`, but the product should choose the behavior.
+
+### How should selection work?
+
+Selection can mean different things depending on the product:
+
+- Fill the input with selected text.
+- Navigate to a destination page.
+- Submit a search.
+- Add an entity to a form.
+- Call a custom callback.
+
+The component should expose `onSelect(item)` and let the consuming product decide.
+
+---
+
+## High-Level Architecture
+
+Autocomplete can be modeled as a small MVC-style system.
+
+```mermaid
+flowchart TD
+  User[User] --> Input[Input Field UI]
+  Input --> Controller[Autocomplete Controller]
+  Controller --> Cache[Query Cache]
+  Cache --> Controller
+  Controller --> API[Backend Search API]
+  API --> Controller
+  Controller --> Popup[Results Popup UI]
+  Popup --> User
+  Popup --> Controller
+```
+
+### Components
+
+#### 1. Input Field UI
+
+Responsibilities:
+
+- Render the text input.
+- Capture user typing.
+- Forward query changes to the controller.
+- Handle focus and blur behavior.
+- Support keyboard events such as ArrowDown, ArrowUp, Enter, Escape, and Tab.
+
+The input should be customizable because different products may need different styling, labels, icons, placeholders, or design system wrappers.
+
+#### 2. Results Popup UI
+
+Responsibilities:
+
+- Render the list of results.
+- Render loading, empty, and error states.
+- Support mouse, touch, and keyboard-highlighted states.
+- Notify the controller when an item is selected.
+- Position itself relative to the input.
+
+The popup should not know how search works. It should only render the state it receives.
+
+#### 3. Cache
+
+Responsibilities:
+
+- Store results for previous queries.
+- Reduce duplicate API calls.
+- Support cache expiration.
+- Optionally support LRU eviction to avoid unbounded memory growth.
+
+The cache can start simple with an in-memory `Map`, then evolve into an LRU cache with TTL.
+
+#### 4. Controller
+
+Responsibilities:
+
+- Own the current query.
+- Own the current result list.
+- Own loading and error states.
+- Debounce query changes.
+- Check cache before fetching.
+- Fetch results from the API on cache miss.
+- Cancel or ignore stale requests.
+- Notify UI components when state changes.
+
+The controller is the brain of the component.
+
+---
+
+## Data Model
+
+### Generic Result Type
+
+The component should avoid hardcoding result shape. Instead, use generics.
+
+```ts
+type AutocompleteItem = unknown;
+```
+
+A real implementation should allow callers to provide a type:
+
+```ts
+interface UserResult {
+  id: string;
+  name: string;
+  title?: string;
+  avatarUrl?: string;
+}
+```
+
+### Component State
+
+```ts
+interface AutocompleteState<TItem> {
+  query: string;
+  results: TItem[];
+  highlightedIndex: number;
+  isOpen: boolean;
+  isLoading: boolean;
+  error: Error | null;
+}
+```
+
+### Cache Entry
+
+```ts
+interface CacheEntry<TItem> {
+  query: string;
+  results: TItem[];
+  createdAt: number;
+  expiresAt?: number;
+}
+```
+
+### Cache Interface
+
+```ts
+interface AutocompleteCache<TItem> {
+  get(query: string): TItem[] | undefined;
+  set(query: string, results: TItem[]): void;
+  delete(query: string): void;
+  clear(): void;
+}
+```
+
+This keeps the cache implementation swappable. For example, one product may want simple memory cache while another may use React Query, SWR, IndexedDB, or a shared service-level cache.
+
+---
+
+## Public Component API
+
+A reusable autocomplete should expose behavior through props rather than forcing product-specific logic.
+
+```ts
+interface AutocompleteProps<TItem> {
+  value?: string;
+  defaultValue?: string;
+  placeholder?: string;
+  disabled?: boolean;
+
+  minQueryLength?: number;
+  debounceMs?: number;
+  cacheTtlMs?: number;
+  maxResults?: number;
+
+  fetchResults: (query: string, signal?: AbortSignal) => Promise<TItem[]>;
+  getItemKey: (item: TItem) => string;
+  getItemLabel: (item: TItem) => string;
+
+  onQueryChange?: (query: string) => void;
+  onSelect?: (item: TItem) => void;
+  onOpenChange?: (isOpen: boolean) => void;
+
+  renderInput?: (props: RenderInputProps) => React.ReactNode;
+  renderItem?: (item: TItem, state: RenderItemState) => React.ReactNode;
+  renderLoading?: () => React.ReactNode;
+  renderEmpty?: (query: string) => React.ReactNode;
+  renderError?: (error: Error) => React.ReactNode;
+}
+```
+
+### Why this API works well
+
+- `fetchResults` makes the component backend-agnostic.
+- `renderItem` makes the result UI product-specific.
+- `getItemKey` avoids unstable React keys.
+- `getItemLabel` supports default rendering and input population.
+- `debounceMs`, `minQueryLength`, and `cacheTtlMs` allow product tuning.
+- Controlled and uncontrolled modes support different integration styles.
+
+---
+
+## Request Lifecycle
+
+When the user types:
+
+1. Input emits a query change.
+2. Controller updates local query state.
+3. Controller waits for debounce delay.
+4. If query length is below `minQueryLength`, clear results or show initial results.
+5. Check cache.
+6. If cache hit, show cached results immediately.
+7. If cache miss, send API request.
+8. Show loading state.
+9. When response returns:
+   - Ignore stale responses.
+   - Store results in cache.
+   - Render results in popup.
+10. If request fails:
+
+- Show error state.
+- Keep the input usable.
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Input
+  participant Controller
+  participant Cache
+  participant API
+  participant Popup
+
+  User->>Input: Type query
+  Input->>Controller: onQueryChange(query)
+  Controller->>Controller: Debounce
+  Controller->>Cache: get(query)
+
+  alt Cache hit
+    Cache-->>Controller: results
+    Controller->>Popup: render results
+  else Cache miss
+    Controller->>API: fetchResults(query)
+    Controller->>Popup: loading
+    API-->>Controller: results
+    Controller->>Cache: set(query, results)
+    Controller->>Popup: render results
+  end
+```
+
+---
+
+## Handling Race Conditions
+
+Autocomplete is vulnerable to out-of-order responses.
+
+Example:
+
+1. User types `a`.
+2. Request for `a` starts.
+3. User quickly types `ap`.
+4. Request for `ap` starts.
+5. Request for `ap` returns first.
+6. Request for `a` returns later and incorrectly overwrites the results.
+
+### Solution 1: AbortController
+
+Cancel the previous request when a new request starts.
+
+```ts
+let abortController: AbortController | null = null;
+
+async function runSearch(query: string) {
+  abortController?.abort();
+
+  const controller = new AbortController();
+  abortController = controller;
+
+  const results = await fetchResults(query, controller.signal);
+  return results;
+}
+```
+
+### Solution 2: Request ID
+
+Track the latest request and ignore stale responses.
+
+```ts
+let latestRequestId = 0;
+
+async function runSearch(query: string) {
+  const requestId = ++latestRequestId;
+  const results = await fetchResults(query);
+
+  if (requestId !== latestRequestId) {
+    return;
+  }
+
+  setResults(results);
+}
+```
+
+### Staff-Level Recommendation
+
+Use both:
+
+- `AbortController` to reduce wasted network and backend work.
+- Request ID guard to protect against APIs or environments where cancellation is unreliable.
+
+---
+
+## Caching Strategy
+
+### Simple Cache
+
+A simple `Map` is enough for the first version.
+
+```ts
+const cache = new Map<string, CacheEntry<TItem>>();
+```
+
+### Cache Key Normalization
+
+Normalize query keys so equivalent queries reuse cache entries.
+
+```ts
+function normalizeQuery(query: string) {
+  return query.trim().toLowerCase();
+}
+```
+
+### TTL
+
+Autocomplete data can become stale. Use a TTL.
+
+```ts
+function isExpired(entry: CacheEntry<unknown>) {
+  return entry.expiresAt != null && Date.now() > entry.expiresAt;
+}
+```
+
+### LRU Eviction
+
+To avoid memory growth, cap cache size.
+
+```ts
+const maxCacheSize = 100;
+```
+
+When the cache exceeds the limit, remove the least recently used query.
+
+### Prefix Reuse Optimization
+
+If the backend supports it or if results are stable enough, the component can reuse prefix results locally.
+
+Example:
+
+- Query `app` returns `apple`, `app store`, `application`.
+- Query `appl` can initially filter from cached `app` results while the network request is pending.
+
+This improves perceived performance, but it must be used carefully because backend ranking may differ by exact query.
+
+---
+
+## Debouncing and Throttling
+
+### Debouncing
+
+Debouncing waits until the user pauses typing before sending a request.
+
+Best for autocomplete because users often type multiple characters quickly.
+
+Common values:
+
+- 100ms for very fast internal APIs.
+- 200ms to 300ms for typical search APIs.
+- 400ms+ for expensive APIs.
+
+### Throttling
+
+Throttling limits requests to at most once per time window. It can be useful for real-time streams, but debounce is usually better for autocomplete input.
+
+### Staff-Level Recommendation
+
+Use debounce as the default and make it configurable.
+
+```ts
+debounceMs = 200;
+```
+
+---
+
+## Keyboard Interaction
+
+A high-quality autocomplete must be keyboard accessible.
+
+| Key         | Behavior                           |
+| ----------- | ---------------------------------- |
+| `ArrowDown` | Move highlight to next result.     |
+| `ArrowUp`   | Move highlight to previous result. |
+| `Enter`     | Select highlighted result.         |
+| `Escape`    | Close popup.                       |
+| `Tab`       | Move focus away naturally.         |
+| `Home`      | Optional: move to first result.    |
+| `End`       | Optional: move to last result.     |
+
+The highlighted item should stay visible if the popup is scrollable.
+
+---
+
+## Accessibility
+
+Use the WAI-ARIA combobox pattern.
+
+### Recommended Semantics
+
+Input:
+
+```tsx
+<input
+  role="combobox"
+  aria-expanded={isOpen}
+  aria-controls="autocomplete-listbox"
+  aria-autocomplete="list"
+  aria-activedescendant={highlightedItemId}
+/>
+```
+
+Popup:
+
+```tsx
+<ul id="autocomplete-listbox" role="listbox">
+  {results.map((item) => (
+    <li id={itemId} role="option" aria-selected={isHighlighted}>
+      ...
+    </li>
+  ))}
+</ul>
+```
+
+### Accessibility Requirements
+
+1. Input must have an accessible label.
+2. Popup state should be announced through ARIA attributes.
+3. Highlighted result should be exposed via `aria-activedescendant`.
+4. Result options should use `role="option"`.
+5. Do not trap focus unnecessarily.
+6. Support keyboard-only users.
+7. Preserve native input behavior where possible.
+8. Loading and error states should be announced if important.
+
+---
+
+## Popup Positioning
+
+The popup should usually be positioned relative to the input.
+
+### Options
+
+#### Inline Positioning
+
+Render the popup below the input in normal DOM flow.
+
+Pros:
+
+- Simple.
+- Easier styling.
+- Easier accessibility.
+
+Cons:
+
+- Can be clipped by parent containers with `overflow: hidden`.
+- Harder to handle viewport boundaries.
+
+#### Portal Positioning
+
+Render the popup into a portal, usually under `document.body`.
+
+Pros:
+
+- Avoids clipping.
+- Easier to layer above modals and containers.
+- Better for complex layouts.
+
+Cons:
+
+- More complex positioning logic.
+- Requires scroll and resize listeners.
+- Must carefully preserve accessibility relationships.
+
+### Staff-Level Recommendation
+
+Start with inline rendering for the base component. Provide an escape hatch for portal rendering when used inside modals, drawers, tables, or scroll containers.
+
+---
+
+## Mobile Considerations
+
+On mobile:
+
+1. The virtual keyboard reduces available viewport height.
+2. Touch targets should be at least 44px high.
+3. Popup should not be hidden behind the keyboard.
+4. Scrolling inside popup should feel natural.
+5. Avoid hover-only interactions.
+6. Consider full-screen search mode for complex result UIs.
+
+For consumer search experiences, a full-screen mobile autocomplete can be better than a small anchored dropdown.
+
+---
+
+## Error Handling
+
+Errors should not break the input.
+
+Possible states:
+
+- API unavailable.
+- Network timeout.
+- Request aborted.
+- Unauthorized request.
+- Rate limited.
+- Malformed response.
+
+Recommended behavior:
+
+1. Keep the typed query in the input.
+2. Show a lightweight error state in the popup.
+3. Allow retry on the next keystroke.
+4. Do not cache failed responses by default.
+5. Do not show errors for intentionally aborted requests.
+
+---
+
+## Loading and Empty States
+
+### Loading State
+
+Show loading when:
+
+- Query is valid.
+- Cache miss occurs.
+- Network request is in flight.
+
+Avoid flicker by adding a small delay before showing loading if the API is usually fast.
+
+### Empty State
+
+Show empty state when:
+
+- Query is valid.
+- Request completed successfully.
+- Results array is empty.
+
+Example:
+
+```tsx
+No results found for “{query}”.
+```
+
+---
+
+## Performance Considerations
+
+### Frontend Performance
+
+1. Debounce requests.
+2. Cache query results.
+3. Memoize expensive renderers.
+4. Virtualize long result lists.
+5. Avoid re-rendering the whole page on each keystroke.
+6. Use stable keys from `getItemKey`.
+7. Avoid layout thrashing when positioning popup.
+8. Lazy-load heavy result item assets.
+
+### Network Performance
+
+1. Abort stale requests.
+2. Limit max results.
+3. Use compressed responses.
+4. Avoid sending requests for very short queries.
+5. Use edge caching when possible.
+6. Consider prefetching popular suggestions.
+
+### Rendering Large Result Lists
+
+Most autocomplete UIs should not show hundreds of results. A limit of 5 to 10 visible results is often better.
+
+If a product requires many results, use virtualization.
+
+---
+
+## Security and Privacy
+
+Autocomplete can leak sensitive user intent because every keystroke may become a request.
+
+Things to consider:
+
+1. Avoid logging raw sensitive queries unless necessary.
+2. Redact PII where appropriate.
+3. Respect user privacy settings.
+4. Use HTTPS.
+5. Avoid exposing unauthorized entities in suggestions.
+6. Backend must enforce authorization.
+7. Frontend should not rely on filtering unauthorized results client-side.
+
+---
+
+## Backend API Contract
+
+The frontend can work with a simple API.
+
+### Request
+
+```http
+GET /api/search-suggestions?q=apple&limit=10
+```
+
+### Response
+
+```ts
+interface SearchSuggestionsResponse<TItem> {
+  query: string;
+  results: TItem[];
+  nextCursor?: string;
+}
+```
+
+### Example Response
+
+```json
+{
+  "query": "apple",
+  "results": [
+    {
+      "id": "1",
+      "type": "company",
+      "title": "Apple",
+      "subtitle": "Technology company",
+      "imageUrl": "https://example.com/apple.png"
+    }
+  ]
+}
+```
+
+### Backend Responsibilities
+
+The backend should own:
+
+- Matching.
+- Ranking.
+- Authorization.
+- Personalization.
+- Rate limiting.
+- Abuse prevention.
+- Deduplication.
+- Typo tolerance, if supported.
+
+The frontend should not attempt to duplicate ranking logic.
+
+---
+
+## React Hook Design
+
+A good implementation separates behavior from rendering.
+
+```ts
+function useAutocomplete<TItem>(options: UseAutocompleteOptions<TItem>) {
+  return {
+    query,
+    results,
+    highlightedIndex,
+    isOpen,
+    isLoading,
+    error,
+    getInputProps,
+    getListboxProps,
+    getOptionProps,
+    setQuery,
+    open,
+    close,
+    selectItem,
+  };
+}
+```
+
+### Why a Hook Helps
+
+- Keeps logic reusable.
+- Allows multiple visual implementations.
+- Makes behavior easier to unit test.
+- Enables design-system integration.
+- Separates accessibility props from styling.
+
+---
+
+## Example Usage
+
+```tsx
+<Autocomplete<UserResult>
+  placeholder="Search people"
+  minQueryLength={2}
+  debounceMs={200}
+  fetchResults={searchUsers}
+  getItemKey={(user) => user.id}
+  getItemLabel={(user) => user.name}
+  onSelect={(user) => navigate(`/users/${user.id}`)}
+  renderItem={(user, state) => (
+    <div className={state.isHighlighted ? styles.highlighted : styles.item}>
+      <img src={user.avatarUrl} alt="" />
+      <div>
+        <div>{user.name}</div>
+        <div>{user.title}</div>
+      </div>
+    </div>
+  )}
+/>
+```
+
+---
+
+## Testing Strategy
+
+### Unit Tests
+
+Test controller behavior:
+
+- Query updates.
+- Debounce behavior.
+- Cache hit and miss.
+- Error handling.
+- Request cancellation.
+- Stale response handling.
+- Highlight movement.
+- Selection behavior.
+
+### Component Tests
+
+Test user interactions:
+
+- Typing opens popup.
+- Results render correctly.
+- Clicking a result calls `onSelect`.
+- Arrow keys move highlight.
+- Enter selects highlighted item.
+- Escape closes popup.
+- Empty state renders.
+- Loading state renders.
+- Error state renders.
+
+### Accessibility Tests
+
+Test:
+
+- Input has accessible label.
+- Combobox attributes are present.
+- Listbox and options have correct roles.
+- `aria-activedescendant` updates correctly.
+- Keyboard-only flow works.
+
+### End-to-End Tests
+
+Test real browser behavior:
+
+- Desktop keyboard usage.
+- Mobile viewport behavior.
+- Popup positioning.
+- Slow network.
+- API failure.
+- Selection navigation.
+
+---
+
+## Tradeoffs
+
+### Controlled vs Uncontrolled Component
+
+| Approach     | Pros                                                          | Cons                                            |
+| ------------ | ------------------------------------------------------------- | ----------------------------------------------- |
+| Controlled   | Caller has full state control. Easier integration with forms. | More boilerplate for consumers.                 |
+| Uncontrolled | Easier to use. Good defaults.                                 | Harder for caller to coordinate external state. |
+
+Recommendation: support both.
+
+### Built-in Fetching vs Caller-Owned Fetching
+
+| Approach              | Pros                                      | Cons                                                     |
+| --------------------- | ----------------------------------------- | -------------------------------------------------------- |
+| Built-in fetching     | Simple consumer API. Consistent behavior. | Less flexible. Harder to integrate with React Query/SWR. |
+| Caller-owned fetching | Maximum flexibility.                      | More work for each consumer.                             |
+
+Recommendation: accept `fetchResults` as a prop, but keep request lifecycle management inside the component.
+
+### Inline Popup vs Portal Popup
+
+| Approach | Pros                     | Cons                                         |
+| -------- | ------------------------ | -------------------------------------------- |
+| Inline   | Simple and accessible.   | Can be clipped by containers.                |
+| Portal   | Handles complex layouts. | More complex positioning and focus handling. |
+
+Recommendation: default to inline; support portal as an advanced option.
+
+### Cache in Component vs Shared Cache
+
+| Approach        | Pros                      | Cons                                       |
+| --------------- | ------------------------- | ------------------------------------------ |
+| Component cache | Simple and isolated.      | Duplicate cache across instances.          |
+| Shared cache    | Better reuse across page. | More complexity and invalidation concerns. |
+
+Recommendation: provide a default cache and allow injection of a custom cache.
+
+---
+
+## Edge Cases
+
+1. User types quickly and responses return out of order.
+2. User clears input while request is in flight.
+3. User tabs away while popup is open.
+4. User clicks outside the component.
+5. API returns duplicate results.
+6. API returns result for a different query.
+7. Result item is removed between render and selection.
+8. Popup is near bottom of viewport.
+9. Parent container has `overflow: hidden`.
+10. Browser autofill interacts with input.
+11. Mobile keyboard changes viewport height.
+12. IME composition for Chinese, Japanese, or Korean input.
+13. Screen reader announces too much or too little.
+14. Result list is very long.
+15. Query contains leading/trailing spaces.
+16. User pastes a large string.
+17. Network goes offline.
+18. Backend rate limits requests.
+
+---
+
+## Internationalization
+
+Autocomplete should support global users.
+
+Consider:
+
+1. Unicode input.
+2. Right-to-left languages.
+3. IME composition events.
+4. Locale-aware matching handled by backend.
+5. Translated loading, empty, and error states.
+6. Locale-specific ranking if needed.
+
+Important: avoid firing requests during active IME composition. Wait until composition ends.
+
+```tsx
+<input
+  onCompositionStart={() => setIsComposing(true)}
+  onCompositionEnd={(event) => {
+    setIsComposing(false);
+    setQuery(event.currentTarget.value);
+  }}
+/>
+```
+
+---
+
+## Observability
+
+For production systems, track component health and user experience.
+
+Useful metrics:
+
+- Query count.
+- Cache hit rate.
+- API latency.
+- Error rate.
+- Empty result rate.
+- Selection rate.
+- Time to first result.
+- Request abort count.
+- Keyboard vs mouse selection rate.
+
+Useful logs:
+
+- Request failure reason.
+- Backend status code.
+- Component configuration.
+
+Be careful not to log raw sensitive queries unnecessarily.
+
+---
+
+## Progressive Enhancement Roadmap
+
+### Version 1
+
+- Text input.
+- Popup result list.
+- Debounced API fetch.
+- Basic cache.
+- Keyboard navigation.
+- Custom result renderer.
+- Basic accessibility.
+
+### Version 2
+
+- TTL and LRU cache.
+- Portal popup positioning.
+- Virtualized results.
+- Better mobile UI.
+- Grouped results.
+- Recent searches.
+- Analytics hooks.
+
+### Version 3
+
+- Multi-section results.
+- Federated search across entity types.
+- AI-assisted suggestions.
+- Personalized ranking.
+- Offline fallback.
+- Streaming results.
+
+---
+
+## Staff Engineer Framing
+
+A strong staff-level answer should show that autocomplete is not just a dropdown. It is a reusable interaction system that sits at the boundary of frontend architecture, backend search, accessibility, performance, design systems, and product analytics.
+
+Key principles:
+
+1. Separate behavior from presentation.
+2. Keep the component generic through type parameters and render props.
+3. Own request lifecycle carefully to prevent race conditions.
+4. Provide good defaults but allow escape hatches.
+5. Treat accessibility as a core requirement, not a polish task.
+6. Avoid pushing ranking, authorization, and personalization into the frontend.
+7. Design for mobile and international input from the beginning.
+8. Add observability so the team can measure quality in production.
+
+---
+
+## Interview Answer Summary
+
+I would design autocomplete as a reusable component composed of an input UI, result popup UI, cache, and controller. The input captures user intent, the controller debounces query changes, checks cache, fetches from the backend on cache miss, protects against stale responses, and pushes state into the popup. The popup renders customizable results and handles selection.
+
+The component API should be generic and expose `fetchResults`, `renderItem`, `getItemKey`, `getItemLabel`, and event callbacks such as `onSelect`. Internally, I would support debouncing, cache TTL, request cancellation, keyboard navigation, ARIA combobox semantics, loading, empty, and error states.
+
+For performance, I would debounce input, cache previous results, limit result size, abort stale requests, and optionally virtualize long lists. For accessibility, I would follow the ARIA combobox/listbox pattern and support keyboard-only usage. For extensibility, I would separate the behavior into a `useAutocomplete` hook and keep the visual rendering customizable through render props or slots.
+
+---
+
+## Follow-Up Interview Questions
+
+### How do you prevent stale API responses from overwriting newer results?
+
+Use `AbortController` to cancel previous requests and a request ID guard to ignore stale responses that still resolve.
+
+### How would you support rich results?
+
+Keep the result item generic and expose a `renderItem` prop. The autocomplete component should not assume the result is only text.
+
+### How would you make this accessible?
+
+Use the ARIA combobox pattern with `role="combobox"`, `aria-expanded`, `aria-controls`, `aria-activedescendant`, a `role="listbox"` popup, and `role="option"` result items. Also support ArrowUp, ArrowDown, Enter, Escape, and Tab.
+
+### How would you improve perceived performance?
+
+Use debounce, cache previous results, show cached results immediately, optionally reuse prefix results while fetching, delay loading indicators to avoid flicker, and keep result rendering lightweight.
+
+### Where should fuzzy search live?
+
+Usually on the backend because ranking, typo tolerance, personalization, authorization, and analytics are backend concerns. The frontend should display the returned results and avoid duplicating ranking logic.
+
+### How would you support different design systems?
+
+Expose behavior through a headless hook and provide render props or slots for input, item, popup, loading, empty, and error states. This allows each product to use its own styling and components.
+
+### How would you test this component?
+
+Test the controller logic, request lifecycle, cache behavior, keyboard interactions, ARIA attributes, mouse selection, empty/loading/error states, and real browser behavior through end-to-end tests.
+
+---
+
+## Final Recommendation
+
+Build autocomplete as a **headless, generic, accessible, cache-aware component** with strong request lifecycle handling. Provide a default UI for simple use cases, but expose enough customization for product teams to render rich search experiences without forking the logic.

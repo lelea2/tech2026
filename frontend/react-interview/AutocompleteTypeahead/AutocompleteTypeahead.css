@@ -1,0 +1,34 @@
+.auto-card {
+  border: 1px solid #d9d9d9;
+  padding: 16px;
+  border-radius: 8px;
+  max-width: 360px;
+  font-family: sans-serif;
+}
+
+.auto-card input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+}
+
+.auto-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  max-height: 200px;
+  overflow: auto;
+}
+
+.auto-list li {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.auto-list li.active,
+.auto-list li:hover {
+  background: #f1f5ff;
+}

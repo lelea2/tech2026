@@ -1,0 +1,36 @@
+{
+  "files": {
+    "frontend-system-design/autocomplete.png": {
+      "hash": "7260e99908c1d228fcd64de581e705750f5f86b76836477d571ecd76f7256a7b",
+      "docRelative": "autocomplete.png"
+    },
+    "frontend-system-design/newsfeed.png": {
+      "hash": "7c32bed9378a970683aa76380ad349cac4434cec781db46acf6504823a8b8857",
+      "docRelative": "newsfeed.png"
+    },
+    "frontend-system-design/pinterest.png": {
+      "hash": "31bc935763091888da0441e94099e995a630e99ce9e3117c1cd618cb3e50b46f",
+      "docRelative": "pinterest.png"
+    },
+    "frontend-system-design/video-netflix.png": {
+      "hash": "6e0ef9664c9fbde91a5ce5388c65ae98db8e6726a990d0f77a219c35d933ae64",
+      "docRelative": "video-netflix.png"
+    },
+    "frontend-system-design/autocomplete.mdx": {
+      "hash": "a2db98ffe21eeab21e9a81cbbaff462d6cfd322abbbedad7cfd7b9fbc0ac9cbb",
+      "docRelative": "autocomplete.mdx"
+    },
+    "frontend-system-design/news-feed.mdx": {
+      "hash": "439b01f76dec2dbcd075ab3e102765eebb94df5e2a5edecd1965d582071c1187",
+      "docRelative": "news-feed.mdx"
+    },
+    "frontend-system-design/pinterest.mdx": {
+      "hash": "1956b7b160966a34a3d693ef86e0f7f67367b8555509c1dd56790353b9b435eb",
+      "docRelative": "pinterest.mdx"
+    },
+    "frontend-system-design/video-netflix.mdx": {
+      "hash": "6cc2c765dca4cc1760ec06abd75b341da68a9592f41bee2c409bde055ccde958",
+      "docRelative": "video-netflix.mdx"
+    }
+  }
+}

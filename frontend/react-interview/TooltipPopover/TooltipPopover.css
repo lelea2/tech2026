@@ -1,0 +1,24 @@
+.tooltip-demo {
+  font-family: sans-serif;
+}
+
+.anchor-wrap {
+  position: relative;
+  width: fit-content;
+}
+
+.anchor-wrap button {
+  padding: 8px 12px;
+}
+
+.popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 220px;
+  background: #111827;
+  color: #fff;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 14px;
+}

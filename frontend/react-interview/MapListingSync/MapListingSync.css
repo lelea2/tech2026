@@ -1,0 +1,36 @@
+.map-sync {
+  font-family: sans-serif;
+}
+
+.map-sync .layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 12px;
+  max-width: 680px;
+}
+
+.map-sync .list,
+.map-sync .map {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.map-sync .list button,
+.map-sync .markers button {
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 8px;
+}
+
+.map-sync .list button.active,
+.map-sync .markers button.active {
+  background: #edf2ff;
+  border-color: #9fb1ff;
+}
+
+.map-sync .markers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}

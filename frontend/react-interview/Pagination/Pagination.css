@@ -1,0 +1,17 @@
+.pagination-demo {
+  font-family: sans-serif;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  width: 320px;
+}
+
+.pagination-demo .controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagination-demo button {
+  padding: 6px 10px;
+}

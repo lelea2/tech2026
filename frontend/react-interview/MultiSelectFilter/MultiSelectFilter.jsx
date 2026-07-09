@@ -1,0 +1,54 @@
+import {useMemo, useState} from 'react';
+import './MultiSelectFilter.css';
+
+const TAGS = ['Wifi', 'Kitchen', 'Pool', 'Parking', 'Pet Friendly', 'Workspace'];
+
+export default function MultiSelectFilter({options = TAGS}) {
+  const [selected, setSelected] = useState([]);
+  const [query, setQuery] = useState('');
+
+  const filtered = useMemo(() => {
+    const q = query.toLowerCase();
+    return options.filter((item) => item.toLowerCase().includes(q));
+  }, [options, query]);
+
+  const toggle = (value) => {
+    setSelected((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],
+    );
+  };
+
+  return (
+    <div className="multi-filter">
+      <h3>Multi-Select Filter</h3>
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Filter amenities"
+      />
+
+      <div className="chips">
+        {selected.map((value) => (
+          <button key={value} onClick={() => toggle(value)}>
+            {value} x
+          </button>
+        ))}
+      </div>
+
+      <ul>
+        {filtered.map((value) => (
+          <li key={value}>
+            <label>
+              <input
+                type="checkbox"
+                checked={selected.includes(value)}
+                onChange={() => toggle(value)}
+              />
+              {value}
+            </label>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}

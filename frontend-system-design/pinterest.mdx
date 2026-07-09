@@ -1,0 +1,170 @@
+---
+title: 'Pinterest'
+description: 'Checklist and framework for tackling a staff-level Pinterest-style frontend system design interview'
+tags: [frontend-system-design, pinterest, staff-engineer, interview]
+---
+
+![Autocomplete component architecture and request flow](./pinterest.png)
+
+# Frontend System Design Interview: Pinterest (Staff Engineer)
+
+Use this as your interview checklist. The goal at staff level is not only to build a feed UI, but to show architecture decisions, tradeoffs, scaling strategy, and product impact.
+
+## 1. Clarify Scope First (2-3 minutes)
+
+- Define platform: web only, mobile web, or both.
+- Define key surfaces: home feed, pin detail, search, board page, profile.
+- Confirm read vs write focus: browsing only or include create/save/comment.
+- Confirm constraints: low-end devices, slow networks, SEO, accessibility, internationalization.
+
+### Interview prompt to say
+
+"I will optimize for fast feed load, smooth scrolling, reliable image delivery, and maintainable architecture for rapid product iteration."
+
+## 2. Define Success Metrics (Product + Technical)
+
+- Product: session length, saves, CTR on pins, return rate.
+- Performance: FCP, LCP, INP, CLS, feed time-to-interactive.
+- Reliability: error rate, failed image load rate, API fallback rate.
+- Efficiency: bundle size, memory footprint, request count per session.
+
+## 3. High-Level Frontend Architecture
+
+- App shell + route-based code splitting.
+- Feature modules:
+  - Feed rendering module
+  - Search/discovery module
+  - Auth/user state module
+  - Board/save actions module
+  - Observability module
+- Data layer:
+  - Request client with retries/backoff
+  - Cache layer (memory + persistent cache)
+  - Normalized entities for pins/users/boards
+- Rendering strategy:
+  - SSR or SSG for landing/search pages if SEO is required
+  - CSR for highly personalized feed sections
+
+## 4. Data Model You Should Mention
+
+- Pin: id, media URLs, dimensions, title, creator, stats, save state.
+- User: id, follows, preferences, locale.
+- Board: id, title, pin references.
+- Feed chunk: cursor, list of pin ids, ranking metadata.
+
+## 5. Feed Experience (Core of Pinterest)
+
+### A. Masonry layout
+
+- Use CSS columns or grid + JS positioning.
+- Pre-calculate item aspect ratio boxes to reduce layout shift.
+- Keep stable placeholders and skeletons.
+
+### B. Infinite scroll
+
+- Cursor-based pagination (not offset).
+- Fetch next page with IntersectionObserver.
+- Deduplicate pin ids across pages.
+- Guard against request storms with in-flight request lock.
+
+### C. Virtualization strategy
+
+- Basic list virtualization for very long sessions.
+- Keep a window of rendered items + overscan.
+- Restore scroll position on back navigation.
+
+## 6. Image Delivery and Performance
+
+- Responsive images (`srcset`, `sizes`).
+- Modern formats (WebP/AVIF) with fallback.
+- Lazy load offscreen content.
+- Priority load above-the-fold images.
+- CDN resizing and quality parameters.
+- Blur-up placeholders and dominant-color backgrounds.
+
+## 7. State Management Strategy
+
+- Separate server state from UI state.
+- Server state: feed pages, pin entities, save mutations.
+- UI state: filters, selected board modal, hover states.
+- Optimistic updates for save/unsave with rollback on failure.
+
+## 8. Search and Personalization
+
+- Debounced query input.
+- Suggestion API + recent search cache.
+- Personalization boundary:
+  - Backend owns ranking
+  - Frontend owns presentation and interaction latency
+
+## 9. Accessibility and UX Quality
+
+- Keyboard navigation for grid items.
+- ARIA labels for save buttons and media cards.
+- Focus management for dialogs and overlays.
+- Reduced motion support.
+- Color contrast compliance.
+
+## 10. Error Handling and Resilience
+
+- Component-level fallbacks for failed images.
+- Retry strategy with exponential backoff.
+- Partial render when some feed cards fail.
+- Offline-friendly behavior for cached pins.
+
+## 11. Security and Abuse Considerations
+
+- Sanitize user-generated text.
+- Safe media URL handling.
+- CSRF/XSS protections (mostly platform-level, but mention frontend guardrails).
+- Rate-limit sensitive actions (save, comment spam signals).
+
+## 12. Observability and Experimentation
+
+- Track:
+  - feed_load_start/feed_load_end
+  - image_load_success/fail
+  - pin_impression/click/save
+- Correlate client metrics with backend feed version and experiment variant.
+- Add feature flags for controlled rollout.
+
+## 13. Staff-Level Tradeoffs to Discuss
+
+- SSR for SEO vs CSR for product velocity.
+- Rich interactions vs low-end device performance.
+- Aggressive prefetch vs bandwidth/memory cost.
+- Deep caching vs stale personalization risk.
+- Centralized design system vs feature-team autonomy.
+
+## 14. 45-60 Minute Interview Talk Track
+
+- 0-5 min: scope + requirements + success metrics.
+- 5-15 min: architecture and data flow.
+- 15-30 min: feed rendering (masonry, pagination, virtualization).
+- 30-40 min: performance, accessibility, reliability.
+- 40-50 min: tradeoffs, scaling, rollout plan.
+- 50-60 min: Q and A, edge cases, future extensions.
+
+## 15. Common Follow-Up Questions (Prepare Answers)
+
+- How do you prevent CLS in masonry grids?
+- How do you recover when a page in the cursor chain fails?
+- How would you support real-time ranking updates?
+- How do you debug scroll jank in production?
+- When do you choose virtualization vs native long list rendering?
+
+## 16. What Interviewers Look For at Staff Level
+
+- Clear decomposition and prioritization.
+- Strong performance instincts with measurable outcomes.
+- Practical API contracts and failure-mode thinking.
+- Strong tradeoff communication, not just "best practice" lists.
+- Organization-level thinking: platform, rollout, and maintainability.
+
+## Quick Checklist Before You Finish Answering
+
+- Did I define explicit assumptions?
+- Did I mention metrics and how to measure success?
+- Did I cover performance + accessibility + reliability?
+- Did I call out at least 3 real tradeoffs?
+- Did I present an incremental rollout strategy?

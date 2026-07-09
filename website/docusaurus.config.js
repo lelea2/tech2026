@@ -124,6 +124,11 @@ const config = {
             label: 'FrontEnd',
           },
           {
+            to: '/docs/category/frontend-system-design',
+            position: 'left',
+            label: 'Frontend System Design',
+          },
+          {
             to: '/docs/ml',
             position: 'left',
             label: 'ML',
