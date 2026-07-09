@@ -4,6 +4,10 @@
       "hash": "7260e99908c1d228fcd64de581e705750f5f86b76836477d571ecd76f7256a7b",
       "docRelative": "autocomplete.png"
     },
+    "frontend-system-design/figma.png": {
+      "hash": "2c37c162b2abbc878aa7d6d29d601de73f232b0500d50ab43136f716b6304229",
+      "docRelative": "figma.png"
+    },
     "frontend-system-design/newsfeed.png": {
       "hash": "7c32bed9378a970683aa76380ad349cac4434cec781db46acf6504823a8b8857",
       "docRelative": "newsfeed.png"
@@ -19,6 +23,10 @@
     "frontend-system-design/autocomplete.mdx": {
       "hash": "a2db98ffe21eeab21e9a81cbbaff462d6cfd322abbbedad7cfd7b9fbc0ac9cbb",
       "docRelative": "autocomplete.mdx"
+    },
+    "frontend-system-design/figma.mdx": {
+      "hash": "d9ec426dcbf94524449f3d4507c7b36a5213ea9a228033460cdf42dcb3a08bb6",
+      "docRelative": "figma.mdx"
     },
     "frontend-system-design/news-feed.mdx": {
       "hash": "439b01f76dec2dbcd075ab3e102765eebb94df5e2a5edecd1965d582071c1187",
