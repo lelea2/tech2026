@@ -8,6 +8,15 @@
  * - getCell(rowId, columnId)
  * - filterRows(predicate)
  * - sortRows(columnId)
+ *
+ * Time complexities:
+ * insertRow:   O(1)
+ * deleteRow:   O(n) because rowOrder is filtered
+ * updateCell:  O(1)
+ * getCell:     O(1)
+ * filterRows:  O(n)
+ * sortRows:    O(n log n)
+getRows:     O(n)
  */
 
 class InMemoryTable {
