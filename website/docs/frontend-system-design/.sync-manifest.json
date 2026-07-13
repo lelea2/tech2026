@@ -24,6 +24,14 @@
       "hash": "31bc935763091888da0441e94099e995a630e99ce9e3117c1cd618cb3e50b46f",
       "docRelative": "pinterest.png"
     },
+    "frontend-system-design/theme-design.png": {
+      "hash": "c19c1c2ffd18e5385641bff5bbcbdf621bf9c8dca1f596c55a92970e3d3ff3ce",
+      "docRelative": "theme-design.png"
+    },
+    "frontend-system-design/travel-booking.png": {
+      "hash": "3cbb01f8565feb88ea98b2a0c1d3fcb6fc58a609d86432fb4e2b5ef64a6d62b7",
+      "docRelative": "travel-booking.png"
+    },
     "frontend-system-design/video-netflix.png": {
       "hash": "6e0ef9664c9fbde91a5ce5388c65ae98db8e6726a990d0f77a219c35d933ae64",
       "docRelative": "video-netflix.png"
@@ -51,6 +59,14 @@
     "frontend-system-design/pinterest.mdx": {
       "hash": "1956b7b160966a34a3d693ef86e0f7f67367b8555509c1dd56790353b9b435eb",
       "docRelative": "pinterest.mdx"
+    },
+    "frontend-system-design/theme-design.mdx": {
+      "hash": "c05cbf1d3a0412b7e807da8974b417f36e75fe5f4d9fd8973f3b35a503c484a0",
+      "docRelative": "theme-design.mdx"
+    },
+    "frontend-system-design/travel-booking.mdx": {
+      "hash": "a5bfbd036ba272e27acbd8afe90646ce35abff738ccf916f8f76dbe934fb38d3",
+      "docRelative": "travel-booking.mdx"
     },
     "frontend-system-design/video-netflix.mdx": {
       "hash": "6cc2c765dca4cc1760ec06abd75b341da68a9592f41bee2c409bde055ccde958",
