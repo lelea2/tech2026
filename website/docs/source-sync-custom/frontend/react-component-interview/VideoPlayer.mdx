@@ -1,0 +1,110 @@
+---
+title: VideoPlayer
+---
+
+# VideoPlayer
+
+~~~jsx
+import { useEffect, useState } from "react";
+
+const snapshots = [
+  {
+    index: 0,
+    time: "10:00 AM",
+    image: "https://placehold.co/640x360?text=10:00",
+  },
+  {
+    index: 1,
+    time: "10:05 AM",
+    image: "https://placehold.co/640x360?text=10:05",
+  },
+  {
+    index: 2,
+    time: "10:10 AM",
+    image: "https://placehold.co/640x360?text=10:10",
+  },
+  {
+    index: 3,
+    time: "10:15 AM",
+    image: "https://placehold.co/640x360?text=10:15",
+  },
+];
+
+export default function VideoTimeline() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (!isPlaying) {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      setCurrentIndex((previousIndex) => {
+        if (previousIndex >= snapshots.length - 1) {
+          setIsPlaying(false);
+          return previousIndex;
+        }
+
+        return previousIndex + 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [isPlaying]);
+
+  function handlePlayPause() {
+    if (!isPlaying && currentIndex === snapshots.length - 1) {
+      setCurrentIndex(0);
+    }
+
+    setIsPlaying((previous) => !previous);
+  }
+
+  function handleMarkerClick(index) {
+    setCurrentIndex(index);
+  }
+
+  const currentSnapshot = snapshots[currentIndex];
+
+  return (
+    <div className="video-timeline">
+      <img
+        className="video-image"
+        src={currentSnapshot.image}
+        alt={`Camera snapshot at ${currentSnapshot.time}`}
+      />
+
+      <div className="controls">
+        <button type="button" onClick={handlePlayPause}>
+          {isPlaying ? "Pause" : "Play"}
+        </button>
+
+        <span>
+          {currentSnapshot.time} — {currentIndex + 1} of {snapshots.length}
+        </span>
+      </div>
+
+      <div className="timeline" aria-label="Video timeline">
+        {snapshots.map((snapshot, index) => (
+          <button
+            key={snapshot.index}
+            type="button"
+            className={
+              index === currentIndex
+                ? "timeline-marker active"
+                : "timeline-marker"
+            }
+            aria-label={`View snapshot at ${snapshot.time}`}
+            aria-pressed={index === currentIndex}
+            onClick={() => handleMarkerClick(index)}
+          >
+            <span className="marker-dot" />
+            <span className="marker-time">{snapshot.time}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+~~~

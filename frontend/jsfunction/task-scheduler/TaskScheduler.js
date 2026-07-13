@@ -1,0 +1,166 @@
+class TaskKey {
+  constructor(namespace, id) {
+    this.namespace = namespace;
+    this.id = id;
+  }
+
+  /**
+   * Returns a stable value used internally by Map.
+   */
+  toMapKey() {
+    return JSON.stringify([this.namespace, this.id]);
+  }
+}
+
+class TaskScheduler {
+  constructor() {
+    /**
+     * Map<string, {
+     *   key: TaskKey,
+     *   task: Function,
+     *   timerId: ReturnType<typeof setTimeout>,
+     *   scheduledAt: number,
+     *   runAt: number
+     * }>
+     */
+    this.tasks = new Map();
+  }
+
+  /**
+   * Schedule a task.
+   *
+   * Scheduling another task with the same logical key replaces
+   * the existing task.
+   *
+   * @param {TaskKey} key
+   * @param {Function} task
+   * @param {number} delayMs
+   */
+  schedule(key, task, delayMs) {
+    this.#validateKey(key);
+
+    if (typeof task !== "function") {
+      throw new TypeError("task must be a function");
+    }
+
+    if (!Number.isFinite(delayMs) || delayMs < 0) {
+      throw new RangeError("delayMs must be a non-negative number");
+    }
+
+    const mapKey = key.toMapKey();
+
+    // Replace any previously scheduled task with the same logical key.
+    this.cancel(key);
+
+    const scheduledAt = Date.now();
+    const runAt = scheduledAt + delayMs;
+
+    const timerId = setTimeout(async () => {
+      // Remove before execution so the task can schedule itself again.
+      this.tasks.delete(mapKey);
+
+      try {
+        await task();
+      } catch (error) {
+        console.error(`Task failed for key ${mapKey}:`, error);
+      }
+    }, delayMs);
+
+    this.tasks.set(mapKey, {
+      key,
+      task,
+      timerId,
+      scheduledAt,
+      runAt,
+    });
+  }
+
+  /**
+   * Cancels a scheduled task.
+   *
+   * @param {TaskKey} key
+   * @returns {boolean} true if a task was cancelled
+   */
+  cancel(key) {
+    this.#validateKey(key);
+
+    const mapKey = key.toMapKey();
+    const scheduledTask = this.tasks.get(mapKey);
+
+    if (!scheduledTask) {
+      return false;
+    }
+
+    clearTimeout(scheduledTask.timerId);
+    this.tasks.delete(mapKey);
+
+    return true;
+  }
+
+  /**
+   * Returns whether a task exists for the logical key.
+   *
+   * @param {TaskKey} key
+   */
+  has(key) {
+    this.#validateKey(key);
+    return this.tasks.has(key.toMapKey());
+  }
+
+  /**
+   * Returns task metadata without exposing the timer.
+   *
+   * @param {TaskKey} key
+   */
+  get(key) {
+    this.#validateKey(key);
+
+    const scheduledTask = this.tasks.get(key.toMapKey());
+
+    if (!scheduledTask) {
+      return null;
+    }
+
+    return {
+      key: scheduledTask.key,
+      scheduledAt: scheduledTask.scheduledAt,
+      runAt: scheduledTask.runAt,
+      remainingMs: Math.max(0, scheduledTask.runAt - Date.now()),
+    };
+  }
+
+  /**
+   * Cancels all scheduled tasks.
+   */
+  clear() {
+    for (const scheduledTask of this.tasks.values()) {
+      clearTimeout(scheduledTask.timerId);
+    }
+
+    this.tasks.clear();
+  }
+
+  get size() {
+    return this.tasks.size;
+  }
+
+  #validateKey(key) {
+    if (!(key instanceof TaskKey)) {
+      throw new TypeError("key must be an instance of TaskKey");
+    }
+  }
+}
+// Usage
+const scheduler = new TaskScheduler();
+
+const key = new TaskKey("report", 10);
+scheduler.schedule(
+  key,
+  () => console.log("Generate report"),
+  500
+);
+
+console.log(scheduler.has(key)); // true
+
+scheduler.cancel(key);
+console.log(scheduler.has(key)); // false

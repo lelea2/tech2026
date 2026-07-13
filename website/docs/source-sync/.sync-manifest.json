@@ -764,6 +764,14 @@
       "hash": "bd9e70e1747464b86c1a8aba37bb83afbf6d85b597deb1f260384f0f495eed74",
       "docRelative": "frontend/jsfunction/sum.mdx"
     },
+    "frontend/jsfunction/task-scheduler/GenericTaskScheduler.js": {
+      "hash": "e65b41168d36d18db87082a10aff1917c262bf690d79eb122bc057442e416333",
+      "docRelative": "frontend/jsfunction/task-scheduler/GenericTaskScheduler.mdx"
+    },
+    "frontend/jsfunction/task-scheduler/TaskScheduler.js": {
+      "hash": "e946c612c942016db9c3f8e798df4b1807accc4a80b8302b051cdd2c50f2c1f5",
+      "docRelative": "frontend/jsfunction/task-scheduler/TaskScheduler.mdx"
+    },
     "frontend/jsfunction/templateEngine.js": {
       "hash": "9eeb31683f3e91bc7b6e83df2e63417784e8dca2799c11bebd39eec846af9920",
       "docRelative": "frontend/jsfunction/templateEngine.mdx"
@@ -857,7 +865,7 @@
       "docRelative": "frontend/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
-      "hash": "080543c9bfee0fa143339e72ecae5f90be81b7c2d0055ec91f300fc2275e3ced",
+      "hash": "7249081d1768c50d9b6ab4213deccd6586d9882c0685ec615888e1cbf8b8cfe5",
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/2d-readingOrder": {
@@ -963,6 +971,10 @@
     "__nav__:frontend/jsfunction/styledTextRange": {
       "hash": "7bbfffb66a42b55d3c32ff6acfd4b5ff20399b84734c91c3e809fb63fbffd4a9",
       "docRelative": "frontend/jsfunction/styledTextRange/_index.mdx"
+    },
+    "__nav__:frontend/jsfunction/task-scheduler": {
+      "hash": "b1ca8d7bdd9061ee21a56b298ed042e98999c6111e7142096d9ddcd74b3b45e0",
+      "docRelative": "frontend/jsfunction/task-scheduler/_index.mdx"
     },
     "__nav__:frontend/jsfunction/testRunner": {
       "hash": "135bea93c7be842513713f10c0f2db48876cf3966e82c3aff506774e392554de",

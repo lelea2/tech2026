@@ -1,0 +1,305 @@
+---
+title: PlayGround
+---
+
+# PlayGround
+
+~~~jsx
+import { useRef, useState } from "react";
+import "./App.css";
+
+const MODELS = {
+  "gpt-4.1": {
+    name: "gpt-4.1",
+    temperature: 0.7,
+    maxTokens: 800,
+  },
+  "gpt-4.1-mini": {
+    name: "gpt-4.1-mini",
+    temperature: 0.5,
+    maxTokens: 500,
+  },
+  "gpt-4o": {
+    name: "gpt-4o",
+    temperature: 0.8,
+    maxTokens: 1000,
+  },
+};
+
+const INITIAL_PRESETS = [
+  {
+    id: 1,
+    name: "Summarize",
+    prompt: "Summarize the following text in 3 bullet points:",
+  },
+  {
+    id: 2,
+    name: "Rewrite",
+    prompt: "Rewrite this to be clearer and more concise:",
+  },
+  {
+    id: 3,
+    name: "Explain",
+    prompt: "Explain this like I am new to the topic:",
+  },
+];
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function buildMockResponse({ prompt, modelInfo }) {
+  return `
+Mock response from ${modelInfo.name}.
+
+I received your prompt:
+
+"${prompt}"
+
+This response is streamed token by token.
+
+Model settings:
+- Temperature: ${modelInfo.temperature}
+- Max tokens: ${modelInfo.maxTokens}
+
+In a real app, this async generator could be replaced by:
+- fetch ReadableStream
+- Server-Sent Events
+- WebSocket
+- OpenAI streaming API through your backend
+
+The important design is that the UI consumes tokens incrementally.
+`;
+}
+
+async function* mockStreamResponse({ prompt, modelInfo, signal }) {
+  const text = buildMockResponse({ prompt, modelInfo });
+  const tokens = text.split(" ");
+
+  for (const token of tokens) {
+    if (signal?.aborted) {
+      throw new DOMException("Generation cancelled", "AbortError");
+    }
+
+    await sleep(80);
+
+    if (signal?.aborted) {
+      throw new DOMException("Generation cancelled", "AbortError");
+    }
+
+    yield token + " ";
+  }
+}
+
+export default function App() {
+  const [prompt, setPrompt] = useState("");
+  const [modelName, setModelName] = useState("gpt-4.1-mini");
+  const [temperature, setTemperature] = useState(
+    MODELS["gpt-4.1-mini"].temperature
+  );
+  const [maxTokens, setMaxTokens] = useState(MODELS["gpt-4.1-mini"].maxTokens);
+
+  const [presets, setPresets] = useState(INITIAL_PRESETS);
+  const [selectedPresetId, setSelectedPresetId] = useState("");
+  const [presetName, setPresetName] = useState("");
+
+  const [output, setOutput] = useState("");
+  const [error, setError] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
+
+  const abortRef = useRef(null);
+  const requestIdRef = useRef(0);
+
+  function handleModelChange(nextModelName) {
+    const nextModel = MODELS[nextModelName];
+
+    setModelName(nextModelName);
+    setTemperature(nextModel.temperature);
+    setMaxTokens(nextModel.maxTokens);
+  }
+
+  function handlePresetChange(presetId) {
+    setSelectedPresetId(presetId);
+
+    const preset = presets.find((item) => item.id === Number(presetId));
+
+    if (preset) {
+      setPrompt(preset.prompt);
+    }
+  }
+
+  function handleSavePreset() {
+    const name = presetName.trim();
+    const value = prompt.trim();
+
+    if (!name || !value) return;
+
+    const newPreset = {
+      id: Date.now(),
+      name,
+      prompt: value,
+    };
+
+    setPresets((prev) => [...prev, newPreset]);
+    setPresetName("");
+    setSelectedPresetId(String(newPreset.id));
+  }
+
+  function handleCancel() {
+    abortRef.current?.abort();
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    if (!prompt.trim() || isStreaming) return;
+
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    const modelInfo = {
+      name: modelName,
+      temperature: Number(temperature),
+      maxTokens: Number(maxTokens),
+    };
+
+    setOutput("");
+    setError("");
+    setIsStreaming(true);
+
+    try {
+      for await (const token of mockStreamResponse({
+        prompt,
+        modelInfo,
+        signal: controller.signal,
+      })) {
+        if (requestId !== requestIdRef.current) {
+          return;
+        }
+
+        setOutput((prev) => prev + token);
+      }
+    } catch (err) {
+      if (err.name === "AbortError") {
+        setOutput((prev) => prev + "\n\n[Generation cancelled]");
+      } else {
+        setError("Something went wrong while generating the response.");
+      }
+    } finally {
+      if (requestId === requestIdRef.current) {
+        setIsStreaming(false);
+        abortRef.current = null;
+      }
+    }
+  }
+
+  return (
+    <main className="app">
+      <h1>GPT Playground</h1>
+
+      <form className="panel" onSubmit={handleSubmit}>
+        <label>
+          Model
+          <select
+            value={modelName}
+            onChange={(event) => handleModelChange(event.target.value)}
+          >
+            {Object.keys(MODELS).map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <div className="row">
+          <label>
+            Temperature
+            <input
+              type="number"
+              min="0"
+              max="2"
+              step="0.1"
+              value={temperature}
+              onChange={(event) => setTemperature(event.target.value)}
+            />
+          </label>
+
+          <label>
+            Max Tokens
+            <input
+              type="number"
+              min="1"
+              max="4000"
+              value={maxTokens}
+              onChange={(event) => setMaxTokens(event.target.value)}
+            />
+          </label>
+        </div>
+
+        <label>
+          Preset
+          <select
+            value={selectedPresetId}
+            onChange={(event) => handlePresetChange(event.target.value)}
+          >
+            <option value="">Select preset</option>
+            {presets.map((preset) => (
+              <option key={preset.id} value={preset.id}>
+                {preset.name}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <div className="row">
+          <input
+            value={presetName}
+            placeholder="New preset name"
+            onChange={(event) => setPresetName(event.target.value)}
+          />
+
+          <button type="button" onClick={handleSavePreset}>
+            Save Preset
+          </button>
+        </div>
+
+        <label>
+          Prompt
+          <textarea
+            value={prompt}
+            placeholder="Enter your prompt..."
+            onChange={(event) => setPrompt(event.target.value)}
+          />
+        </label>
+
+        <div className="actions">
+          {!isStreaming ? (
+            <button type="submit" disabled={!prompt.trim()}>
+              Submit
+            </button>
+          ) : (
+            <button type="button" onClick={handleCancel}>
+              Cancel
+            </button>
+          )}
+        </div>
+      </form>
+
+      <section className="panel">
+        <div className="responseHeader">
+          <h2>Response</h2>
+          {isStreaming && <span>Streaming...</span>}
+        </div>
+
+        {error && <p className="error">{error}</p>}
+
+        <pre>{output || "Mock response will appear here..."}</pre>
+      </section>
+    </main>
+  );
+}
+~~~

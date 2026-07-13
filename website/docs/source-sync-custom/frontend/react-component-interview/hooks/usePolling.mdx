@@ -1,0 +1,116 @@
+---
+title: usePolling
+---
+
+# usePolling
+
+~~~javascript
+import React, {useRef} from "react";
+
+export function usePolling(callback, options) {
+  const { intervalMs, enabled = true, immediate = true } = options;
+
+  const callbackRef = useRef(callback);
+  // We use useRef to store the callback function so that it can be accessed
+  // inside the async function without being captured by the closure.
+
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  const [isPolling, setIsPolling] = useState(false);
+
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    let cancelled = false;
+    let timeoutId = null;
+
+    async function poll() {
+      try {
+        setIsPolling(true);
+        setError(null);
+
+        const result = await callbackRef.current();
+
+        if (!cancelled) {
+          setData(result);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err : new Error(String(err)));
+        }
+      } finally {
+        if (!cancelled) {
+          setIsPolling(false);
+
+          timeoutId = setTimeout(() => {
+            poll();
+          }, intervalMs);
+        }
+      }
+    }
+
+    if (immediate) {
+      poll();
+    } else {
+      timeoutId = setTimeout(() => {
+        poll();
+      }, intervalMs);
+    }
+
+    return () => {
+      cancelled = true;
+
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [enabled, intervalMs, immediate]);
+
+  return {
+    data,
+    error,
+    isPolling,
+  };
+}
+
+// Example usage
+function JobStatus({ jobId }) {
+  const [enabled, setEnabled] = useState(true);
+
+  const { data, error, isPolling } = usePolling(
+    async () => {
+      const response = await fetch(`/api/jobs/${jobId}`);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch job");
+      }
+
+      return response.json();
+    },
+    {
+      intervalMs: 2000,
+      enabled,
+      immediate: true,
+    }
+  );
+
+  useEffect(() => {
+    if (data?.status === "completed" || data?.status === "failed") {
+      setEnabled(false);
+    }
+  }, [data]);
+
+  if (error) return <p>{error.message}</p>;
+
+  return (
+    <div>
+      <p>Status: {data?.status || "unknown"}</p>
+      {isPolling && <p>Checking...</p>}
+    </div>
+  );
+}
+~~~
