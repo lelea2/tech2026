@@ -1,0 +1,254 @@
+---
+title: ConnectionPool
+---
+
+# ConnectionPool
+
+~~~javascript
+/**
+ * Mock connection.
+ * In a real system, this could be a DB connection, HTTP socket, Redis client, etc.
+ */
+class Connection {
+  constructor(id) {
+    this.id = id;
+    this.closed = false;
+  }
+
+  async close() {
+    this.closed = true;
+  }
+}
+
+class ConnectionPool {
+  constructor(maxConnections, createConnection = null) {
+    if (!Number.isInteger(maxConnections) || maxConnections <= 0) {
+      throw new Error("maxConnections must be a positive integer");
+    }
+
+    this.maxConnections = maxConnections;
+    this.createConnection =
+      createConnection || ((id) => new Connection(id));
+
+    this.nextId = 1;
+
+    // Connections currently checked out by callers.
+    this.active = new Set();
+
+    // Connections available for reuse.
+    this.idle = [];
+
+    // FIFO queue of waiting acquire requests.
+    this.waitQueue = [];
+
+    // Total created connections, active + idle.
+    this.totalConnections = 0;
+  }
+
+  async acquire(options = {}) {
+    const { timeoutMs } = options;
+
+    // Case 1: reuse idle connection.
+    if (this.idle.length > 0) {
+      const connection = this.idle.pop();
+      this.active.add(connection);
+      return connection;
+    }
+
+    // Case 2: create new connection if under capacity.
+    if (this.totalConnections < this.maxConnections) {
+      const connection = await this._createConnection();
+      this.active.add(connection);
+      return connection;
+    }
+
+    // Case 3: pool is full, enqueue request.
+    return new Promise((resolve, reject) => {
+      const waiter = {
+        resolve,
+        reject,
+        settled: false,
+        timer: null,
+      };
+
+      if (typeof timeoutMs === "number") {
+        waiter.timer = setTimeout(() => {
+          if (waiter.settled) return;
+
+          waiter.settled = true;
+
+          // Remove this waiter from queue if still waiting.
+          this.waitQueue = this.waitQueue.filter((w) => w !== waiter);
+
+          reject(new Error("Connection acquire timed out"));
+        }, timeoutMs);
+      }
+
+      this.waitQueue.push(waiter);
+    });
+  }
+
+  release(connection) {
+    if (!connection) {
+      throw new Error("Cannot release empty connection");
+    }
+
+    if (!this.active.has(connection)) {
+      throw new Error(
+        `Cannot release connection ${connection.id}; it is not active or was already released`
+      );
+    }
+
+    this.active.delete(connection);
+
+    // If connection is broken/closed, do not reuse it.
+    if (connection.closed) {
+      this.totalConnections--;
+      this._serveNextWaiter();
+      return;
+    }
+
+    // Prefer giving the released connection directly to the next waiter.
+    const waiter = this._getNextWaiter();
+
+    if (waiter) {
+      this.active.add(connection);
+      this._resolveWaiter(waiter, connection);
+      return;
+    }
+
+    // Otherwise keep it idle for reuse.
+    this.idle.push(connection);
+  }
+
+  async destroy() {
+    const allConnections = [...this.active, ...this.idle];
+
+    this.active.clear();
+    this.idle = [];
+    this.totalConnections = 0;
+
+    for (const waiter of this.waitQueue) {
+      waiter.settled = true;
+      if (waiter.timer) clearTimeout(waiter.timer);
+      waiter.reject(new Error("Connection pool destroyed"));
+    }
+
+    this.waitQueue = [];
+
+    await Promise.all(
+      allConnections.map((connection) => connection.close())
+    );
+  }
+
+  getStats() {
+    return {
+      maxConnections: this.maxConnections,
+      totalConnections: this.totalConnections,
+      activeConnections: this.active.size,
+      idleConnections: this.idle.length,
+      waitingRequests: this.waitQueue.length,
+    };
+  }
+
+  async _createConnection() {
+    const connection = await this.createConnection(this.nextId++);
+    this.totalConnections++;
+    return connection;
+  }
+
+  _getNextWaiter() {
+    while (this.waitQueue.length > 0) {
+      const waiter = this.waitQueue.shift();
+
+      if (!waiter.settled) {
+        return waiter;
+      }
+    }
+
+    return null;
+  }
+
+  _resolveWaiter(waiter, connection) {
+    waiter.settled = true;
+
+    if (waiter.timer) {
+      clearTimeout(waiter.timer);
+    }
+
+    waiter.resolve(connection);
+  }
+
+  async _serveNextWaiter() {
+    const waiter = this._getNextWaiter();
+
+    if (!waiter) return;
+
+    if (this.idle.length > 0) {
+      const connection = this.idle.pop();
+      this.active.add(connection);
+      this._resolveWaiter(waiter, connection);
+      return;
+    }
+
+    if (this.totalConnections < this.maxConnections) {
+      try {
+        const connection = await this._createConnection();
+        this.active.add(connection);
+        this._resolveWaiter(waiter, connection);
+      } catch (error) {
+        waiter.settled = true;
+        if (waiter.timer) clearTimeout(waiter.timer);
+        waiter.reject(error);
+      }
+    }
+  }
+}
+
+// Test
+// async function demo() {
+//   const pool = new ConnectionPool(2);
+
+//   const c1 = await pool.acquire();
+//   const c2 = await pool.acquire();
+
+//   console.log("After acquiring 2:", pool.getStats());
+//   // activeConnections: 2, idleConnections: 0, waitingRequests: 0
+
+//   const waiting = pool.acquire({ timeoutMs: 1000 });
+
+//   console.log("After third acquire waits:", pool.getStats());
+//   // waitingRequests: 1
+
+//   pool.release(c1);
+
+//   const c3 = await waiting;
+
+//   console.log("Third request got connection:", c3.id);
+//   console.log("After release served waiter:", pool.getStats());
+
+//   pool.release(c2);
+//   pool.release(c3);
+
+//   console.log("After releasing all:", pool.getStats());
+// }
+
+// demo();
+
+/// Testing with timeout example
+// async function timeoutDemo() {
+//   const pool = new ConnectionPool(1);
+
+//   const c1 = await pool.acquire();
+
+//   try {
+//     await pool.acquire({ timeoutMs: 100 });
+//   } catch (err) {
+//     console.log(err.message); // Connection acquire timed out
+//   }
+
+//   pool.release(c1);
+// }
+
+// timeoutDemo();
+~~~

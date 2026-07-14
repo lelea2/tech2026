@@ -1,0 +1,121 @@
+---
+title: findMedianSortedArray
+---
+
+# findMedianSortedArray
+
+~~~javascript
+/**
+ * Interview question:
+ * Given two sorted arrays, return the median of the combined sorted values.
+ *
+ * The expected interview target is usually O(log(min(m, n))) time, not merging
+ * both arrays. Merging would be simpler but costs O(m + n) time.
+ *
+ * Core idea:
+ * Instead of building the merged array, binary search for a partition where:
+ *
+ * left side contains half of the total values
+ * right side contains the remaining values
+ * every value on the left side <= every value on the right side
+ *
+ * If we can find that split, the median is at the boundary:
+ * - odd total length: max(left side)
+ * - even total length: average of max(left side) and min(right side)
+ *
+ * Example:
+ * nums1 = [1, 3]
+ * nums2 = [2]
+ * merged = [1, 2, 3]
+ * median = 2
+ *
+ * Example:
+ * nums1 = [1, 2]
+ * nums2 = [3, 4]
+ * merged = [1, 2, 3, 4]
+ * median = (2 + 3) / 2 = 2.5
+ *
+ * Time: O(log(min(m, n))) because we binary search the smaller array.
+ * Space: O(1).
+ */
+export default function findMedianSortedArrays(nums1, nums2) {
+  // Always binary search the smaller array so the search range is minimal and
+  // the companion partition in the larger array stays valid.
+  if (nums1.length > nums2.length) {
+    return findMedianSortedArrays(nums2, nums1);
+  }
+
+  const A = nums1;
+  const B = nums2;
+  const m = A.length;
+  const n = B.length;
+
+  let left = 0;
+  let right = m;
+
+  const total = m + n;
+
+  // The left partition should contain one extra value when total length is odd.
+  // That lets the odd-length median be max(left side).
+  const half = Math.floor((total + 1) / 2);
+
+  while (left <= right) {
+    // i is how many values from A go into the left partition.
+    const i = Math.floor((left + right) / 2);
+
+    // j is forced by i because the whole left partition must contain `half`
+    // values across both arrays.
+    const j = half - i;
+
+    // Sentinels handle partitions at array boundaries:
+    // - if nothing is on the left, use -Infinity
+    // - if nothing is on the right, use Infinity
+    //
+    // This avoids special-case branching for empty arrays or edge partitions.
+    const Aleft = i === 0 ? -Infinity : A[i - 1];
+    const Aright = i === m ? Infinity : A[i];
+
+    const Bleft = j === 0 ? -Infinity : B[j - 1];
+    const Bright = j === n ? Infinity : B[j];
+
+    // Correct partition:
+    // A's left boundary fits before B's right boundary, and B's left boundary
+    // fits before A's right boundary. Therefore all left-side values are <= all
+    // right-side values.
+    if (Aleft <= Bright && Bleft <= Aright) {
+      if (total % 2 === 1) {
+        return Math.max(Aleft, Bleft);
+      }
+
+      return (Math.max(Aleft, Bleft) + Math.min(Aright, Bright)) / 2;
+    }
+
+    // A's left side is too large, so move A's partition left.
+    if (Aleft > Bright) {
+      right = i - 1;
+    } else {
+      // B's left side is too large, so move A's partition right.
+      left = i + 1;
+    }
+  }
+
+  throw new Error("Input arrays must be sorted.");
+}
+
+/**
+ * Test case examples:
+ *
+ * findMedianSortedArrays([1, 3], [2])
+ * Output: 2
+ *
+ * findMedianSortedArrays([1, 2], [3, 4])
+ * Output: 2.5
+ *
+ * findMedianSortedArrays([], [1])
+ * Output: 1
+ *
+ * findMedianSortedArrays([0, 0], [0, 0])
+ * Output: 0
+ */
+
+~~~

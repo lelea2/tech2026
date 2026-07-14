@@ -1,0 +1,198 @@
+---
+title: DoubleLinkedList
+---
+
+# DoubleLinkedList
+
+~~~javascript
+/**
+ * Interview Question:
+ * Implement a Doubly Linked List with operations to set the head/tail, insert
+ * nodes before or after another node, insert at a position, remove nodes, and
+ * check whether a value exists.
+ *
+ * Node structure:
+ * - value stores the node data
+ * - prev points to the previous node
+ * - next points to the next node
+ *
+ * Key idea:
+ * A doubly linked list keeps both `head` and `tail` pointers so inserting at the
+ * front or back can be O(1). Each mutation must carefully update both sides of
+ * every affected link:
+ * - old previous node's next pointer
+ * - old next node's prev pointer
+ * - inserted/removed node's prev and next pointers
+ * - list head or tail when the boundary changes
+ *
+ * Important interview edge cases:
+ * - Empty list: setting head should also set tail
+ * - One-node list: removing the only node should clear both head and tail
+ * - Moving an existing node: remove it from its current position before inserting
+ * - Inserting at position 1: same as setHead
+ * - Inserting past the end: same as setTail
+ *
+ * Complexity:
+ * - setHead, setTail, insertBefore, insertAfter, remove: O(1) time, O(1) space
+ * - insertAtPosition: O(p) time, where p is the target position
+ * - removeNodesWithValue and containsNodeWithValue: O(n) time
+ */
+
+// This is an input class. Do not edit.
+class Node {
+  constructor(value) {
+    this.value = value;
+    this.prev = null;
+    this.next = null;
+  }
+}
+
+// Feel free to add new properties and methods to the class.
+class DoublyLinkedList {
+  constructor() {
+    this.head = null;
+    this.tail = null;
+  }
+
+  // O(1) time, O(1) space
+  setHead(node) {
+    if (this.head === null) {
+      // Empty list: the same node is both the head and the tail.
+      this.head = node;
+      this.tail = node;
+    } else {
+      // Non-empty list: insert before the current head.
+      this.insertBefore(this.head, node);
+    }
+  }
+
+  // O(1) time, O(1) space
+  setTail(node) {
+    if (this.tail === null) {
+      // Empty list: setting tail is the same as setting head.
+      this.setHead(node);
+    } else {
+      // Non-empty list: insert after the current tail.
+      this.insertAfter(this.tail, node);
+    }
+  }
+
+  // O(1) time, O(1) space
+  insertBefore(node, nodeToInsert) {
+    if (nodeToInsert === this.head && nodeToInsert === this.tail) {
+      // The node is already the only node in the list, so there is nothing to move.
+    } else {
+      // If nodeToInsert is already in the list, detach it before re-linking it.
+      this.remove(nodeToInsert);
+
+      // Wire nodeToInsert between node.prev and node.
+      nodeToInsert.prev = node.prev;
+      nodeToInsert.next = node;
+      if (node.prev === null) { // new head
+        this.head = nodeToInsert;
+      } else {
+        node.prev.next = nodeToInsert;
+      }
+      node.prev = nodeToInsert;
+    }
+  }
+
+  // O(1) time, O(1)space
+  insertAfter(node, nodeToInsert) {
+    if (nodeToInsert === this.head && nodeToInsert === this.tail) {
+      // The node is already the only node in the list, so there is nothing to move.
+    } else {
+      // If nodeToInsert is already in the list, detach it before re-linking it.
+      this.remove(nodeToInsert);
+
+      // Wire nodeToInsert between node and node.next.
+      nodeToInsert.prev = node;
+      nodeToInsert.next = node.next;
+      if (node.next === null) {
+        this.tail = nodeToInsert;
+      } else {
+        node.next.prev = nodeToInsert;
+      }
+      node.next = nodeToInsert;
+    }
+  }
+
+  // O(p) time, O(1)space
+  insertAtPosition(position, nodeToInsert) {
+    if (position === 1) {
+      this.setHead(nodeToInsert);
+    } else {
+      // Walk until we reach the requested position or fall off the list.
+      let node = this.head;
+      let currPos = 1;
+      while (node !== null && currPos++ !== position) {
+        node = node.next;
+      }
+      if (node !== null)  {
+        // Found an existing node at this position, so insert before it.
+        this.insertBefore(node, nodeToInsert);
+      } else {
+        // Position is beyond the current length, so append to the tail.
+        this.setTail(nodeToInsert);
+      }
+    }
+  }
+
+  // O(n)  time, O(1) space
+  removeNodesWithValue(value) {
+    let node = this.head;
+    while (node !== null) {
+      // Save next before removal because remove() clears this node's links.
+      const nodeToRemove = node;
+      node = node.next;
+      if (nodeToRemove.value === value) {
+        this.remove(nodeToRemove);
+      }
+    }
+  }
+
+  _removeNodeBindings(node) {
+    // Bridge the previous node over the removed node.
+    if (node.prev !== null) {
+      node.prev.next = node.next;
+    }
+
+    // Bridge the next node back over the removed node.
+    if (node.next !== null) {
+      node.next.prev = node.prev;
+    }
+
+    // Fully detach this node from the list.
+    node.prev = null;
+    node.next = null;
+  }
+
+  // O(1) time, O(1) space
+  remove(node) {
+    if (node === this.head) {
+      // Removing head means the next node becomes the new head.
+      this.head = this.head.next;
+    }
+    if (node === this.tail) {
+      // Removing tail means the previous node becomes the new tail.
+      this.tail = this.tail.prev;
+    }
+    this._removeNodeBindings(node);
+  }
+
+  // O(n) time, O(1)space
+  containsNodeWithValue(value) {
+    let node = this.head;
+    // Linear scan from head to tail until value is found or list ends.
+    while (node !== null && node.value !== value) {
+      node = node.next;
+    }
+    return node !== null;
+  }
+}
+
+// Do not edit the line below.
+exports.Node = Node;
+exports.DoublyLinkedList = DoublyLinkedList;
+
+~~~

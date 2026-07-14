@@ -1,0 +1,32 @@
+---
+title: ResponsivePhotoGrid.jsx
+---
+
+# ResponsivePhotoGrid.jsx
+
+~~~jsx
+import './ResponsivePhotoGrid.css';
+
+const PHOTOS = [
+  'https://picsum.photos/id/1015/800/600',
+  'https://picsum.photos/id/1024/800/600',
+  'https://picsum.photos/id/1037/800/600',
+  'https://picsum.photos/id/1048/800/600',
+  'https://picsum.photos/id/1056/800/600',
+  'https://picsum.photos/id/1067/800/600',
+];
+
+export default function ResponsivePhotoGrid({photos = PHOTOS}) {
+  return (
+    <div className="photo-grid-demo">
+      <h3>Responsive Photo Grid</h3>
+      <div className="photo-grid">
+        {photos.map((src, index) => (
+          <img key={src} src={src} alt={`Listing photo ${index + 1}`} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+~~~

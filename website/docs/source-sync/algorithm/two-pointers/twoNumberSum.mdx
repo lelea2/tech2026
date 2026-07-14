@@ -1,0 +1,54 @@
+---
+title: twoNumberSum
+---
+
+# twoNumberSum
+
+~~~javascript
+/**
+ * Interview Question:
+ * Given an array of integers and a target sum, return any two numbers from the
+ * array that add up to the target.
+ *
+ * Example:
+ * array = [3, 5, -4, 8, 11, 1, -1, 6]
+ * targetSum = 10
+ * output = [-1, 11]
+ *
+ * Answer:
+ * Sort the array, then use two pointers:
+ * - left starts at the smallest number
+ * - right starts at the largest number
+ *
+ * If the current sum is too small, move left forward to increase the sum.
+ * If the current sum is too large, move right backward to decrease the sum.
+ * If the sum matches the target, return the pair.
+ *
+ * Complexity:
+ * O(n log n) time because of sorting and O(1) extra space.
+ *
+ * @param {number[]} array
+ * @param {number} targetSum
+ * @return {number[]}
+ */
+export default function twoNumberSum(array, targetSum) {
+  const sortedArray = [...array].sort((a, b) => a - b);
+  let left = 0;
+  let right = sortedArray.length - 1;
+
+  while (left < right) {
+    const currentSum = sortedArray[left] + sortedArray[right];
+
+    if (currentSum === targetSum) {
+      return [sortedArray[left], sortedArray[right]];
+    } else if (currentSum < targetSum) {
+      left++;
+    } else {
+      right--;
+    }
+  }
+
+  return [];
+}
+
+~~~

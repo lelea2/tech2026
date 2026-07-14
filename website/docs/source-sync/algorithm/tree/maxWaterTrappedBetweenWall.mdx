@@ -1,0 +1,58 @@
+---
+title: maxWaterTrappedBetweenWall
+---
+
+# maxWaterTrappedBetweenWall
+
+~~~javascript
+/**
+ * Interview Question:
+ * Given an array of non-negative integers where each value represents the
+ * height of a vertical wall, find the maximum amount of water that can be held
+ * between any two walls and the x-axis.
+ *
+ * Requirements:
+ * - Choose two walls from the array
+ * - The water height is limited by the shorter wall
+ * - The water width is the distance between the two chosen walls
+ * - Return the maximum possible area: width * min(leftHeight, rightHeight)
+ *
+ * Approach:
+ * Use two pointers, one at the start and one at the end. Calculate the current
+ * area, update the maximum, then move the pointer at the shorter wall inward.
+ * Moving the taller wall cannot improve the area because the width shrinks and
+ * the shorter wall is still the limiting height.
+ *
+ * Complexity:
+ * O(n) time and O(1) space.
+ */
+
+/**
+ * @param {number[]} walls
+ * @return {number}
+ */
+export default function maximumWaterBetweenWalls(walls) {
+  let left = 0;
+  let right = walls.length - 1;
+  let maxVolume = 0;
+
+  while (left < right) {
+    const width = right - left;
+    const height = Math.min(walls[left], walls[right]);
+    const volumne = width * height;
+
+    maxVolume = Math.max(maxVolume, volumne);
+    // Move the shorter wall inward.
+    // Why? The current volume is limited by the shorter wall.
+    // Moving the taller wall cannot help because width gets smaller
+    // while the limiting height stays the same or lower.
+    if (walls[left] < walls[right]) {
+      left++;
+    } else {
+      right--;
+    }
+  }
+  return maxVolume;
+}
+
+~~~
