@@ -4,6 +4,10 @@
       "hash": "bfd4e7de18eb1b3aac540742c62bd0986ab5cba7df0edd4c8df7ef1bc86e43fb",
       "docRelative": "SPV-webhook.png"
     },
+    "system-designs/agent-design.png": {
+      "hash": "c80fee034d3ddaa278e0e575d453894fa40e0480b36a82193ab9811b8ea0a8f6",
+      "docRelative": "agent-design.png"
+    },
     "system-designs/agent-execution-ide.png": {
       "hash": "162ddb6b7e20827a7469d444a9de2884ad18168a60bf00491d8f121583722a04",
       "docRelative": "agent-execution-ide.png"
@@ -11,10 +15,6 @@
     "system-designs/assets/ml_lifecycle_feedback_loop_chart.png": {
       "hash": "b080d3e5fb2d1eab6830a319f1b0ce464e122d830e3fbb215d59884fbe064f1d",
       "docRelative": "assets/ml_lifecycle_feedback_loop_chart.png"
-    },
-    "system-designs/autocomplete.png": {
-      "hash": "7260e99908c1d228fcd64de581e705750f5f86b76836477d571ecd76f7256a7b",
-      "docRelative": "autocomplete.png"
     },
     "system-designs/chat-gpt.png": {
       "hash": "44c8cf74eb0c76ce3fc8d9f7a70f464b4a8f4137af168fba8a777f03d9cdc2ed",
@@ -60,10 +60,6 @@
       "hash": "b3fe895bd9c82aa8879b476907876c8a4fce936147138b02625263e184253a53",
       "docRelative": "feature-flag.png"
     },
-    "system-designs/figma.png": {
-      "hash": "2c37c162b2abbc878aa7d6d29d601de73f232b0500d50ab43136f716b6304229",
-      "docRelative": "figma.png"
-    },
     "system-designs/github-actions-fe-run-view.svg": {
       "hash": "c618adc3bc826faa21f968af2b0fe590d448640ad8eeeb6dc86548729b2d65f8",
       "docRelative": "github-actions-fe-run-view.svg"
@@ -75,10 +71,6 @@
     "system-designs/google-calendar.png": {
       "hash": "42e44ac47f61c64659ccc16a63b1b90e3761fd8cdeba498bdb1bace9cee58c45",
       "docRelative": "google-calendar.png"
-    },
-    "system-designs/google-docs.png": {
-      "hash": "5f7d52ded9e724121f726355a02a21194b7607ffead8fd7fa186ee1ee18a9254",
-      "docRelative": "google-docs.png"
     },
     "system-designs/i18n.png": {
       "hash": "fd6d2e9fd5a69d3c6947665db4ad8c5ba879e38af192f7896612c2b95d8c2583",
@@ -103,10 +95,6 @@
     "system-designs/netflix.png": {
       "hash": "66118e22ec250382cb26428c4f1f3ed668cf3969e64ee0c805b22e9bad48367e",
       "docRelative": "netflix.png"
-    },
-    "system-designs/newsfeed.png": {
-      "hash": "7c32bed9378a970683aa76380ad349cac4434cec781db46acf6504823a8b8857",
-      "docRelative": "newsfeed.png"
     },
     "system-designs/pastebin.png": {
       "hash": "daa823c0c1c0582fc63bb78546c640043b41386ebbf5783ab5e75fe1e302a363",
@@ -160,10 +148,6 @@
       "hash": "9172b514e9baeb4015517f804a34328a2bfce59c5a9dbdb7b4fda0c051ad1c72",
       "docRelative": "ux-mock.svg"
     },
-    "system-designs/video-netflix.png": {
-      "hash": "6e0ef9664c9fbde91a5ce5388c65ae98db8e6726a990d0f77a219c35d933ae64",
-      "docRelative": "video-netflix.png"
-    },
     "system-designs/web-crawler.png": {
       "hash": "c8459830c65893b3b3129075cb4be566079e7c55ff5838142f23a6067e77574a",
       "docRelative": "web-crawler.png"
@@ -180,9 +164,13 @@
       "hash": "eb675f8eee4f2c92937da22f2f60c14c44a2e81a27d6ca686b9f8e89cefd6294",
       "docRelative": "Tournament.mdx"
     },
-    "system-designs/autocomplete.mdx": {
-      "hash": "64f2f3b9e6476e0fa76eb234d0a477ab8089f81ff7936d712e61b3d16c1ff32f",
-      "docRelative": "autocomplete.mdx"
+    "system-designs/agentic-mcp-copilot-system-design.mdx": {
+      "hash": "3a0bf131a9b50e430e6b1995a4872724a4afaacfbce185192bbfd0a42ee06bb5",
+      "docRelative": "agentic-mcp-copilot-system-design.mdx"
+    },
+    "system-designs/agentic-mcp-interview-qa.mdx": {
+      "hash": "acd26879e124945a895b8b584f70aaf22fc4b02638d44d7c1bfa8c53cc209018",
+      "docRelative": "agentic-mcp-interview-qa.mdx"
     },
     "system-designs/chat-gpt.mdx": {
       "hash": "7b685a4b6549ed121e66d211d6fdb1bc1942329d07b9a145a4365215644393e2",
@@ -220,10 +208,6 @@
       "hash": "309a1903eabc03ac762cd41e3d0c31f20f768547a08966af0efb7c266b15609a",
       "docRelative": "feature-flag-system.mdx"
     },
-    "system-designs/figma.mdx": {
-      "hash": "2d2ab791c0042fc7295ecdb36981cd251488bc91a9f6b5b31837486a57cf052f",
-      "docRelative": "figma.mdx"
-    },
     "system-designs/flink_vs_temporal_staff_engineer.mdx": {
       "hash": "ee08dd90bb76a77d24e06b308bc9d5fadf305e19284e6461c7b01f999d9b7c5d",
       "docRelative": "flink_vs_temporal_staff_engineer.mdx"
@@ -231,10 +215,6 @@
     "system-designs/github-actions-system-design.mdx": {
       "hash": "8b7228fa984e56358456d7e53fc2484433e81761db105f0c6f007e708e30c7a9",
       "docRelative": "github-actions-system-design.mdx"
-    },
-    "system-designs/google-docs-design.mdx": {
-      "hash": "2ff6893d1cb231f6107db66183c4ca7752196180ad3682c968ddac2e598bbd9d",
-      "docRelative": "google-docs-design.mdx"
     },
     "system-designs/i18n-design.mdx": {
       "hash": "19b247dbf720c63bcbab360fe12e3cfd6742d76ed9036c5d27665e1734787aef",
@@ -276,10 +256,6 @@
       "hash": "0ef13c09123cd9ea56b24c29a4eb013e55cd630c42b835549407ba63d14dbbc5",
       "docRelative": "news-aggregator.mdx"
     },
-    "system-designs/news-feed.mdx": {
-      "hash": "3abc75467b09bec8311acccecb0398dba7d18cadad8c5e3a9d89664aaef64f1c",
-      "docRelative": "news-feed.mdx"
-    },
     "system-designs/pastebin.mdx": {
       "hash": "2fdb4849b46135dd829aec572f9b52290c3e885e746a1d8bf1113a42af2e4ff6",
       "docRelative": "pastebin.mdx"
@@ -320,10 +296,6 @@
       "hash": "292e3eb6bb2eeb501d3409be2437ca67c945f6fa4deebc3b32dc2d95be282636",
       "docRelative": "spv-webhook.mdx"
     },
-    "system-designs/theme-design.mdx": {
-      "hash": "c35fef2d017608b2d534dc8a89fc496bfb0aedbaec24f9adc02be22955065e7a",
-      "docRelative": "theme-design.mdx"
-    },
     "system-designs/ticketmaster.mdx": {
       "hash": "d662f2fd0247f984733ef8cac66bf2bf9ed0f58b37bf4e83c4a610a33ff145b2",
       "docRelative": "ticketmaster.mdx"
@@ -331,10 +303,6 @@
     "system-designs/uber.mdx": {
       "hash": "ba18df651de88956a12d8077edaadafee04151c9b05f20feda3a9c6129f1a0bd",
       "docRelative": "uber.mdx"
-    },
-    "system-designs/video-netflix.mdx": {
-      "hash": "7b6d85541f1bed21262b1e45f6422579534c7212b0e2d5a4f1571a1656354ec8",
-      "docRelative": "video-netflix.mdx"
     },
     "system-designs/web-crawler.mdx": {
       "hash": "d0a52b1a218472326456aac68a6b2183eef09a7d41bca84b69d52f6e13e08d51",
