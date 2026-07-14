@@ -28,6 +28,10 @@
       "hash": "31bc935763091888da0441e94099e995a630e99ce9e3117c1cd618cb3e50b46f",
       "docRelative": "pinterest.png"
     },
+    "frontend-system-design/poll-widget.png": {
+      "hash": "c1c22d48ce6ba69ad3d57540e8d32e3229a73c9080857d0d3d97689da0ba0a6e",
+      "docRelative": "poll-widget.png"
+    },
     "frontend-system-design/richtexteditor.png": {
       "hash": "592701c33e1c48937a82965d23d439d3ee486403cb4a542bb40003df2e51c187",
       "docRelative": "richtexteditor.png"
@@ -75,6 +79,10 @@
     "frontend-system-design/pinterest.mdx": {
       "hash": "f27069131c904a7deac34569f67edcf712b78f5953f760fbf746911b97156808",
       "docRelative": "pinterest.mdx"
+    },
+    "frontend-system-design/poll-widget.mdx": {
+      "hash": "bf5a18a53921d34476249da4e972f118906c8c1347abcb0d17b619b5d3cc442f",
+      "docRelative": "poll-widget.mdx"
     },
     "frontend-system-design/rich-text-editor.mdx": {
       "hash": "cb1d3c631db998eea07f3fffa2fb37f312fdf8d887da477fa4e1e24a6812eee0",
