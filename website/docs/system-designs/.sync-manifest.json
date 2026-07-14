@@ -108,10 +108,6 @@
       "hash": "3e345492223338e5e3cc87a55e5f89f6e8caf4865f8c40e791d0ae9100c0ad45",
       "docRelative": "rate-limiter.png"
     },
-    "system-designs/richtexteditor.png": {
-      "hash": "592701c33e1c48937a82965d23d439d3ee486403cb4a542bb40003df2e51c187",
-      "docRelative": "richtexteditor.png"
-    },
     "system-designs/sandbox-cloud-ide-architecture.svg": {
       "hash": "d5408f61ecbc42342093ce1e8146a463301811b1e086baad983a1e48a306a08a",
       "docRelative": "sandbox-cloud-ide-architecture.svg"
@@ -236,10 +232,6 @@
       "hash": "260731cc0219ad96021a4cfab559d981ffb7a3cd06150a749329a36e2d2e4897",
       "docRelative": "leetcode_execution_leaderboard.mdx"
     },
-    "system-designs/masonry-layout-system-design.mdx": {
-      "hash": "1c8d4bb7f33b751429b77c3448c7694039d0112d39b27cc305067bd8dac94927",
-      "docRelative": "masonry-layout-system-design.mdx"
-    },
     "system-designs/metrics-monitoring.mdx": {
       "hash": "dc00f4a891daf3b106aa0dacdee206d256acb926e4fb8ed2ba5962f2d79e06ce",
       "docRelative": "metrics-monitoring.mdx"
@@ -275,10 +267,6 @@
     "system-designs/rate-limit.mdx": {
       "hash": "c2904cc2bd4b9026a16010b7cfc0cd939f514c45c6957e2797b5639572bde9e2",
       "docRelative": "rate-limit.mdx"
-    },
-    "system-designs/rich-text-editor.mdx": {
-      "hash": "1f4b99640db4dbe0431904c36064c02057032385337eb643f4bcc911f50a6cf3",
-      "docRelative": "rich-text-editor.mdx"
     },
     "system-designs/sandboxed-cloud-ide-system-design.mdx": {
       "hash": "d0d32179bd7a78ad6523c221b69bb4877f18777ef87187c730c0a6473f87c7d3",

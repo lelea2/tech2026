@@ -28,6 +28,10 @@
       "hash": "31bc935763091888da0441e94099e995a630e99ce9e3117c1cd618cb3e50b46f",
       "docRelative": "pinterest.png"
     },
+    "frontend-system-design/richtexteditor.png": {
+      "hash": "592701c33e1c48937a82965d23d439d3ee486403cb4a542bb40003df2e51c187",
+      "docRelative": "richtexteditor.png"
+    },
     "frontend-system-design/theme-design.png": {
       "hash": "c19c1c2ffd18e5385641bff5bbcbdf621bf9c8dca1f596c55a92970e3d3ff3ce",
       "docRelative": "theme-design.png"
@@ -56,6 +60,10 @@
       "hash": "04208f76240f659921d307997b21ade9aa4565510d7f6151c219fc826c424db2",
       "docRelative": "google-docs-design.mdx"
     },
+    "frontend-system-design/masonry-layout-system-design.mdx": {
+      "hash": "f1db19746175d3345d853c6e53b08d80b6b9aeec1938d418e2250827878ff87f",
+      "docRelative": "masonry-layout-system-design.mdx"
+    },
     "frontend-system-design/news-feed.mdx": {
       "hash": "439b01f76dec2dbcd075ab3e102765eebb94df5e2a5edecd1965d582071c1187",
       "docRelative": "news-feed.mdx"
@@ -67,6 +75,10 @@
     "frontend-system-design/pinterest.mdx": {
       "hash": "f27069131c904a7deac34569f67edcf712b78f5953f760fbf746911b97156808",
       "docRelative": "pinterest.mdx"
+    },
+    "frontend-system-design/rich-text-editor.mdx": {
+      "hash": "cb1d3c631db998eea07f3fffa2fb37f312fdf8d887da477fa4e1e24a6812eee0",
+      "docRelative": "rich-text-editor.mdx"
     },
     "frontend-system-design/theme-design.mdx": {
       "hash": "c05cbf1d3a0412b7e807da8974b417f36e75fe5f4d9fd8973f3b35a503c484a0",
