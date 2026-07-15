@@ -1,8 +1,7 @@
 ---
-title: "Staff Frontend System Design Interview — Web Experience Deep Dive"
-description: "Practice guide based on ML Observability, Model Foundry, EngX, reusable frontend infrastructure, SSO, permissions, performance, and staff-level leadership."
-author: "Khanh Dao"
-date: "2026-07-13"
+title: 'Web Experience Deep Dive'
+description: 'Practice guide based on ML Observability, Model Foundry, EngX, reusable frontend infrastructure, SSO, permissions, performance, and staff-level leadership.'
+date: '2026-07-13'
 ---
 
 # Staff Frontend System Design Interview
@@ -173,7 +172,7 @@ type ModelOverviewResponse = {
     servingPlatforms: ServingPlatform[];
   };
   activity: {
-    status: "active" | "inactive" | "unknown";
+    status: 'active' | 'inactive' | 'unknown';
     lastOnlineInferenceAt?: string;
     lastOfflineInferenceAt?: string;
   };
@@ -193,7 +192,7 @@ type ModelOverviewResponse = {
 };
 
 type SectionEnvelope<T> = {
-  status: "ready" | "partial" | "unavailable";
+  status: 'ready' | 'partial' | 'unavailable';
   data?: T;
   errorCode?: string;
   lastUpdatedAt?: string;
@@ -237,14 +236,14 @@ A model or feature table may need:
 
 ## 4.2 Client-side versus server-side operations
 
-| Operation | Small result set | Large result set |
-|---|---:|---:|
-| Search | Client may filter | Server search |
-| Sorting | Client is acceptable | Server sort |
-| Filtering | Client is acceptable | Server filter |
-| Pagination | Optional | Cursor or page based |
+| Operation   |               Small result set |       Large result set |
+| ----------- | -----------------------------: | ---------------------: |
+| Search      |              Client may filter |          Server search |
+| Sorting     |           Client is acceptable |            Server sort |
+| Filtering   |           Client is acceptable |          Server filter |
+| Pagination  |                       Optional |   Cursor or page based |
 | Aggregation | Client for display-only values | Server pre-aggregation |
-| Export | Client for visible subset | Async server export |
+| Export      |      Client for visible subset |    Async server export |
 
 ### Decision rule
 
@@ -285,10 +284,10 @@ function VirtualizedTable<T>({
   return (
     <div
       role="table"
-      style={{ height, overflow: "auto" }}
+      style={{ height, overflow: 'auto' }}
       onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
     >
-      <div style={{ height: rows.length * rowHeight, position: "relative" }}>
+      <div style={{ height: rows.length * rowHeight, position: 'relative' }}>
         {rows.slice(start, end).map((item, offset) => {
           const index = start + offset;
           return (
@@ -296,7 +295,7 @@ function VirtualizedTable<T>({
               role="row"
               key={index}
               style={{
-                position: "absolute",
+                position: 'absolute',
                 top: index * rowHeight,
                 height: rowHeight,
                 left: 0,
@@ -358,10 +357,7 @@ const ModelRow = React.memo(function ModelRow({
   selected: boolean;
   onSelect: (id: string) => void;
 }) {
-  const handleSelect = React.useCallback(
-    () => onSelect(model.id),
-    [model.id, onSelect]
-  );
+  const handleSelect = React.useCallback(() => onSelect(model.id), [model.id, onSelect]);
 
   return (
     <div role="row" aria-selected={selected}>
@@ -388,8 +384,8 @@ type ModelSearchState = {
   platforms: ServingPlatform[];
   activeOnly: boolean;
   sort: {
-    field: "name" | "lastActivity" | "health";
-    direction: "asc" | "desc";
+    field: 'name' | 'lastActivity' | 'health';
+    direction: 'asc' | 'desc';
   };
   cursor?: string;
 };
@@ -442,11 +438,8 @@ function useModelSearch(state: ModelSearchState) {
   React.useEffect(() => {
     const controller = new AbortController();
 
-    fetchModelSearch(
-      { ...state, query },
-      { signal: controller.signal }
-    ).catch((error) => {
-      if (error.name !== "AbortError") {
+    fetchModelSearch({ ...state, query }, { signal: controller.signal }).catch((error) => {
+      if (error.name !== 'AbortError') {
         reportError(error);
       }
     });
@@ -555,20 +548,20 @@ The API may return hourly data for seven days, but daily data for one year.
 ```ts
 type TimeSeriesResponse = {
   metric: string;
-  resolution: "minute" | "hour" | "day";
+  resolution: 'minute' | 'hour' | 'day';
   series: Array<{
     name: string;
     points: Array<{
       timestamp: string;
       value: number | null;
       sampleSize?: number;
-      confidence?: "high" | "medium" | "low";
+      confidence?: 'high' | 'medium' | 'low';
     }>;
   }>;
   gaps: Array<{
     from: string;
     to: string;
-    reason: "no_traffic" | "pipeline_delay" | "unknown";
+    reason: 'no_traffic' | 'pipeline_delay' | 'unknown';
   }>;
 };
 ```
@@ -677,16 +670,16 @@ This avoids spending days optimizing React renders while the page is waiting ten
 
 ## 7.3 Example performance budget
 
-| Metric | Target |
-|---|---:|
-| Shell visible | < 1 second |
-| Primary summary usable | < 2 seconds |
-| Main table interactive | < 3 seconds |
-| Secondary sections | progressively within 4 seconds |
-| Search response P95 | < 500 ms |
-| Filter interaction INP | < 200 ms |
-| Route JS initial gzip | explicit route budget |
-| Long tasks | no repeated task > 50 ms |
+| Metric                 |                         Target |
+| ---------------------- | -----------------------------: |
+| Shell visible          |                     < 1 second |
+| Primary summary usable |                    < 2 seconds |
+| Main table interactive |                    < 3 seconds |
+| Secondary sections     | progressively within 4 seconds |
+| Search response P95    |                       < 500 ms |
+| Filter interaction INP |                       < 200 ms |
+| Route JS initial gzip  |          explicit route budget |
+| Long tasks             |       no repeated task > 50 ms |
 
 ## 7.4 Instrumentation
 
@@ -697,17 +690,17 @@ type WebExperienceEvent = {
   entityId?: string;
   navigationId: string;
   metric:
-    | "shell_visible"
-    | "summary_ready"
-    | "table_ready"
-    | "chart_ready"
-    | "search_complete"
-    | "filter_applied"
-    | "error_visible";
+    | 'shell_visible'
+    | 'summary_ready'
+    | 'table_ready'
+    | 'chart_ready'
+    | 'search_complete'
+    | 'filter_applied'
+    | 'error_visible';
   durationMs: number;
   resultCount?: number;
-  cacheStatus?: "hit" | "miss" | "stale";
-  dependencyStatus?: Record<string, "ok" | "slow" | "error">;
+  cacheStatus?: 'hit' | 'miss' | 'stale';
+  dependencyStatus?: Record<string, 'ok' | 'slow' | 'error'>;
 };
 ```
 
@@ -769,7 +762,7 @@ I frame the discussion around a user journey and measurable cost:
 
 ```ts
 type ApiEnvelope<T> = {
-  schemaVersion: "2";
+  schemaVersion: '2';
   data: T;
   warnings?: ApiWarning[];
   generatedAt: string;
@@ -793,16 +786,16 @@ Compatibility strategies:
 
 A mature data-heavy UI distinguishes:
 
-| State | Meaning | UI behavior |
-|---|---|---|
-| Initial loading | No usable data yet | Skeleton with stable geometry |
-| Background refresh | Existing data is usable | Keep content, show subtle refresh |
-| Empty result | Query succeeded, no matching entities | Explain filters and next action |
-| Partial success | Some dependencies failed | Render available sections |
-| Unauthorized | User lacks permission | Explain access boundary |
-| Stale | Data exists but is old | Show timestamp and warning |
-| Error | Request failed | Preserve context and support retry |
-| No traffic | Valid metric has no events | Do not label as pipeline failure |
+| State              | Meaning                               | UI behavior                        |
+| ------------------ | ------------------------------------- | ---------------------------------- |
+| Initial loading    | No usable data yet                    | Skeleton with stable geometry      |
+| Background refresh | Existing data is usable               | Keep content, show subtle refresh  |
+| Empty result       | Query succeeded, no matching entities | Explain filters and next action    |
+| Partial success    | Some dependencies failed              | Render available sections          |
+| Unauthorized       | User lacks permission                 | Explain access boundary            |
+| Stale              | Data exists but is old                | Show timestamp and warning         |
+| Error              | Request failed                        | Preserve context and support retry |
+| No traffic         | Valid metric has no events            | Do not label as pipeline failure   |
 
 ## Example section boundary
 
@@ -814,13 +807,8 @@ function SectionBoundary<T>({
   section: SectionEnvelope<T>;
   children: (data: T) => React.ReactNode;
 }) {
-  if (section.status === "unavailable") {
-    return (
-      <InlineError
-        title="This section is temporarily unavailable"
-        code={section.errorCode}
-      />
-    );
+  if (section.status === 'unavailable') {
+    return <InlineError title="This section is temporarily unavailable" code={section.errorCode} />;
   }
 
   if (!section.data) {
@@ -829,9 +817,7 @@ function SectionBoundary<T>({
 
   return (
     <>
-      {section.status === "partial" && (
-        <InlineWarning>Some data may be incomplete.</InlineWarning>
-      )}
+      {section.status === 'partial' && <InlineWarning>Some data may be incomplete.</InlineWarning>}
       {children(section.data)}
     </>
   );
@@ -947,7 +933,7 @@ type CoreUserSettings = {
   locale: string;
   timezone: string;
   reducedMotion: boolean;
-  tableDensity: "comfortable" | "compact";
+  tableDensity: 'comfortable' | 'compact';
 };
 
 type ProductSettings<T extends object = {}> = CoreUserSettings & T;
@@ -1069,17 +1055,17 @@ I previously helped establish a server-driven component architecture that reduce
 ```ts
 type ComponentDescriptor =
   | {
-      type: "metric_card";
+      type: 'metric_card';
       version: 1;
       props: MetricCardProps;
     }
   | {
-      type: "data_table";
+      type: 'data_table';
       version: 2;
       props: DataTableProps;
     }
   | {
-      type: "time_series_chart";
+      type: 'time_series_chart';
       version: 1;
       props: TimeSeriesChartProps;
     };
@@ -1127,12 +1113,15 @@ My approach:
 # Decision: Add Model Overview BFF
 
 ## Context
+
 The current route calls seven systems from the browser and has a P95 load time above ten seconds.
 
 ## Decision
+
 Introduce a task-oriented BFF endpoint for the overview route.
 
 ## Benefits
+
 - parallel server calls;
 - centralized authorization;
 - bounded response;
@@ -1141,16 +1130,19 @@ Introduce a task-oriented BFF endpoint for the overview route.
 - shared tracing.
 
 ## Costs
+
 - new service ownership;
 - additional schema;
 - possible duplication with source APIs.
 
 ## Alternatives
+
 - continue browser orchestration;
 - GraphQL federation;
 - precomputed page store.
 
 ## Success metrics
+
 - P95 summary-ready time under four seconds;
 - error-free page rate above target;
 - payload below budget;
@@ -1656,18 +1648,18 @@ Global search
 
 # 24. Technical Tradeoff Matrix
 
-| Decision | Option A | Option B | My default |
-|---|---|---|---|
-| Table operations | Client-side | Server-side | Server for large datasets |
-| Page integration | Browser orchestration | BFF | BFF for multi-system pages |
-| Chart data | Raw events | Aggregates | Aggregates |
-| Live updates | Polling | SSE/WebSocket | Simplest option meeting freshness |
-| State | Global store | Split by ownership | URL + server state + local UI |
-| Rendering | Full DOM | Virtualization | Measure, then virtualize |
-| Shared UI | Generic mega-component | Composable primitives | Composable primitives |
-| Authorization | UI checks | Server enforcement | Server enforcement |
-| Loading | Block entire page | Progressive sections | Progressive sections |
-| Schema changes | Breaking update | Versioned additive change | Additive and versioned |
+| Decision         | Option A               | Option B                  | My default                        |
+| ---------------- | ---------------------- | ------------------------- | --------------------------------- |
+| Table operations | Client-side            | Server-side               | Server for large datasets         |
+| Page integration | Browser orchestration  | BFF                       | BFF for multi-system pages        |
+| Chart data       | Raw events             | Aggregates                | Aggregates                        |
+| Live updates     | Polling                | SSE/WebSocket             | Simplest option meeting freshness |
+| State            | Global store           | Split by ownership        | URL + server state + local UI     |
+| Rendering        | Full DOM               | Virtualization            | Measure, then virtualize          |
+| Shared UI        | Generic mega-component | Composable primitives     | Composable primitives             |
+| Authorization    | UI checks              | Server enforcement        | Server enforcement                |
+| Loading          | Block entire page      | Progressive sections      | Progressive sections              |
+| Schema changes   | Breaking update        | Versioned additive change | Additive and versioned            |
 
 ---
 
