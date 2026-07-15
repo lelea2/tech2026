@@ -43,130 +43,107 @@
  */
 
 class Node {
-  constructor(key, value) {
+  constructor(key = null, value = null) {
     this.key = key;
-    this.val = value;
-    this.newer = null;
-    this.older = null;
+    this.value = value;
+    this.prev = null;
+    this.next = null;
   }
 }
 
 class LRUCache {
   constructor(capacity) {
+    if (!Number.isInteger(capacity) || capacity <= 0) {
+      throw new RangeError("capacity must be a positive integer");
+    }
+
     this.capacity = capacity;
-    this.length = 0;
-    this.map = {};
-    // save the head and tail so we can update it easily
-    this.head = null;
-    this.tail = null;
+    this.cache = new Map();
+
+    // Dummy nodes:
+    // head.next is the most recently used real node.
+    // tail.prev is the least recently used real node.
+    this.head = new Node();
+    this.tail = new Node();
+
+    this.head.next = this.tail;
+    this.tail.prev = this.head;
   }
 
   /**
-   * Get value by key
-   * Time: O(1) — hash map lookup + node relinking
-   * If key exists, mark it as recently used by moving to head
-   * If not found, return -1
+   * Returns the value and marks the key as most recently used.
+   *
+   * Average time: O(1)
    */
   get(key) {
-    if (this.map.hasOwnProperty(key)) {
-      this.updateKey(key);
-      return this.map[key].val;
-    } else {
+    const node = this.cache.get(key);
+
+    if (!node) {
       return -1;
     }
+
+    this.#moveToFront(node);
+    return node.value;
   }
 
   /**
-   * Move accessed node to head (mark as most recently used)
-   * Time: O(1) — node relinking operations
-   * 
-   * Algorithm:
-   * 1. Remove node from its current position in the doubly-linked list
-   * 2. Insert node at head (most recent position)
-   * 3. Handle edge cases: node at tail, node at head, or only node
-   */
-  updateKey(key) {
-    const node = this.map[key];
-    
-    // Step 1: Break the chain — remove node from current position
-    // If node has a newer neighbor, connect it to node's older neighbor
-    if (node.newer) {
-      node.newer.older = node.older;
-    } else {
-      // Node is at head, update head pointer
-      this.head = node.older;
-    }
-
-    // If node has an older neighbor, connect it to node's newer neighbor
-    if (node.older) {
-      node.older.newer = node.newer;
-    } else {
-      // Node is at tail, update tail pointer
-      this.tail = node.newer;
-    }
-
-    // Step 2: Insert node at head (most recently used)
-    node.older = this.head;
-    node.newer = null;
-    if (this.head) {
-      this.head.newer = node;
-    }
-    this.head = node;
-    
-    // Step 3: Handle edge case — if cache becomes empty (shouldn't happen in updateKey)
-    if (!this.tail) {
-      this.tail = node;
-    }
-  }
-
-  /**
-   * Set or update key-value pair
-   * Time: O(1) — hash map operations + list node relinking
-   * Space: O(1) per insertion
-   * 
-   * Algorithm:
-   * 1. If key exists, update value and mark as recently used
-   * 2. If cache at capacity, evict least recently used (tail) item
-   * 3. Insert new node at head (most recent position)
+   * Inserts or updates a key.
+   *
+   * Average time: O(1)
    */
   set(key, value) {
-    const node = new Node(key, value);
-    
-    // Case 1: Key already exists — update value and mark as recently used
-    if (this.map.hasOwnProperty(key)) {
-      this.map[key].val = value;
-      this.updateKey(key);
+    const existingNode = this.cache.get(key);
+
+    if (existingNode) {
+      existingNode.value = value;
+      this.#moveToFront(existingNode);
       return;
     }
-    
-    // Case 2: Cache at capacity — evict least recently used (tail) item
-    if (this.length >= this.capacity) {
-      // Remove tail node (least recently used)
-      const dKey = this.tail.key;
-      this.tail = this.tail.newer;
-      if (this.tail) {
-        this.tail.older = null;  // Disconnect from old tail
-      }
-      delete this.map[dKey];  // Remove from hash map
-      this.length--;
-    }
 
-    // Case 3: Insert new node at head (most recently used position)
-    node.older = this.head;
-    if (this.head) {
-      this.head.newer = node;
+    const node = new Node(key, value);
+
+    this.cache.set(key, node);
+    this.#addToFront(node);
+
+    if (this.cache.size > this.capacity) {
+      const leastRecentlyUsed = this.#removeLeastRecentlyUsed();
+      this.cache.delete(leastRecentlyUsed.key);
     }
-    this.head = node;
-    
-    // Handle edge case — first insertion in empty cache
-    if (!this.tail) {
-      this.tail = node;
-    }
-    
-    // Add to hash map and increment length
-    this.map[key] = node;
-    this.length++;
+  }
+
+  /**
+   * Removes a node from its current position.
+   */
+  #remove(node) {
+    node.prev.next = node.next;
+    node.next.prev = node.prev;
+  }
+
+  /**
+   * Inserts a node immediately after the dummy head.
+   */
+  #addToFront(node) {
+    node.prev = this.head;
+    node.next = this.head.next;
+
+    this.head.next.prev = node;
+    this.head.next = node;
+  }
+
+  /**
+   * Marks a node as most recently used.
+   */
+  #moveToFront(node) {
+    this.#remove(node);
+    this.#addToFront(node);
+  }
+
+  /**
+   * Removes and returns the least recently used node.
+   */
+  #removeLeastRecentlyUsed() {
+    const node = this.tail.prev;
+    this.#remove(node);
+    return node;
   }
 }
-
-export default LRUCache;
