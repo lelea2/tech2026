@@ -424,6 +424,10 @@
       "hash": "1c2ab6259f8bf70a097ecf8a3c30ca62bc7c50db15aa750e3377d3821a2104c0",
       "docRelative": "jsfunction/hooks/useQuery.mdx"
     },
+    "frontend/jsfunction/hooks/useSearchQuery.js": {
+      "hash": "288a25d947b61ba04ff0c7281f4ebbd55894b0ed11318df655b82294a048a846",
+      "docRelative": "jsfunction/hooks/useSearchQuery.mdx"
+    },
     "frontend/jsfunction/hooks/useSet.js": {
       "hash": "b5f2f5fa872beb6013024b4895b9a13cda7e2a5da8b40b8bee279952594253ef",
       "docRelative": "jsfunction/hooks/useSet.mdx"
@@ -877,7 +881,7 @@
       "docRelative": "jsfunction/getElementBy/_index.mdx"
     },
     "__nav__:jsfunction/hooks": {
-      "hash": "914900b9322529b7ef330f8ee3dbff0c046e2647c4b1fbf1f2ebaaea8258189f",
+      "hash": "9a046e3b5519e3d146b4c16c2b0d99ada6385b561a3ce1930f825d7155430879",
       "docRelative": "jsfunction/hooks/_index.mdx"
     },
     "__nav__:jsfunction/htmlModifier": {
