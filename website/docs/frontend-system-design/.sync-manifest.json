@@ -56,6 +56,10 @@
       "hash": "6fbeb992cc0b9633847f12120c7632efedb2f4ff07f8c564510e5e04c4dad492",
       "docRelative": "chatapp.mdx"
     },
+    "frontend-system-design/claude-ai-spreadsheet-agent-interview-guide.mdx": {
+      "hash": "7433c2bba7dc574c55288bc9f01755d0f3d9f715de4f1adbb2079523d9807dea",
+      "docRelative": "claude-ai-spreadsheet-agent-interview-guide.mdx"
+    },
     "frontend-system-design/figma.mdx": {
       "hash": "d9ec426dcbf94524449f3d4507c7b36a5213ea9a228033460cdf42dcb3a08bb6",
       "docRelative": "figma.mdx"
