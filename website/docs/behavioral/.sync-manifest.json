@@ -1,5 +1,9 @@
 {
   "files": {
+    "behavorial/web-experience.png": {
+      "hash": "cb3e15c912f2360b9368070921fb2b4584e0e0cd6475829bae8cd9ee3401f0dd",
+      "docRelative": "web-experience.png"
+    },
     "behavorial/em-difficult-stakeholder-framework.mdx": {
       "hash": "9f5b537d8bfe6754f30e5a74b2997262c8674eccc46480b061f04c210d0bb90a",
       "docRelative": "em-difficult-stakeholder-framework.mdx"
@@ -13,19 +17,15 @@
       "docRelative": "engineering-manager-behavioral-interview.mdx"
     },
     "behavorial/model_foundry_interview_script.mdx": {
-      "hash": "43e343786df2da6c9df4672059afe64da533737bf1d88b2316c153635479a43d",
+      "hash": "743d7e6fd0e2fb93cd06ddae964a202127b5af0cc132264e695e32ed599ce331",
       "docRelative": "model_foundry_interview_script.mdx"
     },
-    "behavorial/staff-frontend-web-experience-interview.mdx": {
-      "hash": "121b43c213c031106cabe17da57422893dd20c80b6a1126da718ba79e7354798",
-      "docRelative": "staff-frontend-web-experience-interview.mdx"
-    },
     "behavorial/staff_frontend_platform_interview_prep.mdx": {
-      "hash": "7ddd227890027126bead7fd3987f75cb383b9d9e80466c7d10ffd2189c11d9d7",
+      "hash": "d747b4eb43974a912ee7c738412f77e06306e5044f5ada92e3be8c8e84c96c56",
       "docRelative": "staff_frontend_platform_interview_prep.mdx"
     },
     "behavorial/staff_frontend_web_experience_interview.mdx": {
-      "hash": "929403713c93bd4a446efcdb1dc1c6f7343b664b70df54f85bc1e4542cd9c121",
+      "hash": "9d79bcec24febb9e660c4c41802d58a16db390dbd9c39f2d9d7cdcd32b8507a8",
       "docRelative": "staff_frontend_web_experience_interview.mdx"
     },
     "behavorial/strength-vs-weakness.mdx": {
@@ -35,6 +35,10 @@
     "behavorial/tradeoff-behavioral.mdx": {
       "hash": "b3de7641108f76b6fd9323ad043aa30cf09a715e134bc02b6427876e98534cb2",
       "docRelative": "tradeoff-behavioral.mdx"
+    },
+    "behavorial/web-experience.mdx": {
+      "hash": "fbdad08c6b5bdee8190be6103ae11ac7ed3e1ff5ffbfbe700e95738658a3e6dd",
+      "docRelative": "web-experience.mdx"
     }
   }
 }

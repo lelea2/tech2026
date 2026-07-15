@@ -1,10 +1,23 @@
 ---
-title: 'Web Experience Deep Dive'
-description: 'Practice guide based on ML Observability, Model Foundry, EngX, reusable frontend infrastructure, SSO, permissions, performance, and staff-level leadership.'
+title: 'Staff Frontend Web Experience Interview Preparation'
+description: 'Staff-level frontend interview preparation tailored to MLOps observability, reusable EngX components, frontend reliability, performance, accessibility, and cross-functional leadership.'
 date: '2026-07-13'
+sidebar_label: 'Web Experience'
+tags:
+  - frontend
+  - staff-engineer
+  - web-experience
+  - react
+  - performance
+  - reliability
+  - accessibility
+  - engx
+  - mlops
 ---
 
-# Staff Frontend System Design Interview
+![Summary](./web-experience.png)
+
+# Staff Frontend Web Experience Interview Preparation
 
 ## Web Experience Deep Dive
 
@@ -23,6 +36,102 @@ The goal is not only to explain what I built. The goal is to demonstrate that I 
 ---
 
 # 1. My Staff-Level Positioning
+
+## Three themes to anchor on
+
+Your experience maps cleanly to three staff-level themes. Use these repeatedly so the interviewer hears a consistent story.
+
+### Product experience
+
+You transformed fragmented MLOps metadata into workflows engineers could actually use:
+
+- homepage views organized around crews, LDAP groups, and model groups;
+- search across owners, models, versions, and organizational entities;
+- model and feature-health drill-downs;
+- online and offline inference status;
+- feature availability, freshness, lineage, and compliance visibility.
+
+### Engineering excellence
+
+You improved the underlying experience instead of only shipping more UI:
+
+- reduced active-model loading from roughly 12-15 seconds to under 4 seconds;
+- reduced registered-model page loading from roughly 4.5 seconds to around 1 second;
+- established clearer loading, empty, partial-error, and stale-data states;
+- improved API aggregation and frontend rendering behavior;
+- created reusable patterns other MLOps surfaces could adopt.
+
+### Organizational leverage
+
+You worked across MLOps, data quality, model serving, compliance, infrastructure, legal, and CI teams.
+
+At staff level, emphasize that you:
+
+- identified common problems across product surfaces;
+- created shared frontend contracts and components;
+- aligned multiple teams around standards;
+- made migrations incremental rather than rewrite-driven;
+- measured adoption and outcomes;
+- balanced immediate delivery with long-term platform quality.
+
+## What the interviewer is likely evaluating
+
+### Product judgment
+
+Show that you can translate ambiguous requirements into a usable experience. Frame answers around the user decision, not the backend schema.
+
+For an observability page, avoid saying:
+
+> We display latency, inference counts, and freshness.
+
+Prefer:
+
+> The user is usually answering one of three questions: Is my model healthy? What changed? What should I do next? I would organize the experience around those decisions rather than around backend schemas.
+
+### Frontend architecture
+
+Expect follow-up on:
+
+- state ownership;
+- server state versus UI state;
+- URL-driven state;
+- component boundaries;
+- data-fetching contracts;
+- error isolation;
+- accessibility;
+- rendering performance;
+- testing strategy;
+- instrumentation;
+- incremental rollout.
+
+### Web fundamentals
+
+Be ready to go deep on:
+
+- semantic HTML;
+- keyboard interaction;
+- focus management;
+- screen-reader announcements;
+- responsive layout;
+- browser rendering;
+- network waterfalls;
+- caching;
+- Core Web Vitals;
+- image and bundle optimization.
+
+### Staff-level influence
+
+The interviewer will also look for evidence that you made other engineers more effective.
+
+Make sure your answer includes:
+
+- how you found the cross-team problem;
+- why a shared solution was preferable;
+- how you gathered requirements;
+- how you avoided over-generalizing;
+- how you launched and migrated consumers;
+- how you measured success;
+- how you handled disagreement or weak adoption.
 
 ## 30-second introduction
 

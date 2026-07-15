@@ -1,6 +1,6 @@
 ---
-title: "Model Foundry / MLOps Observability Interview Script"
-description: "Interview narrative, metrics impact, frontend optimization techniques, visualization strategy, Core Web Vitals framing, and scenario Q&A."
+title: 'Model Foundry / MLOps Observability Interview Script'
+description: 'Interview narrative, metrics impact, frontend optimization techniques, visualization strategy, Core Web Vitals framing, and scenario Q&A.'
 ---
 
 # Model Foundry / MLOps Observability Interview Script
@@ -8,6 +8,8 @@ description: "Interview narrative, metrics impact, frontend optimization techniq
 > Goal: present the project as a Staff/Lead Engineer story that connects product ambiguity, organizational alignment, system design, frontend performance, metrics quality, and measurable business impact.
 
 Demo reference: [Model Foundry MLOps Observability Demo](https://project-slide-demo.vercel.app/mlops-observability-demo.html)
+
+![Summary](./web-experience.png)
 
 ---
 
@@ -63,14 +65,14 @@ The result was a faster and more trusted Model Foundry experience. Teams had cle
 
 ## 3. Metrics and Impact Framing
 
-| Area | Before | After | Impact |
-|---|---|---|---|
-| Model discovery | Fragmented across registry, serving, ownership, and compliance systems | Unified model group and model version views | Faster discovery and fewer manual lookups |
-| Page performance | Key pages took roughly 12–15 seconds | Optimized pages loaded under 4 seconds; registered model pages around 1 second | Better developer experience and faster debugging |
-| Ownership | Unclear or inconsistent owner mapping | Ownership surfaced at model/group level | Faster escalation during incidents |
-| Feature health | Feature availability and drift signals required separate investigation | Feature availability, drift, and freshness surfaced in model context | Faster diagnosis of data quality issues |
-| Compliance metadata | Compliance information lived outside the operational model view | Compliance metadata connected to model-level observability | Better audit readiness |
-| Dataset freshness | Offline and online data freshness were not consistently visible | Freshness became part of the observability workflow | Earlier detection of stale data risk |
+| Area                | Before                                                                 | After                                                                          | Impact                                           |
+| ------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------ |
+| Model discovery     | Fragmented across registry, serving, ownership, and compliance systems | Unified model group and model version views                                    | Faster discovery and fewer manual lookups        |
+| Page performance    | Key pages took roughly 12–15 seconds                                   | Optimized pages loaded under 4 seconds; registered model pages around 1 second | Better developer experience and faster debugging |
+| Ownership           | Unclear or inconsistent owner mapping                                  | Ownership surfaced at model/group level                                        | Faster escalation during incidents               |
+| Feature health      | Feature availability and drift signals required separate investigation | Feature availability, drift, and freshness surfaced in model context           | Faster diagnosis of data quality issues          |
+| Compliance metadata | Compliance information lived outside the operational model view        | Compliance metadata connected to model-level observability                     | Better audit readiness                           |
+| Dataset freshness   | Offline and online data freshness were not consistently visible        | Freshness became part of the observability workflow                            | Earlier detection of stale data risk             |
 
 ---
 
@@ -89,7 +91,6 @@ I used a few principles:
 1. **Define user-facing metrics first**
 
    I started from the questions users needed to answer:
-
    - Is the model active?
    - Is it serving traffic?
    - Did latency regress?
@@ -103,7 +104,6 @@ I used a few principles:
 2. **Separate raw telemetry from serving aggregates**
 
    Raw telemetry is useful for offline analysis, but it is too expensive for every page view. For UI serving, we used precomputed aggregates such as:
-
    - Latest active model status
    - Last online inference timestamp
    - Last offline inference timestamp
@@ -120,7 +120,6 @@ I used a few principles:
 4. **Reduce cardinality before it reaches the UI**
 
    Instead of sending every feature × model × version × timestamp series to the browser, the backend produced summaries:
-
    - Healthy / warning / critical counts
    - Top drifting features
    - Most recent freshness violation
@@ -130,7 +129,6 @@ I used a few principles:
 5. **Make metrics explainable**
 
    Every metric needed a definition. For example:
-
    - Active model: model with inference activity in a defined recent window.
    - Feature drift: distribution shift between baseline and current feature values.
    - Dataset freshness: difference between expected update time and observed latest data partition/event.
@@ -160,15 +158,15 @@ The page hierarchy followed a progressive disclosure pattern:
 
 ### Visualization techniques
 
-| Visualization need | Technique |
-|---|---|
-| Show model health quickly | Status cards and summary badges |
-| Show trend over time | Line charts with downsampled points |
-| Show latency distribution | P50/P95/P99 percentile trend instead of raw traces |
-| Show feature drift | Severity-ranked feature list and distribution comparison |
-| Show ownership | Owner and crew metadata surfaced near health signals |
-| Show compliance readiness | Coverage summary with missing fields/actions |
-| Show dataset freshness | Latest partition/event freshness with threshold state |
+| Visualization need        | Technique                                                |
+| ------------------------- | -------------------------------------------------------- |
+| Show model health quickly | Status cards and summary badges                          |
+| Show trend over time      | Line charts with downsampled points                      |
+| Show latency distribution | P50/P95/P99 percentile trend instead of raw traces       |
+| Show feature drift        | Severity-ranked feature list and distribution comparison |
+| Show ownership            | Owner and crew metadata surfaced near health signals     |
+| Show compliance readiness | Coverage summary with missing fields/actions             |
+| Show dataset freshness    | Latest partition/event freshness with threshold state    |
 
 ### Why this mattered
 
@@ -229,7 +227,7 @@ type LatencySummary = {
   p50Ms: number;
   p95Ms: number;
   p99Ms: number;
-  window: "1h" | "24h" | "7d";
+  window: '1h' | '24h' | '7d';
 };
 
 type FeatureHealthSummary = {
@@ -332,7 +330,7 @@ The UI derived view-specific state from API responses, such as severity groups, 
 ```tsx
 const criticalFeatures = useMemo(() => {
   return features
-    .filter((feature) => feature.status === "critical")
+    .filter((feature) => feature.status === 'critical')
     .sort((a, b) => b.severityScore - a.severityScore);
 }, [features]);
 ```
@@ -342,8 +340,8 @@ const criticalFeatures = useMemo(() => {
 Heavy views such as lineage graph, drift detail, or export flows were loaded only when needed.
 
 ```tsx
-const LineageGraph = lazy(() => import("./LineageGraph"));
-const DriftDetail = lazy(() => import("./DriftDetail"));
+const LineageGraph = lazy(() => import('./LineageGraph'));
+const DriftDetail = lazy(() => import('./DriftDetail'));
 ```
 
 #### 10. Rendering priority
@@ -356,13 +354,13 @@ The page prioritized visible, actionable content. Expensive below-the-fold chart
 
 Even though this was an internal enterprise platform, I used Core Web Vitals as a practical language for performance because it connects engineering work to user experience.
 
-| Core Web Vital | What I optimized | Example technique |
-|---|---|---|
-| LCP — Largest Contentful Paint | Time until the main model summary was visible | Smaller initial payload, server-side summary, progressive loading |
+| Core Web Vital                  | What I optimized                                                     | Example technique                                                              |
+| ------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| LCP — Largest Contentful Paint  | Time until the main model summary was visible                        | Smaller initial payload, server-side summary, progressive loading              |
 | INP — Interaction to Next Paint | Responsiveness when filtering, sorting, expanding, or switching tabs | Virtualized tables, memoized selectors, avoiding large synchronous render work |
-| CLS — Cumulative Layout Shift | Stability of cards/charts/tables while data loaded | Skeleton dimensions, reserved chart/table space, predictable layout containers |
-| TTFB — Time to First Byte | Backend response start time | Pre-aggregation, indexed queries, cacheable summaries |
-| Bundle cost | JavaScript parse and execution time | Route splitting, lazy-loading charts, avoiding unnecessary libraries |
+| CLS — Cumulative Layout Shift   | Stability of cards/charts/tables while data loaded                   | Skeleton dimensions, reserved chart/table space, predictable layout containers |
+| TTFB — Time to First Byte       | Backend response start time                                          | Pre-aggregation, indexed queries, cacheable summaries                          |
+| Bundle cost                     | JavaScript parse and execution time                                  | Route splitting, lazy-loading charts, avoiding unnecessary libraries           |
 
 ### Interview phrasing
 
@@ -423,15 +421,15 @@ This project required more than engineering execution. The hard part was alignin
 
 ### Stakeholders
 
-| Stakeholder | Concern |
-|---|---|
-| Model owners | Need to know health, activity, drift, ownership, and action items |
-| MLOps platform | Need reliable model lifecycle visibility |
-| Data quality teams | Need freshness and feature availability surfaced in context |
-| Compliance/legal | Need model-level metadata and audit readiness |
-| CI/CD teams | Need model metadata and manifest integration |
-| Serving infrastructure | Need telemetry contracts and operational metrics |
-| Leadership | Need platform adoption, reliability, and measurable impact |
+| Stakeholder            | Concern                                                           |
+| ---------------------- | ----------------------------------------------------------------- |
+| Model owners           | Need to know health, activity, drift, ownership, and action items |
+| MLOps platform         | Need reliable model lifecycle visibility                          |
+| Data quality teams     | Need freshness and feature availability surfaced in context       |
+| Compliance/legal       | Need model-level metadata and audit readiness                     |
+| CI/CD teams            | Need model metadata and manifest integration                      |
+| Serving infrastructure | Need telemetry contracts and operational metrics                  |
+| Leadership             | Need platform adoption, reliability, and measurable impact        |
 
 ### Leadership behaviors demonstrated
 
@@ -603,7 +601,7 @@ The platform became more than a dashboard. It became an operational workflow for
 ## 13. Technical Deep-Dive: Example API Design
 
 ```ts
-type ModelHealthStatus = "healthy" | "warning" | "critical" | "unknown";
+type ModelHealthStatus = 'healthy' | 'warning' | 'critical' | 'unknown';
 
 type ModelFoundryOverview = {
   modelGroup: {
@@ -636,7 +634,7 @@ type ModelFoundryOverview = {
     critical: number;
     topIssues: Array<{
       featureName: string;
-      issueType: "missing" | "stale" | "drift";
+      issueType: 'missing' | 'stale' | 'drift';
       severity: ModelHealthStatus;
     }>;
   };
