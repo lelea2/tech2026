@@ -207,56 +207,50 @@ Classify the request as one of:
 ```ts
 const tools = [
   {
-    name: "propose_spreadsheet_operation",
-    description:
-      "Propose one safe spreadsheet operation based on the user's request.",
+    name: 'propose_spreadsheet_operation',
+    description: "Propose one safe spreadsheet operation based on the user's request.",
     input_schema: {
-      type: "object",
+      type: 'object',
       additionalProperties: false,
-      required: [
-        "operation",
-        "explanation",
-        "requiresConfirmation",
-        "estimatedAffectedRows",
-      ],
+      required: ['operation', 'explanation', 'requiresConfirmation', 'estimatedAffectedRows'],
       properties: {
         operation: {
-          type: "string",
+          type: 'string',
           enum: [
-            "query_records",
-            "update_records",
-            "create_column",
-            "set_formula",
-            "delete_records",
-            "delete_column",
-            "unsupported",
-            "clarification_required",
+            'query_records',
+            'update_records',
+            'create_column',
+            'set_formula',
+            'delete_records',
+            'delete_column',
+            'unsupported',
+            'clarification_required',
           ],
         },
         targetColumn: {
-          type: ["string", "null"],
+          type: ['string', 'null'],
         },
         formula: {
-          type: ["string", "null"],
+          type: ['string', 'null'],
         },
         filter: {
-          type: ["object", "null"],
+          type: ['object', 'null'],
           additionalProperties: true,
         },
         value: {
-          type: ["string", "number", "boolean", "null"],
+          type: ['string', 'number', 'boolean', 'null'],
         },
         clarificationQuestion: {
-          type: ["string", "null"],
+          type: ['string', 'null'],
         },
         explanation: {
-          type: "string",
+          type: 'string',
         },
         requiresConfirmation: {
-          type: "boolean",
+          type: 'boolean',
         },
         estimatedAffectedRows: {
-          type: "integer",
+          type: 'integer',
           minimum: 0,
         },
       },
@@ -270,18 +264,13 @@ const tools = [
 ## 7. TypeScript Implementation
 
 ```ts
-import Anthropic from "@anthropic-ai/sdk";
+import Anthropic from '@anthropic-ai/sdk';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-type ColumnType =
-  | "text"
-  | "number"
-  | "boolean"
-  | "date"
-  | "formula";
+type ColumnType = 'text' | 'number' | 'boolean' | 'date' | 'formula';
 
 type Column = {
   id: string;
@@ -289,7 +278,7 @@ type Column = {
   type: ColumnType;
 };
 
-type Permission = "read" | "write" | "delete";
+type Permission = 'read' | 'write' | 'delete';
 
 type AgentRequest = {
   instruction: string;
@@ -302,14 +291,14 @@ type AgentRequest = {
 };
 
 type OperationName =
-  | "query_records"
-  | "update_records"
-  | "create_column"
-  | "set_formula"
-  | "delete_records"
-  | "delete_column"
-  | "unsupported"
-  | "clarification_required";
+  | 'query_records'
+  | 'update_records'
+  | 'create_column'
+  | 'set_formula'
+  | 'delete_records'
+  | 'delete_column'
+  | 'unsupported'
+  | 'clarification_required';
 
 type ProposedOperation = {
   operation: OperationName;
@@ -341,74 +330,67 @@ Rules:
 `;
 
 const operationTool: Anthropic.Tool = {
-  name: "propose_spreadsheet_operation",
-  description: "Propose one safe spreadsheet operation.",
+  name: 'propose_spreadsheet_operation',
+  description: 'Propose one safe spreadsheet operation.',
   input_schema: {
-    type: "object",
-    required: [
-      "operation",
-      "explanation",
-      "requiresConfirmation",
-      "estimatedAffectedRows",
-    ],
+    type: 'object',
+    required: ['operation', 'explanation', 'requiresConfirmation', 'estimatedAffectedRows'],
     additionalProperties: false,
     properties: {
       operation: {
-        type: "string",
+        type: 'string',
         enum: [
-          "query_records",
-          "update_records",
-          "create_column",
-          "set_formula",
-          "delete_records",
-          "delete_column",
-          "unsupported",
-          "clarification_required",
+          'query_records',
+          'update_records',
+          'create_column',
+          'set_formula',
+          'delete_records',
+          'delete_column',
+          'unsupported',
+          'clarification_required',
         ],
       },
       targetColumn: {
-        type: ["string", "null"],
+        type: ['string', 'null'],
       },
       formula: {
-        type: ["string", "null"],
+        type: ['string', 'null'],
       },
       filter: {
-        type: ["object", "null"],
+        type: ['object', 'null'],
       },
       value: {
-        type: ["string", "number", "boolean", "null"],
+        type: ['string', 'number', 'boolean', 'null'],
       },
       clarificationQuestion: {
-        type: ["string", "null"],
+        type: ['string', 'null'],
       },
       explanation: {
-        type: "string",
+        type: 'string',
       },
       requiresConfirmation: {
-        type: "boolean",
+        type: 'boolean',
       },
       estimatedAffectedRows: {
-        type: "integer",
+        type: 'integer',
       },
     },
   },
 };
 
-export async function proposeOperation(
-  request: AgentRequest,
-): Promise<ProposedOperation> {
+export async function proposeOperation(request: AgentRequest): Promise<ProposedOperation> {
   const response = await anthropic.messages.create({
     model: process.env.CLAUDE_MODEL!,
     max_tokens: 1_500,
     system: SYSTEM_PROMPT,
     tools: [operationTool],
     tool_choice: {
-      type: "tool",
-      name: "propose_spreadsheet_operation",
+      type: 'tool',
+      name: 'propose_spreadsheet_operation',
     },
     messages: [
       {
-        role: "user",
+        role: 'user',
         content: JSON.stringify({
           instruction: request.instruction,
           table: {
@@ -425,17 +407,12 @@ export async function proposeOperation(
   });
 
   const toolUse = response.content.find(
-    (
-      block,
-    ): block is Anthropic.ToolUseBlock =>
-      block.type === "tool_use" &&
-      block.name === "propose_spreadsheet_operation",
+    (block): block is Anthropic.ToolUseBlock =>
+      block.type === 'tool_use' && block.name === 'propose_spreadsheet_operation'
   );
 
   if (!toolUse) {
-    throw new Error(
-      "Claude did not return a spreadsheet operation.",
-    );
+    throw new Error('Claude did not return a spreadsheet operation.');
   }
 
   const proposal = toolUse.input as ProposedOperation;
@@ -453,100 +430,53 @@ export async function proposeOperation(
 The validator is the trusted safety boundary.
 
 ```ts
-function validateProposal(
-  request: AgentRequest,
-  proposal: ProposedOperation,
-): void {
-  const validColumns = new Map(
-    request.columns.map((column) => [
-      column.name,
-      column,
-    ]),
-  );
+function validateProposal(request: AgentRequest, proposal: ProposedOperation): void {
+  const validColumns = new Map(request.columns.map((column) => [column.name, column]));
 
   const mutationOperations: OperationName[] = [
-    "update_records",
-    "create_column",
-    "set_formula",
-    "delete_records",
-    "delete_column",
+    'update_records',
+    'create_column',
+    'set_formula',
+    'delete_records',
+    'delete_column',
   ];
 
-  const deletionOperations: OperationName[] = [
-    "delete_records",
-    "delete_column",
-  ];
+  const deletionOperations: OperationName[] = ['delete_records', 'delete_column'];
 
-  const isMutation = mutationOperations.includes(
-    proposal.operation,
-  );
+  const isMutation = mutationOperations.includes(proposal.operation);
 
-  const isDeletion = deletionOperations.includes(
-    proposal.operation,
-  );
+  const isDeletion = deletionOperations.includes(proposal.operation);
 
   if (
     proposal.targetColumn &&
     !validColumns.has(proposal.targetColumn) &&
-    proposal.operation !== "create_column"
+    proposal.operation !== 'create_column'
   ) {
-    throw new Error(
-      `Unknown target column: ${proposal.targetColumn}`,
-    );
+    throw new Error(`Unknown target column: ${proposal.targetColumn}`);
   }
 
-  if (
-    isMutation &&
-    !request.permissions.includes("write")
-  ) {
-    throw new Error(
-      "The user does not have write permission.",
-    );
+  if (isMutation && !request.permissions.includes('write')) {
+    throw new Error('The user does not have write permission.');
   }
 
-  if (
-    isDeletion &&
-    !request.permissions.includes("delete")
-  ) {
-    throw new Error(
-      "The user does not have delete permission.",
-    );
+  if (isDeletion && !request.permissions.includes('delete')) {
+    throw new Error('The user does not have delete permission.');
   }
 
-  if (
-    isDeletion &&
-    !proposal.requiresConfirmation
-  ) {
-    throw new Error(
-      "Deletion must require confirmation.",
-    );
+  if (isDeletion && !proposal.requiresConfirmation) {
+    throw new Error('Deletion must require confirmation.');
   }
 
-  if (
-    proposal.estimatedAffectedRows > 100 &&
-    !proposal.requiresConfirmation
-  ) {
-    throw new Error(
-      "Large operations must require confirmation.",
-    );
+  if (proposal.estimatedAffectedRows > 100 && !proposal.requiresConfirmation) {
+    throw new Error('Large operations must require confirmation.');
   }
 
-  if (
-    proposal.operation === "set_formula" &&
-    !proposal.formula
-  ) {
-    throw new Error(
-      "A formula operation requires a formula.",
-    );
+  if (proposal.operation === 'set_formula' && !proposal.formula) {
+    throw new Error('A formula operation requires a formula.');
   }
 
-  if (
-    proposal.operation === "clarification_required" &&
-    !proposal.clarificationQuestion
-  ) {
-    throw new Error(
-      "A clarification request requires a question.",
-    );
+  if (proposal.operation === 'clarification_required' && !proposal.clarificationQuestion) {
+    throw new Error('A clarification request requires a question.');
   }
 }
 ```
@@ -568,42 +498,36 @@ In production, add:
 ```ts
 type AgentResponse =
   | {
-      status: "needs_clarification";
+      status: 'needs_clarification';
       message: string;
     }
   | {
-      status: "unsupported";
+      status: 'unsupported';
       message: string;
     }
   | {
-      status: "confirmation_required";
+      status: 'confirmation_required';
       operationId: string;
       proposal: ProposedOperation;
     }
   | {
-      status: "completed";
+      status: 'completed';
       result: unknown;
     };
 
-async function handleAgentRequest(
-  request: AgentRequest,
-): Promise<AgentResponse> {
+async function handleAgentRequest(request: AgentRequest): Promise<AgentResponse> {
   const proposal = await proposeOperation(request);
 
-  if (
-    proposal.operation === "clarification_required"
-  ) {
+  if (proposal.operation === 'clarification_required') {
     return {
-      status: "needs_clarification",
-      message:
-        proposal.clarificationQuestion ??
-        "Please clarify your request.",
+      status: 'needs_clarification',
+      message: proposal.clarificationQuestion ?? 'Please clarify your request.',
     };
   }
 
-  if (proposal.operation === "unsupported") {
+  if (proposal.operation === 'unsupported') {
     return {
-      status: "unsupported",
+      status: 'unsupported',
       message: proposal.explanation,
     };
   }
@@ -618,7 +542,7 @@ async function handleAgentRequest(
 
   if (proposal.requiresConfirmation) {
     return {
-      status: "confirmation_required",
+      status: 'confirmation_required',
       operationId,
       proposal,
     };
@@ -638,7 +562,7 @@ async function handleAgentRequest(
   });
 
   return {
-    status: "completed",
+    status: 'completed',
     result,
   };
 }
@@ -674,10 +598,7 @@ async function handleAgentRequest(
       "Salary": 120000
     }
   ],
-  "permissions": [
-    "read",
-    "write"
-  ]
+  "permissions": ["read", "write"]
 }
 ```
 
@@ -743,10 +664,8 @@ Expected proposal:
 ```json
 {
   "operation": "clarification_required",
-  "clarificationQuestion":
-    "How much should salary increase, and which records should be updated?",
-  "explanation":
-    "The increase amount and affected employees were not specified.",
+  "clarificationQuestion": "How much should salary increase, and which records should be updated?",
+  "explanation": "The increase amount and affected employees were not specified.",
   "requiresConfirmation": false,
   "estimatedAffectedRows": 0
 }

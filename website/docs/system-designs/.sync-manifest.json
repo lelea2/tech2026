@@ -84,6 +84,10 @@
       "hash": "7a9dbbd8d9db0c73ee2241963b2b3719219b366398d666e16afec2ca33d0b638",
       "docRelative": "leetcode.png"
     },
+    "system-designs/marketing-ai-agent.png": {
+      "hash": "0d2ba5cd301f2b9c3fabad44957866b006adcae6d4f71cded4b9752aff056155",
+      "docRelative": "marketing-ai-agent.png"
+    },
     "system-designs/metrics-monitoring.png": {
       "hash": "a07d37937a19f64a26371965e0b7614f86a088f72f80fd52cb0f39d7ea5abc84",
       "docRelative": "metrics-monitoring.png"
@@ -231,6 +235,10 @@
     "system-designs/leetcode_execution_leaderboard.mdx": {
       "hash": "260731cc0219ad96021a4cfab559d981ffb7a3cd06150a749329a36e2d2e4897",
       "docRelative": "leetcode_execution_leaderboard.mdx"
+    },
+    "system-designs/marketing-ai-agent.mdx": {
+      "hash": "c5a04092163517c8f7724aa908162309a6c49bfdbb81072fd16518847092f382",
+      "docRelative": "marketing-ai-agent.mdx"
     },
     "system-designs/metrics-monitoring.mdx": {
       "hash": "dc00f4a891daf3b106aa0dacdee206d256acb926e4fb8ed2ba5962f2d79e06ce",
