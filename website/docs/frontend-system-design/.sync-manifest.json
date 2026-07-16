@@ -8,6 +8,10 @@
       "hash": "ab44cc76d535e72f96d36fdc8520eceb1d186983b53b0a4993cdf18bb61299a2",
       "docRelative": "chatapp.png"
     },
+    "frontend-system-design/chatgpt.png": {
+      "hash": "21d565565a3c30b078cd2d0b22555c66e9842210892518390d4ce38e4d1f638b",
+      "docRelative": "chatgpt.png"
+    },
     "frontend-system-design/design-calendar.png": {
       "hash": "e4906ec1cd39b1526e4d0acdbebaf8eaa960640a16b8067d03ca480f67ac6db6",
       "docRelative": "design-calendar.png"
@@ -59,6 +63,10 @@
     "frontend-system-design/chatapp.mdx": {
       "hash": "6fbeb992cc0b9633847f12120c7632efedb2f4ff07f8c564510e5e04c4dad492",
       "docRelative": "chatapp.mdx"
+    },
+    "frontend-system-design/chatgpt-frontend-system-design-staff.mdx": {
+      "hash": "c93c69c7fe5fce995ba023f8b3f30718e45a4acef3f342eabb0b1f2ac043adc6",
+      "docRelative": "chatgpt-frontend-system-design-staff.mdx"
     },
     "frontend-system-design/claude-ai-spreadsheet-agent-interview-guide.mdx": {
       "hash": "1cfafe5dda3ea44b53f27b187487900d4bf83e6ae6a0e34d6a8615b6a31e1f5f",
