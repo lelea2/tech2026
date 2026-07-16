@@ -5,8 +5,12 @@
       "docRelative": "autocomplete.png"
     },
     "frontend-system-design/chatapp.png": {
-      "hash": "7374fe62e96f452e290ba16280c195d5039c3a76092de597c43fc55f72cf6cbe",
+      "hash": "ab44cc76d535e72f96d36fdc8520eceb1d186983b53b0a4993cdf18bb61299a2",
       "docRelative": "chatapp.png"
+    },
+    "frontend-system-design/design-calendar.png": {
+      "hash": "e4906ec1cd39b1526e4d0acdbebaf8eaa960640a16b8067d03ca480f67ac6db6",
+      "docRelative": "design-calendar.png"
     },
     "frontend-system-design/figma.png": {
       "hash": "2c37c162b2abbc878aa7d6d29d601de73f232b0500d50ab43136f716b6304229",
@@ -49,7 +53,7 @@
       "docRelative": "video-netflix.png"
     },
     "frontend-system-design/autocomplete.mdx": {
-      "hash": "a2db98ffe21eeab21e9a81cbbaff462d6cfd322abbbedad7cfd7b9fbc0ac9cbb",
+      "hash": "886fedf4755486b440d1d56cead08a807cb7bd0160905feb919b28095b3ef0e4",
       "docRelative": "autocomplete.mdx"
     },
     "frontend-system-design/chatapp.mdx": {
@@ -59,6 +63,10 @@
     "frontend-system-design/claude-ai-spreadsheet-agent-interview-guide.mdx": {
       "hash": "1cfafe5dda3ea44b53f27b187487900d4bf83e6ae6a0e34d6a8615b6a31e1f5f",
       "docRelative": "claude-ai-spreadsheet-agent-interview-guide.mdx"
+    },
+    "frontend-system-design/date-picker-design.mdx": {
+      "hash": "cd48f96361d61c7ea0bbeacb40b09d437188effbff95cc829a4cdaa417771a77",
+      "docRelative": "date-picker-design.mdx"
     },
     "frontend-system-design/figma.mdx": {
       "hash": "d9ec426dcbf94524449f3d4507c7b36a5213ea9a228033460cdf42dcb3a08bb6",

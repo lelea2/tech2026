@@ -1,0 +1,112 @@
+/**
+ * @typedef {Object} TaggedPattern
+ * @property {string} tag
+ * @property {number} priority
+ * @property {string} pattern
+ * @property {number} inputOrder
+ */
+
+/**
+ * @typedef {Object} Annotation
+ * @property {number} start
+ * @property {number} end
+ * @property {string} tag
+ * @property {string} matchedSubstring
+ */
+
+/**
+ * Annotates non-overlapping pattern matches in a string.
+ *
+ * Selection rules:
+ * 1. Higher priority
+ * 2. Longer pattern
+ * 3. Earlier input order
+ *
+ * @param {string} text
+ * @param {{ tag: string, priority: number, pattern: string }[]} patterns
+ * @returns {Annotation[]}
+ */
+function annotateText(text, patterns) {
+  const patternsByFirstCharacter = new Map();
+
+  for (let inputOrder = 0; inputOrder < patterns.length; inputOrder++) {
+    const item = {
+      ...patterns[inputOrder],
+      inputOrder,
+    };
+
+    const firstCharacter = item.pattern[0];
+
+    if (!patternsByFirstCharacter.has(firstCharacter)) {
+      patternsByFirstCharacter.set(firstCharacter, []);
+    }
+
+    patternsByFirstCharacter.get(firstCharacter).push(item);
+  }
+
+  // Pre-sort each group according to the selection rules.
+  // Then the first matching pattern at an index is automatically the winner.
+  for (const candidates of patternsByFirstCharacter.values()) {
+    candidates.sort(comparePatterns);
+  }
+
+  const annotations = [];
+  let index = 0;
+
+  while (index < text.length) {
+    const candidates = patternsByFirstCharacter.get(text[index]) ?? [];
+    let selectedPattern = null;
+
+    for (const candidate of candidates) {
+      if (text.startsWith(candidate.pattern, index)) {
+        selectedPattern = candidate;
+        break;
+      }
+    }
+
+    if (selectedPattern === null) {
+      index++;
+      continue;
+    }
+
+    const end = index + selectedPattern.pattern.length;
+
+    annotations.push({
+      start: index,
+      end,
+      tag: selectedPattern.tag,
+      matchedSubstring: text.slice(index, end),
+    });
+
+    index = end;
+  }
+
+  return annotations;
+}
+
+/**
+ * Sorts patterns from best to worst.
+ *
+ * @param {TaggedPattern} first
+ * @param {TaggedPattern} second
+ * @returns {number}
+ */
+function comparePatterns(first, second) {
+  if (first.priority !== second.priority) {
+    return second.priority - first.priority;
+  }
+
+  if (first.pattern.length !== second.pattern.length) {
+    return second.pattern.length - first.pattern.length;
+  }
+
+  return first.inputOrder - second.inputOrder;
+}
+
+// Example: 
+// const text = "San Francisco";
+
+// const patterns = [
+//   { tag: "PART", priority: 5, pattern: "San" },
+//   { tag: "CITY", priority: 5, pattern: "San Francisco" },
+// ];
