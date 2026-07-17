@@ -20,6 +20,10 @@
       "hash": "b7ed56fadb08ab07ccc948ec2540fce6607eb0cc770e9f9194ed001c2234d3ec",
       "docRelative": "engineering-manager-behavioral-interview.mdx"
     },
+    "behavorial/feature-drift-staff-interview-story.mdx": {
+      "hash": "bfb6db97950977351545c7601cb50753f118363c4b092833ac30248a0eef0a3f",
+      "docRelative": "feature-drift-staff-interview-story.mdx"
+    },
     "behavorial/model_foundry_agent_qna_system_design.mdx": {
       "hash": "09e748c2580e2ea998ef6e1ddd3befc8135ca8cdf06fd9277f0f386dee675021",
       "docRelative": "model_foundry_agent_qna_system_design.mdx"

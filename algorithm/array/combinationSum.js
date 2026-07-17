@@ -1,0 +1,43 @@
+// Input: candidates = [2,3,6,7], target = 7
+// Output: [[2,2,3],[7]]
+// Explanation:
+// 2 and 3 are candidates, and 2 + 2 + 3 = 7. Note that 2 can be used multiple times.
+// 7 is a candidate, and 7 = 7.
+// These are the only two combinations.
+/**
+ * @param {number[]} candidates
+ * @param {number} target
+ * @return {number[][]}
+ */
+function combinationSum(candidates, target) {
+  const result = [];
+
+  function backtrack(startIndex, remaining, current) {
+    // Found a valid combination.
+    if (remaining === 0) {
+      result.push([...current]);
+      return;
+    }
+
+    for (let i = startIndex; i < candidates.length; i++) {
+      const candidate = candidates[i];
+
+      // This candidate is too large.
+      if (candidate > remaining) continue;
+
+      current.push(candidate);
+
+      // Pass i instead of i + 1 because we can reuse the same number.
+      backtrack(i, remaining - candidate, current);
+
+      // Undo the choice.
+      current.pop();
+    }
+  }
+
+  backtrack(0, target, []);
+  return result;
+}
+
+console.log(combinationSum([2, 3, 6, 7], 7));
+// [[2, 2, 3], [7]]
