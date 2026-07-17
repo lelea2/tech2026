@@ -1,0 +1,130 @@
+---
+title: TrieNode
+---
+
+# TrieNode
+
+~~~javascript
+class TrieNode {
+  children = new Map<string, TrieNode>();
+  isWord = false;
+}
+
+class Solution {
+  private root = new TrieNode();
+
+  setup(words: string[]): void {
+    this.root = new TrieNode();
+
+    for (const word of words) {
+      let node = this.root;
+
+      for (const char of word) {
+        if (!node.children.has(char)) {
+          node.children.set(char, new TrieNode());
+        }
+
+        node = node.children.get(char)!;
+      }
+
+      node.isWord = true;
+    }
+  }
+
+  hasWord(pattern: string): boolean {
+    // Optimized for exact words and a single trailing wildcard.
+    const hasTrailingWildcard = pattern.endsWith("*");
+    const searchText = hasTrailingWildcard
+      ? pattern.slice(0, -1)
+      : pattern;
+
+    let node = this.root;
+
+    for (const char of searchText) {
+      const next = node.children.get(char);
+
+      if (!next) {
+        return false;
+      }
+
+      node = next;
+    }
+
+    return hasTrailingWildcard ? true : node.isWord;
+  }
+}
+
+const example = new Solution();
+
+example.setup(["cat", "car", "bar"]);
+
+console.log(example.hasWord("cat")); // true
+console.log(example.hasWord("bat")); // false
+console.log(example.hasWord("ca*")); // true
+console.log(example.hasWord("do*")); // false
+
+
+// Considering the following input: ["cat", "car", "bar"]
+//
+// Let's write two functions:
+//
+// - setup: takes the input, does all the initialization work necessary to make hasWord fast
+// - hasWord: takes a word as a parameter and checks if it exists, should be as fast as possible
+//
+// For example:
+//
+// setup(["cat", "car", "bar"])
+// hasWord("cat") => true
+// hasWord("bat") => false
+
+// * - wildcard, matches any 1 character, exactly 1 character, max 1 wildcard
+//
+// hasWord("ca*") => true
+// hasWord("*ar") => true
+// hasWord("b*t") => false
+
+class Solution {
+    private wordSet: Set<string>;
+    private words: Array<string>;
+
+    constructor() {
+        this.wordSet = new Set();
+        this.words = [];
+    }
+
+    setup(words: Array<string>) {
+        this.wordSet = new Set(words);
+        this.words = words;
+    }
+
+    hasWord(pattern: string) {
+        if (!pattern.includes("*")) {
+            // word only
+            return this.wordSet.has(pattern);
+        }
+
+        // convert wildcard ca* ==> cat, car,
+        const escapePattern = pattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+        const regExPattern = `^${escapePattern.replace(/\*/g, ".*")}$`;
+        const regEx = new RegExp(regExPattern);
+        console.log(
+            ">>> test",
+            this.words.filter((word) => regEx.test(word))
+        );
+        return this.words.some((word) => regEx.test(word));
+    }
+}
+
+// wordSet
+// setup => cat => cat, ca*, c*t, *at; ...
+// hasWord("ca*") => O(1)
+
+const example = new Solution();
+example.setup(["cat", "car", "bar"]);
+console.log(example.hasWord("cat"));
+console.log(example.hasWord("bat"));
+console.log(example.hasWord("ca*"));
+console.log(example.hasWord("*ar"));
+console.log(example.hasWord("b*t"));
+
+~~~

@@ -1,0 +1,93 @@
+---
+title: Carousel
+---
+
+# Carousel
+
+~~~jsx
+import { useEffect, useState } from "react";
+
+const images = [
+  { url: "image-1.jpg", duration: 5000 },
+  { url: "image-2.jpg", duration: 3000 },
+  { url: "image-3.jpg", duration: 4000 },
+];
+
+export default function Slideshow() {
+  const [index, setIndex] = useState(0);
+  const [remaining, setRemaining] = useState(images[0].duration);
+
+  useEffect(() => {
+    setRemaining(images[index].duration);
+
+    const timer = setInterval(() => {
+      setRemaining((time) => {
+        const nextTime = time - 100;
+
+        if (nextTime <= 0) {
+          clearInterval(timer);
+
+          if (index < images.length - 1) {
+            setIndex(index + 1);
+          }
+
+          return 0;
+        }
+
+        return nextTime;
+      });
+    }, 100);
+
+    return () => clearInterval(timer);
+  }, [index]);
+
+  const seconds = Math.floor(remaining / 1000);
+  const milliseconds = String(remaining % 1000).padStart(3, "0");
+
+  return (
+    <div>
+      <img
+        src={images[index].url}
+        alt={`Slide ${index + 1}`}
+        width="500"
+      />
+
+      <p>
+        Remaining: {seconds}:{milliseconds}
+      </p>
+    </div>
+  );
+}
+
+// CSS
+// .slideshow {
+//   max-width: 800px;
+//   margin: 0 auto;
+//   text-align: center;
+// }
+
+// .image-container {
+//   position: relative;
+//   aspect-ratio: 16 / 9;
+//   overflow: hidden;
+//   background: #111;
+// }
+
+// .image-container img {
+//   width: 100%;
+//   height: 100%;
+//   object-fit: cover;
+// }
+
+// .countdown {
+//   position: absolute;
+//   right: 16px;
+//   bottom: 16px;
+//   padding: 8px 12px;
+//   border-radius: 6px;
+//   background: rgb(0 0 0 / 70%);
+//   color: white;
+//   font-family: monospace;
+//   font-size: 20px;
+// }
+~~~
