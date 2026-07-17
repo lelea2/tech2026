@@ -83,3 +83,90 @@ export default function Slideshow() {
 //   font-family: monospace;
 //   font-size: 20px;
 // }
+
+import { useEffect, useState } from "react";
+
+const images = [
+  {
+    url: "https://picsum.photos/id/10/800/450",
+    duration: 5000,
+  },
+  {
+    url: "https://picsum.photos/id/20/800/450",
+    duration: 3000,
+  },
+  {
+    url: "https://picsum.photos/id/30/800/450",
+    duration: 4500,
+  },
+];
+
+const TICK_INTERVAL = 100;
+
+function formatRemainingTime(milliseconds) {
+  const safeTime = Math.max(0, milliseconds);
+  const seconds = Math.floor(safeTime / 1000);
+  const hundredths = Math.floor((safeTime % 1000) / 10);
+
+  return `${seconds}:${String(hundredths).padStart(2, "0")}`;
+}
+
+export default function Slideshow({ items = images }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [remainingTime, setRemainingTime] = useState(
+    items[0]?.duration ?? 0
+  );
+
+  const currentImage = items[currentIndex];
+  const isLastImage = currentIndex === items.length - 1;
+
+  useEffect(() => {
+    if (!currentImage) return;
+
+    setRemainingTime(currentImage.duration);
+
+    const startedAt = Date.now();
+    const endsAt = startedAt + currentImage.duration;
+
+    const intervalId = window.setInterval(() => {
+      const nextRemainingTime = Math.max(0, endsAt - Date.now());
+
+      setRemainingTime(nextRemainingTime);
+
+      if (nextRemainingTime === 0) {
+        window.clearInterval(intervalId);
+
+        if (!isLastImage) {
+          setCurrentIndex((index) => index + 1);
+        }
+      }
+    }, TICK_INTERVAL);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [currentIndex, currentImage, isLastImage]);
+
+  if (!currentImage) {
+    return <p>No images available.</p>;
+  }
+
+  return (
+    <div className="slideshow">
+      <div className="image-container">
+        <img
+          src={currentImage.url}
+          alt={`Slide ${currentIndex + 1}`}
+        />
+
+        <output className="countdown" aria-live="off">
+          {formatRemainingTime(remainingTime)}
+        </output>
+      </div>
+
+      <p>
+        Image {currentIndex + 1} of {items.length}
+      </p>
+    </div>
+  );
+}
