@@ -14,15 +14,12 @@ class FileSystem {
   create(path, value = undefined) {
     const parts = this.parsePath(path);
     let current = this.root;
-
     for (const part of parts) {
       if (!current.children.has(part)) {
         current.children.set(part, new FileNode());
       }
-
       current = current.children.get(part);
     }
-
     current.value = value;
     return true;
   }
@@ -34,11 +31,9 @@ class FileSystem {
 
   set(path, value) {
     const node = this.findNode(path);
-
     if (!node) {
       return false;
     }
-
     node.value = value;
     return true;
   }
@@ -49,42 +44,33 @@ class FileSystem {
 
   list(path = "") {
     const node = path ? this.findNode(path) : this.root;
-
     if (!node) {
       return [];
     }
-
     return [...node.children.keys()];
   }
 
   delete(path) {
     const parts = this.parsePath(path);
-
     if (parts.length === 0) {
       return false;
     }
-
     const name = parts.pop();
     let parent = this.root;
-
     for (const part of parts) {
       parent = parent.children.get(part);
-
       if (!parent) {
         return false;
       }
     }
-
     return parent.children.delete(name);
   }
 
   findNode(path) {
     const parts = this.parsePath(path);
     let current = this.root;
-
     for (const part of parts) {
       current = current.children.get(part);
-
       if (!current) {
         return null;
       }
