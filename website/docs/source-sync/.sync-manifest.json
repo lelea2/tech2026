@@ -8,9 +8,17 @@
       "hash": "7a33264f2c9f3ed50504ed353b0c8c87473da21ce4ac26aaa7efcba6ed3d5e8a",
       "docRelative": "frontend/css/position.mdx"
     },
+    "frontend/interview/AIEfficiency.js": {
+      "hash": "1b8da14a382aebbb566e0bc80845f66793c96512dcda2adb19720e112c78a5a2",
+      "docRelative": "frontend/interview/AIEfficiency.mdx"
+    },
     "frontend/interview/ConnectionPool.js": {
       "hash": "ae60d7953a5283afa27cb684b895a390fc70172fbd29abe80af2dfb796777109",
       "docRelative": "frontend/interview/ConnectionPool.mdx"
+    },
+    "frontend/interview/FileSystem.js": {
+      "hash": "4df303d31bc59ad5b15ea36dccabd816b593e05cd29e1416e4ecc9df56cff1da",
+      "docRelative": "frontend/interview/FileSystem.mdx"
     },
     "frontend/interview/InMemoryTable.js": {
       "hash": "d32ee60cf7d403cc454b05841ea18816771caf8084c04f2e81d043d698dc1b89",
@@ -24,6 +32,10 @@
       "hash": "7e9223e5be70c14e7587861c01b91129fce1722834e2decf36725da4ffab1fc0",
       "docRelative": "frontend/interview/Percentiles.mdx"
     },
+    "frontend/interview/SpreadSheetHistory.js": {
+      "hash": "fcc534b25f56c4c4d39ace50f9b225192516499bd25ef68bf5dce9a54689b728",
+      "docRelative": "frontend/interview/SpreadSheetHistory.mdx"
+    },
     "frontend/interview/TrieNode.js": {
       "hash": "747dcdaaf21a9ae61c3fc578a011ed7318ff011426e81a7c3c7e9300e9449908",
       "docRelative": "frontend/interview/TrieNode.mdx"
@@ -31,6 +43,10 @@
     "frontend/interview/Underground.js": {
       "hash": "59235e7e54b2c76a565452b1e762a5ccc3e12231bbf4346b81a06288d23cc520",
       "docRelative": "frontend/interview/Underground.mdx"
+    },
+    "frontend/interview/annotation.js": {
+      "hash": "571948adce6c9a384f2946d2b94b2cbb4e81036770ccffc319b6c1d41947712b",
+      "docRelative": "frontend/interview/annotation.mdx"
     },
     "frontend/interview/backupFiles.js": {
       "hash": "18aaad931be5148209c2730694c20cccb215adcb754707b78562cad820be6b4a",
@@ -48,10 +64,6 @@
       "hash": "7ef8e15afba7cb65d43f8a4ed076a345e3ea6fd1d66e050c68eeff14987aa82d",
       "docRelative": "frontend/interview/calendarDaysNeed.mdx"
     },
-    "frontend/interview/cycleInDependencies.js": {
-      "hash": "07dbe2bd705fe558d333205e6284d5034451c3c27fba477d6be4c3776243b497",
-      "docRelative": "frontend/interview/cycleInDependencies.mdx"
-    },
     "frontend/interview/duplicateFiles.js": {
       "hash": "17a0b3e651bf7098108195a13fd1695605dfb1a494c58d0f062332db02266cd1",
       "docRelative": "frontend/interview/duplicateFiles.mdx"
@@ -67,6 +79,14 @@
     "frontend/interview/inferColumnTypes.js": {
       "hash": "9dd22ca848e218c09b3f6d90f8caf68ce6f929f8cf7df48ff506ae8f229ef414",
       "docRelative": "frontend/interview/inferColumnTypes.mdx"
+    },
+    "frontend/interview/packageDependencies.js": {
+      "hash": "fa052b68caad1468fc20377cf567c69a3db715fbc5f8bf303c2834c2d5504d8b",
+      "docRelative": "frontend/interview/packageDependencies.mdx"
+    },
+    "frontend/interview/parseQueryString.js": {
+      "hash": "67f71be7a31321c6e75e951f95317c3a10297499daff41657d32ea15d4ae1a8f",
+      "docRelative": "frontend/interview/parseQueryString.mdx"
     },
     "frontend/interview/spreadsheet.js": {
       "hash": "b3e9c218898773caa745a982605d38ca2979359ec01464c7bc1f87a85aae0eed",
@@ -496,6 +516,10 @@
       "hash": "1c2ab6259f8bf70a097ecf8a3c30ca62bc7c50db15aa750e3377d3821a2104c0",
       "docRelative": "frontend/jsfunction/hooks/useQuery.mdx"
     },
+    "frontend/jsfunction/hooks/useSearchQuery.js": {
+      "hash": "288a25d947b61ba04ff0c7281f4ebbd55894b0ed11318df655b82294a048a846",
+      "docRelative": "frontend/jsfunction/hooks/useSearchQuery.mdx"
+    },
     "frontend/jsfunction/hooks/useSet.js": {
       "hash": "b5f2f5fa872beb6013024b4895b9a13cda7e2a5da8b40b8bee279952594253ef",
       "docRelative": "frontend/jsfunction/hooks/useSet.mdx"
@@ -648,6 +672,10 @@
       "hash": "e7ce05e3f9613d7f69c57eee0b7dceb1796a28a0b62f63a4618366d2b3158a7c",
       "docRelative": "frontend/jsfunction/mean.mdx"
     },
+    "frontend/jsfunction/memoize/cacheFetch.js": {
+      "hash": "9984c5cc2c49d60f8dcdf3d678734ecbc196a2f78e270c54174169ce6514b9ec",
+      "docRelative": "frontend/jsfunction/memoize/cacheFetch.mdx"
+    },
     "frontend/jsfunction/memoize/memoize.js": {
       "hash": "9afbc811e92c80e900b6db6e3ee384141a9c589b3075c264afc9fef7473d58e3",
       "docRelative": "frontend/jsfunction/memoize/memoize.mdx"
@@ -709,7 +737,7 @@
       "docRelative": "frontend/jsfunction/prismaORM/miniORMIII.mdx"
     },
     "frontend/jsfunction/promise/Promise.js": {
-      "hash": "e462e032efa14c1ffc93bb3c1e26122542d3252368e14c5e0bc8de1b66b29fbf",
+      "hash": "285c582b856e25a11394f8a6a4b3be5f844260fa8146970b4bbb7382481cd9f1",
       "docRelative": "frontend/jsfunction/promise/Promise.mdx"
     },
     "frontend/jsfunction/promise/PromiseMerge.js": {
@@ -900,6 +928,10 @@
       "hash": "1ee453cbd45dd12a3f23a3b31381e882283e119ff320cbc7ff5677532b47007e",
       "docRelative": "frontend/react-component-interview/AutoComplete.mdx"
     },
+    "frontend/react-component-interview/Carousel.jsx": {
+      "hash": "d1cee534ee3539963127767cc946710bb24a2c51c1ad42d2e14a45918168542c",
+      "docRelative": "frontend/react-component-interview/Carousel.mdx"
+    },
     "frontend/react-component-interview/ChatBox.jsx": {
       "hash": "1b12d7de81949bd41e801bea207192a0aede06aad1254ac32981edd453b63930",
       "docRelative": "frontend/react-component-interview/ChatBox.mdx"
@@ -956,6 +988,10 @@
       "hash": "1f5043db31f8b7bff6f4b4adfcb90dae312e1ce7a7d8237d42813bde0ec17292",
       "docRelative": "frontend/react-component-interview/PlaygroundReducer.mdx"
     },
+    "frontend/react-component-interview/PokerDealer.jsx": {
+      "hash": "0967d48740cb691fef3688db63b85816a292da743324f828e7aa329151c01af8",
+      "docRelative": "frontend/react-component-interview/PokerDealer.mdx"
+    },
     "frontend/react-component-interview/PollWidget.jsx": {
       "hash": "203f73b253ad4374edccdd435cb660a3fcb9bf48f82fd1b4f783f2557b099afe",
       "docRelative": "frontend/react-component-interview/PollWidget.mdx"
@@ -967,6 +1003,10 @@
     "frontend/react-component-interview/TransferList.jsx": {
       "hash": "85a1b569d468c6aebd1abf325c93c1e8d1ac0ed7db046963909617096fe21162",
       "docRelative": "frontend/react-component-interview/TransferList.mdx"
+    },
+    "frontend/react-component-interview/TypeAhead.jsx": {
+      "hash": "2aaeaa63cef6e4cafd225e71fee05f821af8a19b030489769a19870dbf960229",
+      "docRelative": "frontend/react-component-interview/TypeAhead.mdx"
     },
     "frontend/react-component-interview/VideoPlayer.jsx": {
       "hash": "6f6ef78e0f59a59c3024ff251132026871626d2b83b7586ecc745bdc25630be7",
@@ -1604,6 +1644,10 @@
       "hash": "337b3900713bd678c43de1a8e91ff21152da3522e5edeeb9b0ad0d7228ed6a97",
       "docRelative": "algorithm/array/coinChange.mdx"
     },
+    "algorithm/array/combinationSum.js": {
+      "hash": "3cae7a9dc8e4998652ea170da3ee06549df6d7f86755ad270a709b26f0c169be",
+      "docRelative": "algorithm/array/combinationSum.mdx"
+    },
     "algorithm/array/duplicateArray.js": {
       "hash": "bc685c19cb2b9ecfb2c0e498b758690a8bbd1ac902ebb86a193dbc0ba7a0f44f",
       "docRelative": "algorithm/array/duplicateArray.mdx"
@@ -1753,7 +1797,7 @@
       "docRelative": "algorithm/linkedlist/reverseList.mdx"
     },
     "algorithm/lru/lru.js": {
-      "hash": "a5307619f4ee079e7133c3d6d0b92366ebffdb7fa421908bff6cb0fa60248257",
+      "hash": "402507d00ea30f853582c78aebd54aa957411260e5e4a3455d2839d8a55a19c2",
       "docRelative": "algorithm/lru/lru.mdx"
     },
     "algorithm/lru/lru_O1.js": {
@@ -1953,7 +1997,7 @@
       "docRelative": "algorithm/_index.mdx"
     },
     "__nav__:algorithm/array": {
-      "hash": "129e063923be87c8ac38fe4f639578a4f1c0da12322a6076a3ba3bdd6b6fdd79",
+      "hash": "47b80143bcb69f98608c5453d0c208df26bdb3a7de40c0a2c01ce6f88121dbca",
       "docRelative": "algorithm/array/_index.mdx"
     },
     "__nav__:algorithm/bit": {
@@ -2017,7 +2061,7 @@
       "docRelative": "frontend/css/_index.mdx"
     },
     "__nav__:frontend/interview": {
-      "hash": "c8cbf5ee788d1f70eb6ce1fdc855f7c6b3a4c1768c9fe1aded5089e4e8d58beb",
+      "hash": "b4bf53a6e76aa717592f8fe2b9e7e80a153de2a1098af6551a63397fb9ee50de",
       "docRelative": "frontend/interview/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
@@ -2073,7 +2117,7 @@
       "docRelative": "frontend/jsfunction/getElementBy/_index.mdx"
     },
     "__nav__:frontend/jsfunction/hooks": {
-      "hash": "914900b9322529b7ef330f8ee3dbff0c046e2647c4b1fbf1f2ebaaea8258189f",
+      "hash": "9a046e3b5519e3d146b4c16c2b0d99ada6385b561a3ce1930f825d7155430879",
       "docRelative": "frontend/jsfunction/hooks/_index.mdx"
     },
     "__nav__:frontend/jsfunction/htmlModifier": {
@@ -2097,7 +2141,7 @@
       "docRelative": "frontend/jsfunction/map/_index.mdx"
     },
     "__nav__:frontend/jsfunction/memoize": {
-      "hash": "0746db8ba982cb5158d06aafaece3a970c13c9ede1294e594b91d25d8d03a96b",
+      "hash": "003e8753b9b4785c40e460816813e6200db091925edeef3907c83e17d2b9043e",
       "docRelative": "frontend/jsfunction/memoize/_index.mdx"
     },
     "__nav__:frontend/jsfunction/object": {
@@ -2145,7 +2189,7 @@
       "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
     },
     "__nav__:frontend/react-component-interview": {
-      "hash": "d0b94549d87601244f4532325104badbf86e48e1207a7392f8a21f5f5da770db",
+      "hash": "1ea0f7f2729ff6dc10f6e625830bf9c51425f6628b5fd1f6b7dd189fcf14048d",
       "docRelative": "frontend/react-component-interview/_index.mdx"
     },
     "__nav__:frontend/react-component-interview/hooks": {

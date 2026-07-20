@@ -1,0 +1,143 @@
+// // User request
+// //     ↓
+// // 1. Delegate: What should AI decide, and what should code decide?
+// //     ↓
+// // 2. Describe: Give AI sufficient schema, constraints, and output format
+// //     ↓
+// // 3. Discern: Validate the response technically and semantically
+// //     ↓
+// // 4. Diligence: Execute safely, explain limitations, and own the result
+
+/****** IMPORTANT ******/
+// I use Claude to interpret the user’s intent and propose a structured formula plan. 
+// Deterministic code validates the referenced fields, operation type, schema compatibility, and API capabilities before anything is applied.
+
+// Delegation
+// I delegate language interpretation and formula synthesis to the model because those tasks benefit from semantic reasoning. 
+// I do not delegate authorization, capability detection, schema validation, or execution safety. Those remain deterministic application responsibilities.
+// Claude should receive real schema instead of invent it 
+// const fields = await getFieldsFromAirtable();
+// const salaryExists = fields.some((field) => field.name === "Salary");
+
+// Description -- provide model with context, constraints, example and response contract needed to be successful
+// You translate user requests into Airtable formula plans.
+
+// Available fields:
+// - Salary: currency
+// - Name: singleLineText
+// - Department: singleSelect
+// - Active: checkbox
+
+// User request:
+// "Create a field that shows twice each employee's salary."
+
+// Rules:
+// 1. Use only fields from the supplied schema.
+// 2. Do not invent field names.
+// 3. Return a formula, but do not execute any operation.
+// 4. If the request is ambiguous, return needsClarification=true.
+// 5. Return only valid JSON matching the requested schema.
+// 6. Airtable field references must use braces, such as {Salary}.
+
+// Return:
+// {
+//   "intent": "create_computed_field",
+//   "fieldName": string,
+//   "formula": string | null,
+//   "referencedFields": string[],
+//   "needsClarification": boolean,
+//   "clarificationQuestion": string | null,
+//   "explanation": string
+// }
+
+// Discernment
+// Evaluate model output along four dimensions: 
+// structural validity, schema grounding, semantic correctness, and tool feasibility. Passing one does not imply passing the others.
+
+type AirtableField = {
+  id: string;
+  name: string;
+  type: string;
+};
+
+type FormulaPlan = {
+  intent: "create_computed_field";
+  fieldName: string;
+  formula: string | null;
+  referencedFields: string[];
+  needsClarification: boolean;
+  clarificationQuestion: string | null;
+  explanation: string;
+};
+
+type ExecutionResult =
+  | {
+      status: "clarification_required";
+      question: string;
+    }
+  | {
+      status: "manual_action_required";
+      fieldName: string;
+      formula: string;
+      reason: string;
+    }
+  | {
+      status: "ready_for_approval";
+      plan: FormulaPlan;
+    };
+
+async function planFormulaChange(
+  userRequest: string,
+  fields: AirtableField[],
+): Promise<ExecutionResult> {
+  // Description: provide grounded schema and structured instructions.
+  const rawPlan = await generateFormulaPlanWithClaude({
+    userRequest,
+    fields,
+  });
+
+  // Discernment: never trust unvalidated model output.
+  const plan = FormulaPlanSchema.parse(rawPlan);
+
+  if (plan.needsClarification) {
+    return {
+      status: "clarification_required",
+      question:
+        plan.clarificationQuestion ??
+        "Could you clarify the requested calculation?",
+    };
+  }
+
+  if (!plan.formula) {
+    throw new Error("Claude returned no formula");
+  }
+
+  const fieldsByName = new Map(fields.map((field) => [field.name, field]));
+
+  for (const referencedField of plan.referencedFields) {
+    if (!fieldsByName.has(referencedField)) {
+      throw new Error(`Unknown field: ${referencedField}`);
+    }
+  }
+
+  validateFormulaTypes(plan, fieldsByName);
+
+  // Delegation boundary: code, not Claude, determines tool support.
+  const canCreateFormulaField = false;
+
+  if (!canCreateFormulaField) {
+    return {
+      status: "manual_action_required",
+      fieldName: plan.fieldName,
+      formula: plan.formula,
+      reason:
+        "The available API does not support creating this formula field.",
+    };
+  }
+
+  // Diligence: require approval before a schema mutation.
+  return {
+    status: "ready_for_approval",
+    plan,
+  };
+}

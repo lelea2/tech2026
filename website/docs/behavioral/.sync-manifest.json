@@ -44,6 +44,10 @@
       "hash": "9d79bcec24febb9e660c4c41802d58a16db390dbd9c39f2d9d7cdcd32b8507a8",
       "docRelative": "staff_frontend_web_experience_interview.mdx"
     },
+    "behavorial/stencil_shared_component_staff_interview.mdx": {
+      "hash": "3e0f9c7edfbfb87aae4cc8441a0b3c74662829ae8aff052057f9c44b86576bb4",
+      "docRelative": "stencil_shared_component_staff_interview.mdx"
+    },
     "behavorial/strength-vs-weakness.mdx": {
       "hash": "7b5aa30ebd7422aa3b2e9af01d6c8038a0ce6e15d2aee0470426e87297977c77",
       "docRelative": "strength-vs-weakness.mdx"

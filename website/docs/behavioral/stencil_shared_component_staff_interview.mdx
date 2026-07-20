@@ -1,0 +1,1945 @@
+---
+title: 'Staff Frontend Interview: Shared Components with Stencil.js'
+description: 'Staff-level interview guide for designing, building, distributing, and operating a cross-framework component library with Stencil.js, including a comparison with Lit.'
+sidebar_label: 'Stencil Shared Components'
+tags:
+  - stencil
+  - lit
+  - web-components
+  - design-system
+  - frontend
+  - system-design
+  - staff-engineer
+---
+
+# Staff Frontend Interview: Shared Components with Stencil.js
+
+## Interview prompt
+
+> You are a Staff Frontend Engineer building a shared component library used by React, Angular, Vue, and framework-free applications. Design the platform using Stencil.js. Explain component APIs, styling, accessibility, build and distribution, framework integration, testing, versioning, migration, and observability. Compare Stencil with Lit and explain when you would choose each.
+
+---
+
+## 1. Staff-level framing
+
+This is not only a component implementation problem. It is a **platform and public-contract problem**.
+
+The platform must provide:
+
+- Consistent behavior and visual language across products.
+- A stable contract across multiple frameworks.
+- Accessibility built into shared primitives.
+- Tree-shakeable and lazy-loadable production output.
+- Safe upgrades across independently deployed applications.
+- Framework-friendly TypeScript APIs.
+- Version, usage, performance, and error visibility.
+
+The contract is larger than TypeScript props:
+
+```text
+Custom-element tag
+Properties and attributes
+DOM events
+Slots
+CSS custom properties
+CSS parts
+Public methods
+Keyboard and accessibility behavior
+Versioning and deprecation policy
+```
+
+Once consumers depend on these surfaces, they must be treated like public APIs.
+
+---
+
+## 2. Requirements
+
+### Functional
+
+1. Shared primitives: button, input, checkbox, dialog, menu, tabs, tooltip.
+2. Composite components: date picker, file uploader, data table.
+3. React, Angular, Vue, and vanilla consumption.
+4. Theme, density, and brand customization.
+5. Keyboard and screen-reader support.
+6. Internationalization and RTL layouts.
+7. Native form participation where appropriate.
+8. Typed framework wrappers.
+9. Incremental migration from legacy libraries.
+10. Stable versioned releases.
+
+### Non-functional
+
+| Requirement | Goal |
+|---|---|
+| Accessibility | WCAG 2.2 AA behavior and automated checks |
+| Performance | Per-component bundle budgets and lazy loading |
+| Reliability | Component failure does not crash the product shell |
+| Compatibility | Explicit browser and framework support matrix |
+| Upgrade safety | SemVer, codemods, deprecation periods, canaries |
+| Observability | Version drift, errors, load latency, usage |
+| Security | No unsafe HTML by default; dependency scanning |
+| Developer experience | Types, docs, examples, wrappers, test helpers |
+
+---
+
+## 3. High-level architecture
+
+```text
+Figma / design token source
+           │
+           ▼
+@company/design-tokens
+CSS variables + JSON + TypeScript
+           │
+           ▼
+@company/web-components
+Stencil behavior + accessibility + styles
+           │
+     ┌─────┴──────────────────┐
+     ▼                        ▼
+dist-custom-elements        dist loader
+     │                        │
+ ┌───┼─────────────┐          └── legacy / script consumers
+ ▼   ▼             ▼
+React Angular      Vue wrappers
+ │     │            │
+React Angular      Vue applications
+```
+
+Recommended monorepo:
+
+```text
+packages/
+  tokens/
+  web-components/
+  react/
+  angular/
+  vue/
+  docs/
+  test-utils/
+  codemods/
+```
+
+The wrappers should remain thin. Shared behavior must live in the Web Component so all frameworks get the same accessibility and interaction implementation.
+
+---
+
+## 4. Stencil component example
+
+```tsx
+// src/components/ds-button/ds-button.tsx
+
+import {
+  Component,
+  Event,
+  EventEmitter,
+  h,
+  Host,
+  Prop,
+} from '@stencil/core';
+
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'danger';
+
+@Component({
+  tag: 'ds-button',
+  styleUrl: 'ds-button.css',
+  shadow: true,
+})
+export class DsButton {
+  /**
+   * A closed union prevents accidental, unsupported variants from
+   * becoming part of the shared platform API.
+   */
+  @Prop({ reflect: true })
+  variant: ButtonVariant = 'primary';
+
+  /**
+   * Preserve native disabled behavior instead of recreating it with ARIA.
+   */
+  @Prop({ reflect: true })
+  disabled = false;
+
+  /**
+   * Standard DOM events work across React, Angular, Vue, and vanilla JS.
+   * composed=true allows the event to cross the Shadow DOM boundary.
+   */
+  @Event({
+    eventName: 'dsPress',
+    bubbles: true,
+    composed: true,
+    cancelable: true,
+  })
+  dsPress!: EventEmitter<{
+    source: 'pointer' | 'keyboard';
+  }>;
+
+  private handleClick = (event: MouseEvent): void => {
+    if (this.disabled) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
+
+    this.dsPress.emit({ source: 'pointer' });
+  };
+
+  render() {
+    return (
+      <Host>
+        <button
+          type="button"
+          class="button"
+          disabled={this.disabled}
+          onClick={this.handleClick}
+        >
+          <span class="label">
+            <slot />
+          </span>
+        </button>
+      </Host>
+    );
+  }
+}
+```
+
+```css
+/* ds-button.css */
+
+:host {
+  display: inline-flex;
+  --ds-button-radius: var(--ds-radius-medium);
+  --ds-button-padding-inline: var(--ds-space-4);
+}
+
+.button {
+  min-height: 44px;
+  padding-inline: var(--ds-button-padding-inline);
+  border-radius: var(--ds-button-radius);
+  font: inherit;
+  cursor: pointer;
+}
+
+:host([variant='primary']) .button {
+  color: var(--ds-color-on-brand);
+  background: var(--ds-color-brand);
+}
+
+:host([variant='danger']) .button {
+  color: var(--ds-color-on-danger);
+  background: var(--ds-color-danger);
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--ds-color-focus);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+```
+
+### Why this API is appropriate
+
+- Properties are typed and have explicit defaults.
+- Useful primitive state is reflected to attributes.
+- The implementation preserves native HTML semantics.
+- Events are standard `CustomEvent` instances.
+- Slots provide framework-independent composition.
+- CSS custom properties expose intentional customization points.
+- Internal DOM remains private.
+
+---
+
+## 5. Properties versus attributes
+
+Use attributes for values that are:
+
+- Serializable as strings.
+- Useful in static HTML.
+- Useful in CSS selectors.
+- Meaningful before JavaScript loads.
+
+```html
+<ds-button variant="danger" disabled>
+  Delete
+</ds-button>
+```
+
+Use properties for complex data:
+
+```ts
+const table = document.querySelector('ds-data-table');
+
+table.columns = [
+  { key: 'name', label: 'Name' },
+  { key: 'salary', label: 'Salary' },
+];
+
+table.rows = records;
+```
+
+Avoid serializing large objects into attributes:
+
+```html
+<!-- Avoid -->
+<ds-data-table rows='[{"name":"Khanh"}]'></ds-data-table>
+```
+
+A strong answer explicitly explains that attributes are an HTML serialization mechanism, while properties can hold richer JavaScript values.
+
+---
+
+## 6. Events as the cross-framework API
+
+Use domain-oriented names:
+
+```text
+dsInput
+dsChange
+dsOpenChange
+dsSelectionChange
+dsValueCommit
+```
+
+Avoid implementation-oriented names:
+
+```text
+internalButtonClicked
+reactOnChange
+setInternalState
+```
+
+Example:
+
+```tsx
+@Component({
+  tag: 'ds-text-field',
+  styleUrl: 'ds-text-field.css',
+  shadow: true,
+  formAssociated: true,
+})
+export class DsTextField {
+  @Prop({ mutable: true })
+  value = '';
+
+  @Prop()
+  label = '';
+
+  @Event({
+    eventName: 'dsInput',
+    bubbles: true,
+    composed: true,
+  })
+  dsInput!: EventEmitter<{ value: string }>;
+
+  @Event({
+    eventName: 'dsChange',
+    bubbles: true,
+    composed: true,
+  })
+  dsChange!: EventEmitter<{ value: string }>;
+
+  private handleInput = (event: Event): void => {
+    const input = event.target as HTMLInputElement;
+    this.value = input.value;
+    this.dsInput.emit({ value: input.value });
+  };
+
+  render() {
+    return (
+      <label>
+        <span>{this.label}</span>
+        <input
+          value={this.value}
+          onInput={this.handleInput}
+          onChange={() => {
+            this.dsChange.emit({ value: this.value });
+          }}
+        />
+      </label>
+    );
+  }
+}
+```
+
+Event design rules:
+
+1. Keep payloads small and stable.
+2. Make events typed.
+3. Document input versus committed change.
+4. Use `composed: true` when hosts outside Shadow DOM must listen.
+5. Do not expose every internal transition.
+6. Make cancelable behavior explicit.
+
+---
+
+## 7. Slots and composition
+
+```tsx
+@Component({
+  tag: 'ds-card',
+  styleUrl: 'ds-card.css',
+  shadow: true,
+})
+export class DsCard {
+  render() {
+    return (
+      <article>
+        <header>
+          <slot name="header" />
+        </header>
+
+        <section>
+          <slot />
+        </section>
+
+        <footer>
+          <slot name="footer" />
+        </footer>
+      </article>
+    );
+  }
+}
+```
+
+```html
+<ds-card>
+  <h2 slot="header">Quarterly results</h2>
+  <p>Revenue increased by 18%.</p>
+  <ds-button slot="footer">View report</ds-button>
+</ds-card>
+```
+
+Staff-level tradeoff: slots provide portable composition but are less expressive than React render props. Expose slots only for stable, meaningful extension points. Every named slot becomes a versioned API.
+
+---
+
+## 8. Styling and theming
+
+Publish semantic tokens separately:
+
+```css
+:root {
+  --ds-color-brand: #0a66c2;
+  --ds-color-on-brand: #ffffff;
+  --ds-color-surface: #ffffff;
+  --ds-color-text: #1f2328;
+  --ds-color-focus: #0969da;
+  --ds-space-4: 1rem;
+  --ds-radius-medium: 0.5rem;
+}
+
+[data-theme='dark'] {
+  --ds-color-surface: #111827;
+  --ds-color-text: #f9fafb;
+  --ds-color-brand: #60a5fa;
+}
+```
+
+Shadow DOM components consume inherited CSS variables:
+
+```css
+:host {
+  color: var(--ds-color-text);
+  background: var(--ds-color-surface);
+}
+```
+
+Expose customization in three levels:
+
+1. Global semantic design tokens.
+2. Supported component CSS custom properties.
+3. Carefully selected `::part()` hooks.
+
+```tsx
+render() {
+  return (
+    <button part="control">
+      <span part="label"><slot /></span>
+    </button>
+  );
+}
+```
+
+```css
+ds-button::part(control) {
+  box-shadow: none;
+}
+```
+
+Do not require consumers to query or style private Shadow DOM markup.
+
+---
+
+## 9. Form-associated components
+
+Use native form participation rather than duplicating form integration in every framework wrapper.
+
+```tsx
+import {
+  AttachInternals,
+  Component,
+  ElementInternals,
+  h,
+  Prop,
+  Watch,
+} from '@stencil/core';
+
+@Component({
+  tag: 'ds-checkbox',
+  styleUrl: 'ds-checkbox.css',
+  shadow: true,
+  formAssociated: true,
+})
+export class DsCheckbox {
+  @AttachInternals()
+  internals!: ElementInternals;
+
+  @Prop({ mutable: true, reflect: true })
+  checked = false;
+
+  @Prop()
+  value = 'on';
+
+  @Watch('checked')
+  syncFormValue(): void {
+    this.internals.setFormValue(
+      this.checked ? this.value : null,
+    );
+  }
+
+  componentWillLoad(): void {
+    this.syncFormValue();
+  }
+
+  render() {
+    return (
+      <label>
+        <input
+          type="checkbox"
+          checked={this.checked}
+          onChange={(event) => {
+            this.checked = (
+              event.target as HTMLInputElement
+            ).checked;
+          }}
+        />
+        <slot />
+      </label>
+    );
+  }
+}
+```
+
+Production controls must also implement reset, restore, disabled, required, validation, and accessible error behavior.
+
+---
+
+## 10. Lifecycle and data ownership
+
+Typical initial lifecycle:
+
+```text
+constructor
+connectedCallback
+componentWillLoad
+componentWillRender
+render
+componentDidRender
+componentDidLoad
+```
+
+Updates:
+
+```text
+@Prop or @State changes
+componentShouldUpdate
+componentWillUpdate
+componentWillRender
+render
+componentDidRender
+componentDidUpdate
+```
+
+Async example:
+
+```tsx
+@Component({
+  tag: 'ds-user-summary',
+  shadow: true,
+})
+export class DsUserSummary {
+  @Prop() userId!: string;
+  @State() user?: User;
+  @State() error?: string;
+
+  private request?: AbortController;
+
+  async componentWillLoad(): Promise<void> {
+    await this.loadUser();
+  }
+
+  @Watch('userId')
+  async onUserIdChanged(): Promise<void> {
+    await this.loadUser();
+  }
+
+  disconnectedCallback(): void {
+    this.request?.abort();
+  }
+
+  private async loadUser(): Promise<void> {
+    this.request?.abort();
+    this.request = new AbortController();
+
+    try {
+      this.error = undefined;
+      this.user = await fetchUser(
+        this.userId,
+        this.request.signal,
+      );
+    } catch (error) {
+      if ((error as Error).name !== 'AbortError') {
+        this.error = 'Unable to load user';
+      }
+    }
+  }
+
+  render() {
+    if (this.error) {
+      return <p role="alert">{this.error}</p>;
+    }
+
+    if (!this.user) {
+      return <p aria-live="polite">Loading user…</p>;
+    }
+
+    return <p>{this.user.name}</p>;
+  }
+}
+```
+
+Important Staff-level clarification: shared design-system primitives should normally **not fetch product data**. Product applications own data fetching, authorization, caching, and business rules. Shared components should receive explicit state through properties.
+
+---
+
+## 11. Build and distribution
+
+```ts
+// stencil.config.ts
+
+import type { Config } from '@stencil/core';
+import { reactOutputTarget } from '@stencil/react-output-target';
+import { angularOutputTarget } from '@stencil/angular-output-target';
+
+export const config: Config = {
+  namespace: 'companyDesignSystem',
+
+  outputTargets: [
+    {
+      type: 'dist',
+      esmLoaderPath: '../loader',
+    },
+    {
+      type: 'dist-custom-elements',
+      customElementsExportBehavior:
+        'auto-define-custom-elements',
+    },
+    {
+      type: 'docs-json',
+      file: 'dist/docs/components.json',
+    },
+
+    reactOutputTarget({
+      outDir: '../react/src/generated',
+      customElementsDir:
+        'company-web-components/dist/components',
+    }),
+
+    angularOutputTarget({
+      componentCorePackage:
+        '@company/web-components',
+      directivesProxyFile:
+        '../angular/src/generated/proxies.ts',
+    }),
+  ],
+};
+```
+
+### `dist`
+
+Use when:
+
+- The Stencil loader and built-in lazy-loading model are valuable.
+- Many components exist and are discovered dynamically.
+- Consumers accept an initialization step.
+
+### `dist-custom-elements`
+
+Use when:
+
+- Consumers want direct ESM imports.
+- Tree shaking and explicit registration matter.
+- Framework wrappers import individual elements.
+- The organization uses conventional bundlers.
+
+Default recommendation for a modern enterprise library:
+
+```text
+dist-custom-elements
++
+framework wrappers
+```
+
+Also publish `dist` when legacy or script-tag consumers require it.
+
+---
+
+## 12. Package exports and registration
+
+```json
+{
+  "name": "@company/web-components",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./loader": {
+      "types": "./loader/index.d.ts",
+      "import": "./loader/index.js"
+    },
+    "./components/*": {
+      "types": "./dist/components/*.d.ts",
+      "import": "./dist/components/*.js"
+    }
+  }
+}
+```
+
+Prefer explicit registration for predictable tree shaking:
+
+```ts
+import {
+  defineCustomElement as defineButton,
+} from '@company/web-components/components/ds-button';
+
+defineButton();
+```
+
+Be careful with `sideEffects: false` when registration relies on side-effect imports.
+
+---
+
+## 13. React integration
+
+Direct Web Component use:
+
+```tsx
+import {
+  defineCustomElement as defineDsButton,
+} from '@company/web-components/components/ds-button';
+
+defineDsButton();
+
+export function DeleteAction() {
+  return (
+    <ds-button variant="danger">
+      Delete
+    </ds-button>
+  );
+}
+```
+
+Generated wrapper:
+
+```tsx
+import { DsButton } from '@company/react';
+
+export function DeleteAction() {
+  return (
+    <DsButton
+      variant="danger"
+      onDsPress={(event) => {
+        console.log(event.detail.source);
+      }}
+    >
+      Delete
+    </DsButton>
+  );
+}
+```
+
+Wrappers provide:
+
+- Typed props and events.
+- Framework refs.
+- JSX declarations.
+- More idiomatic integration.
+- Form and SSR integration where supported.
+
+They should not duplicate component behavior.
+
+---
+
+## 14. Angular and Vue integration
+
+Angular:
+
+```html
+<ds-button
+  variant="primary"
+  (dsPress)="save($event)">
+  Save
+</ds-button>
+```
+
+Vue:
+
+```vue
+<script setup lang="ts">
+function handlePress(
+  event: CustomEvent<{ source: string }>,
+) {
+  console.log(event.detail.source);
+}
+</script>
+
+<template>
+  <ds-button
+    variant="primary"
+    @dsPress="handlePress">
+    Save
+  </ds-button>
+</template>
+```
+
+Staff questions to address:
+
+- Are wrappers independently versioned?
+- How are framework major versions supported?
+- Are core and wrappers published atomically?
+- How is wrapper drift detected?
+- How are forms, refs, events, and SSR tested in each host?
+
+---
+
+## 15. SSR and hydration
+
+Web Components do not make SSR free.
+
+Potential unresolved server output:
+
+```html
+<ds-profile-card user-name="Khanh"></ds-profile-card>
+```
+
+Risks:
+
+- Flash of unupgraded content.
+- Layout shift.
+- Delayed interactivity.
+- Component registration races.
+- Framework hydration mismatches.
+
+Mitigations:
+
+1. Use Stencil hydration or prerender tooling where appropriate.
+2. Register critical components early.
+3. Use Declarative Shadow DOM when supported by the stack.
+4. Reserve stable dimensions to prevent layout shift.
+5. Test SSR in every supported framework host.
+6. Avoid depending on browser globals during module evaluation.
+
+A strong answer says that Web Components are portable, but SSR behavior still requires deliberate engineering.
+
+---
+
+## 16. Accessibility architecture
+
+For every shared component, define:
+
+- Native semantic element or ARIA role.
+- Accessible name.
+- Keyboard interaction model.
+- Focus entry, movement, and restoration.
+- Disabled and invalid behavior.
+- Screen-reader announcements.
+- High-contrast behavior.
+- Reduced-motion behavior.
+
+Dialog skeleton:
+
+```tsx
+@Component({
+  tag: 'ds-dialog',
+  styleUrl: 'ds-dialog.css',
+  shadow: true,
+})
+export class DsDialog {
+  @Prop({ mutable: true, reflect: true })
+  open = false;
+
+  @Event({
+    eventName: 'dsOpenChange',
+    bubbles: true,
+    composed: true,
+  })
+  dsOpenChange!: EventEmitter<{ open: boolean }>;
+
+  @Element()
+  host!: HTMLDsDialogElement;
+
+  private previouslyFocused?: HTMLElement;
+
+  @Watch('open')
+  handleOpenChanged(open: boolean): void {
+    if (open) {
+      this.previouslyFocused =
+        document.activeElement as HTMLElement;
+
+      requestAnimationFrame(() => {
+        this.host.shadowRoot
+          ?.querySelector<HTMLElement>(
+            '[data-initial-focus]',
+          )
+          ?.focus();
+      });
+    } else {
+      this.previouslyFocused?.focus();
+    }
+  }
+
+  private close = (): void => {
+    this.open = false;
+    this.dsOpenChange.emit({ open: false });
+  };
+
+  render() {
+    if (!this.open) return null;
+
+    return (
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="title"
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') this.close();
+        }}
+      >
+        <h2 id="title">
+          <slot name="title" />
+        </h2>
+
+        <slot />
+
+        <button
+          data-initial-focus
+          type="button"
+          onClick={this.close}
+        >
+          Close
+        </button>
+      </section>
+    );
+  }
+}
+```
+
+Call out that production dialogs also need focus containment, inert background behavior, nested overlay support, scroll management, and cross-browser assistive-technology testing.
+
+---
+
+## 17. Testing strategy
+
+### Unit and rendering
+
+```tsx
+import { newSpecPage } from '@stencil/core/testing';
+import { DsButton } from './ds-button';
+
+describe('ds-button', () => {
+  it('preserves native disabled behavior', async () => {
+    const page = await newSpecPage({
+      components: [DsButton],
+      html: `
+        <ds-button disabled>
+          Delete
+        </ds-button>
+      `,
+    });
+
+    const button =
+      page.root?.shadowRoot?.querySelector('button');
+
+    expect(button?.disabled).toBe(true);
+  });
+});
+```
+
+### Event contract
+
+```tsx
+it('emits dsPress', async () => {
+  const page = await newSpecPage({
+    components: [DsButton],
+    html: '<ds-button>Save</ds-button>',
+  });
+
+  const listener = jest.fn();
+  page.root?.addEventListener('dsPress', listener);
+
+  page.root?.shadowRoot
+    ?.querySelector('button')
+    ?.click();
+
+  expect(listener).toHaveBeenCalledTimes(1);
+  expect(listener.mock.calls[0][0].detail).toEqual({
+    source: 'pointer',
+  });
+});
+```
+
+### Browser conformance suite
+
+Run the same scenarios in:
+
+```text
+vanilla HTML
+React wrapper
+Angular wrapper
+Vue wrapper
+SSR host
+```
+
+Verify:
+
+- Property assignment.
+- Attribute conversion.
+- Event delivery.
+- Slot projection.
+- Forms.
+- Refs.
+- Cleanup on unmount.
+- Hydration.
+- Accessibility behavior.
+
+### Accessibility and visual testing
+
+Automate Axe checks, keyboard flows, focus order, high contrast, dark mode, RTL, and 200% zoom. Complex widgets still require manual testing with browsers and screen readers.
+
+---
+
+## 18. Performance strategy
+
+Track:
+
+- Per-component module size.
+- Shared runtime size.
+- Registration and upgrade latency.
+- First-render duration.
+- Long tasks.
+- Layout shift.
+- Re-render frequency.
+- Detached-element memory.
+- Duplicate versions on one page.
+
+Do not make non-render state reactive:
+
+```tsx
+export class DsSearch {
+  // Affects rendering.
+  @State() query = '';
+
+  // Does not affect rendering.
+  private debounceTimer?: number;
+}
+```
+
+For a large grid:
+
+- Virtualize rows and columns.
+- Avoid one Shadow Root per simple cell.
+- Batch DOM measurement.
+- Normalize selection state.
+- Keep data fetching outside the primitive.
+- Add bundle and render budgets to CI.
+
+---
+
+## 19. Reliability and observability
+
+Possible low-volume telemetry:
+
+```ts
+type ComponentTelemetry = {
+  component: string;
+  version: string;
+  event:
+    | 'definition_failed'
+    | 'render_failed'
+    | 'upgrade_timeout'
+    | 'deprecated_api_used'
+    | 'performance_sample';
+  hostFramework?:
+    | 'react'
+    | 'angular'
+    | 'vue'
+    | 'vanilla';
+};
+```
+
+Rules:
+
+- Never collect component content or sensitive product data.
+- Sample high-volume events.
+- Telemetry must never block rendering.
+- Abort async work on disconnect.
+- Remove global event listeners.
+- Product error boundaries remain owned by host frameworks.
+
+---
+
+## 20. Versioning and migration
+
+Breaking changes include:
+
+- Tag renames.
+- Property or event changes.
+- Event payload changes.
+- Slot renames.
+- Removed CSS variables or parts.
+- Changed keyboard behavior.
+- Changed form behavior.
+- Significant default layout changes.
+
+Deprecation flow:
+
+```text
+Release N
+Add new API and deprecate old API
+        ↓
+Release N+1
+Migrate internal consumers, add codemod, track usage
+        ↓
+Next major
+Remove deprecated API
+```
+
+Development warning:
+
+```tsx
+@Prop()
+legacyAppearance?: string;
+
+componentWillLoad(): void {
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    this.legacyAppearance
+  ) {
+    console.warn(
+      '[ds-button] legacyAppearance is deprecated. ' +
+      'Use variant instead.',
+    );
+  }
+}
+```
+
+At enterprise scale, add static usage scanning and codemods rather than relying only on console warnings.
+
+---
+
+# Stencil versus Lit
+
+## 21. Comparison table
+
+| Area | Stencil | Lit |
+|---|---|---|
+| Core model | Compiler and component toolchain | Lightweight runtime library |
+| Authoring | TypeScript, decorators, JSX | TypeScript/JS, decorators optional, tagged templates |
+| Rendering | JSX | `html` tagged templates |
+| Output | Compiled Custom Elements and output targets | Custom Element classes using Lit runtime |
+| Lazy loading | Built-in `dist` loader model | Usually application bundler and dynamic imports |
+| Framework wrappers | Output-target ecosystem | `@lit/react`; other wrappers often custom or ecosystem-driven |
+| Docs metadata | Compiler can generate metadata/docs | Usually external tooling |
+| Testing | Integrated Stencil tooling | Standard browser-testing ecosystem |
+| Composition reuse | Helpers and framework-neutral modules | Reactive Controllers and mixins |
+| Opinionation | Higher | Lower |
+| Best fit | Enterprise multi-framework design system | Lightweight components or teams with existing platform tooling |
+
+---
+
+## 22. Equivalent Lit component
+
+```ts
+import {
+  LitElement,
+  css,
+  html,
+} from 'lit';
+
+import {
+  customElement,
+  property,
+} from 'lit/decorators.js';
+
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'danger';
+
+@customElement('ds-button')
+export class DsButton extends LitElement {
+  @property({
+    type: String,
+    reflect: true,
+  })
+  variant: ButtonVariant = 'primary';
+
+  @property({
+    type: Boolean,
+    reflect: true,
+  })
+  disabled = false;
+
+  private handleClick(event: MouseEvent): void {
+    if (this.disabled) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
+
+    this.dispatchEvent(
+      new CustomEvent('dsPress', {
+        detail: { source: 'pointer' },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }
+
+  override render() {
+    return html`
+      <button
+        type="button"
+        ?disabled=${this.disabled}
+        @click=${this.handleClick}
+      >
+        <slot></slot>
+      </button>
+    `;
+  }
+
+  static override styles = css`
+    :host {
+      display: inline-flex;
+    }
+
+    button {
+      min-height: 44px;
+      font: inherit;
+    }
+
+    button:focus-visible {
+      outline: 3px solid var(--ds-color-focus);
+      outline-offset: 2px;
+    }
+  `;
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'ds-button': DsButton;
+  }
+}
+```
+
+Both implementations produce a standards-based Custom Element. The main difference is the surrounding operating model: Stencil provides a compiler and distribution platform; Lit provides a smaller reactive component library and leaves more infrastructure to the team.
+
+---
+
+## 23. Reactivity comparison
+
+Stencil:
+
+```tsx
+export class Counter {
+  @Prop() initialValue = 0;
+  @State() count = 0;
+
+  componentWillLoad() {
+    this.count = this.initialValue;
+  }
+
+  render() {
+    return (
+      <button onClick={() => this.count++}>
+        Count: {this.count}
+      </button>
+    );
+  }
+}
+```
+
+Lit:
+
+```ts
+@customElement('ds-counter')
+export class DsCounter extends LitElement {
+  @property({ type: Number })
+  initialValue = 0;
+
+  @state()
+  private count = 0;
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this.count = this.initialValue;
+  }
+
+  override render() {
+    return html`
+      <button @click=${() => this.count++}>
+        Count: ${this.count}
+      </button>
+    `;
+  }
+}
+```
+
+Lit explicitly documents an asynchronous reactive update cycle that batches property changes. Stencil uses compiler-generated metadata and a runtime scheduler to update components when reactive props or state change.
+
+---
+
+## 24. Lit Reactive Controller example
+
+Lit has a strong lifecycle-aware reuse mechanism:
+
+```ts
+import {
+  ReactiveController,
+  ReactiveControllerHost,
+} from 'lit';
+
+export class EscapeKeyController
+  implements ReactiveController {
+  constructor(
+    private host: ReactiveControllerHost,
+    private onEscape: () => void,
+  ) {
+    host.addController(this);
+  }
+
+  private handleKeyDown = (
+    event: KeyboardEvent,
+  ): void => {
+    if (event.key === 'Escape') {
+      this.onEscape();
+    }
+  };
+
+  hostConnected(): void {
+    window.addEventListener(
+      'keydown',
+      this.handleKeyDown,
+    );
+  }
+
+  hostDisconnected(): void {
+    window.removeEventListener(
+      'keydown',
+      this.handleKeyDown,
+    );
+  }
+}
+```
+
+```ts
+@customElement('ds-popover')
+export class DsPopover extends LitElement {
+  @property({ type: Boolean })
+  open = false;
+
+  private escapeController =
+    new EscapeKeyController(
+      this,
+      () => {
+        this.open = false;
+      },
+    );
+}
+```
+
+Stencil commonly uses explicit helpers or services:
+
+```ts
+export function listenForEscape(
+  onEscape: () => void,
+): () => void {
+  const listener = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      onEscape();
+    }
+  };
+
+  window.addEventListener('keydown', listener);
+
+  return () => {
+    window.removeEventListener('keydown', listener);
+  };
+}
+```
+
+```tsx
+export class DsPopover {
+  @Prop({ mutable: true })
+  open = false;
+
+  private removeEscapeListener?: () => void;
+
+  connectedCallback(): void {
+    this.removeEscapeListener =
+      listenForEscape(() => {
+        this.open = false;
+      });
+  }
+
+  disconnectedCallback(): void {
+    this.removeEscapeListener?.();
+  }
+}
+```
+
+---
+
+## 25. When to choose Stencil
+
+Choose Stencil when:
+
+1. The product is a shared component platform, not one application.
+2. Consumers span several frameworks.
+3. Generated wrappers are important.
+4. Multiple output formats are required.
+5. Compiler metadata and generated documentation are valuable.
+6. Built-in lazy-loaded distribution is important.
+7. A dedicated design-system team owns governance and releases.
+
+Interview answer:
+
+> I would choose Stencil when I need to operate a multi-framework component product. Its compiler, output targets, wrapper generation, metadata, and lazy distribution model reduce the platform infrastructure my team must build itself.
+
+---
+
+## 26. When to choose Lit
+
+Choose Lit when:
+
+1. The team wants a small abstraction over native Web Components.
+2. Components are app-local or have a smaller consumer set.
+3. Existing infrastructure already handles packaging, docs, testing, and releases.
+4. Tagged-template rendering is preferred.
+5. Reactive Controllers fit the reuse model.
+6. Fine-grained control is more important than an opinionated toolchain.
+
+Interview answer:
+
+> I would choose Lit when I need lightweight reactive Web Component authoring and do not need Stencil's larger compiler-and-distribution platform. Lit stays close to native Custom Element APIs while providing reactive properties, templates, scoped styles, and lifecycle integration.
+
+---
+
+## 27. Do not compare only hello-world bundle size
+
+The real cost is:
+
+```text
+component runtime
++ wrapper generation
++ documentation tooling
++ test infrastructure
++ release engineering
++ migration tooling
++ consumer support
+```
+
+Lit may be smaller and less opinionated, while requiring the organization to build more surrounding platform infrastructure.
+
+Stencil may impose more compiler conventions while reducing the operating cost of a governed multi-framework library.
+
+---
+
+## 28. Risks and mitigations
+
+### Stencil risks
+
+**Build-tool coupling**
+
+- Keep public contracts standards-based.
+- Do not expose Stencil-specific types to consumers.
+- Publish direct Custom Elements.
+- Test built artifacts, not only source classes.
+
+**Wrapper drift**
+
+- Build wrappers from the same commit.
+- Publish atomically.
+- Add host-framework conformance tests.
+
+**Shadow DOM customization pressure**
+
+- Expose semantic tokens, slots, and parts.
+- Reject unsupported deep styling.
+- Use an RFC process for new extension points.
+
+**Duplicate tag registration**
+
+- Enforce dependency alignment.
+- Track duplicate versions.
+- Avoid multiple incompatible versions on one page.
+
+### Lit risks
+
+**More platform work**
+
+The team may need to build wrapper generation, docs extraction, release conventions, and adoption analytics.
+
+**Framework ergonomics**
+
+Use `@lit/react` or thin adapters and test custom events, refs, forms, and SSR.
+
+**Runtime duplication**
+
+Align versions through workspace policy, overrides, and bundle analysis.
+
+---
+
+# Staff interview questions and model answers
+
+## Why not build the library only in React?
+
+React is a good choice when every consumer uses compatible React versions. It is not a native cross-framework contract.
+
+For React, Angular, Vue, and legacy consumers, a React-only core either excludes non-React products or forces parallel implementations. A Web Component core lets behavior and accessibility live once, while thin wrappers provide framework ergonomics.
+
+I would still choose React-only components when the organization is truly standardized on React and cross-framework portability has no realistic value. Web Components add complexity that must be justified.
+
+---
+
+## Should every component use Shadow DOM?
+
+No.
+
+Use Shadow DOM when:
+
+- Style isolation is valuable.
+- Internal markup should remain private.
+- Slots and parts provide sufficient customization.
+- Host CSS must not break interaction behavior.
+
+Reconsider it when:
+
+- Global typography and layout inheritance are central.
+- The component is a simple layout primitive.
+- A large grid would create excessive nested Shadow Roots.
+- The browser or testing stack has important limitations.
+
+Establish a default but allow documented exceptions.
+
+---
+
+## How do you prevent consumers from depending on internal DOM?
+
+- Use Shadow DOM where appropriate.
+- Expose named slots.
+- Expose semantic CSS variables.
+- Expose a small set of CSS parts.
+- Do not document private selectors.
+- Treat documented slots, parts, events, and properties as public API.
+
+---
+
+## How does theming cross Shadow DOM?
+
+CSS custom properties inherit across Shadow DOM boundaries:
+
+```css
+:root {
+  --ds-color-brand: #0a66c2;
+}
+
+[data-theme='dark'] {
+  --ds-color-brand: #60a5fa;
+}
+```
+
+```css
+/* Inside the Shadow Root */
+.button {
+  background: var(--ds-color-brand);
+}
+```
+
+Use semantic names such as `--ds-color-brand`, not raw implementation names as the primary contract.
+
+---
+
+## How do you test cross-framework behavior?
+
+Create a shared conformance suite and run it in vanilla HTML, React, Angular, Vue, and SSR hosts.
+
+Test:
+
+- Props and attributes.
+- Events.
+- Slots.
+- Forms.
+- Refs.
+- Cleanup.
+- Hydration.
+- Accessibility.
+
+This catches integration failures that a Stencil unit test cannot.
+
+---
+
+## How do you handle overlays and z-index?
+
+Prefer native top-layer APIs such as `<dialog>` or the Popover API when they satisfy requirements.
+
+Otherwise, provide one platform-owned overlay system with clear rules for:
+
+- Layer ordering.
+- Focus.
+- Theme propagation.
+- Cleanup.
+- Nested overlays.
+- SSR.
+
+Do not let every component invent its own portal behavior.
+
+---
+
+## How do you handle internationalization?
+
+Shared primitives should usually receive localized labels from the host rather than own product translations.
+
+Support:
+
+- `lang` and `dir` inheritance.
+- RTL layout.
+- Explicit locale and time zone when formatting.
+- Localized accessibility messages.
+- Dynamic locale changes.
+
+```tsx
+@Prop()
+messages: DatePickerMessages = {
+  nextMonth: 'Next month',
+  previousMonth: 'Previous month',
+  chooseDate: 'Choose date',
+};
+```
+
+---
+
+## How do you decide whether a component belongs in the shared system?
+
+It belongs when:
+
+- Multiple independent products need it.
+- Interaction and accessibility should be standardized.
+- The API can remain product-neutral.
+- A central team can support it over time.
+
+It should remain product-owned when:
+
+- It represents one workflow.
+- Requirements change rapidly.
+- It depends on product data or permissions.
+- Central ownership would become a bottleneck.
+
+---
+
+## How do you roll out a major version?
+
+1. Publish a prerelease.
+2. Run conformance tests against representative consumers.
+3. Provide codemods and a migration guide.
+4. Track deprecated API usage.
+5. Canary in selected applications.
+6. Compare errors, accessibility, bundle size, and Core Web Vitals.
+7. Roll out by cohort.
+8. Maintain rollback capability.
+9. Prevent incompatible versions of the same tag from sharing a page.
+
+---
+
+# Example component boundary: date picker
+
+The shared date picker should own:
+
+- Calendar semantics.
+- Keyboard navigation.
+- Focus behavior.
+- Date selection.
+- Disabled-date contract.
+- Locale labels.
+- Validation presentation.
+- Accessible announcements.
+
+The host application should own:
+
+- Availability fetching.
+- Pricing.
+- Booking rules.
+- Server validation.
+- Product analytics.
+- Business copy.
+- Time-zone policy.
+
+```html
+<ds-date-picker
+  value="2026-07-20"
+  min="2026-07-20"
+  max="2027-07-20"
+  locale="en-US"
+  time-zone="America/Los_Angeles">
+</ds-date-picker>
+```
+
+Complex values should be assigned as properties:
+
+```ts
+datePicker.disabledDates = [
+  '2026-07-25',
+  '2026-07-26',
+];
+```
+
+```ts
+datePicker.addEventListener(
+  'dsDateChange',
+  (
+    event: CustomEvent<{
+      value: string;
+      reason:
+        | 'pointer'
+        | 'keyboard'
+        | 'programmatic';
+    }>,
+  ) => {
+    console.log(event.detail.value);
+  },
+);
+```
+
+Do not embed product availability fetching inside the shared date picker.
+
+---
+
+# CI and release pipeline
+
+```yaml
+name: Design System
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint and typecheck
+        run: npm run validate
+
+      - name: Build components and wrappers
+        run: npm run build -- --ci
+
+      - name: Unit tests
+        run: npm run test:spec
+
+      - name: Browser integration tests
+        run: npm run test:e2e
+
+      - name: Accessibility tests
+        run: npm run test:a11y
+
+      - name: Framework conformance
+        run: npm run test:frameworks
+
+      - name: Bundle budgets
+        run: npm run check:size
+
+      - name: Visual regression
+        run: npm run test:visual
+
+      - name: Package integrity
+        run: npm pack --dry-run
+```
+
+Release flow:
+
+```text
+Merge to main
+    ↓
+Build affected components and wrappers from one commit
+    ↓
+Generate changelog and migration metadata
+    ↓
+Publish prerelease or stable packages
+    ↓
+Deploy documentation
+    ↓
+Run canary smoke tests
+    ↓
+Record release and adoption telemetry
+```
+
+---
+
+# Ten-minute interview structure
+
+## Minute 0–1: Clarify
+
+Ask about frameworks, SSR, browser support, application count, component scope, ownership, and independent deployment.
+
+## Minute 1–3: Define the contract
+
+Cover properties, attributes, events, slots, styling, accessibility, and versioning.
+
+## Minute 3–5: Draw architecture
+
+```text
+tokens → Stencil core → output targets → wrappers → applications
+```
+
+## Minute 5–7: Deep dive
+
+Choose forms, dialog/focus, date picker, data grid, SSR, or migration.
+
+## Minute 7–8: Compare Lit
+
+Explain compiler/platform versus lightweight runtime/library.
+
+## Minute 8–9: Reliability
+
+Cover conformance tests, bundle budgets, observability, and rollback.
+
+## Minute 9–10: Tradeoffs
+
+State when you would not use Stencil and identify its main risks.
+
+---
+
+# Two-minute model answer
+
+> I would treat the Stencil library as a component platform rather than a set of JSX files. Its public contract includes tags, properties, attributes, DOM events, slots, CSS variables, parts, accessibility behavior, and versioning guarantees.
+>
+> I would implement behavior once in Stencil and publish `dist-custom-elements` for tree-shakeable ESM consumption, plus thin generated wrappers for React, Angular, and Vue. The wrappers provide framework typing and event ergonomics but do not duplicate behavior.
+>
+> Design tokens would be published separately and consumed through semantic CSS custom properties, which inherit across Shadow DOM boundaries. I would use Shadow DOM by default for interactive controls but allow justified exceptions for simple layout or performance-sensitive structures.
+>
+> CI would cover unit behavior, real-browser interaction, accessibility, visual regression, framework conformance, SSR, and bundle budgets. Core components and wrappers would be built from the same commit, versioned together, and released through prerelease canaries with codemods and usage tracking.
+>
+> Compared with Lit, Stencil is stronger when I need an opinionated multi-framework component distribution platform with output targets, generated wrappers, metadata, and lazy loading. Lit is better when I want a lightweight, direct Web Component library and already own the surrounding packaging, documentation, testing, and release infrastructure.
+>
+> The largest risks are toolchain coupling, wrapper drift, styling pressure across Shadow DOM, duplicate registrations, and consumers relying on private internals. I would mitigate these through standards-based APIs, explicit extension points, atomic releases, conformance tests, and strict governance.
+
+---
+
+# Quick decision summary
+
+```text
+Choose Stencil
+- Enterprise component platform
+- React, Angular, Vue, and vanilla consumers
+- Generated wrappers
+- Output targets and compiler metadata
+- Lazy-loaded distribution
+- Dedicated platform team
+
+Choose Lit
+- Lightweight component authoring
+- Smaller or app-local scope
+- Existing build/release infrastructure
+- Preference for tagged templates
+- Reactive Controllers
+- More direct packaging control
+```
+
+---
+
+# Questions to ask the interviewer
+
+1. Can multiple library versions appear on one page?
+2. Which frameworks and major versions are supported?
+3. Is SSR a hard requirement?
+4. Who owns tokens, icons, and accessibility standards?
+5. How much styling override should consumers receive?
+6. Which controls require native form participation?
+7. How are accessibility regressions detected today?
+8. Is there existing release and codemod infrastructure?
+9. How do teams request and discover shared components?
+10. Which adoption and performance metrics define success?
+
+---
+
+# Final recommendation
+
+For an enterprise cross-framework design system, my default architecture would be:
+
+```text
+Stencil core
++
+dist-custom-elements
++
+generated framework wrappers
++
+semantic design-token package
++
+framework conformance tests
++
+central release governance
+```
+
+I would choose Lit when the organization wants a lighter Web Component abstraction and is prepared to own the broader distribution, wrapper, documentation, testing, and migration platform.
+
+The decision should be based on the total organizational operating model, not only syntax or a hello-world bundle comparison.
+
+---
+
+## Official references
+
+- [Stencil component model](https://stenciljs.com/docs/component)
+- [Stencil component API](https://stenciljs.com/docs/api)
+- [Stencil lifecycle](https://stenciljs.com/docs/component-lifecycle)
+- [Stencil Custom Elements output](https://stenciljs.com/docs/custom-elements)
+- [Stencil output targets](https://stenciljs.com/docs/output-targets)
+- [Stencil publishing](https://stenciljs.com/docs/publishing)
+- [Stencil React integration](https://stenciljs.com/docs/react)
+- [Stencil events](https://stenciljs.com/docs/events)
+- [Stencil JSX](https://stenciljs.com/docs/templating-jsx)
+- [Lit component overview](https://lit.dev/docs/components/overview/)
+- [Lit reactive properties](https://lit.dev/docs/components/properties/)
+- [Lit lifecycle](https://lit.dev/docs/components/lifecycle/)
+- [Lit styles](https://lit.dev/docs/components/styles/)
+- [Lit React integration](https://lit.dev/docs/frameworks/react/)
+- [Lit Reactive Controllers](https://lit.dev/docs/composition/controllers/)
