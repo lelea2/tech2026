@@ -1,0 +1,212 @@
+---
+title: 'DB Selection for Model Foundry Metrics Monitoring'
+description: 'Staff-level framework for choosing SQL vs NoSQL vs time-series databases, with Model Foundry examples and tradeoffs.'
+sidebar_label: 'SQL vs NoSQL vs Time-Series'
+tags:
+	- behavioral
+	- system-design
+	- database
+	- model-foundry
+	- metrics
+	- staff-engineer
+---
+
+# SQL vs NoSQL vs Time-Series: Staff-Level Decision Framework
+
+## Interview Context
+
+If asked how I choose between SQL, NoSQL, and a time-series database for Model Foundry metrics monitoring, I explain the decision as a workload fit problem, not a technology preference.
+
+My framing:
+
+1. What are the dominant access patterns?
+2. What are the data shape and consistency requirements?
+3. What are retention and query-latency targets?
+4. What operational complexity can the team sustain?
+
+## 1. Model Foundry Workload Breakdown
+
+In Model Foundry, data usually falls into three buckets:
+
+- Relational metadata:
+  - model, version, owner, compliance state, lineage links.
+- High-write metric events or points:
+  - latency, error rate, traffic, freshness, drift signals by timestamp.
+- Flexible diagnostic payloads:
+  - semi-structured annotations, experiment metadata, debugging context.
+
+Because these workloads are different, one database is rarely optimal for all of them.
+
+## 2. When I Choose SQL
+
+I choose SQL first when:
+
+- the schema is relational and stable enough;
+- joins and filtering across entities are critical;
+- transactional correctness matters;
+- auditability and reporting are core needs.
+
+### Why SQL for Model Foundry metadata
+
+Model/entity ownership, model-version tables, compliance status, and permission-aware queries are naturally relational.
+
+Example:
+
+- "Show active models owned by Team X with missing compliance fields and stale datasets."
+
+This usually needs joins across model, owner, compliance, and freshness tables. SQL is excellent here.
+
+### SQL pros
+
+- Strong consistency and transactional guarantees.
+- Mature query language and indexing options.
+- Great for joins and ad hoc analytics.
+- Strong ecosystem for governance and BI/reporting.
+
+### SQL cons
+
+- Harder horizontal scaling for very high-write telemetry streams.
+- Rigid schema evolution can slow fast-changing event models.
+- Can become expensive if used as the primary store for large raw time-series points.
+
+## 3. When I Choose NoSQL
+
+I choose NoSQL when:
+
+- data is semi-structured or evolves quickly;
+- access patterns are key-value or document-centric;
+- write scalability and low-latency simple lookups dominate;
+- strict joins are less important.
+
+### Model Foundry examples for NoSQL
+
+- storing flexible model diagnostics blobs;
+- storing per-model feature snapshots with changing shape;
+- caching denormalized dashboard read models for fast retrieval.
+
+### NoSQL pros
+
+- Flexible schema for rapidly evolving payloads.
+- High horizontal write/read scalability.
+- Good for document or key-based retrieval.
+
+### NoSQL cons
+
+- Weaker relational querying and cross-entity joins.
+- Data consistency and transactions can be more complex by product.
+- Risk of duplicated/denormalized data drift.
+
+## 4. When I Choose Time-Series DB
+
+I choose a time-series database when:
+
+- timestamped metric ingestion is high volume;
+- queries are mostly time-window aggregations;
+- downsampling/retention policies are essential;
+- low-latency dashboards over recent windows are required.
+
+### Model Foundry examples for time-series
+
+- P95 latency over the last 1h/24h/7d;
+- error-rate trend with rollups by model/version/env;
+- feature freshness and drift trend lines;
+- alert thresholds on moving windows.
+
+### Time-series pros
+
+- Optimized ingestion for timestamped points.
+- Efficient range scans and aggregate queries.
+- Native retention/downsampling capabilities in many systems.
+- Better cost profile for large metric streams than general OLTP stores.
+
+### Time-series cons
+
+- Limited fit for relational metadata workflows.
+- Cross-domain joins with ownership/compliance often require another store or ETL.
+- Additional operational surface area if introduced as a new system.
+
+## 5. My Staff-Level Choice for Model Foundry
+
+For metrics monitoring, I usually recommend a hybrid architecture:
+
+- SQL for metadata, ownership, permissions, compliance, and configuration.
+- Time-series DB for high-volume metric points and trend queries.
+- Optional NoSQL for flexible diagnostic documents if needed.
+
+This preserves correctness for core entities while keeping metric reads and writes efficient at scale.
+
+## 6. Concrete Example: Why SQL First, Then Time-Series
+
+### Phase 1 (SQL-first)
+
+Start with SQL if:
+
+- metric volume is moderate;
+- team already operates SQL reliably;
+- product needs rapid iteration on relational queries.
+
+Benefits:
+
+- faster delivery with fewer systems;
+- easier governance and access control;
+- simpler team operations early on.
+
+Tradeoff:
+
+- as metric cardinality and retention grow, range queries and storage costs may degrade.
+
+### Phase 2 (add time-series)
+
+Introduce time-series when you observe:
+
+- sustained high write throughput;
+- expensive dashboard queries for long windows;
+- need for native retention and downsampling;
+- SQL cluster pressure from telemetry-heavy workloads.
+
+Migration pattern:
+
+1. Keep SQL as system of record for metadata.
+2. Dual-write or pipeline metrics into time-series storage.
+3. Move trend and windowed queries to time-series APIs.
+4. Keep cross-entity joins in SQL-backed services.
+
+## 7. Decision Matrix (Quick Interview Answer)
+
+| Requirement                                    | SQL           | NoSQL            | Time-Series               |
+| ---------------------------------------------- | ------------- | ---------------- | ------------------------- |
+| Relational joins across model/owner/compliance | Excellent     | Weak-Moderate    | Weak                      |
+| High-write timestamp metrics                   | Moderate      | Good             | Excellent                 |
+| Flexible evolving payload schema               | Moderate      | Excellent        | Moderate                  |
+| Time-window aggregations and rollups           | Moderate      | Moderate         | Excellent                 |
+| Strict transactional guarantees                | Excellent     | Varies           | Varies                    |
+| Operational simplicity (single store)          | Good at start | Good by use case | Usually additional system |
+
+## 8. Risks and Mitigations
+
+### Risk: premature multi-DB complexity
+
+Mitigation:
+
+- start with SQL-first if scale allows;
+- introduce time-series based on measured bottlenecks, not assumptions.
+
+### Risk: stale joins across stores
+
+Mitigation:
+
+- define authoritative ownership per entity;
+- use clear APIs between metadata and metrics domains;
+- include timestamps/versioning in responses.
+
+### Risk: runaway cardinality in metrics labels
+
+Mitigation:
+
+- enforce dimension allowlists;
+- cap high-cardinality tags;
+- pre-aggregate where product allows.
+
+## 9. Strong Closing Statement
+
+> For Model Foundry metrics monitoring, I choose storage based on workload boundaries. SQL is my default for relational metadata and correctness-heavy workflows. Time-series becomes the right addition when metric ingestion and windowed analytics outgrow OLTP patterns. NoSQL is useful for flexible diagnostic documents, but not as a replacement for relational governance queries. The key staff-level decision is sequencing: start simple, instrument bottlenecks, then evolve to a hybrid architecture with clear ownership and APIs.
