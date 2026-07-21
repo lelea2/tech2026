@@ -1,0 +1,581 @@
+/**
+ * Lane Change Simulation
+ *
+ * Scenario:
+ * - Hero drives in the right lane.
+ * - Other vehicles drive in the left lane.
+ * - Hero wants to move into the left lane.
+ * - Hero should not cut in front of a blocking vehicle.
+ * - Instead, Hero slows down, lets the vehicle pass,
+ *   and changes lanes behind it with a safe buffer.
+ *
+ * Simplifying assumptions:
+ * - Only longitudinal position and velocity are considered.
+ * - Vehicles are treated as points, without physical length.
+ * - Left-lane entities have zero acceleration.
+ * - Hero's maximum desired speed is 50% of the speed limit.
+ * - The exact buffer/controller formulas were not provided,
+ *   so reasonable configurable values are used.
+ */
+
+class VelocityController {
+  constructor(proportionalGain) {
+    this.proportionalGain = proportionalGain;
+  }
+
+  /**
+   * Basic proportional controller.
+   *
+   * If Hero is slower than the desired velocity:
+   *   acceleration is positive.
+   *
+   * If Hero is faster than the desired velocity:
+   *   acceleration is negative.
+   *
+   * Formula:
+   *   acceleration = gain * velocityError
+   */
+  calculateAcceleration(currentVelocity, desiredVelocity) {
+    const velocityError = desiredVelocity - currentVelocity;
+
+    return this.proportionalGain * velocityError;
+  }
+}
+
+class FallBehindController {
+  constructor(
+    positionGain,
+    velocityGain,
+    reactionTimeSeconds,
+    minimumFollowingGapMeters
+  ) {
+    this.positionGain = positionGain;
+    this.velocityGain = velocityGain;
+    this.reactionTimeSeconds = reactionTimeSeconds;
+    this.minimumFollowingGapMeters = minimumFollowingGapMeters;
+  }
+
+  /**
+   * Calculates an acceleration that encourages Hero
+   * to remain behind the blocking target.
+   *
+   * The desired gap becomes larger when Hero is
+   * approaching the target faster.
+   */
+  calculateAcceleration(hero, target) {
+    // Positive when Hero is moving faster than the target.
+    const closingVelocity = Math.max(
+      0,
+      hero.velocity - target.velocity
+    );
+
+    // Add more following distance when Hero is closing quickly.
+    const desiredGap =
+      this.minimumFollowingGapMeters +
+      closingVelocity * this.reactionTimeSeconds;
+
+    // Hero should ideally remain this far behind the target.
+    const desiredHeroPosition =
+      target.position - desiredGap;
+
+    const positionError =
+      desiredHeroPosition - hero.position;
+
+    const velocityError =
+      target.velocity - hero.velocity;
+
+    /**
+     * A negative position error usually asks Hero to slow down.
+     *
+     * The velocity term also encourages Hero to match
+     * the target's speed.
+     */
+    return (
+      this.positionGain * positionError +
+      this.velocityGain * velocityError
+    );
+  }
+}
+
+class LaneChangeFeature {
+  constructor(config) {
+    this.config = config;
+
+    /**
+     * Becomes true once the left lane is safe.
+     */
+    this.lane_change_active_ = false;
+
+    /**
+     * Contains only vehicles currently blocking the lane change.
+     */
+    this.relevant_targets_ = [];
+
+    this.velocityController =
+      new VelocityController(1);
+
+    this.fallBehindController =
+      new FallBehindController(
+        0.35,
+        0.8,
+        config.reactionTimeSeconds,
+        config.desiredFollowingGapMeters
+      );
+  }
+
+  /**
+   * Determines whether the lane change is currently safe.
+   *
+   * For each left-lane vehicle:
+   *
+   * 1. If the vehicle is ahead:
+   *    Check whether Hero has enough front buffer.
+   *
+   * 2. If the vehicle is behind:
+   *    Check whether Hero has enough rear buffer.
+   *
+   * The required buffer increases when vehicles
+   * are closing on each other.
+   */
+  checkLaneChangeAllowedAndPopulateTargets(
+    hero,
+    leftLaneEntities
+  ) {
+    const blockingTargets = [];
+
+    for (const entity of leftLaneEntities) {
+      /**
+       * Positive:
+       *   entity is ahead of Hero.
+       *
+       * Negative:
+       *   entity is behind Hero.
+       */
+      const relativePosition =
+        entity.position - hero.position;
+
+      if (relativePosition >= 0) {
+        // Entity is ahead of Hero.
+        const gapAhead = relativePosition;
+
+        /**
+         * Hero is closing on the entity only when
+         * Hero is moving faster.
+         */
+        const closingVelocity = Math.max(
+          0,
+          hero.velocity - entity.velocity
+        );
+
+        const requiredFrontBuffer =
+          this.config.minimumFrontBufferMeters +
+          closingVelocity *
+            this.config.reactionTimeSeconds;
+
+        if (gapAhead < requiredFrontBuffer) {
+          blockingTargets.push(entity);
+        }
+      } else {
+        // Entity is behind Hero.
+        const gapBehind = Math.abs(relativePosition);
+
+        /**
+         * The rear vehicle is approaching Hero only
+         * when it is moving faster than Hero.
+         */
+        const approachingVelocity = Math.max(
+          0,
+          entity.velocity - hero.velocity
+        );
+
+        const requiredRearBuffer =
+          this.config.minimumRearBufferMeters +
+          approachingVelocity *
+            this.config.reactionTimeSeconds;
+
+        if (gapBehind < requiredRearBuffer) {
+          blockingTargets.push(entity);
+        }
+      }
+    }
+
+    this.relevant_targets_ = blockingTargets;
+
+    /**
+     * Lane change is active only when no vehicle
+     * currently blocks the maneuver.
+     */
+    this.lane_change_active_ =
+      blockingTargets.length === 0;
+
+    return this.lane_change_active_;
+  }
+
+  /**
+   * Calculates Hero's desired longitudinal acceleration.
+   *
+   * There are two kinds of acceleration requests:
+   *
+   * 1. Velocity controller:
+   *    Attempts to drive at 50% of the speed limit.
+   *
+   * 2. Fall-behind controller:
+   *    Attempts to keep Hero behind blocking vehicles.
+   *
+   * We choose the minimum acceleration because it is
+   * the most conservative request.
+   *
+   * Example:
+   *   velocity controller requests +1 m/s²
+   *   safety controller requests -2 m/s²
+   *
+   * Result:
+   *   choose -2 m/s²
+   */
+  calculateAx(hero, speedLimit) {
+    const maximumDesiredVelocity =
+      speedLimit * 0.5;
+
+    const accelerationCandidates = [];
+
+    // First candidate: maintain the allowed desired speed.
+    const velocityAcceleration =
+      this.velocityController.calculateAcceleration(
+        hero.velocity,
+        maximumDesiredVelocity
+      );
+
+    accelerationCandidates.push(
+      velocityAcceleration
+    );
+
+    /**
+     * Add one fall-behind acceleration request
+     * for every blocking target.
+     */
+    for (const target of this.relevant_targets_) {
+      const fallBehindAcceleration =
+        this.fallBehindController.calculateAcceleration(
+          hero,
+          target
+        );
+
+      accelerationCandidates.push(
+        fallBehindAcceleration
+      );
+    }
+
+    /**
+     * Most conservative means the smallest acceleration.
+     *
+     * More negative = stronger braking.
+     */
+    const mostConservativeAcceleration =
+      Math.min(...accelerationCandidates);
+
+    return this.clampAccelerationForNextStep(
+      hero,
+      mostConservativeAcceleration,
+      maximumDesiredVelocity
+    );
+  }
+
+  /**
+   * Clamps acceleration for both physical limits
+   * and next-step velocity limits.
+   */
+  clampAccelerationForNextStep(
+    hero,
+    requestedAcceleration,
+    maximumVelocity
+  ) {
+    const dt = this.config.timeStepSeconds;
+
+    /**
+     * First clamp against the configured physical
+     * acceleration and deceleration bounds.
+     */
+    let acceleration = clamp(
+      requestedAcceleration,
+      this.config.maximumDeceleration,
+      this.config.maximumAcceleration
+    );
+
+    /**
+     * Velocity update:
+     *
+     *   nextVelocity =
+     *     currentVelocity + acceleration * dt
+     *
+     * To prevent nextVelocity from going below zero:
+     *
+     *   acceleration >= -currentVelocity / dt
+     */
+    const minimumAccelerationForZeroVelocity =
+      -hero.velocity / dt;
+
+    /**
+     * To prevent nextVelocity from exceeding max velocity:
+     *
+     *   acceleration <=
+     *     (maximumVelocity - currentVelocity) / dt
+     */
+    const maximumAccelerationForVelocityLimit =
+      (maximumVelocity - hero.velocity) / dt;
+
+    acceleration = Math.max(
+      acceleration,
+      minimumAccelerationForZeroVelocity
+    );
+
+    acceleration = Math.min(
+      acceleration,
+      maximumAccelerationForVelocityLimit
+    );
+
+    return acceleration;
+  }
+}
+
+/**
+ * Keeps a value between minimum and maximum.
+ */
+function clamp(value, minimum, maximum) {
+  return Math.max(
+    minimum,
+    Math.min(maximum, value)
+  );
+}
+
+/**
+ * Updates Hero using constant-acceleration equations.
+ *
+ * Position:
+ *   x2 = x1 + v1 * dt + 0.5 * a * dt²
+ *
+ * Velocity:
+ *   v2 = v1 + a * dt
+ */
+function updateHero(
+  hero,
+  acceleration,
+  timeStepSeconds
+) {
+  hero.position =
+    hero.position +
+    hero.velocity * timeStepSeconds +
+    0.5 *
+      acceleration *
+      timeStepSeconds *
+      timeStepSeconds;
+
+  hero.velocity = Math.max(
+    0,
+    hero.velocity +
+      acceleration * timeStepSeconds
+  );
+
+  hero.acceleration = acceleration;
+}
+
+/**
+ * Left-lane entities have zero acceleration.
+ *
+ * Therefore:
+ *   x2 = x1 + velocity * dt
+ *
+ * Their velocity remains unchanged.
+ */
+function updateEntity(
+  entity,
+  timeStepSeconds
+) {
+  entity.position =
+    entity.position +
+    entity.velocity * timeStepSeconds;
+
+  entity.acceleration = 0;
+}
+
+function formatNumber(value) {
+  return value.toFixed(2);
+}
+
+function runSimulation() {
+  const timeStepSeconds = 0.1;
+  const simulationEndSeconds = 10;
+  const speedLimit = 20;
+
+  /**
+   * Hero starts at:
+   *   position = 30 meters
+   *   velocity = 10 meters/second
+   *   acceleration = 0
+   */
+  const hero = {
+    position: 30,
+    velocity: 10,
+    acceleration: 0,
+  };
+
+  /**
+   * Both entities are in the left lane.
+   *
+   * Entity 1:
+   *   starts 10 meters behind Hero
+   *   moves faster than Hero
+   *
+   * Entity 2:
+   *   starts 20 meters ahead of Hero
+   *   also moves faster than Hero
+   */
+  const entities = [
+    {
+      id: "entity-1",
+      position: 20,
+      velocity: 12,
+      acceleration: 0,
+    },
+    {
+      id: "entity-2",
+      position: 50,
+      velocity: 14,
+      acceleration: 0,
+    },
+  ];
+
+  const laneChangeFeature =
+    new LaneChangeFeature({
+      timeStepSeconds,
+
+      // Minimum desired gap to a vehicle ahead.
+      minimumFrontBufferMeters: 12,
+
+      // Minimum desired gap to a vehicle behind.
+      minimumRearBufferMeters: 15,
+
+      // Used to increase buffers based on relative speed.
+      reactionTimeSeconds: 1.5,
+
+      // Desired gap when following behind a target.
+      desiredFollowingGapMeters: 12,
+
+      // Physical acceleration limits.
+      maximumAcceleration: 2,
+      maximumDeceleration: -4,
+    });
+
+  console.log(
+    [
+      "time",
+      "hero_x",
+      "hero_v",
+      "hero_a",
+      "entity_1_x",
+      "entity_1_v",
+      "entity_2_x",
+      "entity_2_v",
+      "lane_change",
+      "blocking_targets",
+    ].join("\t")
+  );
+
+  const numberOfSteps = Math.round(
+    simulationEndSeconds / timeStepSeconds
+  );
+
+  for (
+    let step = 0;
+    step <= numberOfSteps;
+    step += 1
+  ) {
+    const time = step * timeStepSeconds;
+
+    /**
+     * Step 1:
+     * Check the current state before advancing time.
+     */
+    laneChangeFeature
+      .checkLaneChangeAllowedAndPopulateTargets(
+        hero,
+        entities
+      );
+
+    /**
+     * Step 2:
+     * Log the state associated with the current time.
+     */
+    console.log(
+      [
+        formatNumber(time),
+        formatNumber(hero.position),
+        formatNumber(hero.velocity),
+        formatNumber(hero.acceleration),
+        formatNumber(entities[0].position),
+        formatNumber(entities[0].velocity),
+        formatNumber(entities[1].position),
+        formatNumber(entities[1].velocity),
+        String(
+          laneChangeFeature.lane_change_active_
+        ),
+        laneChangeFeature.relevant_targets_
+          .map((target) => target.id)
+          .join(",") || "none",
+      ].join("\t")
+    );
+
+    /**
+     * Stop the simulation as soon as the lane
+     * change becomes safe.
+     */
+    if (
+      laneChangeFeature.lane_change_active_
+    ) {
+      console.log(
+        `Lane change triggered at t=${formatNumber(
+          time
+        )}s`
+      );
+
+      break;
+    }
+
+    /**
+     * Step 3:
+     * Calculate Hero's acceleration using both:
+     *
+     * - desired velocity;
+     * - blocking vehicles.
+     */
+    const heroAcceleration =
+      laneChangeFeature.calculateAx(
+        hero,
+        speedLimit
+      );
+
+    /**
+     * Step 4:
+     * Advance Hero by one timestep.
+     */
+    updateHero(
+      hero,
+      heroAcceleration,
+      timeStepSeconds
+    );
+
+    /**
+     * Step 5:
+     * Advance every entity by one timestep.
+     *
+     * Entity acceleration is always zero.
+     */
+    for (const entity of entities) {
+      updateEntity(
+        entity,
+        timeStepSeconds
+      );
+    }
+  }
+}
+
+runSimulation();
