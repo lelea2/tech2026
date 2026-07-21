@@ -44,6 +44,10 @@
       "hash": "592701c33e1c48937a82965d23d439d3ee486403cb4a542bb40003df2e51c187",
       "docRelative": "richtexteditor.png"
     },
+    "frontend-system-design/sprint-board.png": {
+      "hash": "c04f594fd8f9c0fd9e583af66b809339f87a277546c767b55c5103c49f34e16c",
+      "docRelative": "sprint-board.png"
+    },
     "frontend-system-design/theme-design.png": {
       "hash": "c19c1c2ffd18e5385641bff5bbcbdf621bf9c8dca1f596c55a92970e3d3ff3ce",
       "docRelative": "theme-design.png"
@@ -107,6 +111,10 @@
     "frontend-system-design/rich-text-editor.mdx": {
       "hash": "cb1d3c631db998eea07f3fffa2fb37f312fdf8d887da477fa4e1e24a6812eee0",
       "docRelative": "rich-text-editor.mdx"
+    },
+    "frontend-system-design/sprint-board.mdx": {
+      "hash": "1c5db679794fb7c79f1252c2589873a5b7ad82061cc1bb320eeafd43aca4f6c1",
+      "docRelative": "sprint-board.mdx"
     },
     "frontend-system-design/theme-design.mdx": {
       "hash": "c05cbf1d3a0412b7e807da8974b417f36e75fe5f4d9fd8973f3b35a503c484a0",
