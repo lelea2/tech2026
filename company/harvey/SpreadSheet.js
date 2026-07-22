@@ -1,0 +1,263 @@
+class Spreadsheet {
+  constructor() {
+    /**
+     *   A1 = "5"
+     *   cells.get("A1") => { constant: 5, references: Map() }
+     *
+     *   B1 = "=A1+A1+3"
+     *   cells.get("B1") => { constant: 3, references: Map([["A1", 2]]) }
+     */
+    this.cells = new Map();
+
+    /**
+     * Example: O(1) on value of cells
+     *   A1 = "5"
+     *   B1 = "=A1+3"
+     *   values => { A1: 5, B1: 8 }
+     */
+    this.values = new Map();
+
+    /**
+     *   B1 = "=A1+3"
+     *   C1 = "=B1+2"
+     *   dependents => { A1: Set(["B1"]), B1: Set(["C1"]) }
+     *   A1 changes, we can follow:  A1 -> B1 -> C1
+     */
+    this.dependents = new Map();
+  }
+
+  /**
+   * Set or overwrite a cell.
+   *
+   * Expected behavior:
+   *
+   *   setCell("A1", "5")
+   *   getCell("A1") === 5
+   *
+   *   setCell("B1", "=A1+3")
+   *   getCell("B1") === 8
+   *
+   *   setCell("A1", "10")
+   *   getCell("A1") === 10
+   *   getCell("B1") === 13
+   *
+   * Steps:
+   * 1. Remove old dependency edges.
+   * 2. Parse the new value.
+   * 3. Store the new parsed cell.
+   * 4. Add new dependency edges.
+   * 5. Evaluate the changed cell.
+   * 6. Recalculate all affected dependents.
+   */
+  setCell(label, rawValue) {
+    this.removeOldDependencies(label);
+
+    const parsedCell = this.parseValue(rawValue);
+
+    this.cells.set(label, parsedCell);
+
+    this.addDependencies(label, parsedCell.references);
+
+
+    const evaluatedValue = this.evaluate(parsedCell);
+    this.values.set(label, evaluatedValue);
+
+    this.recalculateDependents(label);
+  }
+
+  /**
+   * Return the latest evaluated value of a cell.
+   *
+   * Because values are updated during setCell(), this is O(1).
+   *
+   * Example:
+   *   setCell("A1", "5")
+   *   getCell("A1") -> 5
+   *
+   * Missing cells return 0.
+   */
+  getCell(label) {
+    return this.values.get(label) ?? 0;
+  }
+
+  /**
+   * return {constant, references}
+   */
+  parseValue(rawValue) {
+    // Plain integer value.
+    if (!rawValue.startsWith("=")) {
+      return {
+        constant: Number(rawValue),
+        references: new Map()
+      };
+    }
+
+    let constant = 0;
+    const references = new Map();
+
+    /**
+     * operands:
+     *   ["A1", "B2", "10"]
+     */
+    const operands = rawValue.slice(1).split("+");
+
+    for (const operand of operands) {
+      if (/^-?\d+$/.test(operand)) {
+        constant += Number(operand);
+      } else {
+        references.set(
+          operand,
+          (references.get(operand) ?? 0) + 1
+        );
+      }
+    }
+
+    return {
+      constant,
+      references
+    };
+  }
+
+  /**
+   * Evaluate one parsed cell using current values.
+   *
+   * Example:
+   *
+   *   A1 = 5
+   *
+   *   parsedCell = {
+   *     constant: 3,
+   *     references: Map([["A1", 2]])
+   *   }
+   *
+   * Calculation:
+   *   3 + 5 * 2 = 13
+   *
+   * Expected return:
+   *   13
+   */
+  evaluate(parsedCell) {
+    let result = parsedCell.constant;
+
+    for (const [referencedCell, count] of parsedCell.references) {
+      const referencedValue = this.getCell(referencedCell);
+
+      result += referencedValue * count;
+    }
+
+    return result;
+  }
+
+  removeOldDependencies(label) {
+    const oldCell = this.cells.get(label);
+
+    // The cell did not previously exist.
+    if (!oldCell) {
+      return;
+    }
+
+    for (const referencedCell of oldCell.references.keys()) {
+      const dependentSet = this.dependents.get(referencedCell);
+
+      if (!dependentSet) {
+        continue;
+      }
+
+      dependentSet.delete(label);
+      if (dependentSet.size === 0) {
+        this.dependents.delete(referencedCell);
+      }
+    }
+  }
+
+  addDependencies(label, references) {
+    for (const referencedCell of references.keys()) {
+      if (!this.dependents.has(referencedCell)) {
+        this.dependents.set(referencedCell, new Set());
+      }
+
+      this.dependents.get(referencedCell).add(label);
+    }
+  }
+
+  recalculateDependents(changedLabel) {
+    const affected = this.collectAffectedCells(changedLabel);
+
+    const indegree = new Map();
+
+    for (const cell of affected) {
+      indegree.set(cell, 0);
+    }
+
+
+    for (const cell of affected) {
+      const parsedCell = this.cells.get(cell);
+
+      if (!parsedCell) {
+        continue;
+      }
+
+      for (const dependency of parsedCell.references.keys()) {
+        if (affected.has(dependency)) {
+          indegree.set(cell, indegree.get(cell) + 1);
+        }
+      }
+    }
+
+    const queue = [];
+
+    for (const [cell, degree] of indegree) {
+      if (degree === 0) {
+        queue.push(cell);
+      }
+    }
+
+    let front = 0;
+
+
+    while (front < queue.length) {
+      const cell = queue[front++];
+
+      if (cell !== changedLabel) {
+        const parsedCell = this.cells.get(cell);
+        const nextValue = this.evaluate(parsedCell);
+
+        this.values.set(cell, nextValue);
+      }
+      for (const dependent of this.dependents.get(cell) ?? []) {
+        if (!affected.has(dependent)) {
+          continue;
+        }
+
+        const nextDegree = indegree.get(dependent) - 1;
+        indegree.set(dependent, nextDegree);
+
+        if (nextDegree === 0) {
+          queue.push(dependent);
+        }
+      }
+    }
+  }
+
+  collectAffectedCells(changedLabel) {
+    const affected = new Set([changedLabel]);
+    const queue = [changedLabel];
+
+    let front = 0;
+
+    while (front < queue.length) {
+      const current = queue[front++];
+
+      for (const dependent of this.dependents.get(current) ?? []) {
+        if (affected.has(dependent)) {
+          continue;
+        }
+
+        affected.add(dependent);
+        queue.push(dependent);
+      }
+    }
+
+    return affected;
+  }
+}
