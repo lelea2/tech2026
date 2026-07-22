@@ -1,0 +1,157 @@
+---
+title: formatArticle
+---
+
+# formatArticle
+
+~~~javascript
+/**
+ * Formats multiple articles into wrapped lines.
+ *
+ * Rules:
+ * - No line exceeds maxWidth.
+ * - Words are never split.
+ * - A line should not begin with punctuation.
+ * - Avoid leaving a single word on the final line when possible.
+ * - Insert "----" between articles.
+ *
+ * Assumption:
+ * Punctuation tokens such as ",", ".", "!", "?", ":", and ";" are attached
+ * to the previous word rather than placed at the beginning of a new line.
+ *
+ * @param {string[]} articles
+ * @param {number} maxWidth
+ * @returns {string[]}
+ */
+function formatArticles(articles, maxWidth) {
+  if (!Number.isInteger(maxWidth) || maxWidth <= 0) {
+    throw new Error("maxWidth must be a positive integer");
+  }
+
+  const result = [];
+
+  for (let i = 0; i < articles.length; i++) {
+    const tokens = tokenize(articles[i]);
+
+    for (const token of tokens) {
+      if (token.length > maxWidth) {
+        throw new Error(
+          `Token "${token}" is longer than maxWidth ${maxWidth}`
+        );
+      }
+    }
+
+    const lines = wrapTokens(tokens, maxWidth);
+    result.push(...lines);
+
+    if (i < articles.length - 1) {
+      result.push("----");
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Splits text into words while keeping punctuation as separate tokens,
+ * then associates punctuation with the preceding word.
+ *
+ * Example:
+ * "Hello , world !" -> ["Hello,", "world!"]
+ */
+function tokenize(article) {
+  const rawTokens =
+    article.match(/[\p{L}\p{N}]+(?:['’-][\p{L}\p{N}]+)*|[^\s\p{L}\p{N}]/gu) ??
+    [];
+
+  const tokens = [];
+
+  for (const token of rawTokens) {
+    if (isLeadingPunctuation(token) && tokens.length > 0) {
+      tokens[tokens.length - 1] += token;
+    } else {
+      tokens.push(token);
+    }
+  }
+
+  return tokens;
+}
+
+/**
+ * Treat punctuation marks as tokens that should be attached to the
+ * preceding word.
+ */
+function isLeadingPunctuation(token) {
+  return /^[,.;:!?%)\]}…]+$/u.test(token);
+}
+
+function wrapTokens(tokens, maxWidth) {
+  if (tokens.length === 0) {
+    return [];
+  }
+
+  const lines = [];
+  let current = [];
+
+  for (const token of tokens) {
+    if (lineLength([...current, token]) <= maxWidth) {
+      current.push(token);
+      continue;
+    }
+
+    if (current.length > 0) {
+      lines.push(current);
+    }
+
+    current = [token];
+  }
+
+  if (current.length > 0) {
+    lines.push(current);
+  }
+
+  rebalanceSingleWordLines(lines, maxWidth);
+
+  return lines.map((line) => line.join(" "));
+}
+
+/**
+ * If a line contains only one word, try moving the last word from the
+ * previous line onto it.
+ *
+ * Example:
+ *
+ * Before:
+ * ["This", "is", "an", "example"]
+ * ["article"]
+ *
+ * After:
+ * ["This", "is", "an"]
+ * ["example", "article"]
+ */
+function rebalanceSingleWordLines(lines, maxWidth) {
+  for (let i = lines.length - 1; i > 0; i--) {
+    if (lines[i].length !== 1 || lines[i - 1].length <= 1) {
+      continue;
+    }
+
+    const candidate = lines[i - 1][lines[i - 1].length - 1];
+    const updatedLine = [candidate, ...lines[i]];
+
+    if (lineLength(updatedLine) <= maxWidth) {
+      lines[i - 1].pop();
+      lines[i].unshift(candidate);
+    }
+  }
+}
+
+function lineLength(tokens) {
+  if (tokens.length === 0) {
+    return 0;
+  }
+
+  return tokens.reduce((length, token) => length + token.length, 0)
+    + tokens.length
+    - 1;
+}
+~~~
