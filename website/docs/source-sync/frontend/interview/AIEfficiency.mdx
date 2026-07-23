@@ -148,4 +148,230 @@ async function planFormulaChange(
     plan,
   };
 }
+
+type AirtableField = {
+  id: string;
+  name: string;
+  type: string;
+};
+
+type FormulaPlan = {
+  intent: "create_computed_field";
+  fieldName: string;
+  formula: string | null;
+  referencedFields: string[];
+  needsClarification: boolean;
+  clarificationQuestion: string | null;
+  explanation: string;
+};
+
+type GenerateFormulaPlanInput = {
+  userRequest: string;
+  fields: AirtableField[];
+};
+
+type ClaudeMessageResponse = {
+  content?: Array<{
+    type: string;
+    text?: string;
+  }>;
+  error?: {
+    message?: string;
+  };
+};
+
+/**
+ * Uses Claude only for:
+ * 1. Understanding the user's natural-language request.
+ * 2. Mapping the request to existing Airtable fields.
+ * 3. Generating a candidate Airtable formula.
+ *
+ * Claude does not:
+ * - Modify Airtable.
+ * - Decide whether the Airtable API supports the mutation.
+ * - Validate its own output.
+ * - Receive the Airtable or Claude API keys inside the prompt.
+ */
+async function generateFormulaPlanWithClaude(
+  input: GenerateFormulaPlanInput,
+): Promise<unknown> {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const model =
+    process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5";
+
+  if (!apiKey) {
+    throw new Error(
+      "Missing ANTHROPIC_API_KEY environment variable",
+    );
+  }
+
+  if (!input.userRequest.trim()) {
+    throw new Error("The user request cannot be empty");
+  }
+
+  if (input.fields.length === 0) {
+    throw new Error(
+      "The Airtable schema must contain at least one field",
+    );
+  }
+
+  /*
+   * Description:
+   * Give Claude the authoritative Airtable schema instead of
+   * allowing the model to guess which fields exist.
+   *
+   * Only include field metadata needed for formula generation.
+   * Do not send record values, secrets, API keys, or unrelated data.
+   */
+  const schemaDescription = input.fields
+    .map(
+      (field) =>
+        `- ${JSON.stringify(field.name)}: ${field.type}`,
+    )
+    .join("\n");
+
+  const systemPrompt = `
+You convert natural-language requests into safe Airtable formula plans.
+
+You are a planning component only.
+You must not claim that you changed Airtable.
+You must not invent fields that are not present in the provided schema.
+
+Return exactly one JSON object with this structure:
+
+{
+  "intent": "create_computed_field",
+  "fieldName": string,
+  "formula": string | null,
+  "referencedFields": string[],
+  "needsClarification": boolean,
+  "clarificationQuestion": string | null,
+  "explanation": string
+}
+
+Rules:
+
+1. Use only fields from the supplied Airtable schema.
+2. Wrap Airtable field references in braces.
+   Example: {Salary}
+3. Do not wrap numeric constants in braces.
+4. "Add two to salary" means {Salary} + 2.
+5. "Double salary" means {Salary} * 2.
+6. "Increase salary by 20 percent" means {Salary} * 1.2.
+7. Do not invent a field when no suitable field exists.
+8. When the request is ambiguous, set:
+   - needsClarification to true
+   - formula to null
+   - clarificationQuestion to a specific question
+9. When clarification is not needed:
+   - needsClarification must be false
+   - clarificationQuestion must be null
+10. referencedFields must contain every field used in formula.
+11. Return JSON only.
+12. Do not include Markdown fences.
+`.trim();
+
+  const userPrompt = `
+Airtable schema:
+
+${schemaDescription}
+
+User request:
+
+${input.userRequest}
+`.trim();
+
+  const response = await fetch(
+    "https://api.anthropic.com/v1/messages",
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 800,
+
+        /*
+         * Formula generation should be consistent.
+         * A low temperature reduces unnecessary variation.
+         */
+        temperature: 0,
+
+        system: systemPrompt,
+
+        messages: [
+          {
+            role: "user",
+            content: userPrompt,
+          },
+        ],
+      }),
+    },
+  );
+
+  const payload =
+    (await response.json()) as ClaudeMessageResponse;
+
+  if (!response.ok) {
+    throw new Error(
+      payload.error?.message ??
+        `Claude request failed with status ${response.status}`,
+    );
+  }
+
+  const text = payload.content
+    ?.filter(
+      (
+        block,
+      ): block is {
+        type: string;
+        text: string;
+      } =>
+        block.type === "text" &&
+        typeof block.text === "string",
+    )
+    .map((block) => block.text)
+    .join("")
+    .trim();
+
+  if (!text) {
+    throw new Error(
+      "Claude returned an empty response",
+    );
+  }
+
+  /*
+   * Discernment:
+   * Parsing JSON is only the first validation layer.
+   * The caller must still validate:
+   *
+   * - Object structure.
+   * - Referenced fields.
+   * - Airtable field types.
+   * - Formula semantics.
+   * - Airtable API capabilities.
+   */
+  try {
+    return JSON.parse(stripMarkdownFence(text));
+  } catch {
+    throw new Error(
+      `Claude did not return valid JSON: ${text}`,
+    );
+  }
+}
+
+/**
+ * Defensive helper in case the model returns a fenced JSON block,
+ * even though the prompt explicitly asks it not to.
+ */
+function stripMarkdownFence(value: string): string {
+  const match = value.match(
+    /^```(?:json)?\s*([\s\S]*?)\s*```$/i,
+  );
+
+  return match?.[1] ?? value;
+}
 ~~~

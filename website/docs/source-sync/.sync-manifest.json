@@ -9,7 +9,7 @@
       "docRelative": "frontend/css/position.mdx"
     },
     "frontend/interview/AIEfficiency.js": {
-      "hash": "1b8da14a382aebbb566e0bc80845f66793c96512dcda2adb19720e112c78a5a2",
+      "hash": "7a0cbffda26828101df3fe6090bea98aa270b1d6af91c1284562153c0e10e216",
       "docRelative": "frontend/interview/AIEfficiency.mdx"
     },
     "frontend/interview/ConnectionPool.js": {
@@ -44,6 +44,14 @@
       "hash": "59235e7e54b2c76a565452b1e762a5ccc3e12231bbf4346b81a06288d23cc520",
       "docRelative": "frontend/interview/Underground.mdx"
     },
+    "frontend/interview/airtable-ai-fluency-60min.ts": {
+      "hash": "acd7004eba8decc5c711c3b95f595f5cfd067b8f85819f61a77dd6d3b0ed4780",
+      "docRelative": "frontend/interview/airtable-ai-fluency-60min.mdx"
+    },
+    "frontend/interview/airtable-ai-fluency-complete.ts": {
+      "hash": "a858c03cd8ca585cdc00087c418c381c75dad90ef104b8892d4bfcdb408ddc96",
+      "docRelative": "frontend/interview/airtable-ai-fluency-complete.mdx"
+    },
     "frontend/interview/annotation.js": {
       "hash": "571948adce6c9a384f2946d2b94b2cbb4e81036770ccffc319b6c1d41947712b",
       "docRelative": "frontend/interview/annotation.mdx"
@@ -60,6 +68,10 @@
       "hash": "8f9a4c9b9f01ffa1d4e283303a9559f10e0b080277d9442ebe7d64eb368448c3",
       "docRelative": "frontend/interview/buildOrder.mdx"
     },
+    "frontend/interview/calculatePassengerRollerCoaster.js": {
+      "hash": "6a763a64ba00fad81ddb15d8b0486f2586eee940ea7894886e21ec4188e53396",
+      "docRelative": "frontend/interview/calculatePassengerRollerCoaster.mdx"
+    },
     "frontend/interview/calendarDaysNeed.js": {
       "hash": "7ef8e15afba7cb65d43f8a4ed076a345e3ea6fd1d66e050c68eeff14987aa82d",
       "docRelative": "frontend/interview/calendarDaysNeed.mdx"
@@ -67,6 +79,14 @@
     "frontend/interview/duplicateFiles.js": {
       "hash": "17a0b3e651bf7098108195a13fd1695605dfb1a494c58d0f062332db02266cd1",
       "docRelative": "frontend/interview/duplicateFiles.mdx"
+    },
+    "frontend/interview/flatMap.js": {
+      "hash": "8b53c322d2cd52134c21202687941dc5b93ecb108d65ba5daf2c38a7ceda8364",
+      "docRelative": "frontend/interview/flatMap.mdx"
+    },
+    "frontend/interview/flatMapAsync.js": {
+      "hash": "dc175fdf5bcbe1b0d000ea1d74ce7d4c79507ac7240efa980e6ca0a590399e46",
+      "docRelative": "frontend/interview/flatMapAsync.mdx"
     },
     "frontend/interview/getAvailableTime.js": {
       "hash": "4e1f05ee24200c73b47c9aadad5790e82d1acd8834a5bc2de9f8e20226d8f118",
@@ -80,6 +100,14 @@
       "hash": "9dd22ca848e218c09b3f6d90f8caf68ce6f929f8cf7df48ff506ae8f229ef414",
       "docRelative": "frontend/interview/inferColumnTypes.mdx"
     },
+    "frontend/interview/isValidJSSyntax.js": {
+      "hash": "90c213fab827959d1f55990febfcc197ad9477cdd1b0a0fcb90062d259ec7106",
+      "docRelative": "frontend/interview/isValidJSSyntax.mdx"
+    },
+    "frontend/interview/laneChange.js": {
+      "hash": "c9d3dc5b8f79fe300e624aae2aece5a2053fdad9c6a102b789ebf24c6774cbc3",
+      "docRelative": "frontend/interview/laneChange.mdx"
+    },
     "frontend/interview/packageDependencies.js": {
       "hash": "fa052b68caad1468fc20377cf567c69a3db715fbc5f8bf303c2834c2d5504d8b",
       "docRelative": "frontend/interview/packageDependencies.mdx"
@@ -87,6 +115,10 @@
     "frontend/interview/parseQueryString.js": {
       "hash": "67f71be7a31321c6e75e951f95317c3a10297499daff41657d32ea15d4ae1a8f",
       "docRelative": "frontend/interview/parseQueryString.mdx"
+    },
+    "frontend/interview/rollerCoasterPeformance.js": {
+      "hash": "87846cb1d825731d7594976bf92e571f21f1bff33f5e9cb86b430735602d4e0d",
+      "docRelative": "frontend/interview/rollerCoasterPeformance.mdx"
     },
     "frontend/interview/spreadsheet.js": {
       "hash": "b3e9c218898773caa745a982605d38ca2979359ec01464c7bc1f87a85aae0eed",
@@ -2061,7 +2093,7 @@
       "docRelative": "frontend/css/_index.mdx"
     },
     "__nav__:frontend/interview": {
-      "hash": "b4bf53a6e76aa717592f8fe2b9e7e80a153de2a1098af6551a63397fb9ee50de",
+      "hash": "e26c07d1ee1ffaeefe8ed7009b634873ceb4d33d54dc4067045e021207da4c97",
       "docRelative": "frontend/interview/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
