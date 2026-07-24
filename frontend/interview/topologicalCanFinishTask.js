@@ -1,0 +1,40 @@
+// Time:  O(V + E) ==> V is taskCount, E is dependencies.length
+// Space: O(V + E)
+function canFinish(
+  taskCount: number,
+  dependencies: Array<[task: number, prerequisite: number]>
+): boolean {
+  const graph = Array.from({ length: taskCount }, () => []);
+  const indegree = new Array(taskCount).fill(0);
+
+  // prerequisite -> tasks it unlocks
+  for (const [task, prerequisite] of dependencies) {
+    graph[prerequisite].push(task);
+    indegree[task]++;
+  }
+
+  const queue: number[] = [];
+
+  for (let task = 0; task < taskCount; task++) {
+    if (indegree[task] === 0) {
+      queue.push(task);
+    }
+  }
+
+  let completed = 0;
+
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    completed++;
+
+    for (const nextTask of graph[current]) {
+      indegree[nextTask]--;
+
+      if (indegree[nextTask] === 0) {
+        queue.push(nextTask);
+      }
+    }
+  }
+
+  return completed === taskCount;
+}

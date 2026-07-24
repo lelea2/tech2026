@@ -1,0 +1,39 @@
+// Assumption: intervals are continuous and represented as inclusive/exclusive ranges such 
+// as [start, end]. Adjacent coverage like [1, 5] and [5, 10] has no gap.
+function findMissingCoverage(
+  coverage: number[][],
+  requiredStart: number,
+  requiredEnd: number
+): number[][] {
+  if (requiredStart >= requiredEnd) {
+    return [];
+  }
+
+  const relevantCoverage = coverage
+    .map(([start, end]) => [
+      Math.max(start, requiredStart),
+      Math.min(end, requiredEnd)
+    ])
+    .filter(([start, end]) => start < end); // example: [5, 10] and [8, 12] => [8, 10] is relevant coverage
+
+  const merged = mergeIntervals(relevantCoverage);
+  const missing: number[][] = [];
+
+  let current = requiredStart;
+
+  for (const [start, end] of merged) {
+    if (current < start) {
+      missing.push([current, start]);
+    }
+
+    current = Math.max(current, end);
+  }
+
+  if (current < requiredEnd) {
+    missing.push([current, requiredEnd]);
+  }
+
+  return missing;
+}
+
+// Time complexity is O(n log n) due to sorting, where n is the number of coverage intervals.

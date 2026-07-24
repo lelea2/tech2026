@@ -1,0 +1,37 @@
+// Time:  O(V + E) ==> V is taskCount, E is dependencies.length
+// Space: O(V + E)
+function getBlockedTasks(
+  dependencies: Array<[task: string, prerequisite: string]>,
+  failedTask: string
+): string[] {
+  // prerequisite -> tasks that depend on it
+  const graph = new Map<string, string[]>();
+
+  for (const [task, prerequisite] of dependencies) {
+    if (!graph.has(prerequisite)) {
+      graph.set(prerequisite, []);
+    }
+
+    graph.get(prerequisite)!.push(task);
+  }
+
+  const blocked: string[] = [];
+  const visited = new Set<string>([failedTask]);
+  const queue: string[] = [failedTask];
+
+  let head = 0;
+
+  while (head < queue.length) {
+    const current = queue[head++];
+
+    for (const dependent of graph.get(current) ?? []) {
+      if (visited.has(dependent)) continue;
+
+      visited.add(dependent);
+      blocked.push(dependent);
+      queue.push(dependent);
+    }
+  }
+
+  return blocked; // list of blocked tasks
+}
