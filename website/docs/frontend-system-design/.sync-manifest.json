@@ -64,6 +64,10 @@
       "hash": "6e0ef9664c9fbde91a5ce5388c65ae98db8e6726a990d0f77a219c35d933ae64",
       "docRelative": "video-netflix.png"
     },
+    "frontend-system-design/webhook-callback-system.png": {
+      "hash": "cd217fc51f11d6553e654ff1af6d6f44c8eba17f4916c35834cb98cfdfc8bb40",
+      "docRelative": "webhook-callback-system.png"
+    },
     "frontend-system-design/autocomplete.mdx": {
       "hash": "886fedf4755486b440d1d56cead08a807cb7bd0160905feb919b28095b3ef0e4",
       "docRelative": "autocomplete.mdx"
@@ -135,6 +139,14 @@
     "frontend-system-design/video-netflix.mdx": {
       "hash": "6cc2c765dca4cc1760ec06abd75b341da68a9592f41bee2c409bde055ccde958",
       "docRelative": "video-netflix.mdx"
+    },
+    "frontend-system-design/webhook-callback-system.mdx": {
+      "hash": "3835cf37ddc5040d7a1ebb3563c6d1745aa8634b9045b9b27eba0f40c5eb7d81",
+      "docRelative": "webhook-callback-system.mdx"
+    },
+    "frontend-system-design/websocket-vs.SSE-vs.polling.mdx": {
+      "hash": "2e23b4525365bbaa997a426b17588c74d1b8e36103e81ca891ff9e5f5243869b",
+      "docRelative": "websocket-vs.SSE-vs.polling.mdx"
     }
   }
 }
