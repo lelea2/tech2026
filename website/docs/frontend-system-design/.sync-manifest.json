@@ -4,6 +4,10 @@
       "hash": "797ef9fa174fbbe6b5070cddece591262249b09794dd60309cc06d89f198ab53",
       "docRelative": "autocomplete.png"
     },
+    "frontend-system-design/camera-motion.png": {
+      "hash": "79653351a020b608eb8fc285863eac4b4d0bf2aaa004b8c3e6589e748314292a",
+      "docRelative": "camera-motion.png"
+    },
     "frontend-system-design/chatapp.png": {
       "hash": "ab44cc76d535e72f96d36fdc8520eceb1d186983b53b0a4993cdf18bb61299a2",
       "docRelative": "chatapp.png"
@@ -63,6 +67,10 @@
     "frontend-system-design/autocomplete.mdx": {
       "hash": "886fedf4755486b440d1d56cead08a807cb7bd0160905feb919b28095b3ef0e4",
       "docRelative": "autocomplete.mdx"
+    },
+    "frontend-system-design/camera-motion-grid-system-design.mdx": {
+      "hash": "07dffa3403cd897bf209bbb47eda14ce5934ebe814de68d6a8eb56dc5d163394",
+      "docRelative": "camera-motion-grid-system-design.mdx"
     },
     "frontend-system-design/chatapp.mdx": {
       "hash": "6fbeb992cc0b9633847f12120c7632efedb2f4ff07f8c564510e5e04c4dad492",
