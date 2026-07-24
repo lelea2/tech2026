@@ -1,0 +1,185 @@
+---
+title: DraggableCellSimple
+---
+
+# DraggableCellSimple
+
+~~~javascript
+import { useEffect, useMemo, useRef, useState } from 'react';
+import styles from './styles.module.css';
+
+const GRID_SIZE = 10;
+
+function getPoint(event) {
+  return { x: event.clientX, y: event.clientY };
+}
+
+function toSelectionBox(start, end) {
+  return {
+    left: Math.min(start.x, end.x),
+    top: Math.min(start.y, end.y),
+    right: Math.max(start.x, end.x),
+    bottom: Math.max(start.y, end.y),
+  };
+}
+
+function intersects(rect, box) {
+  return (
+    rect.left < box.right &&
+    rect.right > box.left &&
+    rect.top < box.bottom &&
+    rect.bottom > box.top
+  );
+}
+
+function getSelectedIndices(gridElement, box) {
+  const next = new Set();
+
+  if (!gridElement) return next;
+
+  const cells = gridElement.querySelectorAll('[data-cell-index]');
+  cells.forEach((cell) => {
+    const rect = cell.getBoundingClientRect();
+    if (!intersects(rect, box)) return;
+    next.add(Number(cell.dataset.cellIndex));
+  });
+
+  return next;
+}
+
+function getSelectionInfo(selected) {
+  if (selected.size === 0) return null;
+
+  const indices = Array.from(selected);
+  const rows = indices.map((index) => Math.floor(index / GRID_SIZE));
+  const cols = indices.map((index) => index % GRID_SIZE);
+
+  const minRow = Math.min(...rows);
+  const maxRow = Math.max(...rows);
+  const minCol = Math.min(...cols);
+  const maxCol = Math.max(...cols);
+
+  return {
+    count: selected.size,
+    width: maxCol - minCol + 1,
+    height: maxRow - minRow + 1,
+    rowStart: minRow + 1,
+    colStart: minCol + 1,
+  };
+}
+
+export default function DraggableCellSimple() {
+  const gridRef = useRef(null);
+
+  const [dragStart, setDragStart] = useState(null);
+  const [dragCurrent, setDragCurrent] = useState(null);
+  const [selected, setSelected] = useState(new Set());
+
+  const isDragging = dragStart !== null && dragCurrent !== null;
+
+  useEffect(() => {
+    if (!dragStart) return;
+
+    function onMouseMove(event) {
+      const point = getPoint(event);
+      const box = toSelectionBox(dragStart, point);
+
+      setDragCurrent(point);
+      setSelected(getSelectedIndices(gridRef.current, box));
+    }
+
+    function onMouseUp() {
+      setDragStart(null);
+      setDragCurrent(null);
+    }
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [dragStart]);
+
+  function handleMouseDown(event) {
+    if (event.button !== 0) return;
+
+    event.preventDefault();
+    const point = getPoint(event);
+
+    setDragStart(point);
+    setDragCurrent(point);
+    setSelected(new Set());
+  }
+
+  function handleClearSelection() {
+    if (!isDragging) {
+      setSelected(new Set());
+    }
+  }
+
+  const selectionBox = useMemo(() => {
+    if (!isDragging) return null;
+    return toSelectionBox(dragStart, dragCurrent);
+  }, [isDragging, dragStart, dragCurrent]);
+
+  const selectionInfo = useMemo(() => getSelectionInfo(selected), [selected]);
+
+  return (
+    <div className={styles.page} onClick={handleClearSelection}>
+      <div
+        ref={gridRef}
+        className={styles.grid}
+        onMouseDown={handleMouseDown}
+        onClick={(event) => event.stopPropagation()}
+      >
+        {Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, index) => (
+          <div
+            key={index}
+            data-cell-index={index}
+            className={`${styles.cell} ${selected.has(index) ? styles.selected : ''}`}
+          />
+        ))}
+      </div>
+
+      {selectionInfo && (
+        <div className={styles.dashboard}>
+          <p className={styles.dashboardTitle}>Selection</p>
+          <dl className={styles.statList}>
+            <div className={styles.stat}>
+              <dt>Cells</dt>
+              <dd>{selectionInfo.count}</dd>
+            </div>
+            <div className={styles.stat}>
+              <dt>Dimensions</dt>
+              <dd>
+                {selectionInfo.width} x {selectionInfo.height}
+              </dd>
+            </div>
+            <div className={styles.stat}>
+              <dt>Start</dt>
+              <dd>
+                Row {selectionInfo.rowStart}, Col {selectionInfo.colStart}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      )}
+
+      {selectionBox && (
+        <div
+          className={styles.selectionBox}
+          style={{
+            left: selectionBox.left,
+            top: selectionBox.top,
+            width: selectionBox.right - selectionBox.left,
+            height: selectionBox.bottom - selectionBox.top,
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+~~~

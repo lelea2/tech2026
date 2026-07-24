@@ -1,0 +1,78 @@
+---
+title: topologicalSort
+---
+
+# topologicalSort
+
+~~~javascript
+/**
+ * prerequisites[i] = [task, prerequisite]
+ *
+ * Example:
+ * [1, 0] means task 0 must finish before task 1.
+ */
+function topologicalSort(n, prerequisites) {
+  // graph = [
+  //   [1, 2], // Completing 0 unlocks 1 and 2
+  //   [3],    // Completing 1 unlocks 3
+  //   [3],    // Completing 2 unlocks 3
+  //   []
+  // ];
+  const graph = Array.from({ length: n }, () => []);
+
+  // indegree[i] = number of prerequisites for task i ==> [0, 1, 2, 3]
+  const indegree = new Array(n).fill(0);
+
+  // Build the graph.
+  for (const [task, prerequisite] of prerequisites) {
+    graph[prerequisite].push(task); // which tasks will preresquisite unlock
+    indegree[task]++;
+  }
+
+  // Start with tasks that have no prerequisites.
+  const queue = [];
+
+  // n is similar to task number
+  for (let task = 0; task < n; task++) {
+    if (indegree[task] === 0) {
+      queue.push(task);
+    }
+  }
+
+  const order = [];
+  let front = 0;
+
+  while (front < queue.length) {
+    const task = queue[front++];
+    order.push(task);
+
+    // Completing this task removes one prerequisite
+    // from each dependent task.
+    for (const nextTask of graph[task]) {
+      indegree[nextTask]--;
+
+      if (indegree[nextTask] === 0) {
+        queue.push(nextTask);
+      }
+    }
+  }
+
+  // Not all tasks were processed, so there is a cycle.
+  if (order.length !== n) {
+    return [];
+  }
+
+  return order;
+}
+
+console.log(
+  topologicalSort(4, [
+    [1, 0], // [1, 0] means task 0 must finish before task 1
+    [2, 0],
+    [3, 1],
+    [3, 2]
+  ])
+);
+
+// [0, 1, 2, 3]
+~~~

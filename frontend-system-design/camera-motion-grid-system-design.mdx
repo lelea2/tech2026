@@ -1,0 +1,999 @@
+---
+title: Motion-Aware Camera Grid
+description: Staff-level React design for a dynamic camera grid whose slots rotate among cameras based on motion signals.
+---
+
+![High level component architecture and request flow](./camera-motion.png)
+
+# Motion-Aware Camera Grid — Frontend System Design
+
+## 1. Problem Statement
+
+Build a React camera wall where:
+
+- The backend returns the grid shape: `rows × columns`.
+- Each grid cell owns a configured list of cameras.
+- The backend returns camera metadata and a changing motion score.
+- Every cell should display the best camera for that cell.
+- Motion data may change every second.
+- Naively switching to the current highest score every second causes a noisy, unstable UI.
+
+The main design problem is not rendering the grid. It is selecting and rotating cameras in a way that is:
+
+- responsive to meaningful motion;
+- stable enough for an operator to understand;
+- resilient to stale data, network failures, and camera failures;
+- scalable across many grids and cameras.
+
+---
+
+## 2. Requirements
+
+### Functional requirements
+
+1. Render an arbitrary `rows × columns` grid.
+2. Each cell has one or more eligible cameras.
+3. Display one active camera per cell.
+4. Update camera motion information continuously.
+5. Promote a camera when its motion is meaningfully stronger.
+6. Allow manual pinning of a camera.
+7. Show loading, offline, stale, and playback-error states.
+8. Allow the operator to pause automatic rotation.
+9. Preserve the grid configuration across refreshes.
+10. Avoid assigning the same camera to multiple cells unless explicitly allowed.
+
+### Non-functional requirements
+
+- Motion-to-screen latency: preferably under 2 seconds for live monitoring.
+- No visible layout shift when a camera changes.
+- Camera selection must remain stable during small score fluctuations.
+- The frontend should handle hundreds of configured cameras without rerendering all video tiles every second.
+- Recover automatically from temporary network or stream failures.
+- Accessible keyboard navigation and status announcements.
+- Observable: selection decisions, stream failures, update lag, switch rate, and stale data should be measurable.
+
+---
+
+## 3. Core Entities
+
+```ts
+type GridId = string;
+type CellId = string;
+type CameraId = string;
+
+interface Camera {
+  id: CameraId;
+  name: string;
+  location: string;
+  status: 'online' | 'offline' | 'degraded';
+  streamUrl?: string;
+  thumbnailUrl?: string;
+  capabilities: {
+    live: boolean;
+    motionDetection: boolean;
+  };
+}
+
+interface GridCellConfig {
+  id: CellId;
+  title?: string;
+  cameraIds: CameraId[];
+  rotationEnabled: boolean;
+  minDisplayMs: number;
+  cooldownMs: number;
+  switchThreshold: number;
+  allowDuplicateCamera?: boolean;
+}
+
+interface CameraGrid {
+  id: GridId;
+  rows: number;
+  columns: number;
+  cells: GridCellConfig[];
+  version: number;
+}
+
+interface MotionSample {
+  cameraId: CameraId;
+  score: number; // normalized 0..1
+  detected: boolean;
+  capturedAt: string;
+  sequence: number;
+}
+
+interface CellRuntimeState {
+  activeCameraId: CameraId | null;
+  activeSince: number;
+  lastSwitchAt: number;
+  pinnedCameraId: CameraId | null;
+  challengerCameraId: CameraId | null;
+  challengerSince: number | null;
+}
+```
+
+---
+
+## 4. API Design
+
+## Bootstrap API
+
+```http
+GET /api/camera-grids/{gridId}
+```
+
+```json
+{
+  "grid": {
+    "id": "security-wall-1",
+    "rows": 3,
+    "columns": 3,
+    "version": 17,
+    "cells": [
+      {
+        "id": "north-entry",
+        "title": "North Entry",
+        "cameraIds": ["cam-101", "cam-102", "cam-103"],
+        "rotationEnabled": true,
+        "minDisplayMs": 8000,
+        "cooldownMs": 12000,
+        "switchThreshold": 0.15
+      }
+    ]
+  },
+  "cameras": {
+    "cam-101": {
+      "id": "cam-101",
+      "name": "North Door",
+      "location": "Building A",
+      "status": "online",
+      "streamUrl": "/api/cameras/cam-101/live",
+      "thumbnailUrl": "/api/cameras/cam-101/thumbnail",
+      "capabilities": {
+        "live": true,
+        "motionDetection": true
+      }
+    }
+  }
+}
+```
+
+### Motion polling API
+
+```http
+POST /api/camera-motion/query
+Content-Type: application/json
+```
+
+```json
+{
+  "cameraIds": ["cam-101", "cam-102", "cam-103"],
+  "sinceSequence": 48291
+}
+```
+
+```json
+{
+  "serverTime": "2026-07-23T20:10:21.000Z",
+  "nextSequence": 48307,
+  "samples": [
+    {
+      "cameraId": "cam-101",
+      "score": 0.74,
+      "detected": true,
+      "capturedAt": "2026-07-23T20:10:20.750Z",
+      "sequence": 48302
+    }
+  ]
+}
+```
+
+Use a batch endpoint rather than one request per camera. The request should contain only cameras used by visible cells.
+
+### Subscription API
+
+For low-latency monitoring, prefer a single multiplexed subscription:
+
+```http
+GET /api/camera-motion/stream?gridId=security-wall-1
+Accept: text/event-stream
+```
+
+```text
+event: motion
+id: 48308
+data: {"cameraId":"cam-102","score":0.81,"detected":true,"capturedAt":"...","sequence":48308}
+```
+
+A WebSocket is appropriate when the client must also send frequent commands over the same channel. For one-way motion updates, SSE is usually simpler:
+
+- automatic browser reconnect;
+- event IDs support resume;
+- works well through common proxies;
+- simpler operational model than bidirectional sockets.
+
+---
+
+## 5. Polling vs Subscription
+
+| Option            | Advantages                                                  | Drawbacks                                                                    | Recommended use                                       |
+| ----------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Poll every second | Simple, easy to debug, stateless server                     | Repeated empty responses, synchronized client spikes, up to one-second delay | Initial version, smaller deployments                  |
+| SSE               | Low overhead, server pushes only changes, reconnect support | Long-lived connection and proxy tuning                                       | Preferred for live motion updates                     |
+| WebSocket         | Bidirectional, very low latency                             | More complex connection lifecycle and scaling                                | PTZ controls, talk-down audio, collaborative controls |
+| Hybrid            | Fast push with polling fallback                             | More client logic                                                            | Production monitoring UI                              |
+
+### Recommended transport strategy
+
+1. Fetch grid configuration and camera metadata with normal HTTP.
+2. Subscribe to motion updates with SSE.
+3. If SSE repeatedly fails, fall back to one-second polling with jitter.
+4. Refetch configuration when its version changes.
+5. Pause or reduce updates while the tab is hidden.
+
+```ts
+const intervalMs = document.hidden ? 5000 : 1000;
+const jitteredMs = intervalMs + Math.random() * 250;
+```
+
+The client should not poll each cell independently. One coordinator should fetch motion data for all currently visible cameras.
+
+---
+
+## 6. Preventing Noisy Camera Rotation
+
+Selecting `max(score)` every second is too unstable. A production selector should combine several controls.
+
+## 6.1 Exponential moving average
+
+Smooth the raw score:
+
+```ts
+smoothed = alpha * current + (1 - alpha) * previous;
+```
+
+For one-second updates, `alpha = 0.3` reacts reasonably quickly while suppressing one-sample spikes.
+
+## 6.2 Hysteresis
+
+Do not switch just because another camera is slightly higher.
+
+```ts
+challengerScore >= activeScore + switchThreshold;
+```
+
+Example: with a threshold of `0.15`, an active score of `0.54` is not replaced by `0.61`.
+
+## 6.3 Challenger hold time
+
+The challenger must remain better for several consecutive samples.
+
+```ts
+challengerHoldMs = 3000;
+```
+
+This removes transient spikes.
+
+## 6.4 Minimum display duration
+
+Once a camera becomes active, keep it visible for a minimum period unless it fails.
+
+```ts
+minDisplayMs = 8000;
+```
+
+This gives the operator time to interpret the view.
+
+## 6.5 Cooldown
+
+After switching away from a camera, prevent immediate switching back.
+
+```ts
+cooldownMs = 12000;
+```
+
+## 6.6 Emergency override
+
+Immediately switch when:
+
+- current camera is offline;
+- current stream fails repeatedly;
+- challenger score crosses a critical threshold such as `0.95`;
+- the backend emits a high-priority event.
+
+## 6.7 Score decay and stale data
+
+Ignore or decay old samples:
+
+```ts
+effectiveScore = smoothedScore * Math.exp(-ageMs / decayWindowMs);
+```
+
+A camera with no recent sample should not remain the winner indefinitely.
+
+## 6.8 Optional backend recommendation
+
+At larger scale, compute the recommended camera on the backend and send:
+
+```ts
+interface CellRecommendation {
+  cellId: string;
+  cameraId: string;
+  reason: 'motion' | 'critical-event' | 'fallback';
+  confidence: number;
+  validUntil: string;
+}
+```
+
+The backend has a global view, can enforce deduplication across cells, and keeps policy consistent across clients. The frontend should still enforce minimum display duration and support manual overrides.
+
+---
+
+## 7. Selection Algorithm
+
+```ts
+interface ScoreState {
+  smoothed: number;
+  updatedAt: number;
+}
+
+interface SelectionPolicy {
+  alpha: number;
+  switchThreshold: number;
+  challengerHoldMs: number;
+  minDisplayMs: number;
+  criticalScore: number;
+}
+
+function chooseCamera(
+  now: number,
+  eligibleCameraIds: string[],
+  scores: Map<string, ScoreState>,
+  runtime: CellRuntimeState,
+  policy: SelectionPolicy
+): CellRuntimeState {
+  if (runtime.pinnedCameraId) {
+    return {
+      ...runtime,
+      activeCameraId: runtime.pinnedCameraId,
+      challengerCameraId: null,
+      challengerSince: null,
+    };
+  }
+
+  const candidates = eligibleCameraIds
+    .map((cameraId) => ({
+      cameraId,
+      score: scores.get(cameraId)?.smoothed ?? 0,
+      updatedAt: scores.get(cameraId)?.updatedAt ?? 0,
+    }))
+    .filter((item) => now - item.updatedAt < 5000)
+    .sort((a, b) => b.score - a.score);
+
+  const winner = candidates[0];
+  if (!winner) return runtime;
+
+  if (!runtime.activeCameraId) {
+    return {
+      ...runtime,
+      activeCameraId: winner.cameraId,
+      activeSince: now,
+      lastSwitchAt: now,
+    };
+  }
+
+  const activeScore = scores.get(runtime.activeCameraId)?.smoothed ?? 0;
+
+  const currentHasMinimumTime = now - runtime.activeSince >= policy.minDisplayMs;
+
+  const isCritical = winner.score >= policy.criticalScore;
+
+  const isMeaningfullyBetter =
+    winner.cameraId !== runtime.activeCameraId &&
+    winner.score >= activeScore + policy.switchThreshold;
+
+  if (!isMeaningfullyBetter) {
+    return {
+      ...runtime,
+      challengerCameraId: null,
+      challengerSince: null,
+    };
+  }
+
+  if (isCritical) {
+    return {
+      ...runtime,
+      activeCameraId: winner.cameraId,
+      activeSince: now,
+      lastSwitchAt: now,
+      challengerCameraId: null,
+      challengerSince: null,
+    };
+  }
+
+  if (!currentHasMinimumTime) return runtime;
+
+  if (runtime.challengerCameraId !== winner.cameraId) {
+    return {
+      ...runtime,
+      challengerCameraId: winner.cameraId,
+      challengerSince: now,
+    };
+  }
+
+  const heldLongEnough =
+    runtime.challengerSince !== null && now - runtime.challengerSince >= policy.challengerHoldMs;
+
+  if (!heldLongEnough) return runtime;
+
+  return {
+    ...runtime,
+    activeCameraId: winner.cameraId,
+    activeSince: now,
+    lastSwitchAt: now,
+    challengerCameraId: null,
+    challengerSince: null,
+  };
+}
+```
+
+### Example
+
+At time T:
+
+| Camera              | Smoothed score |
+| ------------------- | -------------: |
+| A, currently active |           0.58 |
+| B                   |           0.64 |
+| C                   |           0.32 |
+
+With `switchThreshold = 0.15`, B does not replace A.
+
+Three seconds later:
+
+| Camera | Smoothed score |
+| ------ | -------------: |
+| A      |           0.52 |
+| B      |           0.78 |
+| C      |           0.35 |
+
+B is now more than `0.15` above A. If the minimum display duration has elapsed and B remains the challenger for three seconds, switch to B.
+
+---
+
+## 8. Frontend Architecture
+
+```text
+CameraGridPage
+├── GridConfigQuery
+├── MotionTransport
+│   ├── SSE client
+│   └── Polling fallback
+├── MotionStore
+│   ├── raw samples
+│   ├── smoothed scores
+│   └── staleness
+├── RotationCoordinator
+│   ├── one policy evaluation per tick
+│   ├── cross-cell camera deduplication
+│   └── manual pin and pause state
+└── CameraGrid
+    └── CameraCell[]
+        ├── VideoSurface
+        ├── StatusOverlay
+        └── CameraControls
+```
+
+### State ownership
+
+- **Server state:** grid config, camera metadata, camera health.
+- **Streaming external state:** motion samples.
+- **Local UI state:** selected camera, pinned camera, paused rotation, focused tile.
+- **URL state:** selected grid, optional focused cell.
+- **Persisted preference:** mute, layout density, auto-rotation enabled.
+
+Do not put one-second motion samples in a global React Context that causes the whole tree to rerender. Use an external store with selectors, such as `useSyncExternalStore`, Zustand selectors, Redux selectors, or a small custom store.
+
+---
+
+## 9. Dynamic React Grid
+
+```tsx
+import React, { memo, useMemo } from 'react';
+
+interface CameraGridProps {
+  grid: CameraGrid;
+  cameras: Record<string, Camera>;
+  activeCameraByCell: Record<string, string | null>;
+}
+
+export function CameraGridView({ grid, cameras, activeCameraByCell }: CameraGridProps) {
+  const style = useMemo(
+    () => ({
+      display: 'grid',
+      gridTemplateColumns: `repeat(${grid.columns}, minmax(0, 1fr))`,
+      gridTemplateRows: `repeat(${grid.rows}, minmax(0, 1fr))`,
+      gap: 8,
+    }),
+    [grid.columns, grid.rows]
+  );
+
+  return (
+    <section aria-label="Live camera grid" style={style} className="camera-grid">
+      {grid.cells.map((cell) => {
+        const activeCameraId = activeCameraByCell[cell.id];
+        const camera = activeCameraId ? cameras[activeCameraId] : undefined;
+
+        return <CameraCell key={cell.id} cell={cell} camera={camera} />;
+      })}
+    </section>
+  );
+}
+
+interface CameraCellProps {
+  cell: GridCellConfig;
+  camera?: Camera;
+}
+
+const CameraCell = memo(function CameraCell({ cell, camera }: CameraCellProps) {
+  if (!camera) {
+    return (
+      <article className="camera-cell camera-cell--empty">
+        <span>No available camera</span>
+      </article>
+    );
+  }
+
+  return (
+    <article className="camera-cell" aria-label={cell.title ?? camera.name}>
+      <header className="camera-cell__header">
+        <span>{cell.title ?? camera.name}</span>
+        <span>{camera.status}</span>
+      </header>
+
+      <video
+        key={camera.id}
+        src={camera.streamUrl}
+        autoPlay
+        muted
+        playsInline
+        className="camera-cell__video"
+      />
+
+      <footer className="camera-cell__footer">
+        {camera.name} · {camera.location}
+      </footer>
+    </article>
+  );
+});
+```
+
+```css
+.camera-grid {
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 0;
+}
+
+.camera-cell {
+  position: relative;
+  overflow: hidden;
+  min-inline-size: 0;
+  min-block-size: 0;
+  background: #111;
+  border-radius: 8px;
+  container-type: inline-size;
+}
+
+.camera-cell__video {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+@container (max-width: 320px) {
+  .camera-cell__footer {
+    display: none;
+  }
+}
+```
+
+### Why CSS Grid
+
+- The backend controls only semantic dimensions, not pixel geometry.
+- `repeat(columns, minmax(0, 1fr))` handles arbitrary column counts.
+- Stable cells prevent layout shift during camera changes.
+- Container queries allow tile-level responsive behavior.
+
+---
+
+## 10. Motion Store and Subscription Hook
+
+```ts
+type Listener = () => void;
+
+class MotionStore {
+  private scores = new Map<string, ScoreState>();
+  private listeners = new Set<Listener>();
+
+  update(sample: MotionSample, alpha = 0.3) {
+    const previous = this.scores.get(sample.cameraId)?.smoothed ?? sample.score;
+
+    this.scores.set(sample.cameraId, {
+      smoothed: alpha * sample.score + (1 - alpha) * previous,
+      updatedAt: Date.parse(sample.capturedAt),
+    });
+
+    this.listeners.forEach((listener) => listener());
+  }
+
+  get(cameraId: string): ScoreState | undefined {
+    return this.scores.get(cameraId);
+  }
+
+  getSnapshot = () => this.scores;
+
+  subscribe = (listener: Listener) => {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  };
+}
+```
+
+```tsx
+import { useEffect, useSyncExternalStore } from 'react';
+
+const motionStore = new MotionStore();
+
+export function useMotionSubscription(gridId: string) {
+  useEffect(() => {
+    let pollingTimer: number | undefined;
+    let source: EventSource | undefined;
+    let closed = false;
+
+    const startPolling = () => {
+      const poll = async () => {
+        try {
+          const response = await fetch(
+            `/api/camera-motion/query?gridId=${encodeURIComponent(gridId)}`
+          );
+          const payload = await response.json();
+
+          for (const sample of payload.samples as MotionSample[]) {
+            motionStore.update(sample);
+          }
+        } finally {
+          if (!closed) {
+            pollingTimer = window.setTimeout(poll, 1000 + Math.random() * 250);
+          }
+        }
+      };
+
+      void poll();
+    };
+
+    try {
+      source = new EventSource(`/api/camera-motion/stream?gridId=${encodeURIComponent(gridId)}`);
+
+      source.addEventListener('motion', (event) => {
+        motionStore.update(JSON.parse((event as MessageEvent).data));
+      });
+
+      source.onerror = () => {
+        source?.close();
+        startPolling();
+      };
+    } catch {
+      startPolling();
+    }
+
+    return () => {
+      closed = true;
+      source?.close();
+      if (pollingTimer) window.clearTimeout(pollingTimer);
+    };
+  }, [gridId]);
+}
+
+export function useCameraMotion(cameraId: string) {
+  return useSyncExternalStore(
+    motionStore.subscribe,
+    () => motionStore.get(cameraId),
+    () => undefined
+  );
+}
+```
+
+In a production implementation, guard against starting polling multiple times after repeated SSE errors.
+
+---
+
+## 11. Rotation Coordinator Hook
+
+```tsx
+import { useEffect, useReducer, useRef } from 'react';
+
+interface RotationState {
+  byCellId: Record<string, CellRuntimeState>;
+}
+
+type RotationAction =
+  | { type: 'evaluate'; now: number }
+  | { type: 'pin'; cellId: string; cameraId: string | null }
+  | { type: 'pause'; cellId: string; paused: boolean };
+
+export function useCameraRotation(
+  grid: CameraGrid,
+  scoreProvider: (cameraId: string) => ScoreState | undefined
+) {
+  const scoresRef = useRef(scoreProvider);
+  scoresRef.current = scoreProvider;
+
+  const [state, dispatch] = useReducer(
+    (current: RotationState, action: RotationAction): RotationState => {
+      if (action.type !== 'evaluate') {
+        // Pin/pause handling omitted for brevity.
+        return current;
+      }
+
+      const nextByCellId = { ...current.byCellId };
+
+      for (const cell of grid.cells) {
+        const scoreMap = new Map(
+          cell.cameraIds.map((cameraId) => [
+            cameraId,
+            scoresRef.current(cameraId) ?? {
+              smoothed: 0,
+              updatedAt: 0,
+            },
+          ])
+        );
+
+        nextByCellId[cell.id] = chooseCamera(
+          action.now,
+          cell.cameraIds,
+          scoreMap,
+          nextByCellId[cell.id],
+          {
+            alpha: 0.3,
+            switchThreshold: cell.switchThreshold,
+            challengerHoldMs: 3000,
+            minDisplayMs: cell.minDisplayMs,
+            criticalScore: 0.95,
+          }
+        );
+      }
+
+      return { byCellId: nextByCellId };
+    },
+    {
+      byCellId: Object.fromEntries(
+        grid.cells.map((cell) => [
+          cell.id,
+          {
+            activeCameraId: cell.cameraIds[0] ?? null,
+            activeSince: Date.now(),
+            lastSwitchAt: 0,
+            pinnedCameraId: null,
+            challengerCameraId: null,
+            challengerSince: null,
+          },
+        ])
+      ),
+    }
+  );
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      dispatch({ type: 'evaluate', now: Date.now() });
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return {
+    activeCameraByCell: Object.fromEntries(
+      Object.entries(state.byCellId).map(([cellId, runtime]) => [cellId, runtime.activeCameraId])
+    ),
+    dispatch,
+  };
+}
+```
+
+Important distinction:
+
+- motion samples may arrive more frequently than once per second;
+- selection policy can still run once per second;
+- video tiles rerender only when their selected camera changes.
+
+---
+
+## 12. Stream Switching
+
+Changing `<video src>` directly can produce a black frame. Prefer a two-player handoff:
+
+```text
+Active player: camera A, opacity 1
+Standby player: preload camera B, opacity 0
+When B reaches canplay:
+  crossfade B to opacity 1
+  stop A after transition
+```
+
+For browser-delivered streams:
+
+- WebRTC: best for sub-second live monitoring;
+- LL-HLS: easier CDN distribution, higher latency;
+- HLS: broad operational support, often several seconds behind;
+- JPEG snapshots: useful fallback for dense grids or limited bandwidth.
+
+Use adaptive quality:
+
+- focused tile: high resolution and frame rate;
+- normal visible tile: medium quality;
+- background or hidden tile: thumbnail or paused stream.
+
+---
+
+## 13. Cross-Cell Coordination
+
+If the same camera appears in multiple cell candidate lists, independent selection may show duplicates.
+
+A global coordinator can allocate cameras:
+
+1. Compute each cell's ranked candidate list.
+2. Sort cell-camera proposals by urgency.
+3. Assign the highest proposal.
+4. Skip already assigned cameras unless duplication is allowed.
+5. Fall back to the next candidate.
+
+For a small grid, a greedy allocator is sufficient. For complex priority constraints, model it as weighted bipartite matching.
+
+---
+
+## 14. Failure Handling
+
+| Failure                    | UI behavior                                              |
+| -------------------------- | -------------------------------------------------------- |
+| Grid API failure           | Retry panel and cached configuration                     |
+| Motion stream disconnected | Stale badge, reconnect, polling fallback                 |
+| Motion sample stale        | Decay score and exclude after timeout                    |
+| Camera offline             | Immediately choose next eligible camera                  |
+| Video startup failure      | Retry stream, then show thumbnail/fallback               |
+| All cameras unavailable    | Stable empty state with reason                           |
+| Configuration changed      | Refetch by version without tearing down unaffected cells |
+
+Use `AbortController` for polling and configuration fetches. Ignore obsolete results when grid ID or visible camera set changes.
+
+---
+
+## 15. Performance Strategy
+
+- Use one motion connection per page, not per tile.
+- Subscribe only to cameras used by visible cells.
+- Keep motion values outside React render state.
+- Select store slices per camera or cell.
+- Memoize cells.
+- Keep the grid dimensions stable.
+- Evaluate rotation once per second rather than on every motion event.
+- Use thumbnails until a stream becomes active.
+- Cap concurrently decoded video streams.
+- Pause hidden-tab video and lower transport frequency.
+- Virtualize configuration panels, not the small primary camera wall.
+- Use a Web Worker only when selection or analytics becomes CPU-heavy.
+
+### Back-of-the-envelope example
+
+For a `3 × 3` grid with 10 candidate cameras per cell:
+
+- 90 logical camera memberships;
+- potentially fewer than 90 unique cameras;
+- one batch poll or SSE connection;
+- nine active decoders;
+- only changed cells rerender after selection.
+
+---
+
+## 16. Accessibility
+
+- Every cell has an accessible name.
+- Auto-rotation can be paused.
+- Do not move keyboard focus when the active camera changes.
+- Announce only important changes; avoid announcing every one-second score update.
+- Provide visible online, offline, stale, pinned, and paused states.
+- Respect reduced motion for crossfades.
+- Ensure controls are keyboard reachable and have large hit targets.
+
+---
+
+## 17. Observability
+
+Client metrics:
+
+```text
+camera_grid_config_load_ms
+motion_transport_connected
+motion_update_lag_ms
+motion_sample_stale_count
+camera_switch_count
+camera_switch_rate_per_cell
+camera_switch_reason
+camera_stream_start_ms
+camera_stream_error_count
+camera_duplicate_assignment_count
+```
+
+A useful stability SLO:
+
+```text
+95% of non-critical camera selections remain active for at least 8 seconds.
+```
+
+Also monitor:
+
+- average switches per cell per minute;
+- percentage of switches reversed within 10 seconds;
+- SSE reconnect rate;
+- polling fallback rate;
+- stream startup latency by protocol and browser.
+
+---
+
+## 18. Testing Strategy
+
+### Unit tests
+
+- EMA calculation.
+- Hysteresis boundary.
+- Challenger hold time.
+- Minimum display duration.
+- Critical override.
+- Stale score exclusion.
+- Pin and pause behavior.
+- Duplicate-camera allocation.
+
+### Integration tests
+
+- SSE event updates the store.
+- SSE failure starts exactly one poll loop.
+- Changing grid ID tears down the previous connection.
+- Only the affected tile rerenders.
+- Offline active camera rotates immediately.
+
+### End-to-end tests
+
+- Dynamic `2 × 2`, `3 × 3`, and `4 × 4` layouts.
+- Manual pin survives motion updates.
+- Auto-rotation pause works.
+- Keyboard navigation remains stable during a switch.
+- Stream fallback appears after a playback error.
+
+---
+
+## 19. Staff-Level Trade-off Summary
+
+### Start simple
+
+- Bootstrap over REST.
+- One-second batch polling.
+- EMA + threshold + three-second challenger hold.
+- Eight-second minimum display duration.
+- React CSS Grid.
+- One shared motion store.
+
+### Evolve when scale requires it
+
+- Replace polling with SSE.
+- Move recommendation policy to a backend service.
+- Use a global allocator for cross-cell deduplication.
+- Add adaptive stream quality.
+- Persist operator overrides.
+- Add motion-event replay and auditability.
+
+The key architectural principle is to separate:
+
+1. **signal ingestion** — receive raw motion updates;
+2. **signal stabilization** — smooth, expire, and classify motion;
+3. **selection policy** — decide whether a switch is justified;
+4. **presentation** — preload and transition the chosen stream.
+
+That separation prevents a noisy backend signal from directly driving a noisy user interface.
