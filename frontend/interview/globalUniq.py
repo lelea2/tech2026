@@ -1,0 +1,154 @@
+import hashlib
+import heapq
+import json
+import os
+import tempfile
+from typing import Any, AsyncIterable, AsyncIterator, Callable, TypeVar
+
+T = TypeVar("T")
+K = TypeVar("K")
+
+
+def stable_hash(value: str) -> int:
+    digest = hashlib.md5(value.encode("utf-8")).digest()
+    return int.from_bytes(digest[:8], "big")
+
+
+async def external_global_uniq(
+    input_stream: AsyncIterable[T],
+    get_key: Callable[[T], K],
+    partition_count: int,
+) -> AsyncIterator[T]:
+    if partition_count <= 0:
+        raise ValueError("partition_count must be positive")
+
+    with tempfile.TemporaryDirectory(prefix="global-uniq-") as directory:
+        raw_paths = [
+            os.path.join(directory, f"raw-{index}.jsonl")
+            for index in range(partition_count)
+        ]
+
+        sorted_paths = [
+            os.path.join(directory, f"sorted-{index}.jsonl")
+            for index in range(partition_count)
+        ]
+
+        # Phase 1: partition records by key.
+        files = [
+            open(path, "w", encoding="utf-8")
+            for path in raw_paths
+        ]
+
+        try:
+            position = 0
+
+            async for value in input_stream:
+                key = get_key(value)
+
+                # Stable serialized representation of the key.
+                serialized_key = json.dumps(
+                    key,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
+
+                partition_index = (
+                    stable_hash(serialized_key) % partition_count
+                )
+
+                record = {
+                    "key": serialized_key,
+                    "value": value,
+                    "position": position,
+                }
+
+                files[partition_index].write(
+                    json.dumps(record) + "\n"
+                )
+
+                position += 1
+        finally:
+            for file in files:
+                file.close()
+
+        # Phase 2: deduplicate each partition.
+        for partition_index in range(partition_count):
+            earliest_by_key: dict[str, dict[str, Any]] = {}
+
+            with open(
+                raw_paths[partition_index],
+                "r",
+                encoding="utf-8",
+            ) as file:
+                for line in file:
+                    record = json.loads(line)
+                    key = record["key"]
+
+                    # Records were written in input order, so the first
+                    # occurrence is the earliest occurrence.
+                    if key not in earliest_by_key:
+                        earliest_by_key[key] = record
+
+            unique_records = sorted(
+                earliest_by_key.values(),
+                key=lambda record: record["position"],
+            )
+
+            with open(
+                sorted_paths[partition_index],
+                "w",
+                encoding="utf-8",
+            ) as file:
+                for record in unique_records:
+                    file.write(json.dumps(record) + "\n")
+
+            os.remove(raw_paths[partition_index])
+
+        # Phase 3: k-way merge sorted partition files.
+        partition_files = [
+            open(path, "r", encoding="utf-8")
+            for path in sorted_paths
+        ]
+
+        heap: list[tuple[int, int, dict[str, Any]]] = []
+
+        try:
+            # Add the first record from every partition.
+            for partition_index, file in enumerate(partition_files):
+                line = file.readline()
+
+                if line:
+                    record = json.loads(line)
+
+                    heapq.heappush(
+                        heap,
+                        (
+                            record["position"],
+                            partition_index,
+                            record,
+                        ),
+                    )
+
+            while heap:
+                _, partition_index, record = heapq.heappop(heap)
+
+                yield record["value"]
+
+                next_line = partition_files[
+                    partition_index
+                ].readline()
+
+                if next_line:
+                    next_record = json.loads(next_line)
+
+                    heapq.heappush(
+                        heap,
+                        (
+                            next_record["position"],
+                            partition_index,
+                            next_record,
+                        ),
+                    )
+        finally:
+            for file in partition_files:
+                file.close()
