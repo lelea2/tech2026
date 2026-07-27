@@ -24,6 +24,10 @@
       "hash": "6dc1f38b39d7bb45176c8e9e7dd47bea7be2e4eec2ea221c402b61b1db517a09",
       "docRelative": "em-product-design-vision-platform-interview.mdx"
     },
+    "behavorial/em_behavior_execution_prep.mdx": {
+      "hash": "e18d175db82e1e5e1b30b0fbada45175e5a00f249c3d30f40047a281a7f2f905",
+      "docRelative": "em_behavior_execution_prep.mdx"
+    },
     "behavorial/engineering-manager-behavioral-interview.mdx": {
       "hash": "b7ed56fadb08ab07ccc948ec2540fce6607eb0cc770e9f9194ed001c2234d3ec",
       "docRelative": "engineering-manager-behavioral-interview.mdx"
@@ -43,6 +47,10 @@
     "behavorial/model_foundry_interview_script.mdx": {
       "hash": "743d7e6fd0e2fb93cd06ddae964a202127b5af0cc132264e695e32ed599ce331",
       "docRelative": "model_foundry_interview_script.mdx"
+    },
+    "behavorial/polymorphism_vs_inheritance.mdx": {
+      "hash": "a6961e16a50d52cc5affc7061672625d1b36a9f4cbc42fd84fd47431dd9c06e5",
+      "docRelative": "polymorphism_vs_inheritance.mdx"
     },
     "behavorial/staff_frontend_platform_interview_prep.mdx": {
       "hash": "d747b4eb43974a912ee7c738412f77e06306e5044f5ada92e3be8c8e84c96c56",

@@ -1,0 +1,124 @@
+---
+title: 'Polymorphism vs Inheritance in JavaScript'
+description: 'Clear explanation of inheritance and polymorphism in JavaScript with practical examples.'
+sidebar_label: 'Polymorphism vs Inheritance'
+tags:
+	- javascript
+	- oop
+	- interview
+	- behavioral
+---
+
+# Polymorphism vs Inheritance in JavaScript
+
+People often group these ideas together, but they solve different problems.
+
+## Quick Difference
+
+- **Inheritance**: reuse structure and behavior by creating a child class from a parent class.
+- **Polymorphism**: use different objects through a shared method name or interface, where each object provides its own behavior.
+
+In short:
+
+- Inheritance is about **how code is organized/reused**.
+- Polymorphism is about **how behavior changes behind a common API**.
+
+## 1) Inheritance Example
+
+```js
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+
+  move() {
+    return `${this.name} moves`;
+  }
+}
+
+class Dog extends Animal {
+  bark() {
+    return `${this.name} says woof`;
+  }
+}
+
+const dog = new Dog('Milo');
+console.log(dog.move()); // inherited from Animal
+console.log(dog.bark()); // defined in Dog
+```
+
+What this shows:
+
+- `Dog` inherits `name` and `move()` from `Animal`.
+- `Dog` adds its own method `bark()`.
+
+## 2) Polymorphism Example (Method Overriding)
+
+```js
+class Animal {
+  speak() {
+    return 'Generic sound';
+  }
+}
+
+class Dog extends Animal {
+  speak() {
+    return 'Woof';
+  }
+}
+
+class Cat extends Animal {
+  speak() {
+    return 'Meow';
+  }
+}
+
+const animals = [new Dog(), new Cat()];
+
+for (const animal of animals) {
+  console.log(animal.speak());
+}
+// Woof
+// Meow
+```
+
+What this shows:
+
+- The loop calls the same method, `speak()`, on each object.
+- Each object responds differently at runtime.
+- That runtime substitution is polymorphism.
+
+## 3) Polymorphism Without Class Inheritance
+
+In JavaScript, polymorphism can also come from duck typing (same method shape), even without `extends`.
+
+```js
+const stripeGateway = {
+  charge(amount) {
+    return `Stripe charged $${amount}`;
+  },
+};
+
+const paypalGateway = {
+  charge(amount) {
+    return `PayPal charged $${amount}`;
+  },
+};
+
+function checkout(gateway, amount) {
+  return gateway.charge(amount);
+}
+
+console.log(checkout(stripeGateway, 50));
+console.log(checkout(paypalGateway, 50));
+```
+
+Both objects work because they expose the same `charge()` method.
+
+## Interview Framing
+
+If asked in an interview:
+
+1. Inheritance gives me a parent-child relationship for reuse.
+2. Polymorphism lets me swap implementations behind a stable interface.
+3. In modern JavaScript code, I often use composition + polymorphism to reduce deep inheritance chains.
