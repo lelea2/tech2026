@@ -1,0 +1,17 @@
+// Time complexity: O(n), where n is the length of the input string. Each character is processed at most twice (once when pushed onto the stack and once when popped off).
+function removeAdjacentDuplicates(str) {
+  const stack = [];
+
+  for (const char of str) {
+    if (stack[stack.length - 1] === char) {
+      stack.pop();
+    } else {
+      stack.push(char);
+    }
+  }
+
+  return stack.join("");
+}
+
+console.log(removeAdjacentDuplicates("abbaca")); // "ca"
+console.log(removeAdjacentDuplicates("azxxzy")); // "ay"

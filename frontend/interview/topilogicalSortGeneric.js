@@ -32,6 +32,7 @@ function topologicalSort(tasks, prerequisites) {
   const order = [];
   let front = 0;
 
+  // The queue stores tasks that are ready to run—tasks whose prerequisite count has reached 0.
   while (front < queue.length) {
     const task = queue[front++];
     order.push(task);

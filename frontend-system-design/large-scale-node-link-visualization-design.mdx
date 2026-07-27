@@ -1,0 +1,1037 @@
+---
+title: "Large-Scale Node-Link Visualization — Frontend System Design"
+description: "Staff-level frontend architecture for rendering and synchronizing a 100K-node graph."
+---
+
+# Large-Scale Node-Link Visualization
+
+## Interview framing
+
+Design an interactive node-link visualization that supports:
+
+- Up to **100K nodes**
+- Hundreds of thousands or millions of edges
+- Pan, zoom, search, filter, hover, selection, and drill-down
+- An initial snapshot followed by live deltas
+- Correct event ordering, replay, reconnect, and resynchronization
+- Version comparison and historical graph inspection
+- Clear ownership across platform and product teams
+
+> The complete graph is the canonical data model.  
+> The visible graph is a level-of-detail projection optimized for the current viewport and user intent.
+
+---
+
+## 1. Requirements
+
+### Functional requirements
+
+1. Load an initial graph snapshot.
+2. Render nodes and edges.
+3. Support smooth pan and zoom.
+4. Search by node ID, label, type, or metadata.
+5. Filter by node type, owner, status, or time range.
+6. Select a node and inspect its details.
+7. Expand a node to retrieve neighbors.
+8. Receive live graph changes.
+9. Compare graph revisions.
+10. Recover after network interruption without silently losing updates.
+
+### Non-functional requirements
+
+| Requirement | Target |
+|---|---:|
+| First meaningful graph | Under 2 seconds |
+| Interaction response | Under 100 ms |
+| Search response | Under 300 ms |
+| Pan and zoom | 60 FPS where practical |
+| Live update latency | Under 1–2 seconds |
+| Memory | Bounded and observable |
+| Recovery | No silent loss or reordering |
+| Accessibility | Keyboard and nonvisual navigation |
+
+---
+
+## 2. Architecture overview
+
+![Large-scale node-link visualization architecture](./large-scale-node-link-visualization-architecture.svg)
+
+```text
+Graph Snapshot API ──┐
+                     ├──> Graph Sync Engine ──> Canonical Graph Store
+Delta Stream ────────┘                               │
+                                                     ├──> UI selectors
+                                                     ├──> Search/filter worker
+                                                     └──> Render adapter ──> WebGL
+```
+
+The frontend is separated into three systems:
+
+1. **Canonical graph state**
+2. **Product and interaction state**
+3. **Imperative rendering state**
+
+These systems update at different frequencies and should not share one React render path.
+
+---
+
+## 3. Rendering technology
+
+### Recommendation
+
+Use **WebGL2** as the initial rendering backend, behind a renderer interface that allows a later **WebGPU** implementation.
+
+| Technology | Good fit | Main limitation |
+|---|---|---|
+| SVG | Small graphs and rich DOM semantics | DOM and layout cost |
+| Canvas 2D | Medium graphs | CPU-bound rendering |
+| WebGL2 | 100K+ nodes | More rendering complexity |
+| WebGPU | Compute-heavy future workloads | Compatibility and maturity |
+
+### React ownership
+
+React owns:
+
+- Toolbar
+- Search
+- Filters
+- Details panel
+- Timeline controls
+- Loading and error surfaces
+- Accessible list/table views
+
+The renderer owns:
+
+- Node geometry
+- Edge geometry
+- GPU buffers
+- Camera transforms
+- Hit testing
+- Level of detail
+- Animation
+
+Do not render one React component per node.
+
+```tsx
+function GraphPage() {
+  return (
+    <GraphProvider>
+      <GraphToolbar />
+      <GraphViewport />
+      <NodeDetailsPanel />
+      <AccessibleGraphList />
+    </GraphProvider>
+  );
+}
+```
+
+```tsx
+function GraphViewport() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+
+    const renderer = createGraphRenderer(canvasRef.current);
+
+    return () => renderer.destroy();
+  }, []);
+
+  return <canvas ref={canvasRef} />;
+}
+```
+
+---
+
+## 4. GPU rendering model
+
+Use a small number of batched draw calls.
+
+```ts
+interface NodeInstance {
+  x: number;
+  y: number;
+  size: number;
+  colorIndex: number;
+  iconIndex: number;
+  flags: number;
+}
+
+interface EdgeInstance {
+  sourceIndex: number;
+  targetIndex: number;
+  colorIndex: number;
+  flags: number;
+}
+```
+
+Recommended techniques:
+
+- Instanced node rendering
+- Typed arrays
+- Texture atlas for icons
+- Batched edge rendering
+- Dirty-range buffer updates
+- Offscreen picking framebuffer
+- Render mutation coalescing once per animation frame
+
+```ts
+function queueRenderChanges(changes: RenderMutationBatch) {
+  mergeMutationBatch(pendingChanges, changes);
+
+  if (flushScheduled) return;
+  flushScheduled = true;
+
+  requestAnimationFrame(() => {
+    renderer.applyMutations(pendingChanges);
+    pendingChanges = createEmptyMutationBatch();
+    flushScheduled = false;
+  });
+}
+```
+
+---
+
+## 5. Level of detail
+
+Rendering 100K nodes may be possible. Rendering every edge and label simultaneously is usually neither performant nor useful.
+
+### Far zoom
+
+- Render clusters
+- Hide labels
+- Hide low-priority edges
+- Use density or heatmap rendering
+- Show aggregate counts
+
+### Medium zoom
+
+- Render individual nodes
+- Render important edge types
+- Show labels for important nodes
+
+### Near zoom
+
+- Render detailed node icons
+- Show labels
+- Show local topology
+- Enable richer hover and selection states
+
+```ts
+type RenderMode = "clusters" | "nodes" | "detailed";
+
+function getRenderMode(zoom: number): RenderMode {
+  if (zoom < 0.2) return "clusters";
+  if (zoom < 0.8) return "nodes";
+  return "detailed";
+}
+```
+
+### Edge reduction
+
+- Draw only edges whose endpoints are visible.
+- Prioritize selected and hovered neighborhoods.
+- Aggregate parallel edges.
+- Filter by importance.
+- Bundle static or slowly changing edges.
+- Query neighborhoods on demand.
+- Cap visible edges with a clear UI indicator.
+
+---
+
+## 6. Core data model
+
+### Node
+
+```ts
+type NodeId = string;
+type GraphVersion = number;
+type SequenceNumber = number;
+
+interface GraphNode {
+  id: NodeId;
+  kind: string;
+  label?: string;
+  status?: "healthy" | "warning" | "error" | "unknown";
+  attributes: Record<string, unknown>;
+
+  position?: {
+    x: number;
+    y: number;
+  };
+
+  createdAt: string;
+  updatedAt: string;
+  entityVersion: number;
+}
+```
+
+### Edge
+
+```ts
+type EdgeId = string;
+
+interface GraphEdge {
+  id: EdgeId;
+  sourceId: NodeId;
+  targetId: NodeId;
+  kind: string;
+  directed: boolean;
+  attributes: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  entityVersion: number;
+}
+```
+
+### Snapshot
+
+```ts
+interface GraphSnapshot {
+  graphId: string;
+  snapshotId: string;
+  graphVersion: GraphVersion;
+
+  // Last event included in this snapshot.
+  lastSequence: SequenceNumber;
+
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+
+  generatedAt: string;
+  schemaVersion: number;
+}
+```
+
+### Snapshot chunk
+
+```ts
+interface SnapshotChunk {
+  snapshotId: string;
+  chunkIndex: number;
+  chunkCount: number;
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  checksum?: string;
+}
+```
+
+---
+
+## 7. Delta contract
+
+Use explicit event operations instead of ambiguous partial objects.
+
+```ts
+interface DeltaBase {
+  eventId: string;
+  graphId: string;
+  sequence: number;
+
+  // State expected before and after applying this event.
+  baseGraphVersion: number;
+  graphVersion: number;
+
+  schemaVersion: number;
+  occurredAt: string;
+}
+```
+
+```ts
+type GraphDelta =
+  | NodeUpsertDelta
+  | NodeDeleteDelta
+  | EdgeUpsertDelta
+  | EdgeDeleteDelta
+  | BatchDelta;
+
+interface NodeUpsertDelta extends DeltaBase {
+  type: "node.upsert";
+  node: GraphNode;
+}
+
+interface NodeDeleteDelta extends DeltaBase {
+  type: "node.delete";
+  nodeId: NodeId;
+  entityVersion: number;
+}
+
+interface EdgeUpsertDelta extends DeltaBase {
+  type: "edge.upsert";
+  edge: GraphEdge;
+}
+
+interface EdgeDeleteDelta extends DeltaBase {
+  type: "edge.delete";
+  edgeId: EdgeId;
+  entityVersion: number;
+}
+
+interface BatchDelta extends DeltaBase {
+  type: "batch";
+  operations: Array<
+    | Omit<NodeUpsertDelta, keyof DeltaBase>
+    | Omit<NodeDeleteDelta, keyof DeltaBase>
+    | Omit<EdgeUpsertDelta, keyof DeltaBase>
+    | Omit<EdgeDeleteDelta, keyof DeltaBase>
+  >;
+}
+```
+
+### Contract guarantees
+
+The backend contract should provide:
+
+- At-least-once delivery
+- Stable event IDs
+- Monotonic sequence numbers
+- Base and resulting graph versions
+- Entity versions
+- Schema versions
+- Atomic mutation batches
+- Replay by sequence
+- Defined retention window
+
+---
+
+## 8. Snapshot plus delta synchronization
+
+### Recommended protocol
+
+1. Client requests a snapshot.
+2. Snapshot contains `lastSequence`.
+3. Client loads and validates all snapshot chunks.
+4. Client atomically installs the snapshot.
+5. Client subscribes using `afterSequence`.
+6. Server replays events after the snapshot watermark.
+7. Client processes only contiguous events.
+
+```text
+Snapshot contains events through sequence 10,000
+Client subscribes with afterSequence=10,000
+First valid delta is sequence 10,001
+```
+
+This prevents losing changes that occur while the snapshot is being transferred.
+
+### Alternative
+
+When replayable snapshot watermarks are unavailable:
+
+1. Subscribe first.
+2. Buffer incoming deltas.
+3. Load the snapshot.
+4. Discard buffered events already covered by the snapshot.
+5. Apply the remaining buffered events in order.
+
+This reduces race risk but increases frontend complexity.
+
+---
+
+## 9. Ordering and deduplication
+
+```ts
+interface SyncState {
+  status:
+    | "idle"
+    | "loading-snapshot"
+    | "streaming"
+    | "recovering"
+    | "resyncing"
+    | "failed";
+
+  snapshotId?: string;
+  graphVersion: number;
+  lastAppliedSequence: number;
+
+  pendingBySequence: Map<number, GraphDelta>;
+  recentEventIds: Set<string>;
+}
+```
+
+```ts
+function receiveDelta(state: SyncState, delta: GraphDelta) {
+  if (state.recentEventIds.has(delta.eventId)) {
+    return;
+  }
+
+  if (delta.sequence <= state.lastAppliedSequence) {
+    return;
+  }
+
+  const expected = state.lastAppliedSequence + 1;
+
+  if (delta.sequence > expected) {
+    state.pendingBySequence.set(delta.sequence, delta);
+    requestReplay(expected, delta.sequence - 1);
+    return;
+  }
+
+  applyAndAdvance(state, delta);
+  flushContiguousPending(state);
+}
+```
+
+```ts
+function applyAndAdvance(state: SyncState, delta: GraphDelta) {
+  if (delta.baseGraphVersion !== state.graphVersion) {
+    triggerFullResync("graph-version-mismatch");
+    return;
+  }
+
+  graphStore.applyAtomically(delta);
+
+  state.graphVersion = delta.graphVersion;
+  state.lastAppliedSequence = delta.sequence;
+  rememberEventId(delta.eventId);
+}
+```
+
+```ts
+function flushContiguousPending(state: SyncState) {
+  while (true) {
+    const nextSequence = state.lastAppliedSequence + 1;
+    const nextDelta = state.pendingBySequence.get(nextSequence);
+
+    if (!nextDelta) return;
+
+    state.pendingBySequence.delete(nextSequence);
+    applyAndAdvance(state, nextDelta);
+  }
+}
+```
+
+### Gap timeout
+
+If replay cannot repair the gap within a bounded time:
+
+1. Pause live mutation application.
+2. Keep the last valid graph visible.
+3. Mark the view as stale.
+4. Fetch a new snapshot.
+5. Replace canonical state atomically.
+6. Resume from the new watermark.
+
+---
+
+## 10. Reconnect state machine
+
+```text
+DISCONNECTED
+     │
+     ▼
+CONNECTING
+     │
+     ├── success ──> STREAMING
+     │
+     └── failure ──> BACKOFF
+                         │
+                         └──> CONNECTING
+
+STREAMING
+     │ disconnect
+     ▼
+RECONNECTING
+     │
+     ├── replay available ──> CATCHING_UP ──> STREAMING
+     │
+     └── cursor expired ────> RESYNCING ────> STREAMING
+```
+
+### Resume request
+
+```json
+{
+  "type": "subscribe",
+  "graphId": "graph-123",
+  "afterSequence": 42018,
+  "snapshotId": "snapshot-abc",
+  "clientSchemaVersion": 3
+}
+```
+
+### Resume response
+
+```ts
+type SubscribeResponse =
+  | {
+      type: "resume.accepted";
+      nextSequence: number;
+    }
+  | {
+      type: "resume.rejected";
+      reason:
+        | "cursor-expired"
+        | "snapshot-invalid"
+        | "schema-incompatible";
+      latestSnapshotId: string;
+    };
+```
+
+### Backoff
+
+```ts
+function reconnectDelay(attempt: number) {
+  const maxDelayMs = 30_000;
+  const exponentialDelay = Math.min(
+    maxDelayMs,
+    500 * 2 ** attempt
+  );
+
+  return Math.random() * exponentialDelay;
+}
+```
+
+Reset the reconnect attempt counter only after the connection has remained stable for a meaningful interval.
+
+---
+
+## 11. Normalized graph store
+
+```ts
+interface GraphStore {
+  nodesById: Map<NodeId, GraphNode>;
+  edgesById: Map<EdgeId, GraphEdge>;
+
+  outgoingEdgeIdsByNode: Map<NodeId, Set<EdgeId>>;
+  incomingEdgeIdsByNode: Map<NodeId, Set<EdgeId>>;
+
+  graphVersion: number;
+  lastAppliedSequence: number;
+}
+```
+
+```ts
+function upsertEdge(store: GraphStore, edge: GraphEdge) {
+  const previous = store.edgesById.get(edge.id);
+
+  if (
+    previous &&
+    previous.entityVersion >= edge.entityVersion
+  ) {
+    return;
+  }
+
+  if (previous) {
+    removeEdgeFromIndexes(store, previous);
+  }
+
+  store.edgesById.set(edge.id, edge);
+
+  addToSet(
+    store.outgoingEdgeIdsByNode,
+    edge.sourceId,
+    edge.id
+  );
+
+  addToSet(
+    store.incomingEdgeIdsByNode,
+    edge.targetId,
+    edge.id
+  );
+}
+```
+
+### Referential integrity
+
+An edge may reference a node that has not arrived yet.
+
+Preferred policy:
+
+- Backend sends related mutations in an atomic batch.
+- Client maintains a bounded unresolved-edge buffer.
+- Buffer expiration triggers repair or resync.
+- The UI never silently drops a version-advancing mutation.
+
+---
+
+## 12. UI state versus graph state
+
+```ts
+interface GraphUiState {
+  selectedNodeIds: Set<NodeId>;
+  hoveredNodeId?: NodeId;
+
+  camera: {
+    x: number;
+    y: number;
+    zoom: number;
+  };
+
+  filters: GraphFilter[];
+  searchQuery: string;
+
+  activeRevision?: string;
+  comparisonRevision?: string;
+}
+```
+
+Do not place camera and pointer movement in the canonical graph store.
+
+| State | Typical frequency |
+|---|---|
+| Pointer and hover | Every frame |
+| Camera | Every frame during navigation |
+| Graph deltas | Bursty |
+| Filters | Occasional |
+| Snapshot replacement | Rare |
+
+---
+
+## 13. Progressive loading
+
+### Loading stages
+
+1. Load graph metadata and saved viewport.
+2. Load clusters or high-priority nodes.
+3. Render an initial useful view.
+4. Stream node chunks.
+5. Stream visible-region edges.
+6. Build indexes in a worker.
+7. Enable expensive filters after indexing.
+
+```text
+0–500 ms       Viewport shell and metadata
+500–1500 ms    Clusters and important nodes
+1.5–3 seconds  Visible-region edges
+Later          Remaining graph and search index
+```
+
+### Viewport-driven APIs
+
+```http
+GET /graphs/:graphId/tiles?zoom=4&x=12&y=8
+GET /graphs/:graphId/neighborhood?nodeId=N123&depth=2
+GET /graphs/:graphId/search?q=payments
+```
+
+At larger scale, the browser should explore a server-backed graph instead of downloading every entity at startup.
+
+---
+
+## 14. Layout architecture
+
+Do not execute a 100K-node force layout on the main thread.
+
+### Server layout
+
+Use when:
+
+- Stable positions matter
+- The layout is shared
+- The full graph is expensive
+- Users need consistent topology
+
+### Worker layout
+
+Use when:
+
+- The active subgraph is smaller
+- Users manipulate layout settings
+- Local refinement improves understanding
+
+### Hybrid recommendation
+
+1. Server provides stable global positions.
+2. Worker refines the visible subgraph.
+3. Pinned nodes retain coordinates.
+4. New nodes begin near connected neighbors.
+
+```text
+Main thread:
+- Input
+- Camera
+- WebGL rendering
+- React controls
+
+Worker:
+- Layout
+- Clustering
+- Filtering
+- Search indexing
+```
+
+Use transferable typed arrays instead of repeatedly cloning large object graphs.
+
+---
+
+## 15. Hit testing
+
+### Spatial index
+
+Best for node hover:
+
+1. Convert pointer coordinates into graph coordinates.
+2. Query a quadtree or R-tree.
+3. Select the nearest visible node.
+
+### GPU picking
+
+Best for complex shapes and edges:
+
+1. Render IDs into an offscreen framebuffer.
+2. Encode the object index as a color.
+3. Read the pointer pixel.
+4. Map the value back to a node or edge.
+
+Throttle hover picking to animation frames because GPU readback can stall the pipeline.
+
+---
+
+## 16. Historical versions and graph diffs
+
+Transport versioning and product-visible history are different concerns.
+
+```ts
+interface GraphRevision {
+  revisionId: string;
+  graphId: string;
+  parentRevisionId?: string;
+  createdAt: string;
+  createdBy: string;
+  reason?: string;
+  snapshotReference: string;
+}
+```
+
+Prefer a backend diff endpoint:
+
+```http
+GET /graphs/:graphId/diff?from=v100&to=v125
+```
+
+```ts
+interface GraphVersionDiff {
+  fromVersion: number;
+  toVersion: number;
+
+  addedNodeIds: NodeId[];
+  removedNodeIds: NodeId[];
+  changedNodeIds: NodeId[];
+
+  addedEdgeIds: EdgeId[];
+  removedEdgeIds: EdgeId[];
+  changedEdgeIds: EdgeId[];
+}
+```
+
+Visual treatment:
+
+- Added: emphasized
+- Removed: ghosted
+- Changed: outlined
+- Unchanged: muted
+
+---
+
+## 17. Accessibility
+
+WebGL has no built-in semantic structure.
+
+Provide:
+
+- Search-first graph navigation
+- Keyboard traversal through neighbors
+- Accessible node details panel
+- List or table view for visible results
+- Screen-reader announcements for selection
+- Reduced-motion support
+- Status indicators that do not depend only on color
+
+Do not expose 100K accessibility nodes. Expose the current result set, selection, and navigable neighborhood.
+
+---
+
+## 18. Failure handling
+
+### Snapshot failure
+
+- Retry chunks independently.
+- Validate a consistent `snapshotId`.
+- Validate chunk count and checksums.
+- Install the snapshot atomically.
+- Distinguish partial display from synchronized state.
+
+### Stream failure
+
+- Preserve the last valid graph.
+- Mark live state as stale.
+- Resume from `lastAppliedSequence`.
+- Replay missing events.
+- Resnapshot when replay is unavailable.
+
+### Invalid delta
+
+- Record event ID and schema version.
+- Do not silently skip graph-version advancement.
+- Trigger replay or resync.
+- Log expected and actual sequence/version.
+
+### WebGL context loss
+
+The canonical graph store remains intact. Reconstruct GPU buffers without re-fetching the graph.
+
+---
+
+## 19. Observability
+
+### User experience
+
+- Time to first meaningful graph
+- Time to complete snapshot
+- Search latency
+- Selection latency
+- FPS percentiles
+- Long tasks
+- Interaction delay
+- Memory usage
+
+### Synchronization
+
+- Delta lag
+- Gap count
+- Replay count
+- Reconnect count
+- Full resync count
+- Buffered event count
+- Snapshot mismatch count
+
+### Rendering
+
+- Visible node count
+- Visible edge count
+- Draw calls
+- Buffer size
+- Layout duration
+- Picking latency
+- Dropped frames
+
+---
+
+## 20. Ownership model
+
+### Visualization platform team
+
+Owns:
+
+- Renderer
+- Camera and interactions
+- Level of detail
+- Hit testing
+- GPU resource management
+- Layout worker integration
+- Performance budgets
+- Rendering diagnostics
+
+### Graph platform team
+
+Owns:
+
+- Snapshot generation
+- Delta event log
+- Sequence semantics
+- Replay retention
+- Graph versions
+- Historical revisions
+- Referential integrity
+- Schema compatibility
+
+### Product team
+
+Owns:
+
+- Domain node and edge semantics
+- Search experience
+- Filters
+- Details panels
+- Visual styles
+- Product workflows
+- Permissions
+
+### Shared contracts
+
+Joint ownership:
+
+- Node and edge schema
+- Snapshot and delta SLOs
+- Maximum payload size
+- Maximum burst size
+- Compatibility policy
+- Degradation behavior
+- Rollout and feature flags
+- Representative performance datasets
+
+---
+
+## 21. Staff-level execution plan
+
+### Phase 1: vertical slice
+
+- 10K nodes
+- Static snapshot
+- WebGL node rendering
+- Pan, zoom, selection
+- Server-provided positions
+- Performance telemetry
+
+### Phase 2: scale
+
+- 100K nodes
+- Edge batching
+- Level of detail
+- Spatial indexing
+- Worker filtering
+- Progressive snapshot chunks
+
+### Phase 3: live synchronization
+
+- Delta stream
+- Ordering and deduplication
+- Replay
+- Reconnect
+- Full resync
+- Schema versioning
+
+### Phase 4: product maturity
+
+- Revision comparison
+- Accessible alternate view
+- Saved views
+- Permissions
+- Operational dashboards
+
+---
+
+## 22. Key interview trade-offs
+
+### Why WebGL instead of SVG?
+
+> SVG provides excellent semantics but creates DOM, layout, and memory pressure at this scale. WebGL allows nodes and edges to be rendered in large GPU batches.
+
+### Why separate canonical and visible graphs?
+
+> The complete graph must remain correct, while the rendered projection must remain understandable and fast. Level of detail, filtering, and clustering derive the visible graph from canonical state.
+
+### Why server layout plus worker refinement?
+
+> The server provides stable global positions. The worker improves a smaller active subgraph without blocking input or rendering.
+
+### Why snapshot plus deltas?
+
+> Snapshots provide a complete recovery point. Deltas reduce bandwidth and preserve visual continuity. Sequence, graph versions, replay, and resnapshot make the combined model correct.
+
+### Why not update React for every event?
+
+> React owns product state, not per-frame graph geometry. Deltas update a normalized store and are coalesced into imperative renderer mutations.
+
+---
+
+## 23. Staff-level summary
+
+> I would separate the system into a normalized graph store, a snapshot-and-delta synchronization engine, and an imperative WebGL renderer. React owns product controls and accessible surfaces, but it does not render individual graph entities.
+>
+> The snapshot contains a sequence watermark. The client subscribes after that watermark, applies only contiguous and version-compatible events, ignores duplicates, repairs gaps through replay, and replaces state from a fresh snapshot when the cursor expires.
+>
+> At 100K nodes, the renderer uses instancing, typed arrays, progressive loading, workers, spatial indexing, and zoom-dependent level of detail. The full graph can be correct without drawing every edge or label at the same time.
+>
+> The visualization platform owns rendering, the graph platform owns synchronization correctness, and product teams own domain semantics. The staff architect defines the contracts, budgets, degradation behavior, ownership boundaries, and rollout plan.
