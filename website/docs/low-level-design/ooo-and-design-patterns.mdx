@@ -1,0 +1,202 @@
+---
+title: OOP Concepts & Design Patterns
+---
+
+# OOP Concepts & Design Patterns
+
+## The Four Pillars
+
+### Encapsulation
+
+> **Hide state, expose behavior.** Make fields private, provide methods for access.
+
+Keep internal state private. Only expose what callers need — not how it's stored.
+
+```ts
+// Bad: exposing raw state
+class BankAccount {
+  balance: number = 0;
+}
+account.balance -= 500; // external code mutates state directly
+
+// Good: encapsulated
+class BankAccount {
+  private balance: number = 0;
+
+  deposit(amount: number): void {
+    if (amount <= 0) throw new Error('Invalid amount');
+    this.balance += amount;
+  }
+
+  withdraw(amount: number): void {
+    if (amount > this.balance) throw new Error('Insufficient funds');
+    this.balance -= amount;
+  }
+
+  getBalance(): number {
+    return this.balance;
+  }
+}
+```
+
+**Why it matters:** Validation lives in one place. Internal representation can change (e.g. switch to BigInt) without breaking callers.
+
+---
+
+### Abstraction
+
+> **Define interfaces for variations.** Multiple payment methods? Different vehicle types? Create an interface.
+
+Model the _what_, not the _how_. Callers depend on the interface, not the concrete class.
+
+```ts
+// Interface defines the contract
+interface PaymentMethod {
+  charge(amount: number): Promise<void>;
+  refund(transactionId: string): Promise<void>;
+}
+
+// Concrete implementations — each handles its own details
+class CreditCard implements PaymentMethod {
+  async charge(amount: number) {
+    /* Stripe API call */
+  }
+  async refund(transactionId: string) {
+    /* Stripe refund */
+  }
+}
+
+class PayPal implements PaymentMethod {
+  async charge(amount: number) {
+    /* PayPal SDK */
+  }
+  async refund(transactionId: string) {
+    /* PayPal refund */
+  }
+}
+
+// Caller is insulated from implementation
+class Checkout {
+  constructor(private payment: PaymentMethod) {}
+
+  async complete(total: number) {
+    await this.payment.charge(total);
+  }
+}
+```
+
+**Why it matters:** Adding a new payment method (e.g. `CryptoWallet`) requires zero changes to `Checkout`.
+
+---
+
+### Polymorphism
+
+> **Let objects handle themselves.** No type checking, no switch statements on types.
+
+Push behavior into objects; let the runtime dispatch the right method.
+
+```ts
+// Bad: type-switching anti-pattern
+function makeSound(animal: Animal) {
+  if (animal.type === 'dog') console.log('Woof');
+  else if (animal.type === 'cat') console.log('Meow');
+  // Adding a new animal requires editing this function
+}
+
+// Good: polymorphic dispatch
+interface Animal {
+  speak(): void;
+}
+
+class Dog implements Animal {
+  speak() {
+    console.log('Woof');
+  }
+}
+
+class Cat implements Animal {
+  speak() {
+    console.log('Meow');
+  }
+}
+
+class Duck implements Animal {
+  speak() {
+    console.log('Quack');
+  }
+}
+
+function makeSound(animal: Animal) {
+  animal.speak(); // no conditionals — open/closed principle
+}
+```
+
+**Why it matters:** Adding `Duck` requires no changes to `makeSound`. Scales to N types without touching existing code.
+
+---
+
+### Inheritance
+
+> **Compose behavior, don't inherit it.** Reach for interfaces first; use inheritance only when sharing stable implementation.
+
+Inheritance creates tight coupling. Prefer composition: inject collaborators, delegate to them.
+
+```ts
+// Fragile inheritance — base class changes break subclasses
+class Logger {
+  log(msg: string) {
+    console.log(msg);
+  }
+}
+
+class TimestampedLogger extends Logger {
+  log(msg: string) {
+    super.log(`[${new Date().toISOString()}] ${msg}`);
+  }
+}
+
+// Prefer composition — decouple via interface
+interface Logger {
+  log(msg: string): void;
+}
+
+class ConsoleLogger implements Logger {
+  log(msg: string) {
+    console.log(msg);
+  }
+}
+
+class TimestampedLogger implements Logger {
+  constructor(private inner: Logger) {}
+
+  log(msg: string) {
+    this.inner.log(`[${new Date().toISOString()}] ${msg}`);
+  }
+}
+
+// Can wrap any Logger — FileLogger, SilentLogger, etc.
+const logger = new TimestampedLogger(new ConsoleLogger());
+```
+
+**When inheritance IS appropriate:**
+
+- Sharing stable, well-tested implementation (e.g. `AbstractList`)
+- Framework extension points designed for inheritance
+- Clear "is-a" relationship that won't change
+
+**Favor composition when:**
+
+- You want to mix in behaviors from multiple sources
+- The base class might evolve independently
+- You need runtime flexibility (swap implementations)
+
+---
+
+## Quick Reference
+
+| Pillar            | One-liner                     | Signal to apply                                    |
+| ----------------- | ----------------------------- | -------------------------------------------------- |
+| **Encapsulation** | Hide state, expose behavior   | Public fields being mutated from outside           |
+| **Abstraction**   | Interface over implementation | Multiple variants of the same concept              |
+| **Polymorphism**  | Let objects decide            | `if type === X` / `switch(type)` in calling code   |
+| **Inheritance**   | Compose first, inherit last   | Shared implementation — only after interfaces fail |
