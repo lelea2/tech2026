@@ -2,24 +2,6 @@
 title: Design Patterns
 ---
 
-# Design Patterns
-
-A list of design patterns for low-level design interviews.
-
-Design patterns are reusable building blocks for solving common design problems. They're names for structures you naturally create when you follow solid design principles.
-
-The Gang of Four catalog, written in 1994 for C++ and Smalltalk, defined 23 patterns that became required reading for software engineers. The book earned legendary status, but the reality is most of those patterns don't matter anymore. Modern languages have built-in features that replaced half of them — iterators are primitives now, not patterns. The shift from inheritance-heavy OOP to composition and functional programming made others obsolete. And in interviews, you'll get asked about maybe five patterns total, not twenty-three.
-
-Most online resources still dutifully list all 23 GoF patterns like they're equally important. They're not. We're cutting the historical baggage and focusing on the patterns that actually show up in modern LLD interviews. The ones below are what interviewers ask about and what you'll use in real designs.
-
-As you learn these patterns, keep in mind that the goal isn't to force them into every solution. You should only use a pattern when the problem naturally calls for it. Forcing one is a common mistake that signals over-engineering. Patterns arise from good design decisions rather than driving them, and the most frequent error is trying to fit a pattern where it doesn't belong.
-
-Design patterns are handled differently depending on where you interview. In the US, most LLD interviews don't explicitly test whether you can name patterns — you're evaluated on the quality of your design. In other parts of the world, particularly India, interviewers are more likely to ask about patterns directly. While we align with the former, both approaches have merit, and we want you prepared for either reality you may encounter.
-
-Patterns fit cleanly into three categories: **creational**, **structural**, and **behavioral**.
-
----
-
 ## Creational Patterns
 
 Creational patterns control how objects get created. They hide construction details, let you swap implementations, and keep your code from being tightly coupled to specific classes.
@@ -626,15 +608,15 @@ Patterns only help when they match the problem you're solving. Most interview-re
 
 ### Quick Reference
 
-| Category | Pattern | When to use |
-|---|---|---|
-| **Creational** | Factory | Callers shouldn't care which concrete class gets created |
-| **Creational** | Builder | Object has lots of optional fields or messy construction details |
-| **Creational** | Singleton | Truly need one global instance (rare in interviews) |
-| **Structural** | Decorator | Layer optional behaviors at runtime without subclass explosion |
-| **Structural** | Facade | Hide internal complexity behind a simple entry point |
-| **Behavioral** | Strategy | Replace if/else logic with interchangeable behaviors |
-| **Behavioral** | Observer | Multiple components need to react to a single event |
+| Category       | Pattern       | When to use                                                          |
+| -------------- | ------------- | -------------------------------------------------------------------- |
+| **Creational** | Factory       | Callers shouldn't care which concrete class gets created             |
+| **Creational** | Builder       | Object has lots of optional fields or messy construction details     |
+| **Creational** | Singleton     | Truly need one global instance (rare in interviews)                  |
+| **Structural** | Decorator     | Layer optional behaviors at runtime without subclass explosion       |
+| **Structural** | Facade        | Hide internal complexity behind a simple entry point                 |
+| **Behavioral** | Strategy      | Replace if/else logic with interchangeable behaviors                 |
+| **Behavioral** | Observer      | Multiple components need to react to a single event                  |
 | **Behavioral** | State Machine | Object's behavior depends on current state and transitions get messy |
 
 Focus on solving the problem cleanly and name the pattern afterward if it fits.

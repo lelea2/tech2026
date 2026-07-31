@@ -1,7 +1,7 @@
 ---
-title: "Chess.com Online Playing System — Staff Engineer System Design"
-description: "Interview-ready frontend and backend system design for an online chess playing platform using single-writer game ownership, WebSockets, server-authoritative clocks, event sourcing, and async downstream processing."
-sidebar_label: "Chess.com Online Playing System"
+title: 'Chess.com Online'
+description: 'Interview-ready frontend and backend system design for an online chess playing platform using single-writer game ownership, WebSockets, server-authoritative clocks, event sourcing, and async downstream processing.'
+sidebar_label: 'Chess.com Online Playing System'
 tags:
   - system-design
   - staff-engineer
@@ -80,15 +80,15 @@ Chess has low move throughput per game but extremely strict ordering and legalit
 
 ## 4. Non-Functional Requirements
 
-| Requirement | Target |
-|---|---|
-| Move latency | P50 under 100ms within same region, P99 under 500ms target |
-| Correctness | No illegal committed moves, no double moves, no duplicate rating updates |
-| Availability | Gameplay should survive session server crash with recovery |
-| Consistency | Strong consistency inside a game; eventual consistency for leaderboard/history/search |
-| Scalability | Horizontally scale by sharding games across session servers |
-| Observability | Per-game event logs, move latency, reconnect rate, ownership transfer failures |
-| Security | Authenticated sockets, rate limiting, anti-cheat signals, replay protection |
+| Requirement   | Target                                                                                |
+| ------------- | ------------------------------------------------------------------------------------- |
+| Move latency  | P50 under 100ms within same region, P99 under 500ms target                            |
+| Correctness   | No illegal committed moves, no double moves, no duplicate rating updates              |
+| Availability  | Gameplay should survive session server crash with recovery                            |
+| Consistency   | Strong consistency inside a game; eventual consistency for leaderboard/history/search |
+| Scalability   | Horizontally scale by sharding games across session servers                           |
+| Observability | Per-game event logs, move latency, reconnect rate, ownership transfer failures        |
+| Security      | Authenticated sockets, rate limiting, anti-cheat signals, replay protection           |
 
 ---
 
@@ -145,13 +145,15 @@ Chess has low move throughput per game but extremely strict ordering and legalit
    - Source of truth for users, ratings, payments, titled status, and transactional updates.
 
 10. **Redis**
-   - Fast leaderboard serving via Sorted Sets.
-   - Matchmaking queues.
-   - Presence and ephemeral socket metadata.
+
+- Fast leaderboard serving via Sorted Sets.
+- Matchmaking queues.
+- Presence and ephemeral socket metadata.
 
 11. **Analytics / Anti-Cheat Pipeline**
-   - Consumes game events asynchronously.
-   - Computes suspicious patterns, engine correlation, time usage, and reporting signals.
+
+- Consumes game events asynchronously.
+- Computes suspicious patterns, engine correlation, time usage, and reporting signals.
 
 ---
 
@@ -189,7 +191,7 @@ Chess has low move throughput per game but extremely strict ordering and legalit
 ```ts
 type GameClientState = {
   gameId: string;
-  connection: "connecting" | "connected" | "reconnecting" | "disconnected";
+  connection: 'connecting' | 'connected' | 'reconnecting' | 'disconnected';
   serverEpoch: number;
   boardFen: string;
   legalMoves?: string[];
@@ -198,7 +200,7 @@ type GameClientState = {
   clocks: {
     whiteMs: number;
     blackMs: number;
-    activeColor: "white" | "black";
+    activeColor: 'white' | 'black';
     serverNowMs: number;
     lastSyncClientNowMs: number;
   };
@@ -234,18 +236,18 @@ Chess move volume is low, but real-time responsiveness matters. WebSockets fit b
 ```ts
 type ClientMessage =
   | {
-      type: "MAKE_MOVE";
+      type: 'MAKE_MOVE';
       gameId: string;
       clientMoveId: string;
       from: string;
       to: string;
-      promotion?: "q" | "r" | "b" | "n";
+      promotion?: 'q' | 'r' | 'b' | 'n';
       lastSeenSeq: number;
     }
-  | { type: "RESIGN"; gameId: string; clientActionId: string }
-  | { type: "OFFER_DRAW"; gameId: string; clientActionId: string }
-  | { type: "ACCEPT_DRAW"; gameId: string; clientActionId: string }
-  | { type: "SYNC"; gameId: string; lastSeenSeq: number };
+  | { type: 'RESIGN'; gameId: string; clientActionId: string }
+  | { type: 'OFFER_DRAW'; gameId: string; clientActionId: string }
+  | { type: 'ACCEPT_DRAW'; gameId: string; clientActionId: string }
+  | { type: 'SYNC'; gameId: string; lastSeenSeq: number };
 ```
 
 ### Server-to-client messages
@@ -253,7 +255,7 @@ type ClientMessage =
 ```ts
 type ServerMessage =
   | {
-      type: "MOVE_COMMITTED";
+      type: 'MOVE_COMMITTED';
       gameId: string;
       seq: number;
       san: string;
@@ -261,28 +263,28 @@ type ServerMessage =
       fen: string;
       whiteMs: number;
       blackMs: number;
-      activeColor: "white" | "black";
+      activeColor: 'white' | 'black';
       serverTimeMs: number;
     }
   | {
-      type: "MOVE_REJECTED";
+      type: 'MOVE_REJECTED';
       gameId: string;
       clientMoveId: string;
-      reason: "not_your_turn" | "illegal_move" | "game_over" | "stale_epoch";
+      reason: 'not_your_turn' | 'illegal_move' | 'game_over' | 'stale_epoch';
     }
   | {
-      type: "GAME_FINISHED";
+      type: 'GAME_FINISHED';
       gameId: string;
       seq: number;
-      result: "1-0" | "0-1" | "1/2-1/2";
-      reason: "checkmate" | "timeout" | "resignation" | "draw" | "abandoned";
+      result: '1-0' | '0-1' | '1/2-1/2';
+      reason: 'checkmate' | 'timeout' | 'resignation' | 'draw' | 'abandoned';
     }
   | {
-      type: "CLOCK_SYNC";
+      type: 'CLOCK_SYNC';
       gameId: string;
       whiteMs: number;
       blackMs: number;
-      activeColor: "white" | "black";
+      activeColor: 'white' | 'black';
       serverTimeMs: number;
     };
 ```
@@ -321,11 +323,11 @@ The server should only broadcast a committed move after the durable append succe
 type ActiveGame = {
   gameId: string;
   epoch: number;
-  status: "active" | "finished";
+  status: 'active' | 'finished';
   whiteUserId: string;
   blackUserId: string;
   boardFen: string;
-  sideToMove: "white" | "black";
+  sideToMove: 'white' | 'black';
   moveSeq: number;
   moveList: MoveEvent[];
   clocks: {
@@ -374,7 +376,7 @@ elapsed = nowMonoMs - game.clocks.turnStartedMonoMs;
 activeRemainingMs -= elapsed;
 
 if (activeRemainingMs <= 0) {
-  finishGame(reason = "timeout");
+  finishGame((reason = 'timeout'));
 } else {
   activeRemainingMs += incrementMs;
   switchTurn();
@@ -702,14 +704,14 @@ This keeps spectator load from impacting players.
 
 ## 18. Consistency Model
 
-| Area | Consistency model | Reason |
-|---|---|---|
-| Active game moves | Strong per game | Move order and legality must be exact |
-| Game clocks | Server-authoritative | Prevent cheating and clock drift |
-| Rating updates | Transactional per completed game | Both ratings must update atomically |
-| Leaderboard | Eventual consistency | Fast reads matter more than immediate rank update |
-| Game history | Eventual after completion | Replay can lag slightly |
-| Analytics / anti-cheat | Eventual | Offline and streaming analysis can run async |
+| Area                   | Consistency model                | Reason                                            |
+| ---------------------- | -------------------------------- | ------------------------------------------------- |
+| Active game moves      | Strong per game                  | Move order and legality must be exact             |
+| Game clocks            | Server-authoritative             | Prevent cheating and clock drift                  |
+| Rating updates         | Transactional per completed game | Both ratings must update atomically               |
+| Leaderboard            | Eventual consistency             | Fast reads matter more than immediate rank update |
+| Game history           | Eventual after completion        | Replay can lag slightly                           |
+| Analytics / anti-cheat | Eventual                         | Offline and streaming analysis can run async      |
 
 ---
 
@@ -802,18 +804,18 @@ Client MAKE_MOVE
 
 ## 22. Technology Choices
 
-| Area | Choice | Why |
-|---|---|---|
-| Client | React / Next.js / TypeScript | Strong interactive UI and typed state model |
-| Real-time | WebSockets | Bidirectional low-latency communication |
-| Session runtime | Java/Kotlin/Go/Node.js | Long-lived connections and stateful game actors |
-| Active state | In-memory per owner | Fast deterministic updates |
-| Durable log | Kafka/Pulsar/Kinesis or append-only DB table | Recovery and event-driven processing |
-| SQL source of truth | Postgres | Transactions for ratings and users |
-| Cache / leaderboard | Redis Sorted Sets | Fast rank and top-N queries |
-| Archive | S3/document store | Game aggregate documents and PGNs |
-| Search/history index | OpenSearch/Elastic optional | User history and public game search |
-| Observability | OpenTelemetry + Prometheus/Grafana | Debug distributed gameplay issues |
+| Area                 | Choice                                       | Why                                             |
+| -------------------- | -------------------------------------------- | ----------------------------------------------- |
+| Client               | React / Next.js / TypeScript                 | Strong interactive UI and typed state model     |
+| Real-time            | WebSockets                                   | Bidirectional low-latency communication         |
+| Session runtime      | Java/Kotlin/Go/Node.js                       | Long-lived connections and stateful game actors |
+| Active state         | In-memory per owner                          | Fast deterministic updates                      |
+| Durable log          | Kafka/Pulsar/Kinesis or append-only DB table | Recovery and event-driven processing            |
+| SQL source of truth  | Postgres                                     | Transactions for ratings and users              |
+| Cache / leaderboard  | Redis Sorted Sets                            | Fast rank and top-N queries                     |
+| Archive              | S3/document store                            | Game aggregate documents and PGNs               |
+| Search/history index | OpenSearch/Elastic optional                  | User history and public game search             |
+| Observability        | OpenTelemetry + Prometheus/Grafana           | Debug distributed gameplay issues               |
 
 ---
 

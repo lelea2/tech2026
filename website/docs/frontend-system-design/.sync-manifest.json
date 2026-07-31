@@ -20,6 +20,10 @@
       "hash": "e4906ec1cd39b1526e4d0acdbebaf8eaa960640a16b8067d03ca480f67ac6db6",
       "docRelative": "design-calendar.png"
     },
+    "frontend-system-design/excalidraw/large-scale-node-link-visualization-architecture.svg": {
+      "hash": "a8e317b80fca68714266cc8dee85745a280ce4771e088cb820ecc40f76eaebdf",
+      "docRelative": "excalidraw/large-scale-node-link-visualization-architecture.svg"
+    },
     "frontend-system-design/figma.png": {
       "hash": "2c37c162b2abbc878aa7d6d29d601de73f232b0500d50ab43136f716b6304229",
       "docRelative": "figma.png"
@@ -68,10 +72,6 @@
       "hash": "6e0ef9664c9fbde91a5ce5388c65ae98db8e6726a990d0f77a219c35d933ae64",
       "docRelative": "video-netflix.png"
     },
-    "frontend-system-design/webhook-callback-system.png": {
-      "hash": "cd217fc51f11d6553e654ff1af6d6f44c8eba17f4916c35834cb98cfdfc8bb40",
-      "docRelative": "webhook-callback-system.png"
-    },
     "frontend-system-design/autocomplete.mdx": {
       "hash": "886fedf4755486b440d1d56cead08a807cb7bd0160905feb919b28095b3ef0e4",
       "docRelative": "autocomplete.mdx"
@@ -96,6 +96,10 @@
       "hash": "cd48f96361d61c7ea0bbeacb40b09d437188effbff95cc829a4cdaa417771a77",
       "docRelative": "date-picker-design.mdx"
     },
+    "frontend-system-design/design-google-calendar-frontend-system-design.mdx": {
+      "hash": "651b8b3b59dd58bfabfbddbfe1ccfb61eb4fda58cd30ef1f526c0904e5be92a5",
+      "docRelative": "design-google-calendar-frontend-system-design.mdx"
+    },
     "frontend-system-design/figma.mdx": {
       "hash": "d9ec426dcbf94524449f3d4507c7b36a5213ea9a228033460cdf42dcb3a08bb6",
       "docRelative": "figma.mdx"
@@ -107,6 +111,10 @@
     "frontend-system-design/google-docs-design.mdx": {
       "hash": "04208f76240f659921d307997b21ade9aa4565510d7f6151c219fc826c424db2",
       "docRelative": "google-docs-design.mdx"
+    },
+    "frontend-system-design/large-scale-node-link-visualization-design.mdx": {
+      "hash": "9613e930bb9621373a1cfaacce2f54d29c559fbdef7840f5111ecb6ef57fe933",
+      "docRelative": "large-scale-node-link-visualization-design.mdx"
     },
     "frontend-system-design/masonry-layout-system-design.mdx": {
       "hash": "f1db19746175d3345d853c6e53b08d80b6b9aeec1938d418e2250827878ff87f",
@@ -148,12 +156,8 @@
       "hash": "6cc2c765dca4cc1760ec06abd75b341da68a9592f41bee2c409bde055ccde958",
       "docRelative": "video-netflix.mdx"
     },
-    "frontend-system-design/webhook-callback-system.mdx": {
-      "hash": "3835cf37ddc5040d7a1ebb3563c6d1745aa8634b9045b9b27eba0f40c5eb7d81",
-      "docRelative": "webhook-callback-system.mdx"
-    },
     "frontend-system-design/websocket-vs.SSE-vs.polling.mdx": {
-      "hash": "cd56f92be04ff5923b4989e3d15501c1e086714c4ca0c40dfd914d73a4a96808",
+      "hash": "7642c0657e181085eee89b9c3aae1d27eb6b3497d04fefd19b093c1e5538b9e0",
       "docRelative": "websocket-vs.SSE-vs.polling.mdx"
     }
   }
