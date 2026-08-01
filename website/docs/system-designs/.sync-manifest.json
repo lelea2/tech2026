@@ -28,6 +28,10 @@
       "hash": "3cb0a3c78612ef2f8f69ed195b30805e2818c2694d836dcb5f455c8c426520f7",
       "docRelative": "agentic-system-design/sandbox-ide-final.png"
     },
+    "system-designs/agentic-system-design/ux-mock.svg": {
+      "hash": "9172b514e9baeb4015517f804a34328a2bfce59c5a9dbdb7b4fda0c051ad1c72",
+      "docRelative": "agentic-system-design/ux-mock.svg"
+    },
     "system-designs/assets/ml_lifecycle_feedback_loop_chart.png": {
       "hash": "b080d3e5fb2d1eab6830a319f1b0ce464e122d830e3fbb215d59884fbe064f1d",
       "docRelative": "assets/ml_lifecycle_feedback_loop_chart.png"
@@ -124,6 +128,10 @@
       "hash": "daa823c0c1c0582fc63bb78546c640043b41386ebbf5783ab5e75fe1e302a363",
       "docRelative": "pastebin.png"
     },
+    "system-designs/patterns/contention.png": {
+      "hash": "6e2ea8837b7f9ef9fccfa23a249c811876afe173a961647eeb8b783950f3f412",
+      "docRelative": "patterns/contention.png"
+    },
     "system-designs/patterns/realtime-updates.png": {
       "hash": "40ce64fb9c130132d4a978bb4ea6f7105d0c69e1b6a9d740148859b8f9258eaf",
       "docRelative": "patterns/realtime-updates.png"
@@ -137,20 +145,16 @@
       "docRelative": "rate-limiter.png"
     },
     "system-designs/ticketmaster.png": {
-      "hash": "d31bb3a663f4a4dd4844a3fddf229d38521d7861cf6550a2003cae37713efd10",
+      "hash": "e84eee0b11bf02a403d2fea6f4d65151e95eb35369149ff7482f01cbb27e61aa",
       "docRelative": "ticketmaster.png"
     },
     "system-designs/tiny-url.png": {
-      "hash": "164a210d53184162bb64e904a39d084eec6ca4a501bd3f0c261fa664313183ed",
+      "hash": "c008aa0a7d33e3db180971c7486f9fe4d565dd0b00a846766a43ad4906b3eaad",
       "docRelative": "tiny-url.png"
     },
     "system-designs/uber.png": {
       "hash": "cc28f7fcaee1f7909d048567bb40f52bdece18299457cff6f97b5b7c67e4e8a3",
       "docRelative": "uber.png"
-    },
-    "system-designs/ux-mock.svg": {
-      "hash": "9172b514e9baeb4015517f804a34328a2bfce59c5a9dbdb7b4fda0c051ad1c72",
-      "docRelative": "ux-mock.svg"
     },
     "system-designs/web-crawler.png": {
       "hash": "c8459830c65893b3b3129075cb4be566079e7c55ff5838142f23a6067e77574a",
@@ -179,6 +183,10 @@
     "system-designs/agentic-system-design/model_eval_training_llm_design.mdx": {
       "hash": "b138a64827a51cefb6c0329dfa9ba9edcc2ef4df174f123585fb128ce15fbe2e",
       "docRelative": "agentic-system-design/model_eval_training_llm_design.mdx"
+    },
+    "system-designs/agentic-system-design/prompt-playground.mdx": {
+      "hash": "f1e0a7022faace799bbbf850889f4d79a45e923b411f10dada35b79ba0d4e1b1",
+      "docRelative": "agentic-system-design/prompt-playground.mdx"
     },
     "system-designs/agentic-system-design/sandboxed-cloud-ide-system-design.mdx": {
       "hash": "a292f0500183671d91abb19f04245d8577a64d4a2922cae5a1ad1914b2331b28",
@@ -261,7 +269,7 @@
       "docRelative": "news-aggregator.mdx"
     },
     "system-designs/pastebin.mdx": {
-      "hash": "2fdb4849b46135dd829aec572f9b52290c3e885e746a1d8bf1113a42af2e4ff6",
+      "hash": "34bcd467d518903f4a7b23fafda0dc627e687ad769dc09fa4faa7c18f46fa795",
       "docRelative": "pastebin.mdx"
     },
     "system-designs/patterns/flink_vs_temporal_staff_engineer.mdx": {
@@ -279,10 +287,6 @@
     "system-designs/preparing.mdx": {
       "hash": "ec97529d329b27a6cfb90bfb0075c4cbbc0afe9039b5f4d40cfaa99930b7a69a",
       "docRelative": "preparing.mdx"
-    },
-    "system-designs/prompt-playground.mdx": {
-      "hash": "42a5e21e9187bc1b291f3034a3bc2d0f6010d85dc36421f7cacbe3a696bd4357",
-      "docRelative": "prompt-playground.mdx"
     },
     "system-designs/rate-limit.mdx": {
       "hash": "c2904cc2bd4b9026a16010b7cfc0cd939f514c45c6957e2797b5639572bde9e2",
@@ -313,7 +317,7 @@
       "docRelative": "whatsapp-chat-app.mdx"
     },
     "__nav__:agentic-system-design": {
-      "hash": "ec42d436bb5ae8cf641064ed1b71083be75284b738ff73f4b14f66bfbeb68c6d",
+      "hash": "1213f1d160cb527cf3049f32747ced8074c128f29063dad461264211fc1c197b",
       "docRelative": "agentic-system-design/_index.mdx"
     },
     "__nav__:miscellaneous": {
