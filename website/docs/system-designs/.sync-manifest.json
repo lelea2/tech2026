@@ -128,6 +128,10 @@
       "hash": "daa823c0c1c0582fc63bb78546c640043b41386ebbf5783ab5e75fe1e302a363",
       "docRelative": "pastebin.png"
     },
+    "system-designs/patterns/blobs.png": {
+      "hash": "ad4ad46046547f30207a2bd693bb6e09640df7b5d3ae360a31c7c9a7f759bc12",
+      "docRelative": "patterns/blobs.png"
+    },
     "system-designs/patterns/contention.png": {
       "hash": "6e2ea8837b7f9ef9fccfa23a249c811876afe173a961647eeb8b783950f3f412",
       "docRelative": "patterns/contention.png"
@@ -135,6 +139,10 @@
     "system-designs/patterns/realtime-updates.png": {
       "hash": "40ce64fb9c130132d4a978bb4ea6f7105d0c69e1b6a9d740148859b8f9258eaf",
       "docRelative": "patterns/realtime-updates.png"
+    },
+    "system-designs/patterns/scale_read_write.png": {
+      "hash": "8d1079abbfb32121a542a0ff585f67ad1d8ce2f11b3f4277b91668baf8371851",
+      "docRelative": "patterns/scale_read_write.png"
     },
     "system-designs/payment-system.png": {
       "hash": "d589f93fdf1e90354c534928bcad8fba3b68eeed5f170a1491848cb771f113b0",
@@ -276,9 +284,17 @@
       "hash": "acd3106b38316e85d98019154dbc398ff863f80c89ff612c68ea3591c0bd7166",
       "docRelative": "patterns/flink_vs_temporal_staff_engineer.mdx"
     },
+    "system-designs/patterns/handle-large-blobs.mdx": {
+      "hash": "8207ba1db73f3a0f847722619a6e5d1382e0bcb7bf3266e9942755e0a51432ba",
+      "docRelative": "patterns/handle-large-blobs.mdx"
+    },
     "system-designs/patterns/real-time-updates.mdx": {
       "hash": "a83cac00d5544927b2bb47c879940611c35675ea984ac1aa3367f980ac4a1018",
       "docRelative": "patterns/real-time-updates.mdx"
+    },
+    "system-designs/patterns/scale-db-read-write.mdx": {
+      "hash": "950a10a21ed7d38b830034c3c7ca7d344f2e86028b2876248289a6763cface86",
+      "docRelative": "patterns/scale-db-read-write.mdx"
     },
     "system-designs/payment-system.mdx": {
       "hash": "e137fd2d0e9e8e54e0709923ff00644b8fbcd0d18cfa17ce556ae4517a605f8f",
@@ -293,7 +309,7 @@
       "docRelative": "rate-limit.mdx"
     },
     "system-designs/short-url.mdx": {
-      "hash": "0a9680404611639e40324ac18c0103ad963b71f12145435f5ed6e2ea443ef70d",
+      "hash": "3a3f44a31300d87485ca2f64578c7a385e599f079d88f758c223f5f930f0318b",
       "docRelative": "short-url.mdx"
     },
     "system-designs/ticketmaster.mdx": {
@@ -325,7 +341,7 @@
       "docRelative": "miscellaneous/_index.mdx"
     },
     "__nav__:patterns": {
-      "hash": "32de73944413abf6762f7f159942e413d113954392cf0cb9510e122ac2dced1e",
+      "hash": "dd82743b4f2b02dd5582a7aa07f0c28d178774bee9df24c1c2d0cd776aad2193",
       "docRelative": "patterns/_index.mdx"
     }
   }
