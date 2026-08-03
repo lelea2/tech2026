@@ -256,9 +256,9 @@
       "hash": "d1877ce0c34b4f0c67637984449312f24887079db126345387a6407d8fb6c10b",
       "docRelative": "leaderboard-realtime-system.mdx"
     },
-    "system-designs/leetcode_execution_leaderboard.mdx": {
-      "hash": "81fca1882e97671c1df454ec4830c3af5a5dd3990cb938ef3f85e072f3b07873",
-      "docRelative": "leetcode_execution_leaderboard.mdx"
+    "system-designs/leetcode.mdx": {
+      "hash": "b4c83758cacd20067bb1b35cc5403e0d620a610194bb68f693bf195cab5d0893",
+      "docRelative": "leetcode.mdx"
     },
     "system-designs/metrics-monitoring.mdx": {
       "hash": "dc00f4a891daf3b106aa0dacdee206d256acb926e4fb8ed2ba5962f2d79e06ce",
