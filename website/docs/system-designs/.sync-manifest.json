@@ -37,7 +37,7 @@
       "docRelative": "assets/ml_lifecycle_feedback_loop_chart.png"
     },
     "system-designs/chat-gpt.png": {
-      "hash": "44c8cf74eb0c76ce3fc8d9f7a70f464b4a8f4137af168fba8a777f03d9cdc2ed",
+      "hash": "a0f6609205251e276eb477905a159a17a323263d664dff8b58752013a831b408",
       "docRelative": "chat-gpt.png"
     },
     "system-designs/chess-live-game-fe-wireframe.svg": {
@@ -49,7 +49,7 @@
       "docRelative": "chess-online-system-architecture.svg"
     },
     "system-designs/cicd.png": {
-      "hash": "1ad1d075457a5e01ed043194f0455c65f60aa944b96a31e1bed844b121b98557",
+      "hash": "8988ef9fcaa24a21b3763564f1a43e0641e433a9fcd3cd09a09507d966974778",
       "docRelative": "cicd.png"
     },
     "system-designs/dau-mau.png": {
