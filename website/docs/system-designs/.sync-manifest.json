@@ -36,6 +36,10 @@
       "hash": "b080d3e5fb2d1eab6830a319f1b0ce464e122d830e3fbb215d59884fbe064f1d",
       "docRelative": "assets/ml_lifecycle_feedback_loop_chart.png"
     },
+    "system-designs/bitly.png": {
+      "hash": "c008aa0a7d33e3db180971c7486f9fe4d565dd0b00a846766a43ad4906b3eaad",
+      "docRelative": "bitly.png"
+    },
     "system-designs/chat-gpt.png": {
       "hash": "a0f6609205251e276eb477905a159a17a323263d664dff8b58752013a831b408",
       "docRelative": "chat-gpt.png"
@@ -164,10 +168,6 @@
       "hash": "e84eee0b11bf02a403d2fea6f4d65151e95eb35369149ff7482f01cbb27e61aa",
       "docRelative": "ticketmaster.png"
     },
-    "system-designs/tiny-url.png": {
-      "hash": "c008aa0a7d33e3db180971c7486f9fe4d565dd0b00a846766a43ad4906b3eaad",
-      "docRelative": "tiny-url.png"
-    },
     "system-designs/uber.png": {
       "hash": "cc28f7fcaee1f7909d048567bb40f52bdece18299457cff6f97b5b7c67e4e8a3",
       "docRelative": "uber.png"
@@ -209,16 +209,12 @@
       "docRelative": "agentic-system-design/sandboxed-cloud-ide-system-design.mdx"
     },
     "system-designs/bitly.mdx": {
-      "hash": "979f4fb63533e53e30dd7a743d0381a0aae3f454c0ad4b8205d45b3f2aa96033",
+      "hash": "9da02c2aa2b6a8ea01789bacec67a98c36161f503dc8d23ec31ba364803aeae9",
       "docRelative": "bitly.mdx"
     },
     "system-designs/chat-gpt.mdx": {
       "hash": "0ea5fb71f01ff516475386f64a40d892730ea2eddccd82e43831a75c53433567",
       "docRelative": "chat-gpt.mdx"
-    },
-    "system-designs/chess-com-online-playing-system.mdx": {
-      "hash": "c0bb6c5c2e03017d33f03d76337b05b5e003c5c26004791375d568ac49682552",
-      "docRelative": "chess-com-online-playing-system.mdx"
     },
     "system-designs/cicd-workflow-design.mdx": {
       "hash": "c4335586269b22359f88d4f3dd775dff2d6fc98edfc45dba089babecaabfbcd4",
@@ -233,7 +229,7 @@
       "docRelative": "distributed-cache.mdx"
     },
     "system-designs/dropbox.mdx": {
-      "hash": "0450fc35ce2bda469463f17aa7345103aa52e56f777d7cc579761d3d2f00893c",
+      "hash": "6e1b484c886dfc374da0d06e159d8f105691ec0d14f01ea764dd225f234bc17e",
       "docRelative": "dropbox.mdx"
     },
     "system-designs/feature-flag-system.mdx": {
@@ -295,6 +291,10 @@
     "system-designs/news-aggregator.mdx": {
       "hash": "0ef13c09123cd9ea56b24c29a4eb013e55cd630c42b835549407ba63d14dbbc5",
       "docRelative": "news-aggregator.mdx"
+    },
+    "system-designs/online-chess.mdx": {
+      "hash": "249b41380dc9a78a05e03dac4be2e6ec445cd5fdaf77d3dd5ffe706620d255f7",
+      "docRelative": "online-chess.mdx"
     },
     "system-designs/pastebin.mdx": {
       "hash": "34bcd467d518903f4a7b23fafda0dc627e687ad769dc09fa4faa7c18f46fa795",
