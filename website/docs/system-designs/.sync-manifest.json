@@ -136,6 +136,10 @@
       "hash": "6e2ea8837b7f9ef9fccfa23a249c811876afe173a961647eeb8b783950f3f412",
       "docRelative": "patterns/contention.png"
     },
+    "system-designs/patterns/long-running-task.png": {
+      "hash": "bd6de504af531b6d00c45cc24dcfab74a84dec5583505ed43426224077bca090",
+      "docRelative": "patterns/long-running-task.png"
+    },
     "system-designs/patterns/realtime-updates.png": {
       "hash": "40ce64fb9c130132d4a978bb4ea6f7105d0c69e1b6a9d740148859b8f9258eaf",
       "docRelative": "patterns/realtime-updates.png"
@@ -143,6 +147,10 @@
     "system-designs/patterns/scale_read_write.png": {
       "hash": "8d1079abbfb32121a542a0ff585f67ad1d8ce2f11b3f4277b91668baf8371851",
       "docRelative": "patterns/scale_read_write.png"
+    },
+    "system-designs/patterns/temporal.png": {
+      "hash": "72378be97bb4e8280545983ab743089bb397b41d8e55ffd93c9234088e2c5452",
+      "docRelative": "patterns/temporal.png"
     },
     "system-designs/payment-system.png": {
       "hash": "d589f93fdf1e90354c534928bcad8fba3b68eeed5f170a1491848cb771f113b0",
@@ -285,8 +293,16 @@
       "docRelative": "patterns/flink_vs_temporal_staff_engineer.mdx"
     },
     "system-designs/patterns/handle-large-blobs.mdx": {
-      "hash": "8207ba1db73f3a0f847722619a6e5d1382e0bcb7bf3266e9942755e0a51432ba",
+      "hash": "ede5b06e86d8d87f25009a11481ee6d521f1599938cc97f25b87d0d9097ce4f6",
       "docRelative": "patterns/handle-large-blobs.mdx"
+    },
+    "system-designs/patterns/manage-long-running-task.mdx": {
+      "hash": "1489abd97b91d8a26ba1db9d7183946dc8ea6641dcd09420319594e8f8c5858d",
+      "docRelative": "patterns/manage-long-running-task.mdx"
+    },
+    "system-designs/patterns/multi-steps-process.mdx": {
+      "hash": "865e39c5022962b872876810b59abb22eb5a259a41c2ccc7f1613ede8a38e895",
+      "docRelative": "patterns/multi-steps-process.mdx"
     },
     "system-designs/patterns/real-time-updates.mdx": {
       "hash": "a83cac00d5544927b2bb47c879940611c35675ea984ac1aa3367f980ac4a1018",
@@ -341,7 +357,7 @@
       "docRelative": "miscellaneous/_index.mdx"
     },
     "__nav__:patterns": {
-      "hash": "dd82743b4f2b02dd5582a7aa07f0c28d178774bee9df24c1c2d0cd776aad2193",
+      "hash": "26a4b0e0f95507d9029c28b5a78fb823960fcc06f8ec34b7106294eca0d234e4",
       "docRelative": "patterns/_index.mdx"
     }
   }
