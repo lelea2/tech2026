@@ -78,6 +78,27 @@ const config = {
           // Remove this to remove the "edit this page" links.
           editUrl:
             'https://github.com/lelea2/tech2026/tree/main/website/',
+          async sidebarItemsGenerator({defaultSidebarItemsGenerator, ...args}) {
+            const items = await defaultSidebarItemsGenerator(args);
+            function sortItems(list) {
+              const categories = list
+                .filter((item) => item.type === 'category')
+                .sort((a, b) => a.label.localeCompare(b.label))
+                .map((item) => ({
+                  ...item,
+                  items: sortItems(item.items ?? []),
+                }));
+              const docs = list
+                .filter((item) => item.type !== 'category')
+                .sort((a, b) => {
+                  const labelA = a.label ?? a.id ?? '';
+                  const labelB = b.label ?? b.id ?? '';
+                  return labelA.localeCompare(labelB);
+                });
+              return [...categories, ...docs];
+            }
+            return sortItems(items);
+          },
         },
         blog: false,
         theme: {

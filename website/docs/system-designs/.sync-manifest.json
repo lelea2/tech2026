@@ -93,7 +93,7 @@
       "docRelative": "i18n.png"
     },
     "system-designs/job-scheduler.png": {
-      "hash": "eb26e2b6b2a312ee8ebdd835075ab2fcb475d6a782f57cb4f54cf3dcd1d6bf9c",
+      "hash": "459fdca03bc7ead4b576a15e1fbaefb0a3aec3490a828ff527636fc618dea467",
       "docRelative": "job-scheduler.png"
     },
     "system-designs/leetcode.png": {
@@ -287,6 +287,10 @@
     "system-designs/multimodal-file-ingestion-retrieval.mdx": {
       "hash": "eff03e929e4631eb3a26fc263ad8080e3660914b272256afee3a4b22dc944c34",
       "docRelative": "multimodal-file-ingestion-retrieval.mdx"
+    },
+    "system-designs/netflix.mdx": {
+      "hash": "7eabbff232b7b245cf291045dc51c68a8fcae919f2cd2a46ba40205d37ed6462",
+      "docRelative": "netflix.mdx"
     },
     "system-designs/news-aggregator.mdx": {
       "hash": "0ef13c09123cd9ea56b24c29a4eb013e55cd630c42b835549407ba63d14dbbc5",
