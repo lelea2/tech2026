@@ -184,6 +184,10 @@
       "hash": "1dcfcb6a205693ba8d5c4450babffc7845dd3a483b139fcd4b4757f94c6b7832",
       "docRelative": "whatsapp-chat.png"
     },
+    "system-designs/yelp.png": {
+      "hash": "a91d3d6f4cf75408c397ba3c423078d6bf442b8106fc97f13a54d0d339b7921d",
+      "docRelative": "yelp.png"
+    },
     "system-designs/agentic-system-design/agentic-mcp-copilot-system-design.mdx": {
       "hash": "d7ee53856ea27dbf9d4ec85d83c0e7c888893451ad88cab0359634226786d0ef",
       "docRelative": "agentic-system-design/agentic-mcp-copilot-system-design.mdx"
@@ -351,6 +355,10 @@
     "system-designs/whatsapp-chat-app.mdx": {
       "hash": "d3b802722eef544d2fb1c8d2dddfe9d325389945af3e7362890c6b034ef29dcd",
       "docRelative": "whatsapp-chat-app.mdx"
+    },
+    "system-designs/yelp.mdx": {
+      "hash": "79221ade813c027f69c039f6e7106fb4db6fd4266b39bbfdb5582478162743f2",
+      "docRelative": "yelp.mdx"
     },
     "__nav__:agentic-system-design": {
       "hash": "1213f1d160cb527cf3049f32747ced8074c128f29063dad461264211fc1c197b",
