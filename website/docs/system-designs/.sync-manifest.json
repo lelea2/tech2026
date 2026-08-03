@@ -157,7 +157,7 @@
       "docRelative": "payment-system.png"
     },
     "system-designs/rate-limiter.png": {
-      "hash": "3e345492223338e5e3cc87a55e5f89f6e8caf4865f8c40e791d0ae9100c0ad45",
+      "hash": "cbc9857f856770f79e74b98e7b38ddc52eada83f69b2b8cc91f44340fd050530",
       "docRelative": "rate-limiter.png"
     },
     "system-designs/ticketmaster.png": {
@@ -207,6 +207,10 @@
     "system-designs/agentic-system-design/sandboxed-cloud-ide-system-design.mdx": {
       "hash": "a292f0500183671d91abb19f04245d8577a64d4a2922cae5a1ad1914b2331b28",
       "docRelative": "agentic-system-design/sandboxed-cloud-ide-system-design.mdx"
+    },
+    "system-designs/bitly.mdx": {
+      "hash": "979f4fb63533e53e30dd7a743d0381a0aae3f454c0ad4b8205d45b3f2aa96033",
+      "docRelative": "bitly.mdx"
     },
     "system-designs/chat-gpt.mdx": {
       "hash": "0ea5fb71f01ff516475386f64a40d892730ea2eddccd82e43831a75c53433567",
@@ -268,6 +272,10 @@
       "hash": "5fcb215feff44b13eef35957da9800d94dbc2a9a8bb62b873003b50fb447d308",
       "docRelative": "miscellaneous/compliance_evidence_collection_system.mdx"
     },
+    "system-designs/miscellaneous/preparing.mdx": {
+      "hash": "9e2b0a7fa695606097db316be665aff7cce72b26570ac9f06f103e466157ce85",
+      "docRelative": "miscellaneous/preparing.mdx"
+    },
     "system-designs/miscellaneous/spv-onboarding.mdx": {
       "hash": "8b6b3ca04eef90f53303ed72f57e0ca56c99bba5a154d69274fc0a3d78e71731",
       "docRelative": "miscellaneous/spv-onboarding.mdx"
@@ -316,17 +324,9 @@
       "hash": "e137fd2d0e9e8e54e0709923ff00644b8fbcd0d18cfa17ce556ae4517a605f8f",
       "docRelative": "payment-system.mdx"
     },
-    "system-designs/preparing.mdx": {
-      "hash": "ec97529d329b27a6cfb90bfb0075c4cbbc0afe9039b5f4d40cfaa99930b7a69a",
-      "docRelative": "preparing.mdx"
-    },
     "system-designs/rate-limit.mdx": {
-      "hash": "c2904cc2bd4b9026a16010b7cfc0cd939f514c45c6957e2797b5639572bde9e2",
+      "hash": "a62a344d5c71f09dade78a20324ea1052d2ae53ae9670a39c5b9fe124a1c1355",
       "docRelative": "rate-limit.mdx"
-    },
-    "system-designs/short-url.mdx": {
-      "hash": "3a3f44a31300d87485ca2f64578c7a385e599f079d88f758c223f5f930f0318b",
-      "docRelative": "short-url.mdx"
     },
     "system-designs/ticketmaster.mdx": {
       "hash": "d662f2fd0247f984733ef8cac66bf2bf9ed0f58b37bf4e83c4a610a33ff145b2",
@@ -353,7 +353,7 @@
       "docRelative": "agentic-system-design/_index.mdx"
     },
     "__nav__:miscellaneous": {
-      "hash": "5d09c0bbc30301467dc0824fd0e55957047bc570c5a10af7fe3e37510f4b755e",
+      "hash": "33747663d804094126ca548e39a4e4ba114b46e64c404b4ccd271c5f499d0c04",
       "docRelative": "miscellaneous/_index.mdx"
     },
     "__nav__:patterns": {
