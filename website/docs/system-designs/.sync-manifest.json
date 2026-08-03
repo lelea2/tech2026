@@ -69,7 +69,7 @@
       "docRelative": "design_tool_ux_wireframe.svg"
     },
     "system-designs/distributed-cache.png": {
-      "hash": "d57a55f6377f34bb704c29064696d0519ca8529393362e37a5a7b5c5f085e85e",
+      "hash": "a05101c6afc165d7becd9f38494bd3199d060fdcb0fb3abf5b43aad5dbbcfbe0",
       "docRelative": "distributed-cache.png"
     },
     "system-designs/dropbox.png": {
@@ -165,7 +165,7 @@
       "docRelative": "rate-limiter.png"
     },
     "system-designs/ticketmaster.png": {
-      "hash": "e84eee0b11bf02a403d2fea6f4d65151e95eb35369149ff7482f01cbb27e61aa",
+      "hash": "21c11e2efac8a45fecd2c9e3911c126e2dc5528dfdaa904d86cedb6402a64af3",
       "docRelative": "ticketmaster.png"
     },
     "system-designs/uber.png": {
@@ -297,7 +297,7 @@
       "docRelative": "news-aggregator.mdx"
     },
     "system-designs/online-chess.mdx": {
-      "hash": "249b41380dc9a78a05e03dac4be2e6ec445cd5fdaf77d3dd5ffe706620d255f7",
+      "hash": "4203e51e1b886c1fe79b1eb4bf66b8d20fe5232bcecd073ae54b8ac7ce6c4ed5",
       "docRelative": "online-chess.mdx"
     },
     "system-designs/pastebin.mdx": {
