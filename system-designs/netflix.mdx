@@ -1,0 +1,390 @@
+---
+title: Video Upload & Streaming — YouTube / Netflix
+---
+
+# Video Upload & Streaming — YouTube / Netflix
+
+![Netflix Architecture](./netflix.png)
+
+---
+
+## Problem Statement
+
+Design a system that allows users to **upload videos** and **watch them on demand** at global scale. Think YouTube (user-generated, massive upload volume) and Netflix (curated catalog, ultra-high streaming reliability).
+
+---
+
+## Scale & Requirements
+
+### Functional
+
+- Users can upload videos (up to 10GB)
+- Videos are processed into multiple resolutions and formats (HLS/DASH adaptive bitrate)
+- Users can stream videos with seek, pause, resume
+- Videos are served globally with low latency
+- Search and recommendations (out of scope for this deep dive)
+
+### Non-Functional
+
+- **Upload:** Support millions of uploads/day; resumable; reliable
+- **Processing:** Videos available for playback within minutes of upload
+- **Streaming:** 99.99% availability; p99 buffering start &lt;2s; support 100M+ concurrent viewers
+- **Durability:** Videos never lost; multi-region replication
+- **Cost:** Efficient storage; serve from CDN not origin
+
+### Scale Estimates (YouTube-like)
+
+- 500 hours of video uploaded per minute
+- 1B+ hours watched per day
+- Average video: 300MB raw → 150MB processed (multi-bitrate HLS)
+- Storage: 500hr/min × 60min × 150MB ≈ **4.5 PB/day**
+- CDN traffic: 1B hr/day × 4Mbps avg ≈ **500 Tbps peak egress**
+
+---
+
+## High-Level Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Upload Path                              │
+│  Client → Upload API → Object Storage (raw) → Processing Queue │
+│                                    ↓                           │
+│                          Transcoding Workers                    │
+│                                    ↓                           │
+│                    CDN Origin (processed HLS segments)          │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                        Watch Path                               │
+│  Client → Playback API (manifest URL) → CDN Edge               │
+│                    ↓ cache miss                                 │
+│               CDN Origin → Object Storage                      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Upload Deep Dive
+
+### Phase 1: Client-Direct Multipart Upload
+
+Never route video bytes through your application servers. The app server issues credentials; the client writes directly to object storage.
+
+```
+1. Client → POST /api/videos/upload/init
+   { title, fileSize, contentType, idempotencyKey }
+
+2. Server:
+   - Validates auth, quota, file size
+   - Generates videoId (UUID)
+   - Calls S3.createMultipartUpload() → uploadId
+   - Inserts DB row: { videoId, status: 'uploading', userId, uploadId }
+   - Returns { videoId, uploadId }
+
+3. Client → POST /api/videos/upload/presign
+   { videoId, uploadId, partNumbers: [1,2,3,...N] }
+
+4. Server returns presigned URLs per part (valid 1hr)
+
+5. Client uploads parts in parallel (5–10 concurrent):
+   PUT <presignedUrl_1>  →  S3  →  ETag1
+   PUT <presignedUrl_2>  →  S3  →  ETag2
+   ...
+
+6. Client → POST /api/videos/upload/complete
+   { videoId, uploadId, parts: [{partNumber, ETag}...] }
+
+7. Server:
+   - Calls S3.completeMultipartUpload()
+   - Updates DB: { status: 'processing' }
+   - Publishes VideoUploaded event → Processing Queue
+   - Returns { videoId, status: 'processing' }
+```
+
+**Resumability:** Client stores `{uploadId, completedParts[]}` in localStorage. On retry, fetches already-uploaded parts from server (store ETags in DB per part), skips completed parts, re-uploads only failed ones.
+
+**Chunk size:** 10–50MB per part. Client measures bandwidth after chunk 1, adjusts dynamically.
+
+**Idempotency:** `idempotencyKey = hash(userId + filename + fileSize)`. Server returns existing `videoId` if key matches — prevents duplicate videos on retry.
+
+---
+
+### Phase 2: Video Processing Pipeline
+
+```
+VideoUploaded event (videoId, rawS3Key)
+        ↓
+  Processing Queue (SQS / Kafka)
+        ↓
+  Transcoding Orchestrator
+        ├── spawn parallel transcode jobs per resolution:
+        │     360p  → worker 1
+        │     720p  → worker 2
+        │     1080p → worker 3
+        │     4K    → worker 4 (if eligible)
+        ├── audio extraction + normalization
+        ├── thumbnail generation (every 10s → sprite sheet)
+        └── subtitle extraction / caption processing
+        ↓
+  All variants complete → Package into HLS/DASH
+        ↓
+  Write segments + manifests → CDN Origin (S3)
+        ↓
+  Update DB: { status: 'ready', masterManifestUrl }
+  Publish VideoReady event → Notification service
+```
+
+### Transcoding Architecture
+
+**Why distributed workers?** A 1-hour 4K video takes ~30 min to transcode on a single machine. Parallelism across resolutions and GOP (Group of Pictures) segments reduces this to minutes.
+
+```
+GOP-level parallelism:
+  Split video into 10s segments
+  Transcode each segment independently across N workers
+  Merge segments after all complete
+
+This cuts a 60-min video transcode from 30min → ~2min with 16 workers
+```
+
+**Worker infrastructure:**
+
+- EC2 Spot instances (70% cost reduction vs On-Demand — transcoding is interruption-tolerant)
+- Auto-scaled by SQS queue depth
+- FFmpeg-based transcoding with hardware acceleration (NVENC on GPU instances)
+- Checkpointing: worker writes completed segment keys to DB every N segments; on crash, resume from last checkpoint
+
+### Output Formats
+
+```
+HLS (HTTP Live Streaming) — Apple/primary:
+  master.m3u8
+    ├── 360p/index.m3u8  (segments: seg_000.ts, seg_001.ts, ...)
+    ├── 720p/index.m3u8
+    ├── 1080p/index.m3u8
+    └── 4k/index.m3u8
+
+DASH (MPEG-DASH) — Android/Smart TV:
+  manifest.mpd
+    ├── video/360p/*.m4s
+    ├── video/1080p/*.m4s
+    └── audio/en/*.m4s
+```
+
+**Segment duration:** 6–10s per segment. Shorter segments = faster bitrate switching but more HTTP requests. Netflix uses 4s; YouTube uses 5–10s.
+
+---
+
+## Storage Architecture
+
+### Raw Video Storage
+
+- S3 bucket: `videos-raw/{userId}/{videoId}/original.mp4`
+- Lifecycle: delete raw after 30 days (or keep for re-transcoding if codec evolves)
+- Access: write-once from worker, never served to end users
+
+### Processed Video Storage (CDN Origin)
+
+- S3 bucket: `videos-cdn/{videoId}/{resolution}/`
+- All segments + manifests stored here
+- CloudFront points to this as origin
+- S3 is never hit directly by clients — all traffic goes through CDN
+
+### Metadata Storage
+
+```sql
+CREATE TABLE videos (
+  id              UUID PRIMARY KEY,
+  owner_id        BIGINT REFERENCES users(id),
+  title           TEXT,
+  status          TEXT,          -- uploading | processing | ready | failed
+  duration_secs   INT,
+  raw_s3_key      TEXT,
+  master_manifest TEXT,          -- CDN URL to master.m3u8
+  thumbnail_url   TEXT,
+  views           BIGINT DEFAULT 0,
+  created_at      TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE video_variants (
+  video_id    UUID REFERENCES videos(id),
+  resolution  TEXT,              -- '360p', '720p', '1080p', '4k'
+  bitrate_kbps INT,
+  codec       TEXT,              -- 'h264', 'h265', 'av1'
+  manifest_url TEXT,
+  size_bytes  BIGINT,
+  PRIMARY KEY (video_id, resolution)
+);
+```
+
+---
+
+## Streaming (Watch) Deep Dive
+
+### Playback Initiation
+
+```
+Client → GET /api/videos/{videoId}/playback
+Server:
+  1. Validate auth + entitlement (subscription check, DRM license)
+  2. Select CDN edge closest to client (GeoDNS or client IP lookup)
+  3. Generate signed CDN URL for master manifest (prevents hotlinking)
+  4. Return:
+     {
+       manifestUrl: "https://cdn.example.com/videos/{videoId}/master.m3u8?sig=...",
+       licenseUrl: "https://drm.example.com/license",   // for DRM-protected content
+       subtitleTracks: [...],
+       nextEpisodeId: "..."
+     }
+Client: loads manifest → HLS player begins ABR streaming
+```
+
+### Adaptive Bitrate (ABR) Streaming
+
+The player dynamically switches quality based on network conditions — this is the core of smooth playback.
+
+```
+Player buffer: 30s target ahead of playback position
+
+ABR decision loop (every segment):
+  measure: download_speed of last segment
+  estimate: available_bandwidth = download_speed × 0.85  (safety margin)
+  select: highest bitrate variant where bitrate < available_bandwidth
+
+  if buffer < 10s → drop to lower quality immediately (rebuffering prevention)
+  if buffer > 45s → try stepping up quality
+  if buffer < 3s  → emergency drop to minimum quality
+```
+
+**Netflix BOLA / YouTube BOLA-E:** Production ABR algorithms factor in buffer level, bandwidth estimate, and segment download time using control-theoretic models — not just raw bandwidth.
+
+### CDN Architecture
+
+```
+Client (Tokyo)
+    │
+    ▼
+CloudFront Edge (Tokyo PoP) ←── 99% of requests served here
+    │ cache miss (cold start or uncached segment)
+    ▼
+Regional CDN Cache (Asia)   ←── reduces cross-continent traffic
+    │ miss
+    ▼
+S3 Origin (us-east-1)       ←── source of truth
+```
+
+**Cache-Control headers:**
+
+```
+Segments (immutable):  Cache-Control: public, max-age=31536000, immutable
+Manifests (mutable):   Cache-Control: public, max-age=5          # updated for live
+Master manifest:       Cache-Control: public, max-age=3600
+```
+
+Segments are **content-addressed** (`seg_000_1080p_h264.ts`) — URL never changes after transcoding. Manifests point to these fixed segment URLs. This means segments can be cached indefinitely at the CDN.
+
+**CDN pop selection:** GeoDNS returns the nearest CDN PoP. Netflix's Open Connect appliances sit directly in ISP networks — zero internet hops for the last mile.
+
+### Seek (Jump to Timestamp)
+
+```
+User seeks to 00:45:30
+
+Player:
+  1. Calculate segment index: 45:30 / 6s per segment = segment 455
+  2. Fetch variant manifest to get segment URL for index 455
+  3. Issue GET for seg_455.ts (often cached at CDN edge)
+  4. Decode from nearest keyframe (IDR frame within segment)
+  5. Resume playback
+
+Seek is fast because:
+  - Segments are independently decodable (each starts with IDR frame)
+  - CDN has all segments cached (popular videos)
+  - No server round-trip required — player computes segment URL directly
+```
+
+---
+
+## DRM (Digital Rights Management)
+
+For licensed content (Netflix), every segment is encrypted.
+
+```
+Encryption at origin (during transcoding):
+  AES-128 per-segment keys stored in Key Management System (KMS)
+  HLS manifest includes: #EXT-X-KEY:METHOD=AES-128,URI="https://drm.example.com/key/{videoId}"
+
+Playback:
+  Player → DRM license server (validates entitlement) → decryption key
+  Player decrypts segments locally during playback
+  Keys are never stored on disk (in-memory only)
+```
+
+**Widevine (Google) / FairPlay (Apple) / PlayReady (Microsoft):** Production DRM systems. Each has a native CDM (Content Decryption Module) in the browser/OS. Your license server validates the device's DRM credentials and issues decryption keys.
+
+---
+
+## View Count & Analytics
+
+View counts are not incremented on every GET — that would require a DB write per segment request (millions/second).
+
+```
+Client → POST /api/videos/{videoId}/heartbeat  (every 30s during playback)
+  payload: { watchedSeconds, quality, bufferingEvents, seekCount }
+
+API: write to Kafka topic (high-throughput, no DB writes)
+  ↓
+Flink/Spark streaming job: aggregates per-video per-minute
+  ↓
+Materialized view in DB: videos.views (updated every 1min)
+  ↓
+Redis cache: hot video view counts (updated from Flink output)
+```
+
+**Deduplication:** a single user refreshing counts once per 24hr window using a Redis `SET` with TTL: `SADD video:{id}:viewers:{date} {userId}` → cardinality = unique viewers.
+
+---
+
+## Failure Scenarios & Mitigations
+
+| Failure                             | Impact                             | Mitigation                                                                                             |
+| ----------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Upload worker crashes mid-transcode | Partial transcode                  | Checkpoint per segment; resume from last checkpoint; SQS re-delivers message                           |
+| CDN PoP goes down                   | Regional outage                    | GeoDNS failover to next nearest PoP within 60s                                                         |
+| S3 origin unavailable               | Cache misses fail                  | CDN serves cached segments (segments are immutable; cache TTL 1yr); only new uncached content affected |
+| Transcoding queue backs up          | Upload → available delay increases | Auto-scale workers on queue depth; priority queue for paying users                                     |
+| DRM license server down             | Playback fails for DRM content     | License caching in player (short TTL, 24hr); redundant license servers multi-region                    |
+| Seek causes cache miss storm        | High origin load on new video      | Pre-warm CDN: after processing, issue GET for first N segments across PoPs                             |
+
+---
+
+## Key Design Decisions & Trade-offs
+
+| Decision                       | Rationale                                                   | Trade-off                                                                            |
+| ------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Client-direct upload to S3     | Eliminates app server bottleneck; S3 handles throughput     | More complex presign flow; client needs SDK knowledge                                |
+| HLS over RTMP                  | Universally supported; works over HTTP/CDN; resumable       | Higher latency than RTMP (6–10s segments); not suitable for live                     |
+| 6s segment duration            | Balance between seek granularity and request overhead       | Shorter = more requests; longer = slower quality switches                            |
+| Spot instances for transcoding | 70% cost reduction                                          | Workers must checkpoint; interruptions add latency                                   |
+| Immutable segment URLs         | Infinite CDN cache TTL; zero origin load for cached content | Re-transcoding requires new URLs; old segments must be purged manually               |
+| AES-128 per-segment encryption | Standard DRM; client-side decrypt in hardware               | Key management complexity; license server becomes critical path                      |
+| Kafka for view heartbeats      | Decouples high-frequency writes from DB                     | Eventual consistency on view counts (acceptable — nobody cares about ±1min accuracy) |
+
+---
+
+## Staff Interview Follow-ups
+
+**"How do you handle a 10GB upload from a mobile client on a flaky connection?"**
+Multipart upload with resumability. Client computes chunk SHA-256 before upload, stores `{uploadId, completedParts}` in IndexedDB. On reconnect, client calls `/upload/status` to retrieve already-uploaded parts, skips them, resumes from first failed part. Exponential backoff on 5xx. VisibilityTimeout on SQS extended by heartbeat while transcoding.
+
+**"How does ABR work when a user's bandwidth drops suddenly mid-video?"**
+The player's buffer is the buffer. A 30s buffer means a sudden bandwidth drop doesn't cause immediate rebuffering — the player has 30s of runway. During that window, ABR switches to lower bitrate for future segments. The player continuously measures download time of each segment (not just raw bandwidth) and feeds that into the ABR algorithm. Emergency fallback: drop to minimum bitrate if buffer &lt; 3s.
+
+**"How do you ensure a video uploaded by a creator is available globally within 5 minutes?"**
+Parallel transcoding (GOP-level + resolution-level parallelism) targets &lt;2min for standard content. Once segments are in S3 origin, CDN pre-warming pushes first N segments to top PoPs (CloudFront invalidation + GET pre-warm). GeoDNS ensures subsequent requests hit a warm PoP. Total: upload → available in ~3–5 minutes.
+
+**"How do you handle copyright infringement detection?"**
+Audio/video fingerprinting (Content ID). During processing pipeline, generate a perceptual hash (fingerprint) of the video. Compare against a database of known copyrighted content fingerprints. On match: block, mute audio, or claim (route revenue to rights holder). This runs as a processing step before the video goes `ready`. False positive rate must be very low — manual review queue for borderline matches.
+
+**"How does Netflix differ from YouTube architecturally?"**
+Netflix: small curated catalog (~15K titles), all DRM-encrypted, served via Open Connect ISP appliances (custom CDN inside ISPs), optimized for sustained multi-hour playback, pre-positions content at ISPs during off-peak hours. YouTube: massive user-generated catalog (800M videos), mix of DRM and open content, uses Google's global CDN infrastructure, must handle both live streaming and VOD, processes thousands of uploads per minute with SLA of minutes to availability.
