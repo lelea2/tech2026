@@ -104,6 +104,10 @@
       "hash": "7a9dbbd8d9db0c73ee2241963b2b3719219b366398d666e16afec2ca33d0b638",
       "docRelative": "leetcode.png"
     },
+    "system-designs/local-delivery-service.png": {
+      "hash": "f85ed6bcdb19726538ef851adf88b43862c750273ce6af5b731a1f054e8b52dd",
+      "docRelative": "local-delivery-service.png"
+    },
     "system-designs/metrics-monitoring.png": {
       "hash": "a07d37937a19f64a26371965e0b7614f86a088f72f80fd52cb0f39d7ea5abc84",
       "docRelative": "metrics-monitoring.png"
@@ -256,13 +260,13 @@
       "hash": "c2c20a8c58d7145293135b4c31ab75b293ed4ba8386abaf22a7894fff9463a0c",
       "docRelative": "job-scheduler.mdx"
     },
-    "system-designs/leaderboard-realtime-system.mdx": {
-      "hash": "d1877ce0c34b4f0c67637984449312f24887079db126345387a6407d8fb6c10b",
-      "docRelative": "leaderboard-realtime-system.mdx"
-    },
     "system-designs/leetcode.mdx": {
       "hash": "b4c83758cacd20067bb1b35cc5403e0d620a610194bb68f693bf195cab5d0893",
       "docRelative": "leetcode.mdx"
+    },
+    "system-designs/local-delivery-service.mdx": {
+      "hash": "2d69028d9146a1335f2c49a5d31268e134e84551d6ab2b56d43042a9438e097e",
+      "docRelative": "local-delivery-service.mdx"
     },
     "system-designs/metrics-monitoring.mdx": {
       "hash": "dc00f4a891daf3b106aa0dacdee206d256acb926e4fb8ed2ba5962f2d79e06ce",
