@@ -156,6 +156,10 @@
       "hash": "66118e22ec250382cb26428c4f1f3ed668cf3969e64ee0c805b22e9bad48367e",
       "docRelative": "netflix.png"
     },
+    "system-designs/online-chess.png": {
+      "hash": "474a7b1e623893b8a93033756dced3243a13a5234e4ec7ad888204e9413b1ed6",
+      "docRelative": "online-chess.png"
+    },
     "system-designs/pastebin.png": {
       "hash": "daa823c0c1c0582fc63bb78546c640043b41386ebbf5783ab5e75fe1e302a363",
       "docRelative": "pastebin.png"
@@ -353,7 +357,7 @@
       "docRelative": "news-aggregator.mdx"
     },
     "system-designs/online-chess.mdx": {
-      "hash": "4203e51e1b886c1fe79b1eb4bf66b8d20fe5232bcecd073ae54b8ac7ce6c4ed5",
+      "hash": "ab00a683b9618b258d594db81c0c6f4526537cabefd1d272696fabb2e8bf1a9e",
       "docRelative": "online-chess.mdx"
     },
     "system-designs/pastebin.mdx": {
