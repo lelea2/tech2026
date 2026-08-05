@@ -1,0 +1,1569 @@
+---
+title: '100,000-Object Editor & Virtualized Tree'
+description: 'Interview reference for designing a data-heavy frontend with 100,000 objects, canvas/WebGL rendering, virtualization, accessibility, collaboration, and reliability.'
+---
+
+![High level flow](./100k-node.png)
+
+## 100,000-Object Editor / Virtualized Tree
+
+Use this document as a staff-level interview reference for a data-heavy frontend system such as:
+
+- A Figma-like editor
+- Adobe Express or Firefly editor
+- A layer tree with 100,000 objects
+- A dashboard with large hierarchical datasets
+- A canvas-based creative application
+
+---
+
+# 1. Example Interview Prompt
+
+> Design the frontend architecture for a browser-based creative editor containing up to 100,000 objects. Users can pan, zoom, select, drag, resize, reorder layers, search objects, and undo or redo changes. The editor must remain responsive during common interactions.
+
+A strong answer should separate:
+
+1. The document model
+2. The React application shell
+3. The interaction controller
+4. The rendering engine
+5. The virtualized layer tree
+6. Worker-based computation
+7. Persistence and collaboration
+
+---
+
+# 2. Requirements
+
+## Functional Requirements
+
+- Load a document containing up to 100,000 objects
+- Pan and zoom the canvas
+- Select one or multiple objects
+- Drag, resize, rotate, hide, lock, and reorder objects
+- Support text, images, vectors, groups, and nested layers
+- Search the document hierarchy
+- Display a virtualized layer tree
+- Undo and redo edits
+- Autosave changes
+- Load assets progressively
+- Optionally support real-time collaboration
+
+## Non-Functional Requirements
+
+- Target 60 FPS during common interactions
+- Input response should usually remain below 100 ms
+- Large documents should become incrementally interactive
+- Memory usage must remain bounded
+- The editor must be keyboard-accessible
+- Assistive technology must understand selection and object hierarchy
+- The system must recover from worker, rendering, asset, and save failures
+- Unsaved work must never be silently discarded
+
+## Scale Assumptions
+
+```text
+100,000 logical document objects
+20–200 objects typically visible
+1,000–5,000 visible in a worst-case zoom level
+10,000+ expanded rows in the layer tree
+Pointer events may arrive faster than display refresh
+Autosave occurs every few seconds
+Large binary assets are served from object storage through a CDN
+```
+
+The first important observation is:
+
+> The system must not create 100,000 React components or DOM nodes.
+
+---
+
+# 3. High-Level Frontend Architecture
+
+```text
+┌──────────────────────────────── Browser ───────────────────────────────┐
+│                                                                       │
+│  React Application Shell                                             │
+│  ┌─────────────┐ ┌────────────────────┐ ┌─────────────────────────┐  │
+│  │ Toolbar     │ │ Virtualized Layers │ │ Properties Panel        │  │
+│  │ Menus       │ │ Tree               │ │ Selection Controls      │  │
+│  └─────────────┘ └────────────────────┘ └─────────────────────────┘  │
+│                         │                                             │
+│                 Command / Interaction Layer                           │
+│                         │                                             │
+│  ┌──────────────────────▼──────────────────────────────────────────┐  │
+│  │ Client Document Store                                          │  │
+│  │ objectsById • selection • viewport • history • revisions       │  │
+│  └─────────────┬──────────────────────────┬────────────────────────┘  │
+│                │                          │                           │
+│       ┌────────▼────────┐        ┌────────▼────────────────┐          │
+│       │ Spatial Index   │        │ Web Worker              │          │
+│       │ R-tree/quadtree │        │ parsing/search/geometry │          │
+│       └────────┬────────┘        └────────┬────────────────┘          │
+│                │                          │                           │
+│       ┌────────▼──────────────────────────▼───────────────────────┐   │
+│       │ Canvas / WebGL Rendering Engine                          │   │
+│       │ culling • batching • hit testing • LOD • texture cache   │   │
+│       └───────────────────────────────────────────────────────────┘   │
+│                                                                       │
+│  Accessible DOM control plane                                        │
+│  layer tree • selection summary • property controls • live regions    │
+└───────────────────────────────────────────────────────────────────────┘
+```
+
+## Core Architectural Principle
+
+> React owns the product UI. It should not own every high-frequency pixel update.
+
+Use React for:
+
+- Toolbar
+- Menus
+- Dialogs
+- Properties panel
+- Search
+- Layer tree
+- Network and save indicators
+
+Use an external renderer for:
+
+- Scene drawing
+- Pan and zoom
+- Selection overlays
+- Drag previews
+- Hit testing
+- Level-of-detail rendering
+- Texture and geometry caches
+
+---
+
+# 4. Core Data Model
+
+Use normalized state instead of a deeply nested mutable object tree.
+
+```ts
+type ObjectId = string;
+
+type EditorObject = {
+  id: ObjectId;
+  type: 'text' | 'image' | 'shape' | 'group';
+
+  parentId: ObjectId | null;
+  childIds?: ObjectId[];
+
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+
+  zIndex: number;
+  hidden: boolean;
+  locked: boolean;
+
+  version: number;
+};
+
+type DocumentState = {
+  objectsById: Map<ObjectId, EditorObject>;
+  rootIds: ObjectId[];
+
+  selectedIds: Set<ObjectId>;
+  primarySelectedId: ObjectId | null;
+
+  viewport: {
+    x: number;
+    y: number;
+    zoom: number;
+    width: number;
+    height: number;
+  };
+
+  documentRevision: number;
+};
+```
+
+## Why Normalized State
+
+- Fast lookup by ID
+- Update one object without cloning a deep tree
+- Easier operation-based undo
+- Easier collaboration
+- Easier spatial-index updates
+- Easier incremental persistence
+- Stable selection independent of row mounting
+
+---
+
+# 5. State Ownership
+
+```text
+React state
+- dialogs
+- toolbar mode
+- panel state
+- search query
+- loading indicators
+
+Document store
+- normalized objects
+- selection
+- document revision
+- undo history
+- dirty operations
+
+Mutable interaction controller
+- current pointer position
+- hover target
+- drag transform
+- resize gesture
+- temporary snap guides
+
+Rendering engine
+- visible object cache
+- tiles
+- geometry buffers
+- textures
+- viewport render state
+```
+
+High-frequency gesture state should not trigger global React rerenders.
+
+---
+
+# 6. Rendering Strategy
+
+## DOM or SVG
+
+Best for:
+
+- Accessibility
+- Native semantics
+- CSS styling
+- Small or moderate object counts
+- Simple interaction
+
+Problems at 100,000 objects:
+
+- Large DOM memory
+- Expensive style calculation
+- Layout and paint invalidation
+- Large accessibility tree
+- React reconciliation overhead
+- Event-listener overhead
+
+## Canvas 2D
+
+Best for:
+
+- Moderate visible object count
+- Images, text, and basic vector drawing
+- Simpler implementation
+- Strong browser support
+- Faster iteration
+
+Limitations:
+
+- CPU-bound drawing
+- Complex compositing can become expensive
+- Limited batching control
+- Heavy filters may miss frame budgets
+
+## WebGL
+
+Best for:
+
+- Dense visible scenes
+- GPU batching
+- Image compositing
+- Shaders and effects
+- Smooth transforms
+- High object throughput
+
+Limitations:
+
+- More complex implementation
+- Text rendering is harder
+- GPU memory management
+- Context-loss recovery
+- Device and driver variation
+- Accessibility still requires DOM
+
+## Recommended Decision
+
+> Use React for the application shell, a virtualized DOM tree for layers, and Canvas or WebGL for the main scene. Start with Canvas 2D unless profiling or product effects justify WebGL.
+
+---
+
+# 7. Viewport Culling
+
+Do not draw all 100,000 objects.
+
+Maintain a spatial index such as an R-tree or quadtree.
+
+```text
+Viewport changes
+    ↓
+Convert screen viewport to world coordinates
+    ↓
+Query spatial index
+    ↓
+Return visible object IDs
+    ↓
+Add overscan
+    ↓
+Sort by z-order
+    ↓
+Render visible objects only
+```
+
+Example:
+
+```ts
+type Rectangle = {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+};
+
+function getVisibleObjects(viewport: Rectangle, spatialIndex: SpatialIndex): ObjectId[] {
+  const overscanned = expandRectangle(viewport, 200);
+  return spatialIndex.search(overscanned);
+}
+```
+
+## Complexity
+
+Without spatial indexing:
+
+```text
+O(N) per frame
+N = 100,000
+```
+
+With an R-tree:
+
+```text
+Approximately O(log N + K)
+K = visible objects
+```
+
+The main design goal is:
+
+> Make frame cost proportional to visible work, not total document size.
+
+---
+
+# 8. Level of Detail
+
+Do not render full detail at every zoom level.
+
+```text
+Zoom < 5%
+→ page or group thumbnails
+
+Zoom 5–20%
+→ object bounds and dominant colors
+
+Zoom 20–75%
+→ normal geometry and lower-resolution images
+
+Zoom > 75%
+→ full geometry, text, effects, and high-resolution assets
+```
+
+This reduces work for:
+
+- Tiny text
+- Shadows
+- Filters
+- Large images
+- Complex paths
+- Deeply nested groups
+
+---
+
+# 9. Interaction Architecture
+
+Pointer events can arrive more frequently than the display can render.
+
+Do not update React state on every pointer event.
+
+```ts
+let pendingPointerPosition: { x: number; y: number } | null = null;
+let frameScheduled = false;
+
+function onPointerMove(event: PointerEvent) {
+  pendingPointerPosition = {
+    x: event.clientX,
+    y: event.clientY,
+  };
+
+  if (frameScheduled) return;
+
+  frameScheduled = true;
+
+  requestAnimationFrame(() => {
+    frameScheduled = false;
+
+    if (pendingPointerPosition) {
+      applyDragFrame(pendingPointerPosition);
+    }
+  });
+}
+```
+
+## Drag Flow
+
+```text
+pointerdown
+→ begin transaction
+
+pointermove
+→ update transient transform
+→ schedule one render per animation frame
+
+pointerup
+→ commit one operation
+→ add to undo history
+→ queue autosave
+```
+
+Benefits:
+
+- Avoid hundreds of store updates
+- Avoid hundreds of undo entries
+- Reduce collaboration traffic
+- Keep interaction latency low
+- Limit rendering to display refresh rate
+
+---
+
+# 10. Hit Testing
+
+Do not attach a handler to every canvas object.
+
+Use delegated hit testing.
+
+```text
+Pointer coordinate
+    ↓
+Convert screen point to world point
+    ↓
+Query spatial index for nearby candidates
+    ↓
+Sort by z-index
+    ↓
+Perform precise geometry test
+    ↓
+Select topmost matching object
+```
+
+Use two phases:
+
+## Broad Phase
+
+- Bounding-box query
+- R-tree or quadtree lookup
+
+## Narrow Phase
+
+- Point in rotated rectangle
+- Point in vector path
+- Alpha test for images when necessary
+- Shape-specific geometry test
+
+---
+
+# 11. Virtualized Layer Tree
+
+The layer panel may represent tens of thousands of expanded rows.
+
+Do not render the full hierarchy into the DOM.
+
+## Step 1: Flatten Visible Nodes
+
+```ts
+type FlatTreeRow = {
+  id: ObjectId;
+  depth: number;
+  isExpanded: boolean;
+  hasChildren: boolean;
+};
+
+function flattenVisibleTree(
+  rootIds: ObjectId[],
+  objectsById: Map<ObjectId, EditorObject>,
+  expandedIds: Set<ObjectId>
+): FlatTreeRow[] {
+  const rows: FlatTreeRow[] = [];
+
+  function visit(id: ObjectId, depth: number): void {
+    const object = objectsById.get(id);
+    if (!object) return;
+
+    rows.push({
+      id,
+      depth,
+      isExpanded: expandedIds.has(id),
+      hasChildren: Boolean(object.childIds?.length),
+    });
+
+    if (!expandedIds.has(id)) return;
+
+    for (const childId of object.childIds ?? []) {
+      visit(childId, depth + 1);
+    }
+  }
+
+  for (const rootId of rootIds) {
+    visit(rootId, 0);
+  }
+
+  return rows;
+}
+```
+
+## Step 2: Render Only the Visible Window
+
+For fixed-height rows:
+
+```ts
+function calculateWindow(
+  itemCount: number,
+  rowHeight: number,
+  scrollTop: number,
+  viewportHeight: number,
+  overscan = 8
+) {
+  const firstVisible = Math.floor(scrollTop / rowHeight);
+  const visibleCount = Math.ceil(viewportHeight / rowHeight);
+
+  const start = Math.max(0, firstVisible - overscan);
+  const end = Math.min(itemCount, firstVisible + visibleCount + overscan);
+
+  return {
+    start,
+    end,
+    offsetTop: start * rowHeight,
+    totalHeight: itemCount * rowHeight,
+  };
+}
+```
+
+Even if there are 100,000 logical rows, the DOM may contain only 30–100 mounted rows.
+
+---
+
+# 12. Tree Interaction Design
+
+## Selection
+
+Store selection by object ID, never by row index.
+
+Indexes change when:
+
+- Groups expand
+- Groups collapse
+- Search filters change
+- Objects move
+- Remote updates arrive
+
+## Keyboard Navigation
+
+Support:
+
+- Arrow up and down
+- Arrow right to expand
+- Arrow left to collapse or move to parent
+- Home and End
+- Shift for range selection
+- Space or Enter to activate
+- Type-ahead search
+
+## Focus
+
+Virtualized rows may unmount.
+
+Prefer:
+
+- A persistent tree container
+- `aria-activedescendant`
+- Stable row IDs
+
+Avoid depending on browser focus remaining on a recycled row.
+
+---
+
+# 13. Undo and Redo
+
+Do not snapshot the entire document after every action.
+
+Use operations or commands.
+
+```ts
+type EditorOperation =
+  | {
+      type: 'move';
+      objectIds: ObjectId[];
+      before: Record<ObjectId, { x: number; y: number }>;
+      after: Record<ObjectId, { x: number; y: number }>;
+    }
+  | {
+      type: 'update-properties';
+      objectId: ObjectId;
+      before: Partial<EditorObject>;
+      after: Partial<EditorObject>;
+    }
+  | {
+      type: 'delete';
+      objects: EditorObject[];
+    };
+```
+
+Undo applies the inverse operation.
+
+```text
+Move:
+before x=100, y=200
+after  x=500, y=300
+
+Undo:
+restore before values
+
+Redo:
+reapply after values
+```
+
+## Coalescing
+
+```text
+100 pointer moves
+→ one move command
+
+20 keystrokes within 500 ms
+→ one text-edit command
+```
+
+Benefits:
+
+- Memory proportional to changed data
+- Easier persistence
+- Easier collaboration
+- Easier replay and debugging
+
+---
+
+# 14. Web Workers
+
+Use workers for CPU-heavy work that does not require DOM access.
+
+Good worker tasks:
+
+- Parse large document snapshots
+- Rebuild spatial indexes
+- Flatten large trees
+- Search indexing
+- Geometry calculations
+- Thumbnail generation
+- Image decoding where supported
+
+Prefer incremental deltas over repeatedly cloning the entire document.
+
+```text
+Main thread
+→ sends operation delta
+
+Worker
+→ applies delta
+→ updates index
+→ returns compact derived result
+```
+
+---
+
+# 15. Incremental Loading
+
+Do not wait for the complete document before showing the editor.
+
+```text
+1. Load application shell
+2. Load document metadata
+3. Load hierarchy and object bounds
+4. Show low-detail scene
+5. Load visible object details
+6. Load nearby objects
+7. Load offscreen objects lazily
+8. Load high-resolution assets on demand
+```
+
+Separate:
+
+- Structural metadata
+- Geometry
+- Style details
+- Binary assets
+- High-resolution variants
+
+---
+
+# 16. Performance Budgets
+
+State explicit budgets in the interview.
+
+```text
+Pointer-to-frame latency: target <16 ms
+Typical interaction response: <100 ms
+Viewport query: <5 ms
+Visible scene render: <10 ms
+Layer panel scroll: 60 FPS
+Initial shell: <2 seconds
+Document metadata interactive: <3 seconds
+Long tasks: preferably below 50 ms
+```
+
+Measure:
+
+- Frame duration
+- Dropped frames
+- Input latency
+- React commit duration
+- Visible object count
+- Spatial-index query time
+- Worker queue depth
+- Texture memory
+- Long tasks
+- Time to document interactive
+
+---
+
+# 17. Deep-Dive Questions and Answers
+
+---
+
+## 17.1 Why Not Render Everything Once?
+
+Rendering all 100,000 objects once does not mean the cost is paid only once.
+
+The browser or renderer must still:
+
+- Retain object state
+- Track transforms
+- Perform hit testing
+- Repaint on viewport changes
+- Maintain layout and style data for DOM/SVG
+- Reconcile updates
+- Keep accessibility metadata
+- Consume memory
+
+With DOM or SVG, the cost is especially high:
+
+- Large DOM memory
+- Style and layout overhead
+- Paint invalidation
+- React reconciliation cost
+- Large accessibility tree
+- More garbage collection work
+
+With Canvas or WebGL, retaining all objects may be possible, but drawing all of them every frame is still wasteful.
+
+Separate:
+
+```text
+Logical objects
+→ all 100,000 objects
+
+Renderable objects
+→ visible or near viewport
+
+Detailed objects
+→ close enough to require full resolution
+```
+
+Use viewport culling and a spatial index.
+
+```text
+Without index: O(N)
+With R-tree: approximately O(log N + K)
+```
+
+The staff-level principle:
+
+> Keep the full document logically available, but bound rendering, layout, and interaction work by what the user can perceive.
+
+---
+
+## 17.2 What If an Offscreen Layer Is Selected?
+
+Selection must not depend on whether an object or tree row is rendered.
+
+```ts
+type SelectionState = {
+  selectedIds: Set<string>;
+  primarySelectedId: string | null;
+};
+```
+
+When an offscreen object is selected:
+
+1. Update selection state immediately
+2. Resolve object bounds
+3. Reveal the object in the canvas if appropriate
+4. Expand necessary ancestors in the layer tree
+5. Scroll the virtualized tree to the row
+6. Update accessible focus after the row mounts
+
+Possible API:
+
+```ts
+editor.revealObject(objectId, {
+  align: 'center',
+  animate: true,
+  padding: 80,
+});
+```
+
+Important distinction:
+
+```text
+Selection
+→ durable editor state
+
+Visibility
+→ derived viewport state
+
+Focus
+→ accessibility and interaction state
+```
+
+Do not represent all three with one variable.
+
+---
+
+## 17.3 How Do Variable Row Heights Work?
+
+Fixed-height virtualization:
+
+```text
+offset = index × rowHeight
+```
+
+Variable-height rows require:
+
+- Estimated row height
+- Measurement cache
+- Prefix sums or cumulative offset structure
+- Binary search from `scrollTop` to row index
+- Scroll anchoring
+
+Example:
+
+```ts
+type RowMeasurement = {
+  height: number;
+  measured: boolean;
+};
+
+const measurements = new Map<string, RowMeasurement>();
+```
+
+Use `ResizeObserver` to measure mounted rows.
+
+For a large dynamic list, use a Fenwick tree or segment tree:
+
+- Height update: `O(log N)`
+- Prefix sum: `O(log N)`
+- Offset lookup: `O(log N)`
+
+## Scroll Anchoring
+
+When estimates change, preserve:
+
+- First visible row ID
+- Offset from viewport top
+
+After measurement, adjust `scrollTop` to keep the same anchor in place.
+
+Staff-level answer:
+
+> Use estimated heights, measure mounted rows, maintain cumulative offsets, binary-search the visible range, and preserve a scroll anchor when measurements change.
+
+---
+
+## 17.4 How Do You Expand a 50K-Child Group?
+
+Do not synchronously:
+
+- Flatten 50,000 rows
+- Create 50,000 React elements
+- Measure every row
+- Build every thumbnail
+
+Possible strategies:
+
+### Incremental Flattening
+
+```text
+Process 1,000 children
+→ yield
+Process next 1,000
+```
+
+Use:
+
+- Web Worker
+- `scheduler.postTask`
+- `MessageChannel`
+- Carefully controlled chunking
+
+### Lazy Range Projection
+
+Maintain subtree sizes and map logical row ranges without materializing all rows.
+
+```ts
+type IndexedTreeNode = {
+  id: string;
+  childIds: string[];
+  visibleSubtreeSize: number;
+};
+```
+
+### Server-Paged Children
+
+```http
+GET /layers/{groupId}/children?cursor=...&limit=500
+```
+
+Use when child metadata is not already local.
+
+## User Experience
+
+1. Mark group expanded immediately
+2. Render the first visible rows
+3. Continue processing incrementally
+4. Allow collapse at any time
+5. Cancel obsolete expansion work
+
+Use request IDs:
+
+```ts
+const requestId = ++latestExpansionRequestId;
+
+if (requestId !== latestExpansionRequestId) {
+  return;
+}
+```
+
+Principle:
+
+> Expansion should update logical visibility immediately, while expensive derived work remains incremental, cancellable, and bounded by the visible range.
+
+---
+
+## 17.5 How Is Canvas Content Accessible?
+
+Canvas is visually rich but semantically empty unless the application provides a DOM-based accessibility layer.
+
+The architecture should be:
+
+```text
+Canvas
+→ pixels and visual rendering
+
+DOM
+→ semantics, focus, keyboard interaction, announcements
+```
+
+Use:
+
+### Layer Tree
+
+```html
+<div role="tree">
+  <div role="treeitem" aria-level="2" aria-expanded="true" aria-selected="true">Product image</div>
+</div>
+```
+
+### Selection Summary
+
+```text
+Rectangle selected.
+X 120, Y 80.
+Width 320, height 200.
+Unlocked and visible.
+```
+
+### Accessible Property Controls
+
+```html
+<label>
+  X position
+  <input type="number" />
+</label>
+```
+
+### Keyboard Alternatives
+
+- Arrow keys to move
+- Shift plus arrow for larger movement
+- Delete to remove
+- Keyboard resize
+- Keyboard rotate
+- Group and reorder shortcuts
+
+### Live Announcements
+
+```text
+Moved rectangle to X 180, Y 240.
+Three layers grouped.
+Undo: image resize.
+```
+
+Do not announce every pointer movement.
+
+Also support:
+
+- Visible focus
+- High contrast
+- Reduced motion
+- Browser zoom
+- Non-color-only indicators
+- Large interaction targets
+
+---
+
+## 17.6 What Changes for Collaboration?
+
+Collaboration turns the editor into a replicated document model.
+
+Updates come from:
+
+- Local user operations
+- Remote operations
+
+Represent committed edits as operations:
+
+```ts
+type Operation = {
+  operationId: string;
+  actorId: string;
+  baseRevision: number;
+  type: string;
+  payload: unknown;
+  timestamp: number;
+};
+```
+
+## Optimistic Flow
+
+```text
+User edits
+→ apply locally
+→ render immediately
+→ send operation
+→ server orders and validates
+→ ACK or correction returns
+```
+
+Track:
+
+- Confirmed server revision
+- Pending local operations
+- Remote operations
+- Reconciliation state
+
+## Conflict Models
+
+Possible approaches:
+
+- Central ordered operation log
+- OT for sequence-like editing
+- CRDT for offline or multi-device merging
+- Hybrid approach
+
+Practical hybrid:
+
+- OT or CRDT for text
+- Last-writer-wins registers for scalar properties
+- Ordered-list CRDT for layer ordering
+- Server-authoritative validation for destructive operations
+
+## Presence Is Separate
+
+Presence messages are ephemeral:
+
+```ts
+type PresenceMessage = {
+  actorId: string;
+  cursor?: { x: number; y: number };
+  selectedIds?: string[];
+  viewport?: Viewport;
+  expiresAt: number;
+};
+```
+
+Do not place cursor movement in the durable operation log.
+
+## Collaborative Undo
+
+Undo should reverse the local user’s last eligible operation, not blindly revert global state.
+
+Example:
+
+```text
+User A moves object
+User B changes color
+User A presses undo
+```
+
+Undo should restore position only.
+
+## Reconnection
+
+1. Send last acknowledged revision
+2. Receive missed operations or a snapshot
+3. Reapply pending local operations
+4. Resolve rejected or transformed operations
+5. Resume presence separately
+
+---
+
+## 17.7 How Do You Avoid Stale Worker Results?
+
+Workers introduce asynchronous races.
+
+Example:
+
+```text
+Worker starts calculation for revision 10
+User updates document to revision 11
+Worker returns revision 10 result
+```
+
+Every request should include versions.
+
+```ts
+type WorkerRequest = {
+  requestId: string;
+  documentRevision: number;
+  viewportRevision?: number;
+  payload: unknown;
+};
+
+type WorkerResponse = {
+  requestId: string;
+  documentRevision: number;
+  result: unknown;
+};
+```
+
+Before applying:
+
+```ts
+if (response.documentRevision !== currentDocumentRevision) {
+  return;
+}
+```
+
+For multiple dimensions:
+
+```ts
+type RevisionVector = {
+  document: number;
+  viewport: number;
+  filter: number;
+};
+```
+
+Use:
+
+- Latest-wins request IDs
+- Incremental ordered deltas
+- Revision acknowledgements
+- Cooperative cancellation
+- Immutable snapshots
+- Idempotent application
+
+Latest-wins example:
+
+```ts
+let latestRequestId = 0;
+
+function requestWork() {
+  const requestId = ++latestRequestId;
+  worker.postMessage({ requestId });
+}
+
+function handleResult(result: { requestId: number }) {
+  if (result.requestId !== latestRequestId) return;
+  apply(result);
+}
+```
+
+Principle:
+
+> Every asynchronous result must prove that it was computed from the state version the UI still cares about.
+
+---
+
+## 17.8 How Do You Recover After WebGL Context Loss?
+
+WebGL contexts may be lost because of:
+
+- GPU resets
+- Driver failures
+- Memory pressure
+- Browser resource reclamation
+- Too many contexts
+
+Listen for:
+
+```ts
+canvas.addEventListener('webglcontextlost', (event) => {
+  event.preventDefault();
+  pauseRenderer();
+});
+
+canvas.addEventListener('webglcontextrestored', () => {
+  restoreRenderer();
+});
+```
+
+GPU state must be treated as a disposable cache.
+
+The durable source of truth remains:
+
+- Document model
+- Asset references
+- Geometry descriptors
+- Viewport state
+- Render settings
+
+Rebuild:
+
+- Shaders
+- Programs
+- Buffers
+- Textures
+- Framebuffers
+- Atlases
+
+Recovery flow:
+
+```text
+context lost
+→ stop render loop
+→ preserve editor state
+→ show recovery indicator
+→ queue or reject GPU work
+
+context restored
+→ recreate shaders
+→ recreate buffers
+→ restore visible textures first
+→ draw basic scene
+→ lazily restore offscreen resources
+→ resume rendering
+```
+
+Fallback options:
+
+- Reduced Canvas 2D mode
+- Disable expensive effects
+- Preserve unsaved operations
+- Ask the user to reload only as a last resort
+
+Principle:
+
+> GPU resources are disposable. The document and render descriptors must be sufficient to rebuild them.
+
+---
+
+## 17.9 How Do You Bound Memory?
+
+Memory can grow in:
+
+- Document model
+- React components
+- Spatial index
+- Undo history
+- Decoded images
+- GPU textures
+- Worker copies
+- Search indexes
+- Collaboration history
+- Thumbnails
+- Event listeners
+
+Set budgets per category.
+
+## Document Model
+
+- Normalize objects
+- Avoid deep duplication
+- Separate asset binaries
+- Avoid retaining old object copies
+- Intern repeated strings when useful
+
+## Render Cache
+
+Retain detailed resources only for:
+
+- Visible objects
+- Nearby overscan
+- Recently used objects
+
+Use byte-based LRU eviction.
+
+```ts
+type CacheEntry = {
+  key: string;
+  byteEstimate: number;
+  lastUsedAt: number;
+};
+```
+
+## Image Memory
+
+A compressed image may decode to much more memory.
+
+```text
+4,000 × 4,000 × 4 bytes
+≈ 64 MB decoded
+```
+
+Use:
+
+- CDN size variants
+- Zoom-based decode resolution
+- Thumbnail versions
+- Decode concurrency limits
+- Explicit `ImageBitmap` cleanup
+
+## GPU Memory
+
+Estimate texture size:
+
+```text
+width × height × bytes per pixel × mipmap factor
+```
+
+Use:
+
+- Lazy upload
+- Texture atlases
+- Resolution tiers
+- Explicit deletion
+- Eviction under pressure
+
+```ts
+gl.deleteTexture(texture);
+gl.deleteBuffer(buffer);
+```
+
+## Undo History
+
+- Store inverse operations
+- Group old operations
+- Create checkpoints
+- Cap by bytes, count, or age
+
+## Worker Memory
+
+Avoid repeated structured cloning.
+
+Prefer:
+
+- Incremental deltas
+- Transferable `ArrayBuffer`
+- Shared immutable structures where safe
+- One canonical worker copy
+
+## Pressure Response
+
+1. Evict offscreen high-resolution textures
+2. Drop thumbnails
+3. Reduce overscan
+4. Lower image resolution
+5. Compact undo history
+6. Pause prefetching
+7. Disable expensive effects
+
+Principle:
+
+> Every cache needs an owner, a byte budget, an eviction policy, and lifecycle cleanup.
+
+---
+
+## 17.10 When Do You Choose Canvas vs WebGL?
+
+Do not decide only from total object count.
+
+Consider:
+
+- Number of visible objects
+- Complexity of effects
+- Frequency of scene changes
+- Amount of compositing
+- Device targets
+- Team expertise
+- Importance of text rendering
+- Time-to-market
+
+## Choose Canvas 2D When
+
+- Visible object count is moderate
+- Basic shapes, text, and images dominate
+- CPU rendering meets the frame budget
+- Simpler implementation matters
+- Fast product iteration matters
+- Shader effects are not required
+
+Advantages:
+
+- Simpler API
+- Easier debugging
+- Easier text rendering
+- Lower engineering cost
+- Strong compatibility
+
+## Choose WebGL When
+
+- Many objects are visible
+- Image compositing is heavy
+- GPU effects are required
+- Continuous transformations must remain smooth
+- Instancing and batching matter
+- Canvas profiling shows CPU rendering is the bottleneck
+
+Advantages:
+
+- GPU acceleration
+- Efficient transforms
+- Instancing
+- Shader-based effects
+- Better dense-scene scaling
+
+## Hybrid Approach
+
+```text
+WebGL
+→ main scene, effects, image compositing
+
+Canvas 2D
+→ overlays, special tools, fallback
+
+DOM/SVG
+→ text editing, controls, accessibility
+```
+
+A renderer abstraction makes migration easier:
+
+```ts
+interface SceneRenderer {
+  setViewport(viewport: Viewport): void;
+  applyChanges(changes: SceneChange[]): void;
+  render(): void;
+  hitTest(point: Point): ObjectId | null;
+  dispose(): void;
+}
+```
+
+Decision principle:
+
+> Canvas is usually the lower-complexity default. WebGL is justified when measured visible-scene density, effects, or compositing exceed the CPU frame budget.
+
+---
+
+# 18. Failure Handling
+
+## Worker Crash
+
+- Restart worker
+- Rebuild from latest revision
+- Replay incremental operations
+- Temporarily fall back to simpler calculations
+
+## Asset Failure
+
+- Render placeholder
+- Retry with backoff
+- Do not block the whole scene
+- Preserve layout bounds to avoid jumps
+
+## Save Failure
+
+- Keep local operation queue
+- Show unsaved state
+- Retry idempotently
+- Clear unsaved state only after server acknowledgement
+
+## Rendering Failure
+
+- Preserve document state
+- Reinitialize renderer
+- Restore visible content first
+- Fall back to reduced mode when necessary
+
+---
+
+# 19. Staff-Level Tradeoffs
+
+The important design decisions are:
+
+- Do not render 100,000 React or DOM nodes
+- Separate React UI from high-frequency scene rendering
+- Separate transient interaction state from committed document state
+- Make rendering proportional to visible objects
+- Use a spatial index for culling and hit testing
+- Virtualize the tree independently from canvas rendering
+- Use workers for expensive derived computation
+- Keep accessibility in a semantic DOM control layer
+- Use operations for undo, autosave, replay, and collaboration
+- Add WebGL only when profiling justifies the complexity
+- Define performance and memory budgets explicitly
+- Design every cache with eviction and ownership
+
+---
+
+# 20. Two-Minute Interview Answer
+
+> I would avoid representing 100,000 objects as React or DOM nodes. React would own the application shell, toolbar, properties panel, search, and virtualized layer tree, while a dedicated Canvas or WebGL renderer owns the creative scene.
+>
+> The document would be normalized by object ID. I would maintain a spatial index such as an R-tree so each viewport update queries only visible objects. That changes rendering work from O(N) over the full document to approximately O(log N + K), where K is the number of visible objects.
+>
+> High-frequency interactions such as dragging would bypass React state. Pointer events update a transient interaction controller, rendering is scheduled once per animation frame, and pointer-up commits one operation to the document store, undo history, and autosave queue.
+>
+> The layer panel would flatten only expanded nodes and virtualize rows, so even a 100,000-node hierarchy produces only dozens of mounted DOM elements. Selection remains stable by object ID, and accessibility is exposed through a semantic DOM control plane using a tree, property controls, keyboard commands, and live announcements.
+>
+> Workers handle parsing, geometry, search, spatial-index updates, and large-tree flattening. Every worker result carries document and viewport revisions so stale results are ignored.
+>
+> I would define explicit performance, memory, and reliability budgets, recover from worker or WebGL failures, and start with Canvas 2D unless profiling proves that WebGL is required for scene density or effects.
+
+---
+
+# 21. Short Whiteboard Flow
+
+Use this order during the interview:
+
+```text
+1. Clarify requirements and scale
+2. Identify the main bottleneck
+3. Separate React, store, interaction controller, and renderer
+4. Normalize the document model
+5. Add spatial indexing and viewport culling
+6. Explain virtualized tree behavior
+7. Explain drag, hit testing, and undo
+8. Cover accessibility
+9. Cover workers and stale-result protection
+10. Cover collaboration
+11. Cover memory and failure recovery
+12. Finish with metrics and tradeoffs
+```
+
+---
+
+# 22. Staff-Level Closing Statement
+
+> The goal is not merely to apply virtualization. The goal is to define where state lives, ensure work is proportional to what the user can perceive, isolate high-frequency rendering from React, preserve accessibility, and make the system observable, recoverable, and evolvable.
