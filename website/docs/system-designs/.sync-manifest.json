@@ -116,6 +116,10 @@
       "hash": "bfd4e7de18eb1b3aac540742c62bd0986ab5cba7df0edd4c8df7ef1bc86e43fb",
       "docRelative": "miscellaneous/SPV-webhook.png"
     },
+    "system-designs/miscellaneous/agoda-scaling.png": {
+      "hash": "af98063dc27682fb0f91a1f0f27486e37b949cbacae7402a57e1f5d2d46ddca6",
+      "docRelative": "miscellaneous/agoda-scaling.png"
+    },
     "system-designs/miscellaneous/compliance-collection.png": {
       "hash": "20db616aba743d55ace3c6cf26f1ab156e16000ad66274f935ca269e8cb35b03",
       "docRelative": "miscellaneous/compliance-collection.png"
@@ -272,6 +276,10 @@
       "hash": "dc00f4a891daf3b106aa0dacdee206d256acb926e4fb8ed2ba5962f2d79e06ce",
       "docRelative": "metrics-monitoring.mdx"
     },
+    "system-designs/miscellaneous/agoda-scaling.mdx": {
+      "hash": "4158ccc10dc8bb088ff78e390bfb945108087aa1a6eae34e0e6c49f9cffe4237",
+      "docRelative": "miscellaneous/agoda-scaling.mdx"
+    },
     "system-designs/miscellaneous/compliance_evidence_collection_system.mdx": {
       "hash": "5fcb215feff44b13eef35957da9800d94dbc2a9a8bb62b873003b50fb447d308",
       "docRelative": "miscellaneous/compliance_evidence_collection_system.mdx"
@@ -369,7 +377,7 @@
       "docRelative": "agentic-system-design/_index.mdx"
     },
     "__nav__:miscellaneous": {
-      "hash": "33747663d804094126ca548e39a4e4ba114b46e64c404b4ccd271c5f499d0c04",
+      "hash": "0e522a80bd9235d06fdebf48bc08b235f6b6fe5e0b8434ea31ba59e9a1df4b03",
       "docRelative": "miscellaneous/_index.mdx"
     },
     "__nav__:patterns": {
