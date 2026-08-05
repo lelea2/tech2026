@@ -161,7 +161,7 @@
       "docRelative": "online-chess.png"
     },
     "system-designs/pastebin.png": {
-      "hash": "daa823c0c1c0582fc63bb78546c640043b41386ebbf5783ab5e75fe1e302a363",
+      "hash": "57ec6595602a63683cfcb8c853980596a6f5203e0c0b3af20715d6a4fb342d07",
       "docRelative": "pastebin.png"
     },
     "system-designs/patterns/blobs.png": {
@@ -361,7 +361,7 @@
       "docRelative": "online-chess.mdx"
     },
     "system-designs/pastebin.mdx": {
-      "hash": "b5a1dcca2503955ad9fd1c780dbd50db2dd311803af6f38c74167024b351c051",
+      "hash": "77146e6c92d60339945bce8bc3cd4f3403a1fb5a4d43e5b599d083816831e0cf",
       "docRelative": "pastebin.mdx"
     },
     "system-designs/patterns/flink_vs_temporal_staff_engineer.mdx": {
