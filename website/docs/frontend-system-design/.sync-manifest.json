@@ -80,6 +80,10 @@
       "hash": "07dffa3403cd897bf209bbb47eda14ce5934ebe814de68d6a8eb56dc5d163394",
       "docRelative": "camera-motion-grid-system-design.mdx"
     },
+    "frontend-system-design/canvas-webgl.mdx": {
+      "hash": "ef0c9a08ac551c5be0ddd0646d73afd9a9fa773ed5b4e8f8eb78ecfe1d3abbde",
+      "docRelative": "canvas-webgl.mdx"
+    },
     "frontend-system-design/chatapp.mdx": {
       "hash": "6fbeb992cc0b9633847f12120c7632efedb2f4ff07f8c564510e5e04c4dad492",
       "docRelative": "chatapp.mdx"

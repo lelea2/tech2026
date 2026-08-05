@@ -1,0 +1,1778 @@
+---
+title: 'Figma - BE & FE'
+description: 'Staff-level interview guide with Adobe-style UI performance focus'
+---
+
+# Design a Figma-like Collaborative Editor
+
+## 1. Interview framing
+
+A strong staff-level answer should separate the system into four concerns:
+
+1. **Document model:** the persistent scene graph and assets.
+2. **Interactive rendering:** how the browser renders and manipulates 100k objects.
+3. **Collaboration:** how multiple players exchange, order, merge, and persist edits.
+4. **History:** how undo/redo and version restore work without corrupting collaborative state.
+
+The recommended architecture is a **hybrid client renderer** backed by a **per-document ordered operation log**:
+
+- React renders the application shell, menus, panels, dialogs, and accessible controls.
+- WebGL renders the large scene.
+- Canvas 2D handles selected fallback or raster-oriented work.
+- DOM/SVG overlays handle text editing, selection handles, focus, and accessibility.
+- The backend stores immutable operations, periodically creates snapshots, and broadcasts committed operations through document-scoped collaboration sessions.
+
+---
+
+## 2. Requirements
+
+### Functional
+
+- Create, open, rename, save, duplicate, and delete design documents.
+- Create and edit shapes, text, images, frames, groups, and reusable components.
+- Move, resize, rotate, align, distribute, group, lock, hide, and reorder nodes.
+- Support pan, zoom, marquee selection, multi-selection, snapping, rulers, and guides.
+- Copy, paste, duplicate, import, and export.
+- Support local undo/redo with collaborative semantics.
+- Show collaborator cursors, selections, presence, and comments.
+- Continue editing during temporary disconnects and reconcile after reconnect.
+- Provide version history and restore.
+- Enforce owner, editor, commenter, and viewer permissions.
+- Render documents containing at least 100,000 objects.
+
+### Non-functional
+
+| Area          | Target                                                                          |
+| ------------- | ------------------------------------------------------------------------------- |
+| Interaction   | Most pointer-driven interactions respond in under 100 ms                        |
+| Rendering     | Target 60 FPS while panning, zooming, and dragging                              |
+| Initial load  | Shell interactive in under 2 seconds on a typical broadband connection          |
+| Collaboration | P99 regional operation propagation under 250 ms                                 |
+| Reliability   | No acknowledged edit is lost                                                    |
+| Scale         | 100k scene nodes and many concurrent documents                                  |
+| Memory        | Bounded caches, history, decoded assets, GPU buffers, and subscriptions         |
+| Security      | Tenant isolation, authorization on every durable operation, signed asset access |
+| Accessibility | Keyboard access and logical screen-reader representation                        |
+| Observability | Client frame metrics plus backend operation and fanout metrics                  |
+
+---
+
+## 3. Core entities
+
+```ts
+type Document = {
+  id: string;
+  tenantId: string;
+  title: string;
+  headVersion: number;
+  homeRegion: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type SceneNode = {
+  id: string;
+  documentId: string;
+  type: 'frame' | 'group' | 'rect' | 'ellipse' | 'path' | 'text' | 'image';
+  parentId: string | null;
+  orderKey: string;
+  transform: number[]; // 2D or 4x4 matrix
+  localBounds: { x: number; y: number; width: number; height: number };
+  style: Record<string, unknown>;
+  contentRef?: string;
+  revision: number;
+  deleted: boolean;
+};
+
+type Operation = {
+  opId: string;
+  documentId: string;
+  actorId: string;
+  clientSeq: number;
+  baseVersion: number;
+  type:
+    | 'createNode'
+    | 'deleteNode'
+    | 'setProperties'
+    | 'transformNodes'
+    | 'moveChild'
+    | 'textOperation'
+    | 'restoreVersion';
+  targetIds: string[];
+  payload: unknown;
+  undoGroupId?: string;
+  inverseOf?: string;
+  createdAt: string;
+};
+
+type Snapshot = {
+  documentId: string;
+  version: number;
+  schemaVersion: number;
+  compressedSceneKey: string;
+  checksum: string;
+  assetRefs: string[];
+};
+
+type Presence = {
+  documentId: string;
+  userId: string;
+  connectionId: string;
+  cursor?: { x: number; y: number };
+  viewport?: { x: number; y: number; zoom: number };
+  selectedNodeIds: string[];
+  expiresAt: number;
+};
+```
+
+Important distinction:
+
+- **Persistent state:** scene nodes, operations, snapshots, comments, permissions.
+- **Ephemeral state:** current pointer position, drag preview, viewport, hover, collaborator cursor.
+- **Derived state:** visible nodes, screen-space bounds, selection handles, snap candidates.
+
+---
+
+## 4. API design
+
+### HTTP
+
+```http
+GET /v1/documents/{documentId}
+GET /v1/documents/{documentId}/snapshot
+GET /v1/documents/{documentId}/operations?afterVersion=1042
+POST /v1/documents/{documentId}/operations:batch
+POST /v1/documents/{documentId}/assets:presign
+GET /v1/documents/{documentId}/versions
+POST /v1/documents/{documentId}/versions/{version}:restore
+POST /v1/documents/{documentId}/exports
+```
+
+### WebSocket messages
+
+```ts
+type ClientMessage =
+  | {
+      type: 'join';
+      documentId: string;
+      lastCommittedVersion: number;
+      capabilities: string[];
+    }
+  | {
+      type: 'operations';
+      documentId: string;
+      clientSeq: number;
+      operations: Operation[];
+    }
+  | {
+      type: 'presence';
+      cursor?: { x: number; y: number };
+      viewport?: { x: number; y: number; zoom: number };
+      selectedNodeIds?: string[];
+    };
+
+type ServerMessage =
+  | { type: 'snapshot'; snapshot: Snapshot; operationTail: Operation[] }
+  | { type: 'operations'; fromVersion: number; toVersion: number; operations: Operation[] }
+  | { type: 'ack'; clientSeq: number; committedVersion: number; opIds: string[] }
+  | { type: 'rebaseRequired'; snapshotVersion: number }
+  | { type: 'presence'; members: Presence[] }
+  | { type: 'permissionChanged'; role: string }
+  | { type: 'rateLimited'; retryAfterMs: number };
+```
+
+Protocol rules:
+
+- `opId` is an idempotency key.
+- `clientSeq` preserves order for one client.
+- `committedVersion` is monotonically increasing per document.
+- The server may acknowledge a batch only after durable append.
+- Schema versions allow forward-compatible clients.
+
+---
+
+## 5. High-level frontend design
+
+```text
+React Application Shell
+├── Router and route loaders
+├── Document metadata and permissions
+├── Toolbar, sidebars, layers panel, comments
+├── Editor Controller
+│   ├── Interaction state machine
+│   ├── Tool registry
+│   ├── Command bus
+│   ├── Keyboard and gesture manager
+│   └── Undo manager
+├── Scene Store
+│   ├── Normalized node map
+│   ├── Spatial index
+│   ├── Parent-child index
+│   ├── Dirty-region tracker
+│   └── Derived viewport model
+├── Renderer
+│   ├── WebGL scene layer
+│   ├── Canvas helper layer
+│   └── DOM/SVG interaction overlay
+├── Collaboration Client
+│   ├── WebSocket session
+│   ├── Optimistic operation queue
+│   ├── Ack/rebase reconciler
+│   └── Presence channel
+├── Workers
+│   ├── Snapshot decode
+│   ├── Geometry and layout
+│   ├── Export preparation
+│   └── Optional hit-test assistance
+└── IndexedDB
+    ├── Pending operations
+    ├── Recent snapshots
+    └── Asset metadata
+```
+
+### Why the scene graph should not live in the React component tree
+
+Rendering one React component per design object is attractive for small scenes, but it breaks down at 100k objects:
+
+- Reconciliation walks too many fibers.
+- SVG or DOM nodes consume substantial memory.
+- Style and layout work becomes expensive.
+- Browser paint invalidation becomes difficult to control.
+- Transient pointer movement causes excessive state propagation.
+
+React should own **product UI**, while the renderer owns **scene drawing**.
+
+---
+
+## 6. Rendering 100k objects
+
+### Recommended hybrid
+
+| Technology | Best use                                                  | Limitation                                                        |
+| ---------- | --------------------------------------------------------- | ----------------------------------------------------------------- |
+| SVG        | Small diagrams, semantic elements, easy hit targets       | Large DOM, style/layout/paint cost                                |
+| Canvas 2D  | Moderate custom drawing, simple bitmap pipeline           | CPU-bound, manual hit testing                                     |
+| WebGL      | Very large scenes, batching, instancing, GPU acceleration | More complexity, text and accessibility require additional layers |
+| DOM        | Inputs, menus, active text editor, accessibility proxy    | Not suitable for 100k scene nodes                                 |
+
+Use:
+
+- **WebGL** for the main scene.
+- **Canvas 2D** for fallback and selected raster operations.
+- **DOM/SVG overlay** for active text editing, transform handles, focus, and screen-reader support.
+
+### Frame budget
+
+At 60 FPS, one frame has about **16.7 ms**. A useful target is:
+
+- Input processing and JS: 3–5 ms.
+- Spatial query and draw-list creation: 2–4 ms.
+- GPU submission: bounded and batched.
+- Layout/style: close to zero for scene objects.
+- Remaining time: compositing and browser overhead.
+
+### Rendering techniques
+
+- Normalize the scene into a node map rather than nested mutable objects.
+- Use R-tree or quadtree viewport queries.
+- Apply frustum or rectangular viewport culling.
+- Add overscan to prevent visible popping.
+- Use level of detail:
+  - very small objects: draw bounds or omit;
+  - medium objects: simplified geometry;
+  - large or selected objects: full fidelity.
+- Use GPU instancing for repeated primitives.
+- Batch by material, texture, blend mode, and clipping context.
+- Use texture atlases for icons and glyphs.
+- Cache static subtrees or frames as textures.
+- Track dirty regions and render on demand.
+- Release GPU buffers and textures when assets leave the working set.
+- Decode images and large snapshots off the main thread.
+
+---
+
+## 7. Viewport and virtualization
+
+The viewport is a camera:
+
+```ts
+type Camera = {
+  x: number;
+  y: number;
+  zoom: number;
+  rotation: number;
+};
+```
+
+Each frame:
+
+1. Convert screen bounds into world bounds.
+2. Expand bounds by overscan.
+3. Query the spatial index.
+4. Remove hidden, clipped, or filtered nodes.
+5. Select level of detail.
+6. Sort by render order.
+7. Batch and draw.
+8. Keep dragged or selected nodes resident even if partially outside the viewport.
+
+### Dashboard rendering 100k objects
+
+For a dashboard, “100k objects” may mean rows, cells, chart marks, or nodes:
+
+- Rows and columns use DOM windowing.
+- Dense chart marks use Canvas or WebGL.
+- Aggregation/downsampling happens before rendering.
+- Variable-height rows use a measurement cache.
+- Recycled cells need stable logical identity.
+- Avoid rendering data labels that are smaller than a pixel.
+- Keep filters and sorting in workers or on the server when datasets are large.
+
+**DOM virtualization and canvas viewport culling are related but different.**
+
+---
+
+## 8. Interaction design
+
+Use a state machine:
+
+```text
+Idle
+├── Hovering
+├── MarqueeSelecting
+├── Dragging
+├── Resizing
+├── Rotating
+├── Panning
+└── TextEditing
+```
+
+### Pointer flow
+
+1. A single surface listener receives pointer events.
+2. Pointer-down performs coarse spatial lookup.
+3. Precise geometry testing identifies the topmost target.
+4. Pointer capture preserves the drag outside the original target.
+5. Pointer movements update a transient preview.
+6. Visual work is scheduled with `requestAnimationFrame`.
+7. Pointer-up emits one semantic operation such as `transformNodes`.
+
+Do not send a backend operation for every pointer movement. During a drag:
+
+- Update local transient state at display rate.
+- Optionally broadcast sampled ghost presence.
+- Commit one operation, or a small number of checkpoints, at semantic boundaries.
+
+### Event delegation
+
+Canvas/WebGL naturally uses one input surface. DOM overlays can use one delegated listener and `data-*` identifiers. This avoids thousands of handlers and simplifies cleanup.
+
+---
+
+## 9. Browser rendering pipeline
+
+The browser pipeline is:
+
+```text
+JavaScript → style calculation → layout → paint → composite
+```
+
+Performance practices:
+
+- Canvas/WebGL prevents each object from participating in DOM layout.
+- Use compositor-friendly transforms for overlays.
+- Read layout in one phase and write in another.
+- Never call layout-reading APIs repeatedly inside `pointermove`.
+- Schedule visual updates with `requestAnimationFrame`.
+- Use workers for geometry, parsing, and compression.
+- Track long tasks, INP, dropped frames, and forced layout.
+- Avoid unnecessary transparency and huge offscreen surfaces.
+- Use layer promotion carefully; too many composited layers waste memory.
+
+---
+
+## 10. Code splitting, lazy loading, and route prefetching
+
+### Code splitting
+
+Suggested boundaries:
+
+- Application shell.
+- Editor core.
+- Comments.
+- Version history.
+- Exporters.
+- Import parsers.
+- Plugin runtime.
+- Advanced effects.
+
+Avoid thousands of micro-chunks. Chunk overhead and dependency waterfalls can erase the benefit.
+
+### Lazy loading
+
+- Load image assets according to viewport priority.
+- Load full-resolution images only when zoom requires them.
+- Defer comments and version history until opened.
+- Load export libraries only when exporting.
+- Decode snapshots and assets progressively.
+- Cancel low-priority work when the user moves to a different viewport.
+
+### Route prefetching
+
+Prefetch on user intent:
+
+- hover or keyboard focus;
+- recent-document prediction;
+- likely next workflow.
+
+Use:
+
+- network-aware budgets;
+- cancellable requests;
+- metadata-first prefetch;
+- reduced prefetch on metered or slow connections.
+
+### Hydration optimization
+
+Do not server-render 100k canvas objects.
+
+- Server-render the shell, metadata, and loading skeleton.
+- Hydrate controls first.
+- Mount the scene renderer on the client.
+- Decode the snapshot in a worker.
+- Paint visible content before the entire scene is ready.
+- Reuse route-loaded data to avoid double fetching.
+
+---
+
+## 11. Memory-leak prevention
+
+Common leak sources:
+
+- Unreleased WebGL buffers, textures, framebuffers, and shader programs.
+- WebSocket listeners surviving route changes.
+- Pointer or keyboard listeners added repeatedly.
+- `ResizeObserver`, `IntersectionObserver`, and `MutationObserver` subscriptions.
+- Orphaned workers.
+- Timers and `requestAnimationFrame` loops.
+- Unbounded undo stacks.
+- Unbounded decoded-image and glyph caches.
+- Retained scene snapshots.
+- Closures holding large node maps.
+
+Mitigations:
+
+- Give editor sessions an explicit `dispose()` lifecycle.
+- Centralize subscriptions and cleanup.
+- Use bounded LRU caches with memory accounting.
+- Record GPU resource counts.
+- Add open-close-open soak tests.
+- Compare heap snapshots after repeated document navigation.
+- Monitor detached nodes and listener counts.
+- Stress test 30–60 minute editing sessions.
+
+---
+
+## 12. Undo and redo
+
+### Frontend command model
+
+```ts
+interface EditorCommand {
+  execute(scene: SceneState): Operation[];
+  invert(before: SceneState, committed: Operation[]): Operation[];
+  mergeWith?(next: EditorCommand): EditorCommand | null;
+}
+```
+
+Rules:
+
+- Store intent-level commands.
+- Merge many drag samples into one transform command.
+- Group related operations with `undoGroupId`.
+- Undo creates an inverse operation.
+- Redo replays the original intent against current state.
+- Clear the redo stack after a divergent new edit.
+- Bound history by operation count and bytes.
+
+### Collaborative undo
+
+A multiplayer editor should not globally rewind the document. Undo means:
+
+> Create a new operation that semantically reverses my most recent eligible action against the current document state.
+
+Example:
+
+1. User A moves rectangle from `x=10` to `x=50`.
+2. User B changes its color.
+3. User A presses undo.
+4. The inverse changes only the position back to `x=10`; B’s color remains.
+
+Harder case:
+
+1. A creates a node.
+2. B adds content beneath or inside it.
+3. A undoes creation.
+4. The product must define whether:
+   - deletion is rejected;
+   - deletion cascades;
+   - children are reparented;
+   - undo becomes partial.
+
+The backend validates inverses like ordinary operations and appends them to the immutable log.
+
+### Version restore
+
+Version restore is not collaborative undo:
+
+- Materialize a historical snapshot.
+- Create a new head from that snapshot.
+- Append a restore operation.
+- Preserve all prior history for auditability.
+
+---
+
+## 13. Multiplayer backend design
+
+```text
+Client
+  │ HTTP + WebSocket
+  ▼
+API Gateway / AuthZ
+  ├── Metadata API
+  ├── Asset API
+  └── Collaboration Gateway
+          │
+          ▼
+   Document Session Service
+   ├── operation validation
+   ├── canonical ordering
+   ├── conflict resolution
+   ├── idempotency
+   └── broadcast
+          │
+          ├── Append-only operation log
+          ├── Snapshot service
+          ├── Metadata database
+          ├── Presence store
+          └── Pub/sub fanout
+```
+
+### Document session ownership
+
+Route all active operations for one document to one logical leader or ordered partition.
+
+Benefits:
+
+- Simpler canonical ordering.
+- Easier deduplication.
+- Easier monotonic version assignment.
+- Easier snapshot boundaries.
+
+The leader is logical, not necessarily one permanent machine. Use leases and failover.
+
+### Durable versus ephemeral
+
+| Data              | Durability |
+| ----------------- | ---------- |
+| Scene operation   | Durable    |
+| Comment           | Durable    |
+| Permission change | Durable    |
+| Version restore   | Durable    |
+| Cursor position   | Ephemeral  |
+| Current selection | Ephemeral  |
+| Viewport          | Ephemeral  |
+| Typing indicator  | Ephemeral  |
+
+Presence may be sampled at 10–20 Hz and stored with TTL.
+
+---
+
+## 14. Conflict resolution choices
+
+### CRDT
+
+Advantages:
+
+- Strong offline editing.
+- Natural concurrent convergence.
+- Reduced dependence on a central transformation step.
+
+Costs:
+
+- Metadata overhead.
+- Tombstone management.
+- Complex domain modeling.
+- Debugging difficulty.
+
+### Operational transformation
+
+Advantages:
+
+- Central canonical order.
+- Mature conceptual model for text.
+
+Costs:
+
+- Transform functions grow combinatorially.
+- Harder for arbitrary scene operations.
+
+### Domain-specific operation model
+
+Recommended for the general scene:
+
+- Scalar property changes: revision-aware last-writer-wins or server-order-wins.
+- Child order: fractional keys or sequence CRDT.
+- Text: dedicated text CRDT.
+- Transform: semantic operation with expected revisions.
+- Deletes: tombstone or delete-wins policy.
+- Multi-node commands: atomic operation group where needed.
+
+This hybrid gives staff-level control over tradeoffs rather than forcing one algorithm onto every data type.
+
+---
+
+## 15. Backend storage
+
+### Operation log
+
+Partition by `documentId`.
+
+```text
+(documentId, committedVersion) -> operation
+```
+
+Properties:
+
+- Append optimized.
+- Ordered per document.
+- Immutable.
+- Replayable.
+- Replicated.
+
+### Snapshots
+
+Create a snapshot based on:
+
+- number of operations;
+- total operation bytes;
+- elapsed time;
+- high join latency;
+- explicit version checkpoint.
+
+A new client reads:
+
+1. Latest valid snapshot.
+2. Operations after snapshot version.
+
+### Databases
+
+- Relational or distributed SQL: document metadata, permissions, comments, versions.
+- Log/stream store: operations.
+- Object storage: snapshots, images, fonts, exports.
+- Redis-like store: presence, leases, routing hints.
+- CDN: immutable assets and exports.
+
+---
+
+## 16. Reconnect and offline edits
+
+Client state:
+
+- `lastCommittedVersion`
+- acknowledged operation IDs
+- pending operation queue in IndexedDB
+- recent snapshot
+
+Reconnect flow:
+
+1. Send document ID, last version, and pending op IDs.
+2. Server either:
+   - sends operation tail; or
+   - returns `rebaseRequired`.
+3. Client applies server state.
+4. Client reapplies unacknowledged local operations.
+5. Invalid or conflicting operations become partial, rejected, or transformed.
+6. The UI explains any unresolved conflict.
+
+Retries always reuse the same `opId`.
+
+---
+
+## 17. Scaling multiple players
+
+### Normal documents
+
+- Sticky WebSocket routing to the document session leader.
+- One partition per document.
+- Broadcast through regional pub/sub.
+
+### Hot documents
+
+- Isolate the document on dedicated capacity.
+- Separate operation and presence channels.
+- Sample presence aggressively.
+- Use hierarchical fanout for thousands of viewers.
+- Apply backpressure to slow clients.
+- Drop obsolete presence messages.
+- Never drop durable operations.
+- Limit expensive selection payloads.
+- Use read-only replicas or edge fanout for viewers.
+
+### Multi-region
+
+A practical design assigns a **home region** per document:
+
+- Writes route to the home region.
+- Regional gateways maintain nearby client connections.
+- Durable logs replicate for disaster recovery.
+- Assets use global CDN.
+- Cross-region latency is accepted for one canonical order.
+
+A more advanced design may use regionally convergent CRDTs, but complexity rises significantly.
+
+---
+
+## 18. Security
+
+- Authenticate the user before joining.
+- Authorize the document and requested role.
+- Recheck authorization for every durable batch.
+- Push permission changes to live sessions.
+- Sign asset uploads and downloads.
+- Validate MIME type, size, checksum, and malware scan status.
+- Encrypt data in transit and at rest.
+- Enforce tenant IDs at every storage layer.
+- Rate-limit operation and presence traffic.
+- Audit permission, export, restore, and deletion actions.
+- Sanitize imported SVG and embedded content.
+- Apply CSP and isolate plugins.
+
+---
+
+## 19. Observability
+
+### Frontend
+
+- First shell interactive.
+- First meaningful canvas paint.
+- Snapshot fetch and worker decode duration.
+- Visible object count.
+- Spatial-query duration.
+- Draw calls.
+- FPS and dropped frames.
+- Interaction latency and INP.
+- Main-thread long tasks.
+- Heap and GPU-memory growth.
+- WebSocket reconnect and rebase rate.
+
+### Backend
+
+- Join latency.
+- Operation validation latency.
+- Durable commit latency.
+- Broadcast/fanout latency.
+- Operations per second by document.
+- Active sessions and collaborators.
+- Queue depth and backpressure.
+- Snapshot age and compaction lag.
+- Duplicate, rejected, and conflicted operations.
+- Hot partition saturation.
+- Cross-region replication lag.
+
+---
+
+## 20. Testing strategy
+
+- Deterministic operation replay.
+- Property-based tests for inverse operations.
+- Concurrency fuzzing with random actor interleavings.
+- Snapshot checksum and corruption recovery tests.
+- Network delay, duplication, loss, and reconnect tests.
+- Browser and GPU compatibility tests.
+- Benchmarks at 10k, 100k, and 1M objects.
+- Long-session memory soak tests.
+- Accessibility keyboard and screen-reader tests.
+- Golden-image rendering tests with tolerance.
+- Permission-change and session-downgrade tests.
+
+---
+
+## 21. Deep-dive interview Q&A
+
+### Why not SVG for all 100k objects?
+
+SVG creates one DOM node per object. The browser must maintain style, layout, paint, hit-testing, and accessibility structures for all nodes. WebGL provides explicit batching and keeps the scene outside normal DOM layout. SVG remains useful for a small overlay or simpler diagrams.
+
+### Canvas or WebGL?
+
+Canvas 2D is easier and works well for moderate scenes. WebGL is preferable when object count, zooming, effects, or repeated geometry requires GPU batching. A good answer chooses based on measurable load rather than fashion.
+
+### How does virtualization work in a canvas?
+
+The client maintains a spatial index. It transforms the screen viewport into world coordinates, queries candidates, applies clipping and LOD, then draws only the resulting set. This is scene culling, not DOM row virtualization.
+
+### How do you keep dragging smooth while collaborating?
+
+Dragging changes transient local state at frame rate. Presence may broadcast sampled previews, but the durable document operation is emitted only at semantic boundaries. The local UI is optimistic; backend acknowledgement reconciles the final version.
+
+### How do multiple players edit the same object?
+
+The server orders operations per document and applies field-specific merge policies. Text and child ordering use specialized concurrent structures. Scalar properties use revision-aware or server-order semantics. The product surfaces conflicts when intent cannot be preserved.
+
+### How does undo work after someone else edits my object?
+
+Undo produces a new inverse operation for the properties changed by the original action. It does not restore the entire old object snapshot, because that would erase collaborators’ later changes.
+
+### How do you detect memory leaks?
+
+Run repeated open/edit/close flows, compare heap snapshots, track detached nodes, subscriptions, workers, timers, decoded assets, and GPU-resource counters. Add long-session automation and memory budgets.
+
+### How do you optimize hydration?
+
+Server-render only the shell and document metadata. Hydrate high-priority controls, mount the imperative renderer client-side, decode the snapshot in a worker, and paint the viewport progressively.
+
+### How do you handle a document with thousands of viewers?
+
+Keep one ordered write path, but build hierarchical fanout for committed operations. Presence is lossy and aggressively sampled. Slow viewers receive batched operations or a fresh snapshot instead of an unbounded queue.
+
+### What would you discuss first in an Adobe interview?
+
+1. Define performance targets.
+2. Explain the hybrid renderer.
+3. Trace open-document and edit flows.
+4. Deep-dive into viewport culling and browser frame budgets.
+5. Explain collaborative ordering and undo semantics.
+6. Close with measurement, failure handling, and tradeoffs.
+
+---
+
+## 22. Concise interview answer structure
+
+> I would separate React product UI from an imperative scene renderer. React owns the toolbar, panels, comments, and accessible controls, while WebGL renders the 100k-object scene. A normalized scene graph and R-tree let us cull by viewport, apply level of detail, batch draw calls, and keep pointer interactions within a 16.7 ms frame budget.
+>
+> On the backend, each document has a canonical ordered operation stream. Clients apply semantic operations optimistically, persist pending edits locally, and send idempotent batches over WebSocket. The document session service validates, orders, durably appends, and broadcasts operations. Periodic snapshots make document joins fast.
+>
+> Multiplayer undo is not a global rewind. It creates a new inverse operation for the current state, preserving collaborators’ later changes. Presence is ephemeral and lossy; document edits are durable. I would measure first meaningful canvas paint, FPS, INP, draw calls, heap and GPU memory, commit latency, fanout latency, reconnect success, and hot-document saturation.
+
+---
+
+# Figma Multiplayer Editing — Deep Dive
+
+## 1. Core Problem
+
+Multiple users edit the same design document concurrently.
+
+The system must provide:
+
+- Instant local interaction
+- Eventual convergence across all clients
+- Offline editing and reconnection
+- Conflict resolution
+- Stable object identity
+- Valid document-tree structure
+- Recovery from server or network failures
+
+Clients apply edits optimistically because waiting for a server round trip would make dragging, resizing, and typing feel slow.
+
+This means clients may temporarily disagree until server synchronization completes.
+
+---
+
+## 2. Why Figma Did Not Use OT
+
+Operational Transformation, used by systems such as Google Docs, transforms concurrent operations against each other.
+
+Example:
+
+```
+Client A inserts at position 5
+Client B inserts 3 characters before position 5
+
+A's operation must be transformed:
+insert(5) → insert(8)
+```
+
+Problems for Figma:
+
+- Very difficult to implement correctly
+- Requires handling many operation combinations
+- Best suited for sequential text operations
+- Design documents contain many object and property types
+- Reparenting, resizing, styling, and layering create a much larger transformation matrix
+
+Conclusion:
+
+```
+OT complexity was unnecessary for most visual-design operations.
+```
+
+---
+
+## 3. Why Figma Simplified CRDTs
+
+Traditional CRDTs allow decentralized replicas to merge without a central authority.
+
+They require metadata such as:
+
+- Logical timestamps
+- Replica identifiers
+- Tombstones for deleted data
+- Deterministic merge rules
+- Version vectors or causal metadata
+
+Figma already had a central server through which every edit flowed.
+
+Therefore, the server could determine ordering directly.
+
+```
+Traditional CRDT:
+Last writer = write with highest timestamp
+
+Figma:
+Last writer = last write received by authoritative server
+```
+
+This removes much of the distributed bookkeeping.
+
+Figma kept the useful CRDT principle—deterministic convergence—but removed decentralization-related complexity.
+
+---
+
+## 4. Document Model
+
+A Figma document is modeled as a tree of objects.
+
+```
+Document
+ └── Page
+      └── Frame
+           ├── Rectangle
+           ├── Text
+           └── Component
+```
+
+Each object has:
+
+- Globally unique object ID
+- Object type
+- Parent relationship
+- Ordering position
+- Map of properties
+
+Conceptual representation:
+
+```
+type Document = Map<ObjectID, Map<PropertyName, PropertyValue>>;
+```
+
+Example:
+
+```
+objects["rectangle-123"] = {
+  fill: "#FF0000",
+  width: 200,
+  height: 100,
+  parent: {
+    parentID: "frame-10",
+    position: 0.375
+  }
+};
+```
+
+---
+
+## 5. Conflict Resolution: Last-Writer-Wins Per Property
+
+The atomic conflict-resolution unit is an individual object property.
+
+Example: concurrent edits to different properties
+
+```
+User A changes rectangle.fill
+User B changes rectangle.width
+
+Result:
+Both changes survive
+```
+
+Example: concurrent edits to the same property
+
+```
+User A sets fill = red
+User B sets fill = blue
+
+Result:
+Whichever write reaches the server last wins
+```
+
+This provides better merge behavior than treating the entire object as one atomic value.
+
+```
+Object-level LWW:
+One user's resize may overwrite another user's color change
+
+Property-level LWW:
+Resize and color change both survive
+```
+
+---
+
+## 6. Property Value Is Atomic
+
+Each property value is replaced as a whole.
+
+Example:
+
+```
+Initial text: B
+
+Client A writes: AB
+Client B writes: BC
+
+Final value:
+AB or BC
+
+Not:
+ABC
+```
+
+This works well for visual properties such as:
+
+- Fill color
+- Width
+- Height
+- Rotation
+- Opacity
+- Font size
+
+It is less suitable for simultaneous character-level text editing.
+
+For rich concurrent text editing, a specialized text CRDT such as Yjs may be more appropriate.
+
+---
+
+## 7. Optimistic Client Updates
+
+The client applies its own mutation immediately.
+
+```
+1. User drags object
+2. Client updates local document
+3. Client sends mutation through WebSocket
+4. Server validates and orders mutation
+5. Server broadcasts authoritative update
+6. Client acknowledges or reconciles
+```
+
+This avoids network latency during interaction.
+
+### Flicker Problem
+
+Suppose the client has an unacknowledged local write:
+
+```
+Local pending write:
+fill = red
+```
+
+Then an older server update arrives:
+
+```
+Remote update:
+fill = blue
+```
+
+Naively applying the update causes:
+
+```
+red → blue → red
+```
+
+This creates visible flicker.
+
+### Client-Side Fix
+
+The client tracks pending local writes and ignores conflicting remote updates until its own mutation is acknowledged.
+
+```
+if (
+  hasPendingLocalWrite(objectID, property) &&
+  incomingUpdate.conflictsWithPendingWrite
+) {
+  ignoreIncomingUpdate();
+}
+```
+
+The server remains authoritative, but the client protects the optimistic user experience.
+
+---
+
+## 8. Object Creation
+
+Clients generate object IDs locally.
+
+The ID includes enough uniqueness to avoid collisions:
+
+```
+ObjectID = clientID + localCounter
+```
+
+Example:
+
+```
+client-42:object-109
+```
+
+Benefits:
+
+- Objects can be created without waiting for the server
+- Creation works offline
+- Two clients cannot accidentally generate the same ID
+- Concurrent edits can reference stable object identities
+
+---
+
+## 9. Object Deletion
+
+Deletion removes the object and its properties.
+
+Figma avoids permanent tombstones because documents may live for years and deletion metadata would grow indefinitely.
+
+Important rule:
+
+```
+A property update cannot recreate a deleted object.
+```
+
+Therefore, a stale write targeting a deleted ID is dropped.
+
+Example:
+
+```
+1. User A deletes object-123
+2. User B sends stale update:
+   object-123.fill = blue
+3. Server sees object-123 no longer exists
+4. Update is ignored
+```
+
+Undo still works because the deleting client keeps the deleted object data in local undo history and can recreate it.
+
+---
+
+## 10. Reparenting Objects
+
+Moving an object between frames is not implemented as delete plus recreate.
+
+Delete-plus-recreate would create a new object ID and break concurrent edits.
+
+Bad approach:
+
+```
+Delete object-123
+Create object-456 under new frame
+```
+
+A concurrent update to `object-123` would be lost.
+
+Figma models the parent as a property of the child:
+
+```
+objects.get(objectID).set("parent", {
+  parentID: newFrameID,
+  position: newPosition
+});
+```
+
+Benefits:
+
+- Object identity remains stable
+- Concurrent style edits still apply
+- One object cannot have two parents
+- Moving an object becomes a normal property update
+
+Example:
+
+```
+User A changes icon.color
+User B moves icon into another frame
+
+Result:
+Both updates survive
+```
+
+---
+
+## 11. Preventing Duplicate Parents
+
+The parent property stores exactly one value.
+
+```
+parent: {
+  parentID: "frame-2",
+  position: 0.5
+}
+```
+
+Because the model cannot represent multiple parent values, the same object cannot appear under two parents simultaneously.
+
+Concurrent moves are resolved with last-writer-wins on the parent property.
+
+```
+User A moves object to Frame A
+User B moves object to Frame B
+
+Final result:
+Object exists once under whichever parent update reaches the server last
+```
+
+---
+
+## 12. Preventing Cycles
+
+Per-property last-writer-wins cannot guarantee that the document remains a valid tree.
+
+Example:
+
+```
+Client 1:
+A.parent = B
+
+Client 2:
+B.parent = A
+```
+
+Each update is individually valid, but together they create a cycle:
+
+```
+A → B → A
+```
+
+The authoritative document server validates every parent update.
+
+```
+function canReparent(childID, newParentID): boolean {
+  return !isDescendant(newParentID, childID);
+}
+```
+
+If the update creates a cycle, the server rejects it.
+
+The client may temporarily observe the invalid optimistic state. It can hide affected objects until the server responds and restores the valid structure.
+
+---
+
+## 13. Ordering Siblings
+
+Simple integer indexes are problematic.
+
+```
+A.position = 1
+B.position = 2
+C.position = 3
+```
+
+Inserting between A and B could require renumbering many siblings.
+
+That creates multiple writes and more conflict opportunities.
+
+Figma uses fractional positions:
+
+```
+A.position = 0.25
+B.position = 0.50
+```
+
+Insert between them:
+
+```
+newPosition = (0.25 + 0.50) / 2
+            = 0.375
+```
+
+Only the inserted object changes.
+
+```
+A: 0.25
+New: 0.375
+B: 0.50
+```
+
+Rendering sorts siblings by their fractional position.
+
+Parent and position must be updated atomically because ordering is meaningful only within a parent.
+
+```
+parent: {
+  parentID: "frame-123",
+  position: 0.375
+}
+```
+
+### Long-Term Concern
+
+Repeated insertion between the same two positions may eventually reduce numeric precision.
+
+Possible mitigation:
+
+- Periodically rebalance sibling positions
+- Use variable-length sortable identifiers
+- Use fractional-indexing libraries
+
+---
+
+## 14. One Authoritative Process Per Document
+
+Every active document is assigned to one authoritative server process.
+
+```
+Document A → Collaboration Process 1
+Document B → Collaboration Process 2
+Document C → Collaboration Process 3
+```
+
+All editors of the same document connect to the same process.
+
+```
+Client A ─┐
+Client B ─┼── WebSocket ── Document Process
+Client C ─┘
+```
+
+The process:
+
+- Holds the active document state
+- Receives mutations
+- Establishes mutation order
+- Validates structural invariants
+- Broadcasts updates
+- Tracks acknowledgements
+- Periodically persists snapshots or mutation logs
+
+Because one process sees every edit, ordering is simply arrival order.
+
+No distributed consensus is required for every mutation.
+
+---
+
+## 15. WebSocket Collaboration Flow
+
+```
+1. Client opens document
+2. Router resolves document owner
+3. Client downloads full document snapshot
+4. Client opens WebSocket to document process
+5. Client applies edits optimistically
+6. Mutations are sent to the process
+7. Process validates and orders mutations
+8. Process broadcasts accepted updates
+9. Clients acknowledge and reconcile state
+```
+
+Example mutation:
+
+```
+type Mutation = {
+  mutationID: string;
+  clientID: string;
+  objectID: string;
+  property: string;
+  value: unknown;
+  baseVersion?: number;
+};
+```
+
+Example server event:
+
+```
+type MutationAccepted = {
+  mutationID: string;
+  documentVersion: number;
+  objectID: string;
+  property: string;
+  value: unknown;
+};
+```
+
+---
+
+## 16. Reconnection and Offline Editing
+
+The system does not need to resume the exact previous connection.
+
+After reconnecting:
+
+```
+1. Download latest document snapshot
+2. Replay local unacknowledged mutations
+3. Open a new WebSocket
+4. Send pending changes
+5. Reconcile with authoritative responses
+```
+
+Offline editing is the same mechanism with a longer disconnection period.
+
+```
+Brief disconnect:
+Replay 3 pending mutations
+
+Four-hour offline session:
+Replay 500 pending mutations
+```
+
+The client must persist pending edits locally, potentially using IndexedDB.
+
+```
+type PendingMutation = {
+  mutationID: string;
+  documentID: string;
+  objectID: string;
+  property: string;
+  value: unknown;
+  createdAt: number;
+};
+```
+
+---
+
+## 17. Document Process Failure
+
+If the authoritative process crashes:
+
+```
+1. Failure detector identifies dead process
+2. Ownership service assigns document to replacement
+3. Replacement loads latest persisted state
+4. Clients reconnect
+5. Clients download fresh snapshot
+6. Clients replay unacknowledged mutations
+```
+
+The hard infrastructure requirement is avoiding split brain.
+
+```
+Never allow two processes to simultaneously accept writes
+for the same document.
+```
+
+Possible mechanisms:
+
+- Lease with expiration
+- Fencing token
+- Compare-and-swap ownership record
+- Consistent routing
+- Durable actor system
+- Single-document lock in coordination storage
+
+Example ownership record:
+
+```
+type DocumentLease = {
+  documentID: string;
+  ownerProcessID: string;
+  fencingToken: number;
+  expiresAt: number;
+};
+```
+
+Every accepted write includes the current fencing token.
+
+A process with an old token cannot persist new updates.
+
+---
+
+## 18. Persistence Strategy
+
+The in-memory document process should not be the only copy.
+
+Common persistence model:
+
+```
+Mutation Log + Periodic Snapshot
+```
+
+### Mutation Log
+
+Append accepted mutations to durable storage.
+
+```
+version 101: rectangle.fill = red
+version 102: rectangle.width = 200
+version 103: icon.parent = frame-2
+```
+
+### Snapshot
+
+Periodically store complete document state.
+
+```
+Snapshot version: 1000
+Document state: ...
+```
+
+Recovery:
+
+```
+1. Load latest snapshot
+2. Replay mutations after snapshot version
+3. Resume serving clients
+```
+
+This reduces recovery time compared with replaying the entire history.
+
+---
+
+## 19. Undo and Redo
+
+Undo should represent user intent, not globally reverse the latest server mutation.
+
+Each client maintains a local history of its own actions.
+
+Example:
+
+```
+User A changes:
+fill: blue → red
+
+Undo operation:
+fill: red → blue
+```
+
+Undo is sent as a new mutation.
+
+It does not delete history or rewind the global document.
+
+Important challenge:
+
+```
+User A changes blue → red
+User B changes red → green
+User A presses undo
+```
+
+Blindly restoring blue may overwrite User B's valid edit.
+
+Possible policies:
+
+- Undo always emits inverse mutation
+- Undo only when current value still matches the user's write
+- Warn when undo conflicts with remote changes
+- Use operation-specific semantic undo
+
+For an interview, state the selected policy explicitly.
+
+---
+
+## 20. Presence Versus Document State
+
+Ephemeral collaboration data should be separate from durable document mutations.
+
+Presence data includes:
+
+- Cursor position
+- Current selection
+- User identity
+- Viewport
+- Typing indicator
+- Active tool
+
+```
+type PresenceUpdate = {
+  clientID: string;
+  cursor: { x: number; y: number };
+  selectedObjectIDs: string[];
+  viewport: {
+    x: number;
+    y: number;
+    zoom: number;
+  };
+};
+```
+
+Presence updates:
+
+- Are not persisted
+- Can be throttled
+- Can tolerate loss
+- Usually use last-update-wins
+- May be broadcast at 10–30 updates per second
+
+Document mutations require stronger durability and ordering.
+
+---
+
+## 21. Scaling Model
+
+The system scales by document, not by individual mutation.
+
+```
+Shard key = documentID
+```
+
+Each active document is assigned to one process.
+
+Benefits:
+
+- No cross-server ordering for edits within a document
+- Natural isolation
+- Easy reasoning about correctness
+- Horizontal scaling across many documents
+
+Challenges:
+
+- Hot documents with many editors
+- Large document memory usage
+- Process placement and migration
+- Ownership coordination
+- Reconnection storms
+- Snapshot loading latency
+
+A single hot document cannot easily be split across multiple writers without reintroducing distributed ordering.
+
+Possible mitigations:
+
+- Dedicated high-capacity process
+- Separate presence fan-out from mutation handling
+- Batch mutation broadcasts
+- Compress WebSocket payloads
+- Partition read-only viewers
+- Apply backpressure
+- Limit expensive derived computations
+- Move assets outside the document process
+
+---
+
+## 22. Key Trade-Off
+
+Figma exchanged an algorithm problem for an infrastructure problem.
+
+### Avoided Algorithm Complexity
+
+- Full OT transformation logic
+- Fully decentralized CRDT metadata
+- Timestamp conflict resolution
+- Tombstone accumulation
+- Cross-replica causal tracking
+
+### Accepted Infrastructure Complexity
+
+- One authoritative owner per document
+- Document-to-process routing
+- Process lifecycle management
+- Lease and fencing mechanisms
+- Crash recovery
+- Reconnection and replay
+- Hot-document management
+
+Core principle:
+
+```
+Do not globally order every edit across servers.
+
+Only agree on which process owns the document,
+then let that process order edits locally.
+```
+
+Ownership changes happen occasionally.
+
+Mutation ordering happens continuously.
+
+This dramatically reduces coordination cost.
+
+---
+
+## 23. Where This Design Works Well
+
+Best suited for:
+
+- Design tools
+- Diagram editors
+- Whiteboards
+- Presentation editors
+- Structured page builders
+- Scene-graph editors
+- Object-property editors
+
+Why:
+
+- Most edits update independent properties
+- Conflicting visual edits usually have no meaningful merge
+- Last-writer-wins is understandable
+- Conflicts are immediately visible and easy to redo
+
+---
+
+## 24. Where It Does Not Work Well
+
+Less suitable for:
+
+- Character-level collaborative text editing
+- Source-code editing
+- Decentralized peer-to-peer editing
+- Systems requiring every conflicting intent to survive
+- Applications requiring strict transactional updates across many objects
+
+For simultaneous text editing, use:
+
+- Sequence CRDT
+- Yjs
+- Automerge
+- OT-based text engine
+
+A hybrid system is often appropriate:
+
+```
+Visual object properties:
+Server-ordered per-property LWW
+
+Rich text content:
+Text-specific CRDT
+```
+
+---
+
+## 25. Interview Summary
+
+```
+Figma models the document as a tree of objects.
+
+Each object property is independently synchronized using
+server-ordered last-writer-wins.
+
+Clients apply edits optimistically for instant interaction
+and track unacknowledged writes to prevent UI flicker.
+
+Object identity remains stable across moves because parent
+and sibling position are properties of the child.
+
+The server validates global tree invariants such as cycle
+prevention, while per-property conflict resolution handles
+most concurrent edits.
+
+Every open document is assigned to one authoritative process,
+so mutation ordering is local arrival order instead of a
+distributed consensus problem.
+
+On reconnect, clients download a fresh snapshot and replay
+unacknowledged or offline mutations.
+
+The architecture replaces complex OT or decentralized CRDT
+algorithms with document ownership, routing, recovery, leases,
+and fencing infrastructure.
+```
+
+## 26. Strong Staff-Level Talking Point
+
+```
+The key design decision is choosing the correct conflict
+granularity.
+
+Figma does not resolve conflicts at the document or object
+level. It resolves them at the property level, maximizing the
+number of concurrent user intents that can survive.
+
+It then centralizes only the responsibilities that require a
+global view: ordering mutations, validating tree invariants,
+and assigning document ownership.
+```

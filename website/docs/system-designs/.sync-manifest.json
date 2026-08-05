@@ -76,9 +76,17 @@
       "hash": "7f05c54311c5622788ca9680b97f0ed747bbd0641c228f785a22565aba20a930",
       "docRelative": "dropbox.png"
     },
+    "system-designs/excalidraw/figma.png": {
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docRelative": "excalidraw/figma.png"
+    },
     "system-designs/feature-flag.png": {
       "hash": "b3fe895bd9c82aa8879b476907876c8a4fce936147138b02625263e184253a53",
       "docRelative": "feature-flag.png"
+    },
+    "system-designs/figma.png": {
+      "hash": "9c847ecca391881c7bedd070836b39c2c90426532a898a1a88b509bf6687250f",
+      "docRelative": "figma.png"
     },
     "system-designs/github-actions-fe-run-view.svg": {
       "hash": "c618adc3bc826faa21f968af2b0fe590d448640ad8eeeb6dc86548729b2d65f8",
@@ -248,6 +256,10 @@
       "hash": "309a1903eabc03ac762cd41e3d0c31f20f768547a08966af0efb7c266b15609a",
       "docRelative": "feature-flag-system.mdx"
     },
+    "system-designs/figma.mdx": {
+      "hash": "b123188ec2c8d9c37a56c823eeab76c7263e87e4e79c5cb6ae3299bc52666b92",
+      "docRelative": "figma.mdx"
+    },
     "system-designs/github-actions-system-design.mdx": {
       "hash": "8b7228fa984e56358456d7e53fc2484433e81761db105f0c6f007e708e30c7a9",
       "docRelative": "github-actions-system-design.mdx"
@@ -263,6 +275,10 @@
     "system-designs/job-scheduler.mdx": {
       "hash": "c2c20a8c58d7145293135b4c31ab75b293ed4ba8386abaf22a7894fff9463a0c",
       "docRelative": "job-scheduler.mdx"
+    },
+    "system-designs/key-technologies/database.mdx": {
+      "hash": "1a6abe7901ffed4f147fecfda03b30e4bc6fdb4f7b381ebf42557befe7139b28",
+      "docRelative": "key-technologies/database.mdx"
     },
     "system-designs/leetcode.mdx": {
       "hash": "b4c83758cacd20067bb1b35cc5403e0d620a610194bb68f693bf195cab5d0893",
@@ -375,6 +391,10 @@
     "__nav__:agentic-system-design": {
       "hash": "1213f1d160cb527cf3049f32747ced8074c128f29063dad461264211fc1c197b",
       "docRelative": "agentic-system-design/_index.mdx"
+    },
+    "__nav__:key-technologies": {
+      "hash": "a0fb14c3013790b04aab6663f46e3a4daef5ef61e583ec0d46af8740e2f9b146",
+      "docRelative": "key-technologies/_index.mdx"
     },
     "__nav__:miscellaneous": {
       "hash": "0e522a80bd9235d06fdebf48bc08b235f6b6fe5e0b8434ea31ba59e9a1df4b03",

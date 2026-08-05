@@ -1,8 +1,16 @@
 {
   "files": {
+    "behavorial/interview_rehearsal_map.svg": {
+      "hash": "1237f801763280fa2cbeac12bd4c346a217623bbe087b8d255d55ea22d3a1e3e",
+      "docRelative": "interview_rehearsal_map.svg"
+    },
     "behavorial/modelfoundry.png": {
       "hash": "491fa8951556543033ecb4b6110cfba5b68839495d72349ec216e7fd043be603",
       "docRelative": "modelfoundry.png"
+    },
+    "behavorial/rehearsal_map.png": {
+      "hash": "3d57d2ce832f2b9dc5a5aec6c55b803d0b57a059738c3adf8ceb91d8cb4672dc",
+      "docRelative": "rehearsal_map.png"
     },
     "behavorial/web-experience.png": {
       "hash": "cb3e15c912f2360b9368070921fb2b4584e0e0cd6475829bae8cd9ee3401f0dd",
@@ -39,6 +47,10 @@
     "behavorial/feature-drift-staff-interview-story.mdx": {
       "hash": "bfb6db97950977351545c7601cb50753f118363c4b092833ac30248a0eef0a3f",
       "docRelative": "feature-drift-staff-interview-story.mdx"
+    },
+    "behavorial/interview_rehearsal.mdx": {
+      "hash": "6e6b715737355ac74e1497c0efca496b80bfba37e1b5e4c64acb076a417e8ff5",
+      "docRelative": "interview_rehearsal.mdx"
     },
     "behavorial/model_foundry_agent_qna_system_design.mdx": {
       "hash": "09e748c2580e2ea998ef6e1ddd3befc8135ca8cdf06fd9277f0f386dee675021",
