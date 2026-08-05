@@ -8,6 +8,10 @@
       "hash": "162ddb6b7e20827a7469d444a9de2884ad18168a60bf00491d8f121583722a04",
       "docRelative": "agentic-system-design/agent-execution-ide.png"
     },
+    "system-designs/agentic-system-design/learning-assistant.png": {
+      "hash": "04df7695d2bd787fea80daea3af50365ba5f01abcf78a802c54b8df186e8bf1f",
+      "docRelative": "agentic-system-design/learning-assistant.png"
+    },
     "system-designs/agentic-system-design/marketing-ai-agent.png": {
       "hash": "0d2ba5cd301f2b9c3fabad44957866b006adcae6d4f71cded4b9752aff056155",
       "docRelative": "agentic-system-design/marketing-ai-agent.png"
@@ -27,6 +31,10 @@
     "system-designs/agentic-system-design/sandbox-ide-final.png": {
       "hash": "3cb0a3c78612ef2f8f69ed195b30805e2818c2694d836dcb5f455c8c426520f7",
       "docRelative": "agentic-system-design/sandbox-ide-final.png"
+    },
+    "system-designs/agentic-system-design/text-to-image.png": {
+      "hash": "26c13a53b8788ad830efecac4ac97c495c3dcd1376040f2c14c7e6b26347e230",
+      "docRelative": "agentic-system-design/text-to-image.png"
     },
     "system-designs/agentic-system-design/ux-mock.svg": {
       "hash": "9172b514e9baeb4015517f804a34328a2bfce59c5a9dbdb7b4fda0c051ad1c72",
@@ -212,6 +220,10 @@
       "hash": "c132c5f3ca58df9614de08aeeba4912f377688b9bf6256f9f85c905d0ccb98fa",
       "docRelative": "agentic-system-design/agentic-mcp-interview-qa.mdx"
     },
+    "system-designs/agentic-system-design/learning-assistant.mdx": {
+      "hash": "1a1a189b4f6ee7f177c35213af6a4f9d08b454fbdb3885c2aebe042f5b879897",
+      "docRelative": "agentic-system-design/learning-assistant.mdx"
+    },
     "system-designs/agentic-system-design/marketing-ai-agent.mdx": {
       "hash": "1d61337e8fc2b424184dda0521a8acb7af210b6f759254af1643fe9de1680647",
       "docRelative": "agentic-system-design/marketing-ai-agent.mdx"
@@ -227,6 +239,10 @@
     "system-designs/agentic-system-design/sandboxed-cloud-ide-system-design.mdx": {
       "hash": "a292f0500183671d91abb19f04245d8577a64d4a2922cae5a1ad1914b2331b28",
       "docRelative": "agentic-system-design/sandboxed-cloud-ide-system-design.mdx"
+    },
+    "system-designs/agentic-system-design/text-to-image-system-design.mdx": {
+      "hash": "0e244fa9f2545ecf38c4fc749035f5daea756ccfda28d3e29fd3343b171e1bed",
+      "docRelative": "agentic-system-design/text-to-image-system-design.mdx"
     },
     "system-designs/bitly.mdx": {
       "hash": "9da02c2aa2b6a8ea01789bacec67a98c36161f503dc8d23ec31ba364803aeae9",
@@ -279,6 +295,10 @@
     "system-designs/key-technologies/database.mdx": {
       "hash": "1a6abe7901ffed4f147fecfda03b30e4bc6fdb4f7b381ebf42557befe7139b28",
       "docRelative": "key-technologies/database.mdx"
+    },
+    "system-designs/key-technologies/vector-database.mdx": {
+      "hash": "1923d4c9ed63e0ee6640ec412c011cc94382724cd80390d4d4c27e648b62c89d",
+      "docRelative": "key-technologies/vector-database.mdx"
     },
     "system-designs/leetcode.mdx": {
       "hash": "b4c83758cacd20067bb1b35cc5403e0d620a610194bb68f693bf195cab5d0893",
@@ -389,11 +409,11 @@
       "docRelative": "yelp.mdx"
     },
     "__nav__:agentic-system-design": {
-      "hash": "1213f1d160cb527cf3049f32747ced8074c128f29063dad461264211fc1c197b",
+      "hash": "c640113b044db6ffb7ffb8ef49629f450a901589938e3610acf6d9ddddedeb9c",
       "docRelative": "agentic-system-design/_index.mdx"
     },
     "__nav__:key-technologies": {
-      "hash": "a0fb14c3013790b04aab6663f46e3a4daef5ef61e583ec0d46af8740e2f9b146",
+      "hash": "8db9b5ee399ca774208ab1c27e53bb5097789a5fd0780c9fba6bf7612c55cf90",
       "docRelative": "key-technologies/_index.mdx"
     },
     "__nav__:miscellaneous": {
