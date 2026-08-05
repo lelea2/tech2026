@@ -12,10 +12,6 @@
       "hash": "3d57d2ce832f2b9dc5a5aec6c55b803d0b57a059738c3adf8ceb91d8cb4672dc",
       "docRelative": "rehearsal_map.png"
     },
-    "behavorial/web-experience.png": {
-      "hash": "cb3e15c912f2360b9368070921fb2b4584e0e0cd6475829bae8cd9ee3401f0dd",
-      "docRelative": "web-experience.png"
-    },
     "behavorial/airtable_ai_fluency_talking_points.mdx": {
       "hash": "0baf4648c79b943f4cd3e534bc27a41857c856d26b7bd4fdc7cc74a2297cc657",
       "docRelative": "airtable_ai_fluency_talking_points.mdx"
@@ -83,10 +79,6 @@
     "behavorial/tradeoff-behavioral.mdx": {
       "hash": "b3de7641108f76b6fd9323ad043aa30cf09a715e134bc02b6427876e98534cb2",
       "docRelative": "tradeoff-behavioral.mdx"
-    },
-    "behavorial/web-experience.mdx": {
-      "hash": "97997c966a22c38c935611786251beb6beda3fb0dbdf4da1e763044534e303f3",
-      "docRelative": "web-experience.mdx"
     }
   }
 }
