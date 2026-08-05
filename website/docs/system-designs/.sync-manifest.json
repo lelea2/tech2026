@@ -369,7 +369,7 @@
       "docRelative": "patterns/flink_vs_temporal_staff_engineer.mdx"
     },
     "system-designs/patterns/handle-large-blobs.mdx": {
-      "hash": "ede5b06e86d8d87f25009a11481ee6d521f1599938cc97f25b87d0d9097ce4f6",
+      "hash": "72a15bd7fe30c9fcc5ff99c2c419d6c523d15a98ee6b24a91eb1829f6dd4946c",
       "docRelative": "patterns/handle-large-blobs.mdx"
     },
     "system-designs/patterns/manage-long-running-task.mdx": {

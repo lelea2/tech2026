@@ -6,7 +6,80 @@ title: Handling Large Blobs — Upload & Download
 
 ![Large Blobs](./blobs.png)
 
----
+```
+
+                     ┌───────────────────────┐
+                     │ Web / Mobile Client   │
+                     └───────────┬───────────┘
+                                 │
+                         Metadata/API calls
+                                 │
+                     ┌───────────▼───────────┐
+                     │ CDN + API Gateway     │
+                     │ WAF / Rate Limiting   │
+                     └───────┬───────────────┘
+                             │
+             ┌───────────────┴─────────────────┐
+             │                                 │
+   ┌─────────▼──────────┐           ┌──────────▼──────────┐
+   │ File Metadata API  │           │ Authorization       │
+   │ Upload Coordinator │           │ Tenant / ACL Service│
+   └─────────┬──────────┘           └─────────────────────┘
+             │
+     ┌───────┴────────┐
+     │                │
+┌────▼─────┐   ┌──────▼─────────┐
+│Metadata DB│   │Upload Session  │
+│SQL/NoSQL  │   │Store / Redis   │
+└────┬─────┘   └────────────────┘
+     │
+     │ returns signed URLs
+     ▼
+┌─────────────────────────────────────────────┐
+│ Distributed Object Storage                 │
+│ S3 / GCS / Azure Blob / Internal Storage   │
+│ Multi-AZ replication + erasure coding      │
+└──────────────────────┬──────────────────────┘
+                       │ Object-created event
+                       ▼
+              ┌─────────────────────┐
+              │ Event Bus           │
+              │ Kafka / Pub/Sub     │
+              └──────────┬──────────┘
+                         │
+       ┌─────────────────┼─────────────────┐
+       │                 │                 │
+┌──────▼───────┐ ┌───────▼──────┐ ┌────────▼────────┐
+│Virus Scanner │ │Preview Worker │ │Metadata Extractor│
+└──────────────┘ └──────────────┘ └─────────────────┘
+                         │
+                         ▼
+                  Preview Storage
+                         │
+                         ▼
+                    Global CDN
+```
+
+1. Client requests an upload session.
+2. API authenticates user and checks quota.
+3. Metadata service creates a PENDING file record.
+4. Upload coordinator returns signed multipart-upload URLs.
+5. Client uploads parts directly to object storage.
+6. Client retries failed parts independently.
+7. Client calls complete-upload.
+8. Server verifies object size, checksum, and multipart manifest.
+9. File status changes to PROCESSING.
+10. Storage event is published to the event bus.
+11. Workers scan the file and generate previews.
+12. File status becomes READY.
+
+I would separate the metadata control plane from the file-byte data plane. The API service manages ownership, versions, permissions, quotas, and upload sessions in a strongly consistent metadata store. Clients upload large files directly to distributed object storage using short-lived multipart signed URLs, avoiding routing file bytes through application servers.
+
+Files are immutable; an edit creates a new version. This simplifies CDN caching, replication, auditability, and rollback. After storage confirms upload completion, the system atomically marks the version as processing and publishes an event through a transactional outbox. Asynchronous workers perform malware scanning, metadata extraction, thumbnailing, and transcoding.
+
+Downloads are served through a global CDN using versioned object URLs and short-lived authorization tokens. The storage layer replicates hot assets across availability zones, uses erasure coding for colder assets, and asynchronously replicates critical content to a disaster-recovery region.
+
+## I would use strong consistency for metadata, permissions, version pointers, and quota accounting, while allowing eventual consistency for previews, search indexes, CDN propagation, and cross-region replicas. Multipart uploads, idempotent completion, checksums, reconciliation jobs, lifecycle tiers, and tenant-aware rate limits provide reliability and cost control at Adobe scale.
 
 ## Why This Is a Staff-Level Problem
 
