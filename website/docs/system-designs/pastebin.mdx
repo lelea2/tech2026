@@ -8,13 +8,13 @@ tags:
   - staff-engineer
 ---
 
+![PasteBin Architecture](./pastebin.png)
+
 # PasteBin System Design
 
 A distributed system for storing and sharing code snippets, text, and documents with short URLs.
 
 ## System Diagram
-
-![PasteBin Architecture](./pastebin.png)
 
 ---
 
@@ -393,7 +393,7 @@ Thresholds:
 | **Random Base62 URLs**       | Non-enumerable; better privacy; simpler than cryptographic hash          |
 | **Redis hot cache**          | Sub-50ms reads for top 1% pastes; 80/20 rule pays off                    |
 | **Lazy + active expiration** | Avoids serving stale data; background cleanup for storage efficiency     |
-| **Async replication**        | Faster writes; acceptable &lt;1s lag given immutable pastes              |
+| **Async replication**        | Faster writes; acceptable <1s lag given immutable pastes                 |
 | **CDN + origin**             | Geo-distribution reduces latency & DDoS surface                          |
 
 ---
