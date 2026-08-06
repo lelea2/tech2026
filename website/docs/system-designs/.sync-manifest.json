@@ -220,6 +220,10 @@
       "hash": "36445ae99ba91aa71c056771b832f39fbb32a87e4d04a72c1b3e9d6d90ca5ef4",
       "docRelative": "teleoperation_management_system.svg"
     },
+    "system-designs/teleoperation_notif.png": {
+      "hash": "1c715746e8812bd15291a4071a758f49e21a66603e9c4a714443ed366941b1df",
+      "docRelative": "teleoperation_notif.png"
+    },
     "system-designs/teleopration.png": {
       "hash": "021bb108e3e2696d76a889b7c36fcd20b50851a1f39056eb7bac2604de6b9500",
       "docRelative": "teleopration.png"
@@ -445,7 +449,7 @@
       "docRelative": "ride_hailing.mdx"
     },
     "system-designs/teleoperations.mdx": {
-      "hash": "5b5126c155832f9612425c7f207321657f1a7206ee14e75cab1ec71ca8b9d506",
+      "hash": "b456b1322ab342a6fb28bbfae5f1524b6b0f96d100af6a37ae39685881e4f379",
       "docRelative": "teleoperations.mdx"
     },
     "system-designs/ticketmaster.mdx": {
