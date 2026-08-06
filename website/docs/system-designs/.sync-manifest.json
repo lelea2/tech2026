@@ -156,6 +156,10 @@
       "hash": "f09a4178656b7fcd39c80d3dbca33476d19a7a27b6b897b096dd41d5e173c8c9",
       "docRelative": "multimodal-file-ingestion.png"
     },
+    "system-designs/nearby-vehicle-search.svg": {
+      "hash": "6e50d64840463ba9607ff1ee186ade3b5d349d77694987b80b339b3825bd338d",
+      "docRelative": "nearby-vehicle-search.svg"
+    },
     "system-designs/netflix.png": {
       "hash": "66118e22ec250382cb26428c4f1f3ed668cf3969e64ee0c805b22e9bad48367e",
       "docRelative": "netflix.png"
@@ -365,7 +369,7 @@
       "docRelative": "multimodal-file-ingestion-retrieval.mdx"
     },
     "system-designs/nearby_vehicle_search.mdx": {
-      "hash": "988db54e12e3f9c48cf6e021a78b4a4cc3d8e3b87bcceec758a5a4abc5c9b91e",
+      "hash": "c493d13d9340e77a95a55f7384e88ecee48a2c31a23b067d78608d8a031aefdd",
       "docRelative": "nearby_vehicle_search.mdx"
     },
     "system-designs/netflix.mdx": {

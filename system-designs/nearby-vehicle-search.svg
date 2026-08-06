@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1180" viewBox="0 0 1800 1180">
+  <defs>
+    <style>
+      .bg{fill:#f8fafc}.title{font:700 32px Inter,Arial,sans-serif;fill:#0f172a}.subtitle{font:500 16px Inter,Arial,sans-serif;fill:#475569}
+      .h{font:700 18px Inter,Arial,sans-serif;fill:#0f172a}.t{font:500 14px Inter,Arial,sans-serif;fill:#334155}.small{font:500 12px Inter,Arial,sans-serif;fill:#475569}
+      .box{fill:white;stroke:#64748b;stroke-width:2;rx:14}.blue{fill:#eff6ff;stroke:#2563eb}.green{fill:#ecfdf5;stroke:#059669}.amber{fill:#fffbeb;stroke:#d97706}.purple{fill:#f5f3ff;stroke:#7c3aed}.red{fill:#fef2f2;stroke:#dc2626}.gray{fill:#f1f5f9;stroke:#64748b}
+      .arrow{stroke:#334155;stroke-width:2.4;fill:none;marker-end:url(#m)}.dashed{stroke-dasharray:8 6}.label{font:600 12px Inter,Arial,sans-serif;fill:#0f172a}
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#334155"/></marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1800" height="1180"/>
+  <text class="title" x="60" y="52">Nearby Vehicle Search for Autonomous Fleets</text>
+  <text class="subtitle" x="60" y="82">Regional, versioned, cell-partitioned search with visible freshness and transactional reservation</text>
+
+  <rect class="box blue" x="60" y="130" width="245" height="130"/><text class="h" x="82" y="165">Vehicle / Edge Agent</text><text class="t" x="82" y="195">GNSS, heading, speed</text><text class="t" x="82" y="218">sequence + event time</text><text class="small" x="82" y="242">1–5 sec updates</text>
+  <rect class="box blue" x="365" y="130" width="250" height="130"/><text class="h" x="388" y="165">Telemetry Gateway</text><text class="t" x="388" y="195">mTLS • auth • schema</text><text class="t" x="388" y="218">ingest time • rate limit</text><text class="small" x="388" y="242">regional and stateless</text>
+  <rect class="box purple" x="680" y="130" width="270" height="130"/><text class="h" x="705" y="165">Durable Event Log</text><text class="t" x="705" y="195">partition by vehicleId</text><text class="t" x="705" y="218">replay + backpressure</text><text class="small" x="705" y="242">Kafka-compatible</text>
+  <rect class="box amber" x="1015" y="130" width="285" height="130"/><text class="h" x="1040" y="165">Ordering + Validation</text><text class="t" x="1040" y="195">(bootEpoch, sequence)</text><text class="t" x="1040" y="218">dedupe • jump detection</text><text class="small" x="1040" y="242">idempotent projection</text>
+  <rect class="box green" x="1365" y="110" width="370" height="170"/><text class="h" x="1390" y="145">Materialized Outputs</text><text class="t" x="1390" y="177">1. Last-known-state KV</text><text class="t" x="1390" y="202">2. Spatial index mutations</text><text class="t" x="1390" y="227">3. Audit / data-quality stream</text><text class="small" x="1390" y="253">all writes carry version</text>
+
+  <path class="arrow" d="M305 195 H365"/><path class="arrow" d="M615 195 H680"/><path class="arrow" d="M950 195 H1015"/><path class="arrow" d="M1300 195 H1365"/>
+
+  <rect class="box gray" x="60" y="340" width="245" height="130"/><text class="h" x="83" y="375">Search Client</text><text class="t" x="83" y="405">lat/lon • radius • top k</text><text class="t" x="83" y="428">eligibility + freshness</text><text class="small" x="83" y="452">dispatch, map, operator</text>
+  <rect class="box blue" x="365" y="340" width="250" height="130"/><text class="h" x="390" y="375">Search API</text><text class="t" x="390" y="405">auth • quotas • deadlines</text><text class="t" x="390" y="428">normalize query policy</text><text class="small" x="390" y="452">p99 target &lt; 200 ms</text>
+  <rect class="box purple" x="680" y="340" width="270" height="130"/><text class="h" x="705" y="375">Cell Cover + Router</text><text class="t" x="705" y="405">H3 / S2 circle cover</text><text class="t" x="705" y="428">cell range → shard replicas</text><text class="small" x="705" y="452">adaptive resolution</text>
+  <rect class="box green" x="1015" y="320" width="285" height="170"/><text class="h" x="1040" y="355">Regional Index Shards</text><text class="t" x="1040" y="387">Map&lt;Cell, VehicleDoc&gt;</text><text class="t" x="1040" y="412">bitmaps • expiry heap</text><text class="t" x="1040" y="437">replicas for hot cells</text><text class="small" x="1040" y="463">memory-resident, rebuildable</text>
+  <rect class="box amber" x="1365" y="320" width="370" height="170"/><text class="h" x="1390" y="355">Exact Filter + Rank</text><text class="t" x="1390" y="387">Haversine • radius cutoff</text><text class="t" x="1390" y="412">freshness • dedupe • eligibility</text><text class="t" x="1390" y="437">optional batched ETA rerank</text><text class="small" x="1390" y="463">return locationAge + watermark</text>
+  <path class="arrow" d="M305 405 H365"/><path class="arrow" d="M615 405 H680"/><path class="arrow" d="M950 405 H1015"/><path class="arrow" d="M1300 405 H1365"/>
+
+  <path class="arrow dashed" d="M1550 280 V320"/><text class="label" x="1570" y="305">projected updates</text>
+
+  <rect class="box red" x="60" y="560" width="500" height="220"/><text class="h" x="85" y="595">Ordering, Freshness, and Correctness</text><text class="t" x="85" y="632">• Prefer monotonic per-vehicle sequence over clock time</text><text class="t" x="85" y="660">• Store eventTime, ingestTime, indexAppliedTime</text><text class="t" x="85" y="688">• Ignore stale add/remove/tombstone by version</text><text class="t" x="85" y="716">• Exclude or explicitly label stale location</text><text class="t" x="85" y="744">• Search is advisory; reservation is authoritative</text>
+
+  <rect class="box purple" x="620" y="560" width="530" height="220"/><text class="h" x="645" y="595">Spatial Technology Choice</text><text class="t" x="645" y="632">H3 / S2: distributed cell ownership and neighbor cover</text><text class="t" x="645" y="660">Custom index: best latency and high update throughput</text><text class="t" x="645" y="688">PostGIS: service polygons, validation, offline truth</text><text class="t" x="645" y="716">Redis/OpenSearch: pragmatic MVP, less tailored semantics</text><text class="t" x="645" y="744">Exact distance always follows coarse cell retrieval</text>
+
+  <rect class="box green" x="1210" y="560" width="525" height="220"/><text class="h" x="1235" y="595">Resilience and Scaling</text><text class="t" x="1235" y="632">• snapshot + log offset for deterministic rebuild</text><text class="t" x="1235" y="660">• hot-cell replicas and adaptive cell resolution</text><text class="t" x="1235" y="688">• partial=true only when API permits incomplete coverage</text><text class="t" x="1235" y="716">• regional operation during WAN/control-plane failure</text><text class="t" x="1235" y="744">• deadline propagation and cancellation to all shards</text>
+
+  <rect class="box amber" x="60" y="840" width="1675" height="260"/><text class="h" x="85" y="878">Critical Dispatch Flow</text>
+  <rect class="box" x="90" y="925" width="230" height="100"/><text class="h" x="110" y="958">1. Nearby Search</text><text class="small" x="110" y="984">bounded-staleness candidates</text>
+  <rect class="box" x="390" y="925" width="250" height="100"/><text class="h" x="412" y="958">2. Select Candidate</text><text class="small" x="412" y="984">distance / ETA / policy</text>
+  <rect class="box red" x="710" y="910" width="300" height="130"/><text class="h" x="734" y="946">3. Conditional Reserve</text><text class="t" x="734" y="974">expected operationalVersion</text><text class="small" x="734" y="1002">CAS + short TTL + idempotency</text>
+  <rect class="box green" x="1080" y="925" width="260" height="100"/><text class="h" x="1104" y="958">4. Confirm Assignment</text><text class="small" x="1104" y="984">vehicle becomes RESERVED</text>
+  <rect class="box gray" x="1410" y="925" width="275" height="100"/><text class="h" x="1434" y="958">5. Retry Next</text><text class="small" x="1434" y="984">on version conflict or timeout</text>
+  <path class="arrow" d="M320 975 H390"/><path class="arrow" d="M640 975 H710"/><path class="arrow" d="M1010 975 H1080"/><path class="arrow" d="M1340 975 H1410"/>
+  <text class="subtitle" x="60" y="1150">Key principle: durable truth by vehicle, search locality by cell, final assignment by transaction.</text>
+</svg>
