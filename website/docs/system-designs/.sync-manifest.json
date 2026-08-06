@@ -204,6 +204,10 @@
       "hash": "cbc9857f856770f79e74b98e7b38ddc52eada83f69b2b8cc91f44340fd050530",
       "docRelative": "rate-limiter.png"
     },
+    "system-designs/ride-hailing.png": {
+      "hash": "b0ddcee377e7b82750f0819bbf74ba6ac34583a5d1b1c994dde48f377e3d6cca",
+      "docRelative": "ride-hailing.png"
+    },
     "system-designs/ticketmaster.png": {
       "hash": "21c11e2efac8a45fecd2c9e3911c126e2dc5528dfdaa904d86cedb6402a64af3",
       "docRelative": "ticketmaster.png"
@@ -408,12 +412,16 @@
       "hash": "a62a344d5c71f09dade78a20324ea1052d2ae53ae9670a39c5b9fe124a1c1355",
       "docRelative": "rate-limit.mdx"
     },
+    "system-designs/ride_hailing.mdx": {
+      "hash": "fd0c91c71e4db2ee07b437acef4df6dbf6a07656bb3adee3a21beb1496961331",
+      "docRelative": "ride_hailing.mdx"
+    },
     "system-designs/ticketmaster.mdx": {
       "hash": "d662f2fd0247f984733ef8cac66bf2bf9ed0f58b37bf4e83c4a610a33ff145b2",
       "docRelative": "ticketmaster.mdx"
     },
     "system-designs/uber.mdx": {
-      "hash": "ba18df651de88956a12d8077edaadafee04151c9b05f20feda3a9c6129f1a0bd",
+      "hash": "f06103d7cefd942912141bbcda5c46bb76a7a45ebf4642cbf2432331f8d47c46",
       "docRelative": "uber.mdx"
     },
     "system-designs/web-crawler.mdx": {
