@@ -5,7 +5,62 @@ description: 'Staff-level discussion guide covering safety boundaries, technolog
 
 ![High level docs architecture and request flow](./teleopration.png)
 
+![Fleet teleoperation management system](./teleoperation_management_system.svg)
+
 # Teleoperations System Design — Technology Deep Dive
+
+---
+
+## Interview Summary — What to Focus On
+
+**The one-line framing:** Teleoperations is a **human-in-the-loop assistance system for autonomous vehicles** — the cloud advises and authorizes, the vehicle validates and executes. Everything else in the design follows from that boundary.
+
+### The four planes (lead with this structure)
+
+| Plane                    | Responsibility                                                                                                        | Key tech                                            |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| **Vehicle safety plane** | Collision avoidance, emergency braking, minimal-risk maneuvers, command validation — stays on-vehicle, never in cloud | Onboard autonomy stack                              |
+| **Control plane**        | Help-request lifecycle, queue, tactician assignment, command authorization, audit trail                               | Postgres (authoritative), Redis (rebuildable index) |
+| **Media plane**          | Low-latency live video, isolated from workflow/command traffic                                                        | WebRTC over mTLS                                    |
+| **Event & data plane**   | Immutable telemetry, replay, stream processing, fleet-stability analytics                                             | Kafka, Flink, lakehouse + OLAP                      |
+
+### The five decisions that earn staff-level signal
+
+1. **Safety boundary** — network loss must never make the vehicle unsafe. Cloud recommends; vehicle validates and can reject expired/unsafe/inconsistent commands.
+2. **Conditional ownership of help requests** — prevent double assignment via a conditional write (compare-and-swap on `assigned_tactician`), not a distributed lock.
+3. **Idempotent vehicle commands** — every command carries a command ID + expiry; replays are deduped, stale commands are rejected on-vehicle.
+4. **Media/control isolation** — video congestion must never delay a command or heartbeat; separate transport, separate scaling, separate failure domain.
+5. **Exposure-normalized fleet metrics** — interventions per 1,000 miles (not raw counts), so release-over-release comparison is fair.
+
+### Technology choices and why
+
+| Choice                                     | Rationale                                                                                                  |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| **WebRTC** for video                       | Sub-second glass-to-glass latency; SRT/HLS buffer too much for a human making driving decisions            |
+| **gRPC / WebSocket over mTLS** for control | Persistent bidirectional channel for help requests, heartbeats, commands, ACKs                             |
+| **Postgres** for workflow state            | Help-request lifecycle needs ACID + auditable transitions; volume is low (requests/sec, not telemetry/sec) |
+| **Redis** for queue/index                  | Low-latency prioritization; treated as rebuildable cache, never source of truth                            |
+| **Kafka** as event backbone                | Durable, replayable, partitioned by `vehicle_id` for per-vehicle ordering                                  |
+| **Flink** for stream processing            | Event-time windowing with watermarks for late/out-of-order telemetry                                       |
+| **Lakehouse + OLAP**                       | Historical fleet-stability analysis; separate from the operational hot path                                |
+
+### Failure scenarios to volunteer proactively
+
+- **Network loss** → vehicle continues approved mission, waits safely, or executes minimal-risk stop (policy + state dependent)
+- **Tactician disconnects mid-session** → request returns to queue with elevated priority, session state preserved for resume
+- **Redis fails** → rebuild queue from Postgres; degraded latency, not lost work
+- **Kafka fails** → operational path continues (Postgres is authoritative); analytics lags and backfills on recovery
+- **Video plane fails** → control plane still functional; tactician falls back to telemetry-only advice or escalates to safe stop
+
+### Common traps
+
+- Putting safety-critical control in the cloud (biggest red flag)
+- Making Redis authoritative for assignment state
+- Using raw intervention counts instead of exposure-normalized rates
+- Sharing one transport for video and commands
+- Forgetting command expiry — a delayed command executing late is a safety incident
+
+---
 
 ## 1. Start with the safety boundary
 

@@ -216,6 +216,10 @@
       "hash": "b0ddcee377e7b82750f0819bbf74ba6ac34583a5d1b1c994dde48f377e3d6cca",
       "docRelative": "ride-hailing.png"
     },
+    "system-designs/teleoperation_management_system.svg": {
+      "hash": "36445ae99ba91aa71c056771b832f39fbb32a87e4d04a72c1b3e9d6d90ca5ef4",
+      "docRelative": "teleoperation_management_system.svg"
+    },
     "system-designs/teleopration.png": {
       "hash": "021bb108e3e2696d76a889b7c36fcd20b50851a1f39056eb7bac2604de6b9500",
       "docRelative": "teleopration.png"
@@ -397,7 +401,7 @@
       "docRelative": "pastebin.mdx"
     },
     "system-designs/patterns/OLAPvsOTLP.mdx": {
-      "hash": "10d5f4ee45cf2431235951d6281cc5ff9ba8c7742063455263cf8b980967cc6e",
+      "hash": "b4f7aa5a57fb6f81033dae3f373794cffcd9304a362b395385b96c280dd99e6c",
       "docRelative": "patterns/OLAPvsOTLP.mdx"
     },
     "system-designs/patterns/flink.mdx": {
@@ -441,7 +445,7 @@
       "docRelative": "ride_hailing.mdx"
     },
     "system-designs/teleoperations.mdx": {
-      "hash": "724008fcfa2bf83744df1194757cbbdd2502c7007b891fbbfa497f9f5a9ed850",
+      "hash": "5b5126c155832f9612425c7f207321657f1a7206ee14e75cab1ec71ca8b9d506",
       "docRelative": "teleoperations.mdx"
     },
     "system-designs/ticketmaster.mdx": {

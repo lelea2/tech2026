@@ -22,21 +22,21 @@ Don't ask "which database?" Ask "what is the user workload?" If it's answering q
 
 ## Quick Decision Matrix
 
-| Dimension               | **OLTP**                                  | **OLAP**                                  |
-| ----------------------- | ----------------------------------------- | ----------------------------------------- |
-| **Primary use**         | Operational app (Uber, Stripe, Airbnb)    | Analytics, BI, ML (data warehouse)        |
-| **Access pattern**      | Point lookups, single-row updates          | Full-table scans, aggregations, joins      |
-| **Data volume/query**   | Kilobytes to megabytes per query           | Terabytes per query                       |
-| **Write throughput**    | Very high (100K–1M writes/sec)             | Batch or near-real-time (append-only)     |
-| **Query latency**       | &lt;100ms p99 required                      | &lt;1–10 seconds acceptable                 |
-| **Freshness**           | Real-time (seconds)                       | Hours to minutes (eventual)                |
-| **Consistency**         | Strong (ACID transactions)                 | Eventual (batch reconciliation)            |
-| **Data model**          | Normalized (3NF for ACID)                  | Denormalized (star schema, wide tables)    |
-| **Compression**         | Dictionary/LZ4 (small)                     | Columnar + aggressive compression (10:1+)  |
-| **Index strategy**      | B-tree (point lookup), hash, BRIN          | Partitioning, clustering keys              |
-| **Cost structure**      | Per-write or per-second                    | Per-byte-scanned or per-GB-stored          |
-| **Scaling approach**    | Horizontal sharding (lose consistency)     | Horizontal append (immutable partitions)   |
-| **Examples**            | Postgres, MySQL, Cassandra, DynamoDB       | Snowflake, BigQuery, Redshift, ClickHouse |
+| Dimension             | **OLTP**                               | **OLAP**                                  |
+| --------------------- | -------------------------------------- | ----------------------------------------- |
+| **Primary use**       | Operational app (Uber, Stripe, Airbnb) | Analytics, BI, ML (data warehouse)        |
+| **Access pattern**    | Point lookups, single-row updates      | Full-table scans, aggregations, joins     |
+| **Data volume/query** | Kilobytes to megabytes per query       | Terabytes per query                       |
+| **Write throughput**  | Very high (100K–1M writes/sec)         | Batch or near-real-time (append-only)     |
+| **Query latency**     | &lt;100ms p99 required                 | &lt;1–10 seconds acceptable               |
+| **Freshness**         | Real-time (seconds)                    | Hours to minutes (eventual)               |
+| **Consistency**       | Strong (ACID transactions)             | Eventual (batch reconciliation)           |
+| **Data model**        | Normalized (3NF for ACID)              | Denormalized (star schema, wide tables)   |
+| **Compression**       | Dictionary/LZ4 (small)                 | Columnar + aggressive compression (10:1+) |
+| **Index strategy**    | B-tree (point lookup), hash, BRIN      | Partitioning, clustering keys             |
+| **Cost structure**    | Per-write or per-second                | Per-byte-scanned or per-GB-stored         |
+| **Scaling approach**  | Horizontal sharding (lose consistency) | Horizontal append (immutable partitions)  |
+| **Examples**          | Postgres, MySQL, Cassandra, DynamoDB   | Snowflake, BigQuery, Redshift, ClickHouse |
 
 ---
 
@@ -47,6 +47,7 @@ Don't ask "which database?" Ask "what is the user workload?" If it's answering q
 **Row-oriented storage:** Data stored row-by-row (customer record = single disk block). Perfect for "get me user 12345 with all their fields" — one disk seek, one row read.
 
 **Normalized schema:** Break data into 3NF (third normal form) to enforce consistency via foreign keys:
+
 - `users` table: id, name, email
 - `orders` table: id, user_id, order_total
 - `order_items` table: id, order_id, product_id, quantity, price
@@ -56,12 +57,14 @@ This prevents anomalies (user deletes their record, but orphaned orders remain) 
 **B-tree indexes:** Fast point lookups (log(n) seeks). An index on `user_id` means "find user 12345's order" is ~3–5 disk seeks regardless of table size.
 
 **ACID transactions:** Multiple statements atomic — either all commit or all rollback. "Transfer $100 from Alice to Bob" is:
+
 ```sql
 BEGIN;
   UPDATE accounts SET balance = balance - 100 WHERE user_id = 'alice';
   UPDATE accounts SET balance = balance + 100 WHERE user_id = 'bob';
 COMMIT;
 ```
+
 If server crashes mid-transfer, neither update persists (no half-finished state).
 
 **Real-time consistency:** Users see results instantly. Stripe's API returns "charge succeeded" before you can blink.
@@ -102,6 +105,7 @@ User places order at 6:15 PM
 Compression is extreme: 1M identical values (region=USA) compresses to a single flag + count. This is why columnar stores achieve **10:1–100:1 compression** vs row stores.
 
 **Denormalized schema (star schema):** Facts + dimensions flattened into wide tables:
+
 - `orders_fact` table: order_id, user_id, restaurant_id, driver_id, order_total, **date_key**, **region_key**, ... (100+ columns)
 - `users_dim` table: user_id, name, email, signup_date (reference data)
 
@@ -127,7 +131,7 @@ Wide tables avoid joins in the hot path — `SELECT SUM(order_total) FROM orders
 ```
 Every night, ETL pipeline loads:
   orders_fact (1B rows)
-    └─ order_id, user_id, restaurant_id, driver_id, 
+    └─ order_id, user_id, restaurant_id, driver_id,
        order_total, delivery_fee, tip, platform_fee,
        order_date, order_hour, region_id, cuisine_type_id
 
@@ -144,6 +148,7 @@ Analyst query: "Revenue by cuisine type for past 7 days"
 ```
 
 **Why not Postgres?**
+
 - Full table scan of 1B rows on row-oriented storage = ~100GB disk I/O (10 seconds minimum)
 - Cost per query would be massive if charged per byte like data warehouses
 - Locking the table blocks live transactional queries (order inserts stall)
@@ -167,6 +172,7 @@ Production Postgres (OLTP)
 ```
 
 **Why?**
+
 - OLTP handles the 50K/sec writes in production
 - OLAP handles the weekly revenue deep-dive queries
 - They don't compete for resources
@@ -181,6 +187,7 @@ Production Postgres (OLTP)
 **Scenario:** Ride-hailing platform wants to show "surge multiplier by zone every 5 minutes" without waiting for nightly batch.
 
 **Design:**
+
 - Kafka streams in real-time events (order requests, driver locations)
 - Flink aggregates every 5 minutes → outputs `(zone, requests_count, driver_count, multiplier)`
 - Results written to Redis (hot cache, for live dashboards) + Snowflake (cold storage, for historical analysis)
@@ -197,6 +204,7 @@ Kafka (events) → Flink (windowing) → Redis + Snowflake
 **Scenario:** Payment processing needs ACID guarantees, but analytics team needs to query transaction history without blocking operations.
 
 **Design:**
+
 - Master Postgres (OLTP): all writes, real-time consistency
 - Read replica Postgres (OLAP adjacent): read-only copy, lagged by ~1 second
 - Analysts query the replica; heavy scans don't lock the master
@@ -208,6 +216,7 @@ Kafka (events) → Flink (windowing) → Redis + Snowflake
 **Scenario:** Uber-scale system (hundreds of write-heavy databases, thousands of analyst queries).
 
 **Design:**
+
 ```
 Uber production Postgres shards (OLTP)
   ├─ Shard 1: (rider_id % 1000 == 0–99)
@@ -227,15 +236,15 @@ Large writes and sharding make OLTP systems eventually-consistent anyway (binlog
 
 ## Comparison Table: Real Systems
 
-| Database       | Type  | Use Case                                  | Write/sec      | Query latency   | Data model          |
-| -------------- | ----- | ----------------------------------------- | --------------- | --------------- | ------------------- |
-| Postgres       | OLTP  | Operational: orders, payments, users      | 100K–1M (sharded) | &lt;100ms          | Normalized rows     |
-| Cassandra      | OLTP  | Time-series writes: events, metrics       | 1M–10M          | 1–10ms          | Wide-column         |
-| MongoDB        | OLTP  | Flexible schema: user profiles, content   | 100K–1M         | 1–10ms          | Document (JSON)     |
-| Snowflake      | OLAP  | Analytics: dashboards, ML training        | Batch (~1M/s)   | 1–10 sec        | Columnar, star schema |
-| BigQuery       | OLAP  | Analytics: petabyte-scale queries         | Streaming        | 5–30 sec        | Columnar            |
-| Redshift       | OLAP  | Analytics: on-premise or AWS              | Batch           | 1–10 sec        | Columnar            |
-| ClickHouse     | OLAP  | Time-series analytics: metrics, logs      | Batch or stream  | &lt;1 sec           | Columnar            |
+| Database   | Type | Use Case                                | Write/sec         | Query latency | Data model            |
+| ---------- | ---- | --------------------------------------- | ----------------- | ------------- | --------------------- |
+| Postgres   | OLTP | Operational: orders, payments, users    | 100K–1M (sharded) | &lt;100ms     | Normalized rows       |
+| Cassandra  | OLTP | Time-series writes: events, metrics     | 1M–10M            | 1–10ms        | Wide-column           |
+| MongoDB    | OLTP | Flexible schema: user profiles, content | 100K–1M           | 1–10ms        | Document (JSON)       |
+| Snowflake  | OLAP | Analytics: dashboards, ML training      | Batch (~1M/s)     | 1–10 sec      | Columnar, star schema |
+| BigQuery   | OLAP | Analytics: petabyte-scale queries       | Streaming         | 5–30 sec      | Columnar              |
+| Redshift   | OLAP | Analytics: on-premise or AWS            | Batch             | 1–10 sec      | Columnar              |
+| ClickHouse | OLAP | Time-series analytics: metrics, logs    | Batch or stream   | &lt;1 sec     | Columnar              |
 
 ---
 
@@ -246,6 +255,7 @@ Large writes and sharding make OLTP systems eventually-consistent anyway (binlog
 **Setup:** Cassandra is OLTP-adjacent but **column-family oriented**, designed for **write-heavy time-series** (events, logs, metrics), not transactional consistency.
 
 **Answer:** Cassandra is ideal when you have:
+
 - Millions of writes per second (Postgres maxes out around 100K–1M sharded)
 - Events flowing in by timestamp (ride events, sensor readings, user activity logs)
 - Eventual consistency is acceptable (no distributed ACID)
@@ -258,6 +268,7 @@ Large writes and sharding make OLTP systems eventually-consistent anyway (binlog
 **Setup:** Real-time dashboards (low latency OLAP) + operational consistency (OLTP).
 
 **Answer:** Three-tier architecture:
+
 1. **OLTP (Postgres):** strong consistency, operational source of truth
 2. **Hot cache (Redis):** pre-aggregated metrics updated every 30s (e.g., `surge:\{zone\}:\{interval\}`)
 3. **OLAP (Snowflake):** nightly historical load for deep analysis
@@ -267,6 +278,7 @@ If 30s stale is too old → push OLTP results to Kafka → aggregate in Flink ev
 ### Q3: "How do you prevent an OLAP query from blocking OLTP writes?"
 
 **Answer:** Four strategies:
+
 1. **Separate databases** — OLTP master, OLAP read replica (lag ~1s)
 2. **Query isolation** — connection pools with different priorities; OLAP queries limited to off-peak hours
 3. **Columnar representation** — if you must use one database, switch to ClickHouse (OLAP-optimized but can handle some OLTP)
@@ -283,6 +295,7 @@ If 30s stale is too old → push OLTP results to Kafka → aggregate in Flink ev
 ### Q5: "How would you optimize this OLAP query: 'Top 10 restaurants by revenue, aggregated by hour for the past 6 months'?"
 
 **Naive approach:**
+
 ```sql
 SELECT restaurant_id, DATE_TRUNC(hour, order_time), SUM(revenue)
 FROM orders
@@ -293,6 +306,7 @@ LIMIT 10
 ```
 
 **Optimizations:**
+
 1. **Partitioning:** Table already partitioned by `order_date`; query filters to 180 partitions (fast)
 2. **Columnar:** Only scan restaurant_id + order_time + revenue columns
 3. **Pre-aggregation:** Materialized view `hourly_restaurant_revenue` pre-computes sums every hour; query becomes a simple filter + sort
@@ -304,15 +318,15 @@ LIMIT 10
 
 ## Summary: When to Use Each
 
-| Question                                       | Answer      |
-| ---------------------------------------------- | ----------- |
-| "Real-time payment processing?"                | OLTP        |
-| "Daily revenue dashboard?"                     | OLAP        |
-| "User write 1M events/sec?"                    | OLTP (scale) |
-| "Analyst query 1 year of data?"                | OLAP        |
-| "Need ACID transactions?"                      | OLTP        |
-| "Sub-100ms p99 latency?"                       | OLTP        |
-| "Can accept 1–10 minute latency?"              | OLAP        |
-| "Complex joins across many tables?"            | OLTP/OLAP   |
-| "Billion-row full scans?"                      | OLAP        |
-| "Money is involved?"                           | OLTP        |
+| Question                            | Answer       |
+| ----------------------------------- | ------------ |
+| "Real-time payment processing?"     | OLTP         |
+| "Daily revenue dashboard?"          | OLAP         |
+| "User write 1M events/sec?"         | OLTP (scale) |
+| "Analyst query 1 year of data?"     | OLAP         |
+| "Need ACID transactions?"           | OLTP         |
+| "Sub-100ms p99 latency?"            | OLTP         |
+| "Can accept 1–10 minute latency?"   | OLAP         |
+| "Complex joins across many tables?" | OLTP/OLAP    |
+| "Billion-row full scans?"           | OLAP         |
+| "Money is involved?"                | OLTP         |
