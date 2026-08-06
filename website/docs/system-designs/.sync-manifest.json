@@ -120,6 +120,10 @@
       "hash": "459fdca03bc7ead4b576a15e1fbaefb0a3aec3490a828ff527636fc618dea467",
       "docRelative": "job-scheduler.png"
     },
+    "system-designs/key-technologies/promixity-search.png": {
+      "hash": "670ef5170d1342c363fc6a7743c72e79bb320cc3ca6e5957e4b60c24823a3391",
+      "docRelative": "key-technologies/promixity-search.png"
+    },
     "system-designs/leetcode.png": {
       "hash": "7a9dbbd8d9db0c73ee2241963b2b3719219b366398d666e16afec2ca33d0b638",
       "docRelative": "leetcode.png"
@@ -195,10 +199,6 @@
     "system-designs/payment-system.png": {
       "hash": "d589f93fdf1e90354c534928bcad8fba3b68eeed5f170a1491848cb771f113b0",
       "docRelative": "payment-system.png"
-    },
-    "system-designs/promixity-search.png": {
-      "hash": "670ef5170d1342c363fc6a7743c72e79bb320cc3ca6e5957e4b60c24823a3391",
-      "docRelative": "promixity-search.png"
     },
     "system-designs/rate-limiter.png": {
       "hash": "cbc9857f856770f79e74b98e7b38ddc52eada83f69b2b8cc91f44340fd050530",
@@ -319,6 +319,10 @@
     "system-designs/key-technologies/database.mdx": {
       "hash": "1a6abe7901ffed4f147fecfda03b30e4bc6fdb4f7b381ebf42557befe7139b28",
       "docRelative": "key-technologies/database.mdx"
+    },
+    "system-designs/key-technologies/proximity-search.mdx": {
+      "hash": "0341f92c8119808795cd167d9e513c96c6eeb8b7b65c63cb291a0c1abbbb0c0d",
+      "docRelative": "key-technologies/proximity-search.mdx"
     },
     "system-designs/key-technologies/vector-database.mdx": {
       "hash": "1923d4c9ed63e0ee6640ec412c011cc94382724cd80390d4d4c27e648b62c89d",
@@ -445,7 +449,7 @@
       "docRelative": "agentic-system-design/_index.mdx"
     },
     "__nav__:key-technologies": {
-      "hash": "8db9b5ee399ca774208ab1c27e53bb5097789a5fd0780c9fba6bf7612c55cf90",
+      "hash": "986b7c4916d7dbf334a8c92ee97335a3b62242d81eef623735e94859e764e30e",
       "docRelative": "key-technologies/_index.mdx"
     },
     "__nav__:miscellaneous": {
