@@ -1,0 +1,80 @@
+---
+title: topologicalSortWithSuccessor
+---
+
+# topologicalSortWithSuccessor
+
+~~~javascript
+function topologicalSortWithSuccessors(n, prerequisites) {
+  const graph = Array.from({ length: n }, () => []);
+  const indegree = new Array(n).fill(0);
+
+  // Build prerequisite -> task edges.
+  for (const [task, prerequisite] of prerequisites) {
+    graph[prerequisite].push(task);
+    indegree[task]++;
+  }
+
+  // Part 1: Find one global topological order.
+  const queue = [];
+
+  for (let task = 0; task < n; task++) {
+    if (indegree[task] === 0) {
+      queue.push(task);
+    }
+  }
+
+  const order = [];
+  let front = 0;
+
+  while (front < queue.length) {
+    const task = queue[front++];
+    order.push(task);
+
+    for (const nextTask of graph[task]) {
+      indegree[nextTask]--;
+
+      if (indegree[nextTask] === 0) {
+        queue.push(nextTask);
+      }
+    }
+  }
+
+  if (order.length !== n) {
+    return {
+      order: [],
+      successors: []
+    };
+  }
+
+  // Part 2: Find all successors for every task.
+  const successors = [];
+
+  for (let start = 0; start < n; start++) {
+    const visited = new Set();
+
+    function dfs(task) {
+      for (const nextTask of graph[task]) {
+        if (!visited.has(nextTask)) {
+          visited.add(nextTask);
+          dfs(nextTask);
+        }
+      }
+    }
+
+    dfs(start);
+
+    // Keep successors in global topological order.
+    const sortedSuccessors = order.filter(task =>
+      visited.has(task)
+    );
+
+    successors.push(sortedSuccessors);
+  }
+
+  return {
+    order,
+    successors
+  };
+}
+~~~

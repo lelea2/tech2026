@@ -1,0 +1,50 @@
+---
+title: rollerCoasterPeformance
+---
+
+# rollerCoasterPeformance
+
+~~~javascript
+/**
+ * Calculates roller coaster comfort and overall performance.
+ *
+ * Comfort:
+ *   min(1.0, 1.0 / bumpsPerSecond, 1.0 / maxSpeed)
+ *
+ * Overall Performance:
+ *   scaleFactor * comfort * maxSpeed
+ */
+function calculatePerformance(
+  bumpsPerSecond,
+  maxSpeed,
+  scaleFactor
+) {
+  const comfort = Math.min(
+    1.0,
+    1.0 / bumpsPerSecond,
+    1.0 / maxSpeed
+  );
+
+  const overallPerformance =
+    scaleFactor * comfort * maxSpeed;
+
+  return {
+    comfort: Number(comfort.toFixed(2)),
+    performance: Number(
+      overallPerformance.toFixed(2)
+    ),
+  };
+}
+
+// Example
+const result = calculatePerformance(
+  2,
+  10.0,
+  1.5
+);
+
+console.log(
+  result.comfort.toFixed(2),
+  result.performance.toFixed(2)
+);
+~~~

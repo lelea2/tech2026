@@ -8,12 +8,24 @@
       "hash": "7a33264f2c9f3ed50504ed353b0c8c87473da21ce4ac26aaa7efcba6ed3d5e8a",
       "docRelative": "frontend/css/position.mdx"
     },
+    "frontend/interview/AIEfficiency.js": {
+      "hash": "7a0cbffda26828101df3fe6090bea98aa270b1d6af91c1284562153c0e10e216",
+      "docRelative": "frontend/interview/AIEfficiency.mdx"
+    },
     "frontend/interview/ConnectionPool.js": {
       "hash": "ae60d7953a5283afa27cb684b895a390fc70172fbd29abe80af2dfb796777109",
       "docRelative": "frontend/interview/ConnectionPool.mdx"
     },
+    "frontend/interview/EmployeeTrainingDay.java": {
+      "hash": "d78d6ae13265aa1da798fab7c5d41818e42e5a5e81d1eaf9b8406cba61f56a5f",
+      "docRelative": "frontend/interview/EmployeeTrainingDay.java.mdx"
+    },
+    "frontend/interview/EmployeeTrainingDay.ts": {
+      "hash": "5327b5d8cca3430c8578d2ea7099496c775aeacf1c66115cf942b0d69cbd6078",
+      "docRelative": "frontend/interview/EmployeeTrainingDay.ts.mdx"
+    },
     "frontend/interview/FileSystem.js": {
-      "hash": "3e842fc7fb6cd18b881a7acd36f829ca1655c8147ec4176c819324af2d655edc",
+      "hash": "4df303d31bc59ad5b15ea36dccabd816b593e05cd29e1416e4ecc9df56cff1da",
       "docRelative": "frontend/interview/FileSystem.mdx"
     },
     "frontend/interview/InMemoryTable.js": {
@@ -28,6 +40,10 @@
       "hash": "7e9223e5be70c14e7587861c01b91129fce1722834e2decf36725da4ffab1fc0",
       "docRelative": "frontend/interview/Percentiles.mdx"
     },
+    "frontend/interview/SpreadSheetHistory.js": {
+      "hash": "fcc534b25f56c4c4d39ace50f9b225192516499bd25ef68bf5dce9a54689b728",
+      "docRelative": "frontend/interview/SpreadSheetHistory.mdx"
+    },
     "frontend/interview/TrieNode.js": {
       "hash": "747dcdaaf21a9ae61c3fc578a011ed7318ff011426e81a7c3c7e9300e9449908",
       "docRelative": "frontend/interview/TrieNode.mdx"
@@ -35,6 +51,14 @@
     "frontend/interview/Underground.js": {
       "hash": "59235e7e54b2c76a565452b1e762a5ccc3e12231bbf4346b81a06288d23cc520",
       "docRelative": "frontend/interview/Underground.mdx"
+    },
+    "frontend/interview/airtable-ai-fluency-60min.ts": {
+      "hash": "acd7004eba8decc5c711c3b95f595f5cfd067b8f85819f61a77dd6d3b0ed4780",
+      "docRelative": "frontend/interview/airtable-ai-fluency-60min.mdx"
+    },
+    "frontend/interview/airtable-ai-fluency-complete.ts": {
+      "hash": "a858c03cd8ca585cdc00087c418c381c75dad90ef104b8892d4bfcdb408ddc96",
+      "docRelative": "frontend/interview/airtable-ai-fluency-complete.mdx"
     },
     "frontend/interview/annotation.js": {
       "hash": "571948adce6c9a384f2946d2b94b2cbb4e81036770ccffc319b6c1d41947712b",
@@ -52,6 +76,10 @@
       "hash": "8f9a4c9b9f01ffa1d4e283303a9559f10e0b080277d9442ebe7d64eb368448c3",
       "docRelative": "frontend/interview/buildOrder.mdx"
     },
+    "frontend/interview/calculatePassengerRollerCoaster.js": {
+      "hash": "6a763a64ba00fad81ddb15d8b0486f2586eee940ea7894886e21ec4188e53396",
+      "docRelative": "frontend/interview/calculatePassengerRollerCoaster.mdx"
+    },
     "frontend/interview/calendarDaysNeed.js": {
       "hash": "7ef8e15afba7cb65d43f8a4ed076a345e3ea6fd1d66e050c68eeff14987aa82d",
       "docRelative": "frontend/interview/calendarDaysNeed.mdx"
@@ -60,17 +88,61 @@
       "hash": "17a0b3e651bf7098108195a13fd1695605dfb1a494c58d0f062332db02266cd1",
       "docRelative": "frontend/interview/duplicateFiles.mdx"
     },
+    "frontend/interview/findMissingCoverage.ts": {
+      "hash": "8427a5ff384602e38b1399ab178ed61b17ad60d056dd6e2da0a60585e7229cd5",
+      "docRelative": "frontend/interview/findMissingCoverage.mdx"
+    },
+    "frontend/interview/findOverDueWindow.ts": {
+      "hash": "9e12c55ac51ec5762d76ea4799568e1c08be1494f4b932c1a439b10349cf8492",
+      "docRelative": "frontend/interview/findOverDueWindow.mdx"
+    },
+    "frontend/interview/flatMap.js": {
+      "hash": "8b53c322d2cd52134c21202687941dc5b93ecb108d65ba5daf2c38a7ceda8364",
+      "docRelative": "frontend/interview/flatMap.mdx"
+    },
+    "frontend/interview/flatMapAsync.js": {
+      "hash": "dc175fdf5bcbe1b0d000ea1d74ce7d4c79507ac7240efa980e6ca0a590399e46",
+      "docRelative": "frontend/interview/flatMapAsync.mdx"
+    },
     "frontend/interview/getAvailableTime.js": {
       "hash": "4e1f05ee24200c73b47c9aadad5790e82d1acd8834a5bc2de9f8e20226d8f118",
       "docRelative": "frontend/interview/getAvailableTime.mdx"
+    },
+    "frontend/interview/globalUniq.py": {
+      "hash": "0ce4e5ff8212a9658d965282c60e9b15fffc241ce170e4ad4eecd0224b0d0775",
+      "docRelative": "frontend/interview/globalUniq.py.mdx"
+    },
+    "frontend/interview/globalUniq.ts": {
+      "hash": "efbedd298f21b9eda3dae881bb8042b607481b948867fb43af8e70471c3f980b",
+      "docRelative": "frontend/interview/globalUniq.ts.mdx"
     },
     "frontend/interview/highestHydrationScore.js": {
       "hash": "2f38429c3bf6305f1638df37e594647812db17290e827d083b4469ecff1d2a1d",
       "docRelative": "frontend/interview/highestHydrationScore.mdx"
     },
+    "frontend/interview/inMemoryUniq.ts": {
+      "hash": "e82e48abcf11b3e057fa1e2640398c7db90535db2cc1294660272ef59467d613",
+      "docRelative": "frontend/interview/inMemoryUniq.mdx"
+    },
     "frontend/interview/inferColumnTypes.js": {
       "hash": "9dd22ca848e218c09b3f6d90f8caf68ce6f929f8cf7df48ff506ae8f229ef414",
       "docRelative": "frontend/interview/inferColumnTypes.mdx"
+    },
+    "frontend/interview/isValidJSSyntax.js": {
+      "hash": "90c213fab827959d1f55990febfcc197ad9477cdd1b0a0fcb90062d259ec7106",
+      "docRelative": "frontend/interview/isValidJSSyntax.mdx"
+    },
+    "frontend/interview/laneChange.js": {
+      "hash": "c9d3dc5b8f79fe300e624aae2aece5a2053fdad9c6a102b789ebf24c6774cbc3",
+      "docRelative": "frontend/interview/laneChange.mdx"
+    },
+    "frontend/interview/matchMetaPattern.ts": {
+      "hash": "c5b6ca8e41b9477dc4150edfd6e071ac8ecfe8053ad6f00d8380eceef3bb202a",
+      "docRelative": "frontend/interview/matchMetaPattern.mdx"
+    },
+    "frontend/interview/mergeInterval.ts": {
+      "hash": "b563b3589097fb4f6fb0fd94fedc3f25aafe6cdffed00342f5b12e3432cbb3a7",
+      "docRelative": "frontend/interview/mergeInterval.mdx"
     },
     "frontend/interview/packageDependencies.js": {
       "hash": "fa052b68caad1468fc20377cf567c69a3db715fbc5f8bf303c2834c2d5504d8b",
@@ -80,9 +152,41 @@
       "hash": "67f71be7a31321c6e75e951f95317c3a10297499daff41657d32ea15d4ae1a8f",
       "docRelative": "frontend/interview/parseQueryString.mdx"
     },
+    "frontend/interview/removeDuplicateString.js": {
+      "hash": "67069ee5b6c20c2d9c10ce49118028854d808199f0af67c2a5147d077185ca37",
+      "docRelative": "frontend/interview/removeDuplicateString.mdx"
+    },
+    "frontend/interview/rollerCoasterPeformance.js": {
+      "hash": "87846cb1d825731d7594976bf92e571f21f1bff33f5e9cb86b430735602d4e0d",
+      "docRelative": "frontend/interview/rollerCoasterPeformance.mdx"
+    },
     "frontend/interview/spreadsheet.js": {
       "hash": "b3e9c218898773caa745a982605d38ca2979359ec01464c7bc1f87a85aae0eed",
       "docRelative": "frontend/interview/spreadsheet.mdx"
+    },
+    "frontend/interview/topilogicalSortGeneric.js": {
+      "hash": "759123c278e45eaf980ac371fdf70f7d56bf42eb124c61174d52c8173f253b96",
+      "docRelative": "frontend/interview/topilogicalSortGeneric.mdx"
+    },
+    "frontend/interview/topilogicalSortGenericWithSuccessor.js": {
+      "hash": "5c942659aaefe78c6b8c4e2c784fce690774c95cf99a58e82f7addcfee82e132",
+      "docRelative": "frontend/interview/topilogicalSortGenericWithSuccessor.mdx"
+    },
+    "frontend/interview/topologicalCanFinishTask.js": {
+      "hash": "6e2ad9d3ad01366d61cd0d671bcf16873ed3c68a23965049523ee33c0e07a2c9",
+      "docRelative": "frontend/interview/topologicalCanFinishTask.mdx"
+    },
+    "frontend/interview/topologicalGetBlockedTask.js": {
+      "hash": "569bc2d41c053943b81fb995bab352c0a1bdb729d920513cfff467aad1d36ada",
+      "docRelative": "frontend/interview/topologicalGetBlockedTask.mdx"
+    },
+    "frontend/interview/topologicalSort.js": {
+      "hash": "f298e3bad6a9c17232eec9986de0ad1c66030a4ef63710457e4f9a9226d18957",
+      "docRelative": "frontend/interview/topologicalSort.mdx"
+    },
+    "frontend/interview/topologicalSortWithSuccessor.js": {
+      "hash": "597897270d8eeb3c7c2c5a56ca90391868b0c6ce26f8216770c251f998b72e0c",
+      "docRelative": "frontend/interview/topologicalSortWithSuccessor.mdx"
     },
     "frontend/jsfunction/2d-readingOrder/readingOrder.js": {
       "hash": "c42c87f044399a8a2e7c253d00d0ca93ff7686198624dfb78063e18e59aeca15",
@@ -920,8 +1024,12 @@
       "hash": "1ee453cbd45dd12a3f23a3b31381e882283e119ff320cbc7ff5677532b47007e",
       "docRelative": "frontend/react-component-interview/AutoComplete.mdx"
     },
+    "frontend/react-component-interview/CameraDebounce.jsx": {
+      "hash": "4ecc049817bea4951df1462e4cf0d22a70f44fdb4c7a17eac9d534d12289d347",
+      "docRelative": "frontend/react-component-interview/CameraDebounce.mdx"
+    },
     "frontend/react-component-interview/Carousel.jsx": {
-      "hash": "b3c64ef50975a3bfb071b0530c502c2cc9f122322c78db9da2579663291fa517",
+      "hash": "d1cee534ee3539963127767cc946710bb24a2c51c1ad42d2e14a45918168542c",
       "docRelative": "frontend/react-component-interview/Carousel.mdx"
     },
     "frontend/react-component-interview/ChatBox.jsx": {
@@ -995,6 +1103,10 @@
     "frontend/react-component-interview/TransferList.jsx": {
       "hash": "85a1b569d468c6aebd1abf325c93c1e8d1ac0ed7db046963909617096fe21162",
       "docRelative": "frontend/react-component-interview/TransferList.mdx"
+    },
+    "frontend/react-component-interview/TypeAhead.jsx": {
+      "hash": "2aaeaa63cef6e4cafd225e71fee05f821af8a19b030489769a19870dbf960229",
+      "docRelative": "frontend/react-component-interview/TypeAhead.mdx"
     },
     "frontend/react-component-interview/VideoPlayer.jsx": {
       "hash": "6f6ef78e0f59a59c3024ff251132026871626d2b83b7586ecc745bdc25630be7",
@@ -1328,6 +1440,10 @@
       "hash": "e0d354223f48a6fc59ad5a54adb5a2504de77c0d80b22422c1a07e2dafe4fdce",
       "docRelative": "frontend/uicoding/ui-prototype-js/draggable-cell/DraggableCell.mdx"
     },
+    "frontend/uicoding/ui-prototype-js/draggable-cell/DraggableCellSimple.js": {
+      "hash": "b63647e594ce618588c2e16bdd04812ef6debc7ec363dabafe3652ee10396394",
+      "docRelative": "frontend/uicoding/ui-prototype-js/draggable-cell/DraggableCellSimple.mdx"
+    },
     "frontend/uicoding/ui-prototype-js/draggable-cell/styles.module.css": {
       "hash": "7141ae5063e9268e0d60c3dc63ec83957c0e747294c2e34bbf802db9855c3d90",
       "docRelative": "frontend/uicoding/ui-prototype-js/draggable-cell/styles.module.mdx"
@@ -1577,12 +1693,8 @@
       "docRelative": "frontend/uicoding/ui-prototype-js/whack-a-mole/styles.module.mdx"
     },
     "frontend/uicoding/ui-prototype-js/wordle/Wordle.js": {
-      "hash": "1ed152ac434c9a8c2fcce76d51f111175fcc6ffc7c2f3fb58081806c9a6b1c81",
+      "hash": "2509997a3851954d858ace28c3735a593984bf68c83fa2efb211c5eb2a985235",
       "docRelative": "frontend/uicoding/ui-prototype-js/wordle/Wordle.mdx"
-    },
-    "frontend/uicoding/ui-prototype-js/wordle/styles.module.css": {
-      "hash": "362023d89c5150438c4b140d5192674b7984730b570d7e951189243d5ee3d07c",
-      "docRelative": "frontend/uicoding/ui-prototype-js/wordle/styles.module.mdx"
     },
     "backend/quizzes/apollo_vs_relay_staff_frontend.mdx": {
       "hash": "b0f003d9b18c36b9d23d09c19df98ff431524d3f8c5c2b544a3ac283d1789dd3",
@@ -1633,7 +1745,7 @@
       "docRelative": "frontend/css/_index.mdx"
     },
     "__nav__:frontend/interview": {
-      "hash": "41707ed33cb3a31fa1196ec3b83601421779340227d9941b2fc643d4c097c46c",
+      "hash": "7b0ec55bc3739b970797e2f856c74129c115fc099d2d331639e8e7f3c748e583",
       "docRelative": "frontend/interview/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
@@ -1761,7 +1873,7 @@
       "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
     },
     "__nav__:frontend/react-component-interview": {
-      "hash": "60ab810254445907ea60b78ad796b93e8a4cb2a1426effabe9187f58d3135a9c",
+      "hash": "3dc8d20edcceb3ec3277b3a5018d5dbc87a96a7273481776633ea9222b3d2270",
       "docRelative": "frontend/react-component-interview/_index.mdx"
     },
     "__nav__:frontend/react-component-interview/hooks": {
@@ -1905,7 +2017,7 @@
       "docRelative": "frontend/uicoding/ui-prototype-js/data-table/_index.mdx"
     },
     "__nav__:frontend/uicoding/ui-prototype-js/draggable-cell": {
-      "hash": "af86c706601f9856d2b2cd5da2503000adc779c6d7b7cbdf494c4999e6cfadb2",
+      "hash": "b96fae4e653bba33d7c3d5de433ef32b54d8afac73e725b0de2a43f77dff9aa4",
       "docRelative": "frontend/uicoding/ui-prototype-js/draggable-cell/_index.mdx"
     },
     "__nav__:frontend/uicoding/ui-prototype-js/file-explorer": {
@@ -2013,7 +2125,7 @@
       "docRelative": "frontend/uicoding/ui-prototype-js/whack-a-mole/_index.mdx"
     },
     "__nav__:frontend/uicoding/ui-prototype-js/wordle": {
-      "hash": "4b9ce6952230d0814dd7055daeba7759a55f426fb2c63c45ce1c0438a528188e",
+      "hash": "349665f0799b0d27e553b0f0d854ce3f537e86930f060a08aee6fc2cfa536c61",
       "docRelative": "frontend/uicoding/ui-prototype-js/wordle/_index.mdx"
     }
   }

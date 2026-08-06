@@ -1,0 +1,82 @@
+---
+title: calculatePassengerRollerCoaster
+---
+
+# calculatePassengerRollerCoaster
+
+~~~javascript
+// R is number of ride
+// C is number of passenger per ride
+function calculateTotalPassengers(rides, capacity, groups) {
+  const n = groups.length;
+
+  // For a ride starting at index i:
+  // ridePassengers[i] = passengers carried
+  // nextStart[i] = front index after the ride
+  const ridePassengers = new Array(n);
+  const nextStart = new Array(n);
+
+  // Circular sliding window.
+  let end = 0;
+  let sum = 0;
+  let groupCount = 0;
+
+  for (let start = 0; start < n; start++) {
+    // Add as many groups as possible.
+    while (
+      groupCount < n &&
+      sum + groups[end] <= capacity
+    ) {
+      sum += groups[end];
+      end = (end + 1) % n; // handle loop if needed
+      groupCount++;
+    }
+
+    ridePassengers[start] = sum;
+    nextStart[start] = end;
+
+    // Remove the old starting group before moving
+    // the window to start + 1.
+    sum -= groups[start];
+    groupCount--;
+  }
+
+  // seenRide[i] stores when state i was first visited.
+  const seenRide = new Array(n).fill(-1);
+
+  // seenTotal[i] stores the total passengers at that time.
+  const seenTotal = new Array(n).fill(0);
+
+  let ride = 0;
+  let start = 0;
+  let total = 0;
+
+  while (ride < rides) {
+    // We found a repeated queue state.
+    if (seenRide[start] !== -1) {
+      const cycleLength = ride - seenRide[start];
+      const cyclePassengers = total - seenTotal[start];
+      const remainingRides = rides - ride;
+
+      const cyclesToSkip = Math.floor(
+        remainingRides / cycleLength
+      );
+
+      if (cyclesToSkip > 0) {
+        ride += cyclesToSkip * cycleLength;
+        total += cyclesToSkip * cyclePassengers;
+        continue;
+      }
+    } else {
+      seenRide[start] = ride;
+      seenTotal[start] = total;
+    }
+
+    total += ridePassengers[start];
+    start = nextStart[start];
+    ride++;
+  }
+
+  return total;
+}
+~~~
