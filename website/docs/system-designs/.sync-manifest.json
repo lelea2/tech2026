@@ -156,6 +156,10 @@
       "hash": "f09a4178656b7fcd39c80d3dbca33476d19a7a27b6b897b096dd41d5e173c8c9",
       "docRelative": "multimodal-file-ingestion.png"
     },
+    "system-designs/nearby-search.png": {
+      "hash": "84f00da0beebb65e017bc20280fbc175717a27168573664ce1f0de6171b0a427",
+      "docRelative": "nearby-search.png"
+    },
     "system-designs/nearby-vehicle-search.svg": {
       "hash": "6e50d64840463ba9607ff1ee186ade3b5d349d77694987b80b339b3825bd338d",
       "docRelative": "nearby-vehicle-search.svg"
@@ -369,7 +373,7 @@
       "docRelative": "multimodal-file-ingestion-retrieval.mdx"
     },
     "system-designs/nearby_vehicle_search.mdx": {
-      "hash": "c493d13d9340e77a95a55f7384e88ecee48a2c31a23b067d78608d8a031aefdd",
+      "hash": "9fe2da10bbacda6e971647b7065c407b955b465e445a6211509bffb49791bcfa",
       "docRelative": "nearby_vehicle_search.mdx"
     },
     "system-designs/netflix.mdx": {
