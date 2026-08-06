@@ -1,0 +1,282 @@
+---
+title: Apache Flink for Streaming Systems
+---
+
+# Apache Flink — When & How to Use It
+
+---
+
+## Interview Summary Box
+
+**When to use Flink:** Windowed aggregations (count/sum per time window at 1M+ events/sec), joins across multiple event streams (e.g., orders × driver locations), temporal joins (stream + slowly-changing reference data), complex stateful event correlation (fraud detection rules).
+
+**When NOT to use:** Batch jobs (use Spark), single-stream stateless alerting (use Kafka consumer), low volume &lt;100K events/sec (operational overhead not worth it), sub-millisecond latency (custom C++ only).
+
+**Core value:** Automatic state management + checkpointing (no manual windowing, recovery from failures), distributed state backends (scale beyond single-process memory), rich semantics (watermarks for late arrivals, allowed-lateness grace periods, multiple join types).
+
+**Architecture:** JobManager (orchestrator), TaskManagers (parallel workers with local RocksDB state), keyed partitioning (all events for key=X go to same subtask), checkpoints for recovery.
+
+**Design pattern:** Windowed aggregations on partitioned streams, multi-stream joins with watermark coordination, temporal enrichment via coprocess functions with local state.
+
+**Operational trade-off:** High complexity (cluster management, state backend tuning, checkpoint coordination) justified only at scale (100K+ events/sec sustained, team expertise available).
+
+---
+
+## The Staff-Level Framing
+
+Flink is a **distributed stream processing framework** — it's the right choice when you have **high-volume event streams that need real-time aggregations, joins, or transformations**, and where **Kafka alone (just a queue) isn't enough.**
+
+Many teams reach for Flink too early (over-engineering simple batch jobs) or too late (building ad-hoc solutions when a unified streaming platform would save months). The staff-level decision comes down to: **"What are my data access patterns?"**
+
+```
+Batch Job (fixed dataset, runs once)           → Spark / Airflow
+Real-time alerting (single stream, stateless)  → Kafka consumer app / Lambda
+Windowed aggregations (volume metrics)         → Flink / Kafka Streams
+Complex event correlation (joins across streams) → Flink
+Temporal joins (join stream against slow table) → Flink with Redis/DB side input
+```
+
+---
+
+## When to Use Flink
+
+### The Right Reasons
+
+**1. Windowed aggregations at scale**
+
+- You need "count events per city per 5-minute window" across billions of events/day
+- Result needs to be ready within seconds for dashboards, not hours later
+- Flink's windowing engine does this far more efficiently than ad-hoc Kafka consumer code
+
+**Example:** Ride-hailing platform → real-time surge pricing by zone, recalculated every minute. A naive Kafka consumer would buffer an entire minute of events in memory; Flink's window state management handles this with spillover-to-disk for memory efficiency.
+
+**2. Joins across multiple event streams**
+
+- You're joining orders from Topic A with driver locations from Topic B, with complex timing logic
+- A simple left-outer join or enrichment isn't enough — you need complex logic like "only join if driver pinged within last 10 seconds"
+
+**Example:** DoorDash matching engine → join incoming orders with driver-location stream to find candidates, but only drivers who've pinged in the last 10s (stateful join on both sides).
+
+**3. Temporal joins (stream + slowly-changing dimension)**
+
+- Stream events need to be enriched with slow-changing reference data (e.g., join user events with user profile, which updates rarely)
+- Can't materialze the entire reference dataset in memory; need a lookback window
+
+**Example:** User events enriched with geo-region info → region boundaries change quarterly, so join logic looks up the _correct_ region boundary for each event's timestamp.
+
+**4. Complex state management across events**
+
+- You're building a fraud-detection rule engine: "flag account if &gt;5 failed logins in 10 minutes AND card was last used in a different country"
+- This requires correlating events across time windows with multiple conditions
+
+**Example:** Uber safety-monitoring → detect suspicious ride patterns by correlating pickup/dropoff locations across multiple trips in a rolling window.
+
+### The Wrong Reasons (Don't Use Flink)
+
+- "We need to process CSV files" → use Spark or Airflow
+- "We need to send real-time alerts on single events" → simple Kafka consumer or AWS Lambda is simpler
+- "We have low volume (100 events/sec)" → operational overhead of Flink isn't worth it; use a scripted consumer
+- "We need sub-millisecond latency" → Flink has scheduling overhead; custom C++ is your only choice
+
+---
+
+## Quick Decision Matrix
+
+| Scenario              | **Kafka Consumer Script** | **Kafka Streams**          | **Flink**                            | **Spark Streaming**           |
+| --------------------- | ------------------------- | -------------------------- | ------------------------------------ | ----------------------------- |
+| Data volume           | &lt;10K events/sec        | 10K–1M events/sec          | 1M+ events/sec                       | Batch or 100K–10M events/sec  |
+| Windowed aggregations | Hard (manual state)       | Good (built-in windows)    | Excellent (rich semantics)           | Batch-style (micro-batches)   |
+| Joins across streams  | Very hard                 | Moderate (KStream-KStream) | Excellent                            | Good (but batch)              |
+| State size            | Limited (process memory)  | Limited (RocksDB local)    | Flexible (distributed state backend) | N/A (stateless micro-batches) |
+| Deployment            | Simple (single process)   | Simple (embedded)          | Complex (cluster + checkpointing)    | Complex (cluster)             |
+| Operational overhead  | Low                       | Low–Medium                 | High                                 | High                          |
+| Latency (p50)         | 1–10ms                    | 10–100ms                   | 100–500ms                            | 1000ms+                       |
+
+---
+
+## High-Level Flink Architecture
+
+```
+Data Source (Kafka, S3, Pulsar)
+        ↓
+   [Flink Cluster]
+        ├─ JobManager (orchestrator, checkpointing coordinator)
+        ├─ TaskManagers (parallel workers)
+        │  └─ State backends (RocksDB or in-memory)
+        │
+   [Windowing / Stateful operations]
+        ├─ Flat-map, map, filter (embarrassingly parallel)
+        ├─ Aggregations (count/sum/avg per key in windows)
+        ├─ Joins (stream-stream, stream-table)
+        ├─ Process functions (custom logic with access to timer/state)
+        │
+        ↓
+Sink (Kafka, S3, database, Redis)
+```
+
+**Key concepts:**
+
+- **Parallelism** — tasks split by key (partition), so all events for user_id=123 go to the same subtask (ensures state locality and correct ordering per key)
+- **State backend** — RocksDB (disk-backed, survives restarts) or in-memory (ephemeral, faster)
+- **Checkpointing** — periodic snapshot of all state; on failure, resume from last checkpoint
+- **Watermarks** — signal "no more events before timestamp X coming" to trigger windowed results (handles late arrivals)
+
+---
+
+## High-Level Design Example: Surge Pricing for Ride-Hailing
+
+**Problem:** Compute surge multiplier for every zone, every minute, from 1M+ ride requests and driver-location pings across a city.
+
+**Naive approach (Kafka consumer):**
+
+```python
+# Pseudo-code: single consumer polling Kafka
+for event in kafka_consumer.poll():
+    zone = geohasher.encode(event.lat, event.lng, precision=6)  # ~1km cells
+    current_window = (now // 60) * 60
+    key = f"zone:{zone}:{current_window}"
+
+    if key not in memory_dict:
+        memory_dict[key] = {"orders": 0, "drivers": 0}
+
+    if event.type == "order_request":
+        memory_dict[key]["orders"] += 1
+    else:
+        memory_dict[key]["drivers"] += 1
+
+    if now reached end_of_window:
+        # Compute surge, write to cache
+        multiplier = compute_surge(memory_dict[key])
+        redis.set(f"surge:{zone}:{current_window}", multiplier)
+        del memory_dict[key]
+```
+
+**Problems:**
+
+- Manual windowing; entire window held in memory → crashes on traffic spikes
+- No ordering guarantees; if consumer restarts, you recompute and lose intermediate state
+- Complexity grows quickly if you add "late arrivals" (event arrived 2 minutes after window closed)
+
+**Flink approach:**
+
+```scala
+val sourceOrders = env.addSource(new FlinkKafkaConsumer(
+  "order-requests", new OrderSchema(), kafkaProps))
+
+val sourceDrivers = env.addSource(new FlinkKafkaConsumer(
+  "driver-locations", new LocationSchema(), kafkaProps))
+
+val ordersPerZoneWindow = sourceOrders
+  .map(order => {
+    val zone = geohasher(order.lat, order.lng)
+    (zone, 1, "order")
+  })
+  .keyBy(0)  // Key by zone
+  .window(TumblingEventTimeWindow.of(Time.minutes(1)))
+  .sum(1)    // Count orders per zone per window
+
+val driversPerZoneWindow = sourceDrivers
+  .map(loc => {
+    val zone = geohasher(loc.lat, loc.lng)
+    (zone, 1, "driver")
+  })
+  .keyBy(0)
+  .window(TumblingEventTimeWindow.of(Time.minutes(1)))
+  .sum(1)
+
+// Join: orders × drivers → surge multiplier
+val surge = ordersPerZoneWindow
+  .join(driversPerZoneWindow)
+  .where(0).equalTo(0)  // Join on zone
+  .window(TumblingEventTimeWindow.of(Time.minutes(1)))
+  .apply((orders, drivers) => {
+    val ratio = orders._2.toDouble / drivers._2
+    val multiplier = if (ratio > 1.5) 1.5 else 1.0 + (ratio - 1.0)
+    (orders._1, multiplier)
+  })
+
+surge.addSink(new RedisSink(...))
+```
+
+**Advantages:**
+
+- **Windowing handled by framework** — no manual state management, spillover to RocksDB if needed
+- **Checkpointing** — on failure, resume from last checkpoint, no recomputation
+- **Late arrivals handled** — Flink's watermark/allowed-lateness semantics let you configure grace periods
+- **Stateful operators** — scale to billions of events by distributing state across TaskManagers
+- **Monitoring** — built-in metrics (lag, backpressure, state size)
+
+---
+
+## Design Pattern: Temporal Join (Stream + Slow Table)
+
+**Scenario:** User events need to be enriched with user profiles. Profiles change rarely but occasionally (name, subscription tier), and you need the _correct_ profile version for each event's timestamp.
+
+```scala
+// Stream of user events
+val userEvents = env.addSource(...)
+  .keyBy(_.user_id)
+
+// Slow-changing lookup table (refreshed every hour from database)
+val userProfiles = env.addSource(new RichParallelSourceFunction[UserProfile] {
+  override def run(ctx) = {
+    val profiles = fetchFromDB()  // Periodic refresh
+    profiles.foreach(p => ctx.collect(p))
+  }
+})
+  .keyBy(_.user_id)
+
+// Temporal join: enrich event with profile valid at event timestamp
+val enriched = userEvents
+  .connect(userProfiles)
+  .keyBy(0, 0)  // Join on user_id
+  .process(new CoProcessFunction[UserEvent, UserProfile, EnrichedEvent] {
+    private var currentProfile: UserProfile = _
+
+    override def processElement1(event: UserEvent, ctx, out) = {
+      if (currentProfile != null) {
+        out.collect(EnrichedEvent(event, currentProfile, event.timestamp))
+      }
+    }
+
+    override def processElement2(profile: UserProfile, ctx) = {
+      currentProfile = profile  // Update cached profile
+    }
+  })
+```
+
+**Why this matters:** you can't just query the database on every event (too slow, too much load); you can't buffer entire table in memory (too large); Flink's state backend gives you a middle ground — keep the _per-key_ state (one profile per user) in a distributed state backend.
+
+---
+
+## Deployment & Operations
+
+**High operational cost:**
+
+- **Cluster management** — JobManager (HA with ZooKeeper), multiple TaskManagers (stateful, can't just kill and restart)
+- **State backend tuning** — RocksDB settings (block size, cache size, LSM levels) impact throughput/latency heavily
+- **Checkpointing coordination** — align checkpoints across 100s of tasks; slow checkpoints block processing
+- **Debugging** — distributed state is hard to reason about; tracing a bug across partitions requires good observability
+
+**When to use in production:**
+
+- Data volume justifies operational burden (100K+ events/sec sustained)
+- Team has Flink expertise or bandwidth to learn
+- Failure cost is high enough that Flink's checkpointing/recovery buys you reliability
+
+**Alternatives to consider before Flink:**
+
+- **Kafka Streams** — if you don't need Flink's advanced joins/windowing, Streams is much simpler (embedded, no cluster)
+- **Dataflow** (Google) — managed Flink equivalent, removes ops burden (but vendor lock-in)
+- **Kafka + custom consumer** — if volume is low and logic is simple
+
+---
+
+## Follow-up Interview Questions
+
+1. **Why not just use Spark Streaming?** — Flink is true streaming; Spark Streaming does micro-batches (100ms–1s), so p50 latency is inherently higher.
+2. **How do you handle out-of-order events with Flink?** — Watermarks signal "no more events before time X," and `allowedLateness()` configures how long to wait for stragglers; events arriving after both expire are discarded.
+3. **What's the difference between a window and a trigger?** — Window defines _when_ to group events (tumbling: 1min buckets, sliding: 30s buckets with 10s overlap); trigger defines _when_ to emit results (default: end of window, custom: on every event, every N events, watermark).
+4. **How do you scale state to petabytes?** — You don't; Flink's per-partition state on each TaskManager has limits (~GB–TB per machine). If you need petabyte-scale state, you either pre-aggregate upstream or use a dedicated key-value store (Cassandra, DynamoDB) with Flink as the compute layer.
+5. **What's backpressure in Flink?** — If downstream is slow (e.g., Kafka sink can't keep up), Flink automatically slows source ingestion, preventing upstream buffering and OOM.
+6. **How do you avoid state explosion in window joins?** — Use a `StateBackend.clearInputCaches()` after the join to drop the cached stream (once you've matched), and set `minRetention()` to flush old state immediately after the watermark passes the window boundary.

@@ -216,6 +216,10 @@
       "hash": "b0ddcee377e7b82750f0819bbf74ba6ac34583a5d1b1c994dde48f377e3d6cca",
       "docRelative": "ride-hailing.png"
     },
+    "system-designs/teleopration.png": {
+      "hash": "021bb108e3e2696d76a889b7c36fcd20b50851a1f39056eb7bac2604de6b9500",
+      "docRelative": "teleopration.png"
+    },
     "system-designs/ticketmaster.png": {
       "hash": "21c11e2efac8a45fecd2c9e3911c126e2dc5528dfdaa904d86cedb6402a64af3",
       "docRelative": "ticketmaster.png"
@@ -392,6 +396,10 @@
       "hash": "77146e6c92d60339945bce8bc3cd4f3403a1fb5a4d43e5b599d083816831e0cf",
       "docRelative": "pastebin.mdx"
     },
+    "system-designs/patterns/flink.mdx": {
+      "hash": "591a31859ae3eb95fca95d1b704eb6448f76a069ccbb65d76ad851c3c03ac02f",
+      "docRelative": "patterns/flink.mdx"
+    },
     "system-designs/patterns/flink_vs_temporal_staff_engineer.mdx": {
       "hash": "acd3106b38316e85d98019154dbc398ff863f80c89ff612c68ea3591c0bd7166",
       "docRelative": "patterns/flink_vs_temporal_staff_engineer.mdx"
@@ -427,6 +435,10 @@
     "system-designs/ride_hailing.mdx": {
       "hash": "fd0c91c71e4db2ee07b437acef4df6dbf6a07656bb3adee3a21beb1496961331",
       "docRelative": "ride_hailing.mdx"
+    },
+    "system-designs/teleoperations.mdx": {
+      "hash": "a9a1386f0d91dc3d528a90449fa721dcf57882ffdda4faf08f46025ea4c4fdcb",
+      "docRelative": "teleoperations.mdx"
     },
     "system-designs/ticketmaster.mdx": {
       "hash": "d662f2fd0247f984733ef8cac66bf2bf9ed0f58b37bf4e83c4a610a33ff145b2",
@@ -465,7 +477,7 @@
       "docRelative": "miscellaneous/_index.mdx"
     },
     "__nav__:patterns": {
-      "hash": "26a4b0e0f95507d9029c28b5a78fb823960fcc06f8ec34b7106294eca0d234e4",
+      "hash": "ea22561283764d2a8f22820ea5aa100213eadf94178551c8f6601214821b8189",
       "docRelative": "patterns/_index.mdx"
     }
   }
