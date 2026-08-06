@@ -196,6 +196,10 @@
       "hash": "d589f93fdf1e90354c534928bcad8fba3b68eeed5f170a1491848cb771f113b0",
       "docRelative": "payment-system.png"
     },
+    "system-designs/promixity-search.png": {
+      "hash": "670ef5170d1342c363fc6a7743c72e79bb320cc3ca6e5957e4b60c24823a3391",
+      "docRelative": "promixity-search.png"
+    },
     "system-designs/rate-limiter.png": {
       "hash": "cbc9857f856770f79e74b98e7b38ddc52eada83f69b2b8cc91f44340fd050530",
       "docRelative": "rate-limiter.png"
@@ -205,7 +209,7 @@
       "docRelative": "ticketmaster.png"
     },
     "system-designs/uber.png": {
-      "hash": "cc28f7fcaee1f7909d048567bb40f52bdece18299457cff6f97b5b7c67e4e8a3",
+      "hash": "cd7acb614cac5698d4f3a8abac986eb8def2a309ec6339dc104b2f46c2fe11a1",
       "docRelative": "uber.png"
     },
     "system-designs/web-crawler.png": {
@@ -351,6 +355,10 @@
     "system-designs/multimodal-file-ingestion-retrieval.mdx": {
       "hash": "eff03e929e4631eb3a26fc263ad8080e3660914b272256afee3a4b22dc944c34",
       "docRelative": "multimodal-file-ingestion-retrieval.mdx"
+    },
+    "system-designs/nearby_vehicle_search.mdx": {
+      "hash": "988db54e12e3f9c48cf6e021a78b4a4cc3d8e3b87bcceec758a5a4abc5c9b91e",
+      "docRelative": "nearby_vehicle_search.mdx"
     },
     "system-designs/netflix.mdx": {
       "hash": "7eabbff232b7b245cf291045dc51c68a8fcae919f2cd2a46ba40205d37ed6462",

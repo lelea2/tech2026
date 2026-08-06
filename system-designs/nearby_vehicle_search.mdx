@@ -1,0 +1,349 @@
+---
+title: Nearby Vehicle Search for Autonomous Fleets
+description: Staff-level system design discussion for continuously changing vehicle locations.
+---
+
+# Nearby Vehicle Search for Autonomous Fleets
+
+## 1. Problem statement
+
+Given a query location, a radius or top-K constraint, and eligibility filters, return nearby autonomous vehicles that currently satisfy the criteria. Vehicle updates are continuous and may arrive late, duplicated, or out of order. The system must expose freshness rather than pretending every location is current.
+
+## 2. Clarifying questions
+
+1. Is distance straight-line, road-network distance, or predicted travel time?
+2. Is the query radius-based, top K, or both?
+3. Which attributes determine eligibility: availability, vehicle class, passenger capacity, battery, autonomy capability, tenant, maintenance state?
+4. What freshness threshold excludes a vehicle? Is a stale-but-visible result allowed?
+5. Is eventual consistency acceptable, or must every query represent a snapshot?
+6. What are update and query rates by region, including hotspot bursts?
+7. Does the caller need exact coordinates, or only an opaque vehicle identifier and distance?
+
+## 3. Assumptions
+
+- First version uses Haversine distance over latitude/longitude.
+- Queries specify either `radiusMeters <= 10,000`, `k <= 100`, or both.
+- Approximately 1 million active vehicles globally and up to 100,000 in a large region.
+- Normal location update frequency is 1 Hz, with short bursts up to 5 Hz.
+- Global query volume is about 20,000 QPS with a target p99 under 150 ms.
+- Locations up to 3 seconds old are fresh; 3-10 seconds old may be returned with a stale flag; older locations are excluded by default.
+- Consistency is per-vehicle monotonic, not a globally atomic fleet snapshot.
+
+## 4. Functional requirements
+
+- Ingest location and eligibility changes.
+- Tolerate duplicate, late, and out-of-order events.
+- Support radius and top-K nearby queries.
+- Filter by vehicle attributes and authorization scope.
+- Return exact distance and freshness metadata.
+- Remove or deactivate a vehicle without returning it during index-cleanup lag.
+- Rebuild indexes after failure from a durable event log.
+
+## 5. Non-functional requirements
+
+- Low query latency with predictable tail behavior.
+- Horizontally scalable writes and reads by region.
+- No cross-region fan-out for normal nearby queries.
+- Graceful handling of hot cells such as airports and stadiums.
+- Observable staleness and partial-result behavior.
+- Privacy boundaries that prevent one tenant from discovering another tenant's vehicles.
+
+## 6. Core entities
+
+```ts
+interface VehicleLocationEvent {
+  vehicleId: string;
+  tenantId: string;
+  producerEpoch: string;
+  sequence: number;
+  eventTime: string;
+  receivedAt: string;
+  latitude: number;
+  longitude: number;
+  accuracyMeters: number;
+  attributesVersion: number;
+}
+
+interface VehicleState {
+  vehicleId: string;
+  tenantId: string;
+  status: 'AVAILABLE' | 'BUSY' | 'OFFLINE' | 'REMOVED';
+  latitude: number;
+  longitude: number;
+  cellId: string;
+  sequence: number;
+  producerEpoch: string;
+  eventTime: string;
+  observedAt: string;
+  attributes: Record<string, string | number | boolean>;
+  tombstone: boolean;
+}
+
+interface NearbyResult {
+  vehicleId: string;
+  distanceMeters: number;
+  observedAt: string;
+  ageMs: number;
+  stale: boolean;
+  locationVersion: string;
+  indexVersion: string;
+  accuracyMeters: number;
+}
+```
+
+## 7. API
+
+```http
+POST /v1/nearby-vehicles/search
+Authorization: Bearer <fleet-scoped-token>
+Content-Type: application/json
+
+{
+  "location": { "latitude": 37.3349, "longitude": -122.0090 },
+  "radiusMeters": 5000,
+  "k": 20,
+  "filters": {
+    "status": ["AVAILABLE"],
+    "minBatteryPercent": 30,
+    "capabilities": ["L4", "WHEELCHAIR_ACCESSIBLE"]
+  },
+  "maxStalenessMs": 10000,
+  "allowPartial": false
+}
+```
+
+```json
+{
+  "vehicles": [
+    {
+      "vehicleId": "veh_123",
+      "distanceMeters": 821,
+      "observedAt": "2026-08-06T14:38:51.120Z",
+      "ageMs": 1840,
+      "stale": false,
+      "locationVersion": "epoch7:1849201",
+      "indexVersion": "us-west:928441",
+      "accuracyMeters": 4.5
+    }
+  ],
+  "query": {
+    "computedAt": "2026-08-06T14:38:52.960Z",
+    "indexWatermarkMs": 420,
+    "partial": false,
+    "cellsScanned": 12,
+    "candidatesScanned": 144
+  }
+}
+```
+
+## 8. High-level architecture
+
+### Update path
+
+1. Vehicle edge agent publishes location events to the nearest regional ingest endpoint using mTLS.
+2. The ingest layer validates schema, identity, tenant, coordinates, and rate limits.
+3. Events enter Kafka or Pulsar, partitioned by `vehicleId`, preserving order for events that use the same partition and producer epoch.
+4. A state processor applies a monotonic ordering rule and updates the authoritative latest-state KV store.
+5. When a vehicle crosses a cell boundary, the processor emits an idempotent remove/add index delta.
+6. Spatial index shards update posting lists keyed by `regionId + cellPrefix`.
+
+### Query path
+
+1. API gateway validates the fleet-scoped token and quota.
+2. Nearby Search validates radius, K, filters, and freshness policy.
+3. Spatial Router maps the query coordinate to an S2/H3 cell and determines neighboring cells.
+4. Regional Index returns coarse candidate vehicle IDs.
+5. Refiner batch-reads authoritative latest state, rejects stale, removed, unauthorized, and ineligible vehicles, and computes exact Haversine distance.
+6. Ranker deduplicates and returns the nearest K, including freshness and version metadata.
+
+## 9. Why a two-stage search?
+
+A spatial cell index is fast and horizontally partitionable but approximate at cell boundaries. Exact distance calculations over the entire fleet are too expensive. The system therefore over-fetches a bounded candidate set, then performs authoritative filtering and exact ranking.
+
+The authoritative state read is important: the spatial index is an acceleration structure, not the source of truth. This separation makes asynchronous index maintenance and removal races safe.
+
+## 10. Ordering and late updates
+
+### Preferred rule
+
+Use `(producerEpoch, sequence)` as the primary monotonic version. Accept an event only when it is newer than the stored version for that producer epoch. A reconnect creates a new epoch so a reset sequence cannot overwrite newer state accidentally.
+
+### Event-time fallback
+
+When the producer cannot supply a reliable sequence, compare event time with a bounded lateness window and an ingest-assigned tie breaker. Event time alone is weaker because vehicle clocks can drift.
+
+### Policy
+
+- Duplicate version: ignore idempotently.
+- Lower sequence in same epoch: retain in raw history if needed, but do not update live state.
+- New producer epoch: accept only after authentication and epoch-registration rules.
+- Extremely late update: archive or drop; never move the live spatial index backward.
+
+## 11. Atomic cell transitions
+
+A vehicle moving from cell A to cell B creates a distributed update problem. The design tolerates temporary dual membership:
+
+1. Update authoritative latest state with `currentCell=B`, `previousCell=A`, and a new version.
+2. Emit `REMOVE(A, vehicleId, version)` and `UPSERT(B, vehicleId, version)`.
+3. Index shards apply an operation only when its version is newer than the member version they have seen.
+4. During a transient dual membership, query refinement deduplicates the ID and validates the latest state.
+
+This avoids a synchronous cross-shard transaction on every boundary crossing.
+
+## 12. Spatial partitioning choice
+
+### Chosen: S2 or H3 hierarchical cells
+
+**Pros**
+
+- Hierarchical resolution supports coarse and fine cells.
+- Neighbor enumeration is well understood.
+- Natural sharding by region and cell prefix.
+- Hot cells can split into finer cells.
+- Queries can expand outward in rings.
+
+**Cons**
+
+- Boundary over-fetch is unavoidable.
+- Dense cells can become hot.
+- Exact distance refinement is still required.
+- H3 hexagons and S2 cells have different area/shape characteristics; either needs careful resolution tuning.
+
+### Geohash
+
+**Pros:** simple string keys and prefix ranges.
+
+**Cons:** awkward neighbor handling, boundary artifacts, and latitude distortion. It is acceptable for a simpler implementation but weaker for adaptive hotspot handling.
+
+### R-tree / PostGIS
+
+**Pros:** expressive geometry queries and mature correctness.
+
+**Cons:** high-frequency moving-object updates create index churn and write contention, and horizontal partitioning is more complex. It is attractive at lower write rates or for analytical/offline workloads.
+
+## 13. Candidate retrieval and top-K termination
+
+For a radius query, enumerate all cells intersecting the search circle at an appropriate resolution, retrieve candidates, then apply exact radius filtering.
+
+For top K, scan cells in increasing lower-bound distance from the query point. Maintain a max-heap of the best K exact distances. Stop when the next cell's minimum possible distance is greater than the current Kth distance. This prevents scanning every surrounding ring.
+
+## 14. Hot-region handling
+
+A stadium, airport, or fleet depot can create both write and read hotspots.
+
+- Increase spatial resolution for the hot cell.
+- Split a dense posting list into virtual buckets using `hash(vehicleId)`.
+- Place hot buckets on dedicated shards with more CPU and memory.
+- Replicate posting lists for read-heavy cells.
+- Coalesce frequent updates and update the spatial index only when a cell changes.
+- Reduce update frequency for stationary/parked vehicles while preserving heartbeats.
+- Cache cell-cover plans, not query results that become stale immediately.
+- Apply admission control and prioritize dispatch-critical traffic.
+
+The tradeoff is fan-out: finer cells reduce per-cell size but increase the number of cell reads. The query planner should adapt based on observed density.
+
+## 15. Staleness contract
+
+A result must contain:
+
+- `observedAt`: when the location was measured.
+- `ageMs`: age at query evaluation.
+- `stale`: whether it exceeds the preferred freshness threshold.
+- `locationVersion`: authoritative per-vehicle version.
+- `indexVersion`: index generation or shard watermark.
+- `accuracyMeters`: GPS uncertainty.
+
+The caller chooses `maxStalenessMs`. For dispatch-critical traffic, the service should fail closed and exclude an unverifiable candidate rather than returning an apparently current location.
+
+## 16. Snapshot versus eventual consistency
+
+### Default: eventual consistency with per-vehicle monotonicity
+
+**Pros:** low latency, high availability, no global coordination.
+
+**Cons:** two vehicles in one response may have been observed at different instants; newly moved vehicles can briefly appear in old and new cells.
+
+### Optional snapshot token
+
+A stricter API could pin an index generation and state-store watermark.
+
+**Pros:** reproducible query semantics.
+
+**Cons:** waits for lagging shards, increases failure coupling, and can return older data merely to satisfy consistency. This is usually unnecessary for live dispatch.
+
+## 17. Failure recovery
+
+- Kafka/Pulsar is the durable replay log.
+- Latest-state KV snapshots reduce restart time.
+- Each index shard checkpoints its consumed log offset.
+- A failed index shard rebuilds only its owned cell range.
+- Periodic reconciliation compares authoritative `state.cellId` with index membership.
+- Query services use local replicas; if required shards are unavailable and `allowPartial=false`, fail the request.
+- If state validation is unavailable, fail closed for safety-sensitive queries.
+
+## 18. Vehicle removal race
+
+A vehicle may be removed while a nearby query is reading an index that still contains its ID.
+
+Safe ordering:
+
+1. Write an authoritative tombstone with a higher vehicle version.
+2. Publish asynchronous index removals.
+3. Refiner reads latest state and rejects tombstoned vehicles.
+4. Retain the tombstone long enough to dominate delayed events and stale index operations.
+
+The index may be stale, but it cannot cause a removed vehicle to be returned because final eligibility is validated against the authoritative state.
+
+## 19. Predicted travel time instead of geometric distance
+
+Use a multi-stage design:
+
+1. Spatial prefilter with a generous geometric radius.
+2. Optional road-network reachability filter.
+3. Batch candidate coordinates into an ETA service backed by a road graph, traffic feeds, closures, and vehicle routing constraints.
+4. Rank by ETA and return `etaModelVersion` and `trafficTimestamp`.
+
+**Pros:** reflects real dispatch usefulness.
+
+**Cons:** much more expensive, traffic-sensitive, and dependent on routing-service availability. Use geometric lower bounds and a candidate cap to protect the ETA service. Cache map partitions and traffic features, but avoid long-lived final ETA caches.
+
+## 20. Privacy and authorization
+
+- Authenticate vehicles with device identity and mTLS.
+- Authorize queries using tenant, fleet, geography, and purpose scopes.
+- Apply authorization before index access by physically/logically partitioning index keys by tenant or fleet.
+- Return opaque vehicle IDs and the minimum required telemetry.
+- Encrypt data in transit and at rest.
+- Keep raw high-frequency traces under short retention and stricter access controls.
+- Audit administrative and cross-fleet access.
+
+## 21. Observability
+
+Track:
+
+- ingest-to-state and state-to-index lag p50/p95/p99;
+- out-of-order, duplicate, and dropped-update counts;
+- stale-result and excluded-stale rates;
+- candidates scanned per result;
+- cell posting-list size and hot-cell QPS;
+- query latency split by routing, index, state fetch, and refinement;
+- index/state reconciliation mismatch rate;
+- partial-result and fail-closed rates;
+- shard rebuild duration and consumer lag;
+- synthetic geo probes for boundary and top-K correctness.
+
+## 22. Key tradeoffs to state explicitly
+
+| Decision                              | Benefit                         | Cost / Risk                                                          |
+| ------------------------------------- | ------------------------------- | -------------------------------------------------------------------- |
+| Cell index + exact refinement         | Fast, scalable candidate lookup | Over-fetch and extra state reads                                     |
+| Async index maintenance               | High write throughput           | Temporary index staleness                                            |
+| Authoritative latest-state validation | Safe removals and eligibility   | Additional latency and KV load                                       |
+| Per-vehicle monotonic consistency     | No global coordination          | No fleet-wide snapshot                                               |
+| Finer cells in hotspots               | Smaller postings                | More query fan-out                                                   |
+| Update index only on cell change      | Lower write amplification       | Attribute-only filters require state refinement or secondary indexes |
+| Fail closed when state unavailable    | Safer dispatch semantics        | Lower availability                                                   |
+
+## 23. Interview closing summary
+
+The central design principle is to separate correctness from acceleration. A durable ordered stream and authoritative per-vehicle latest-state store define what is current and eligible. A hierarchical spatial index narrows the search cheaply but is allowed to lag. Every candidate is revalidated, precisely ranked, and returned with explicit freshness metadata. This supports high update rates, hotspot isolation, safe removal races, and clear operational behavior without requiring a globally consistent snapshot.
