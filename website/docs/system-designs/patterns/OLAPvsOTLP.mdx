@@ -1,0 +1,318 @@
+---
+title: OLAP vs OLTP — Database Workload Design
+---
+
+# OLAP vs OLTP — The Core Difference in System Architecture
+
+---
+
+## The Staff-Level Framing
+
+The single biggest mistake teams make is treating these as a single database problem. They're not. OLAP (analytical) and OLTP (transactional) workloads have **fundamentally different access patterns, consistency requirements, and cost trade-offs** — mixing them into one database almost always makes both worse.
+
+**The 30-second version:**
+
+- **OLTP** (Online Transaction Processing): Write-heavy, small fast queries, strong consistency, users on the product → Postgres, MySQL, Cassandra
+- **OLAP** (Online Analytical Processing): Read-heavy, large scan queries, eventual consistency, business analysts on dashboards → Snowflake, BigQuery, Redshift
+
+**The staff-level decision:**
+Don't ask "which database?" Ask "what is the user workload?" If it's answering questions in seconds with strong freshness guarantees, it's probably OLTP. If it's analyzing trends from a month's worth of data and waiting 1-10 minutes is fine, it's probably OLAP.
+
+---
+
+## Quick Decision Matrix
+
+| Dimension               | **OLTP**                                  | **OLAP**                                  |
+| ----------------------- | ----------------------------------------- | ----------------------------------------- |
+| **Primary use**         | Operational app (Uber, Stripe, Airbnb)    | Analytics, BI, ML (data warehouse)        |
+| **Access pattern**      | Point lookups, single-row updates          | Full-table scans, aggregations, joins      |
+| **Data volume/query**   | Kilobytes to megabytes per query           | Terabytes per query                       |
+| **Write throughput**    | Very high (100K–1M writes/sec)             | Batch or near-real-time (append-only)     |
+| **Query latency**       | &lt;100ms p99 required                      | &lt;1–10 seconds acceptable                 |
+| **Freshness**           | Real-time (seconds)                       | Hours to minutes (eventual)                |
+| **Consistency**         | Strong (ACID transactions)                 | Eventual (batch reconciliation)            |
+| **Data model**          | Normalized (3NF for ACID)                  | Denormalized (star schema, wide tables)    |
+| **Compression**         | Dictionary/LZ4 (small)                     | Columnar + aggressive compression (10:1+)  |
+| **Index strategy**      | B-tree (point lookup), hash, BRIN          | Partitioning, clustering keys              |
+| **Cost structure**      | Per-write or per-second                    | Per-byte-scanned or per-GB-stored          |
+| **Scaling approach**    | Horizontal sharding (lose consistency)     | Horizontal append (immutable partitions)   |
+| **Examples**            | Postgres, MySQL, Cassandra, DynamoDB       | Snowflake, BigQuery, Redshift, ClickHouse |
+
+---
+
+## Part 1: OLTP — Write-Optimized for Operational Systems
+
+### Characteristics
+
+**Row-oriented storage:** Data stored row-by-row (customer record = single disk block). Perfect for "get me user 12345 with all their fields" — one disk seek, one row read.
+
+**Normalized schema:** Break data into 3NF (third normal form) to enforce consistency via foreign keys:
+- `users` table: id, name, email
+- `orders` table: id, user_id, order_total
+- `order_items` table: id, order_id, product_id, quantity, price
+
+This prevents anomalies (user deletes their record, but orphaned orders remain) and saves space (don't duplicate user_name across 1M orders).
+
+**B-tree indexes:** Fast point lookups (log(n) seeks). An index on `user_id` means "find user 12345's order" is ~3–5 disk seeks regardless of table size.
+
+**ACID transactions:** Multiple statements atomic — either all commit or all rollback. "Transfer $100 from Alice to Bob" is:
+```sql
+BEGIN;
+  UPDATE accounts SET balance = balance - 100 WHERE user_id = 'alice';
+  UPDATE accounts SET balance = balance + 100 WHERE user_id = 'bob';
+COMMIT;
+```
+If server crashes mid-transfer, neither update persists (no half-finished state).
+
+**Real-time consistency:** Users see results instantly. Stripe's API returns "charge succeeded" before you can blink.
+
+### When to Use OLTP
+
+- **Operational data** — anything users interact with in the product (payments, orders, messages, comments)
+- **Strong consistency requirements** — financial transactions, inventory, bookings can't be approximate
+- **Sub-second latency** — the app user is waiting
+- **High write volume** — Uber receiving 1M ride requests/hour
+
+### OLTP Example: DoorDash Order Processing
+
+```
+User places order at 6:15 PM
+  → Trip Service writes to Postgres:
+    INSERT INTO orders (user_id, restaurant_id, items, total) VALUES (...)
+    BEGIN;
+      UPDATE restaurants SET active_orders = active_orders + 1 WHERE id = restaurant_id;
+      INSERT INTO order_items (order_id, product_id, qty) VALUES (...)
+      UPDATE products SET inventory = inventory - qty WHERE id = product_id;
+    COMMIT;
+  → User immediately sees order confirmation (ACID guarantee)
+  → Real-time stock check prevents overselling
+  → Driver matching pulls from this same consistent database
+```
+
+**Why not BigQuery (OLAP)?** Reads would have 10–30s latency (batch ingestion lag), orders would be "eventually" deducted from inventory (race condition: both driver apps see same item in stock), and consistency guarantees would be gone.
+
+---
+
+## Part 2: OLAP — Read-Optimized for Analytics
+
+### Characteristics
+
+**Columnar storage:** Data stored by column (all prices together, all dates together). One disk block might hold 100K prices. Perfect for "sum revenue by region" — scan only the price + region columns, skip customer_name, email, phone.
+
+Compression is extreme: 1M identical values (region=USA) compresses to a single flag + count. This is why columnar stores achieve **10:1–100:1 compression** vs row stores.
+
+**Denormalized schema (star schema):** Facts + dimensions flattened into wide tables:
+- `orders_fact` table: order_id, user_id, restaurant_id, driver_id, order_total, **date_key**, **region_key**, ... (100+ columns)
+- `users_dim` table: user_id, name, email, signup_date (reference data)
+
+Wide tables avoid joins in the hot path — `SELECT SUM(order_total) FROM orders_fact WHERE region_key = 3 AND date >= '2026-08-01'` scans one table, no join needed.
+
+**Partitioning by time:** Tables sharded by date (orders_2026_08_06, orders_2026_08_05, ...). Queries filter by partition automatically, scanning only relevant data.
+
+**Clustering/sort keys:** Within each partition, data sorted by high-cardinality columns (e.g., restaurant_id). Queries on restaurant_id are sequential reads, not random seeks.
+
+**Approximate consistency:** Data loaded via batch pipeline every 1–6 hours. Until that pipeline runs, the warehouse is stale. This is acceptable for "revenue last week" but not for "current order status."
+
+**Cost model:** Charged by bytes scanned or stored, not by queries per second. You want aggressive partitioning and compression to reduce scan size.
+
+### When to Use OLAP
+
+- **Analytics & BI** — "How much revenue last month?" "Which restaurants are trending?" "What's churn rate by region?"
+- **ML training data** — historical data for model building (exact recency not critical)
+- **Batch reporting** — daily/weekly dashboards (1–10 minute latency acceptable)
+- **Compliance & audit** — immutable historical records
+
+### OLAP Example: DoorDash Analytics
+
+```
+Every night, ETL pipeline loads:
+  orders_fact (1B rows)
+    └─ order_id, user_id, restaurant_id, driver_id, 
+       order_total, delivery_fee, tip, platform_fee,
+       order_date, order_hour, region_id, cuisine_type_id
+
+Analyst query: "Revenue by cuisine type for past 7 days"
+  SELECT cuisine_type, SUM(order_total) FROM orders_fact
+  WHERE order_date BETWEEN '2026-07-30' AND '2026-08-06'
+  GROUP BY cuisine_type
+
+  → Scans only 7 date partitions (skip older data)
+  → Columnar: loads cuisine_type_id + order_total columns (skip name, email, etc.)
+  → Compression: 7B rows compresses to ~100GB
+  → Result: aggregation completes in 2–3 seconds
+  → Cost: ~100GB scanned @ $6.25 per TB = ~$0.60
+```
+
+**Why not Postgres?**
+- Full table scan of 1B rows on row-oriented storage = ~100GB disk I/O (10 seconds minimum)
+- Cost per query would be massive if charged per byte like data warehouses
+- Locking the table blocks live transactional queries (order inserts stall)
+
+---
+
+## The Polyglot Architecture (Best Practice)
+
+Real systems use **both simultaneously:**
+
+```
+Production Postgres (OLTP)
+  ↓
+  Every night: ETL pipeline (Airflow/Dataflow)
+    └─ EXTRACT orders from Postgres
+    └─ TRANSFORM: flatten, denormalize, add business logic
+    └─ LOAD into Snowflake (OLAP)
+       ↓
+   Analyst runs BigQuery query on Snowflake data
+   Dashboard refreshes every 1 hour
+```
+
+**Why?**
+- OLTP handles the 50K/sec writes in production
+- OLAP handles the weekly revenue deep-dive queries
+- They don't compete for resources
+- OLAP is cheaper per TB for read-heavy workloads
+
+---
+
+## Design Pattern Examples
+
+### Pattern 1: Real-Time Analytics (Streaming to OLAP)
+
+**Scenario:** Ride-hailing platform wants to show "surge multiplier by zone every 5 minutes" without waiting for nightly batch.
+
+**Design:**
+- Kafka streams in real-time events (order requests, driver locations)
+- Flink aggregates every 5 minutes → outputs `(zone, requests_count, driver_count, multiplier)`
+- Results written to Redis (hot cache, for live dashboards) + Snowflake (cold storage, for historical analysis)
+
+```
+Kafka (events) → Flink (windowing) → Redis + Snowflake
+  ↓ (5 minute latency)
+  Live dashboard shows current surge
+  (older: nightly Postgres → Snowflake historical)
+```
+
+### Pattern 2: OLTP with Read Replicas for OLAP
+
+**Scenario:** Payment processing needs ACID guarantees, but analytics team needs to query transaction history without blocking operations.
+
+**Design:**
+- Master Postgres (OLTP): all writes, real-time consistency
+- Read replica Postgres (OLAP adjacent): read-only copy, lagged by ~1 second
+- Analysts query the replica; heavy scans don't lock the master
+
+**Limitation:** Still row-oriented storage, so full scans are expensive. Better for "give me transactions from past 48 hours" than "all transactions since 2020."
+
+### Pattern 3: OLTP for Operational, Data Warehouse for Analytics
+
+**Scenario:** Uber-scale system (hundreds of write-heavy databases, thousands of analyst queries).
+
+**Design:**
+```
+Uber production Postgres shards (OLTP)
+  ├─ Shard 1: (rider_id % 1000 == 0–99)
+  ├─ Shard 2: (rider_id % 1000 == 100–199)
+  └─ ...
+     ↓
+  Binlog replication → Kafka → ETL pipeline
+     ↓
+  Uber data warehouse (BigQuery or internal columnar DB)
+     ↓
+  Analytics team queries
+```
+
+Large writes and sharding make OLTP systems eventually-consistent anyway (binlog lag ~1 second), so data warehouse is only ~1 minute behind for most purposes.
+
+---
+
+## Comparison Table: Real Systems
+
+| Database       | Type  | Use Case                                  | Write/sec      | Query latency   | Data model          |
+| -------------- | ----- | ----------------------------------------- | --------------- | --------------- | ------------------- |
+| Postgres       | OLTP  | Operational: orders, payments, users      | 100K–1M (sharded) | &lt;100ms          | Normalized rows     |
+| Cassandra      | OLTP  | Time-series writes: events, metrics       | 1M–10M          | 1–10ms          | Wide-column         |
+| MongoDB        | OLTP  | Flexible schema: user profiles, content   | 100K–1M         | 1–10ms          | Document (JSON)     |
+| Snowflake      | OLAP  | Analytics: dashboards, ML training        | Batch (~1M/s)   | 1–10 sec        | Columnar, star schema |
+| BigQuery       | OLAP  | Analytics: petabyte-scale queries         | Streaming        | 5–30 sec        | Columnar            |
+| Redshift       | OLAP  | Analytics: on-premise or AWS              | Batch           | 1–10 sec        | Columnar            |
+| ClickHouse     | OLAP  | Time-series analytics: metrics, logs      | Batch or stream  | &lt;1 sec           | Columnar            |
+
+---
+
+## Interview Follow-ups & Talking Points
+
+### Q1: "When would you use Cassandra instead of Postgres?"
+
+**Setup:** Cassandra is OLTP-adjacent but **column-family oriented**, designed for **write-heavy time-series** (events, logs, metrics), not transactional consistency.
+
+**Answer:** Cassandra is ideal when you have:
+- Millions of writes per second (Postgres maxes out around 100K–1M sharded)
+- Events flowing in by timestamp (ride events, sensor readings, user activity logs)
+- Eventual consistency is acceptable (no distributed ACID)
+- Data is append-only (events don't update, just accumulate)
+
+**Example:** Uber events → Cassandra: `PRIMARY KEY((driver_id), event_timestamp DESC)` → query "latest 100 events for driver X" in milliseconds, even with billions of events total. Postgres would require aggressive partitioning or archive strategies; Cassandra handles it natively.
+
+### Q2: "How would you handle a use case that needs both OLTP and OLAP characteristics?"
+
+**Setup:** Real-time dashboards (low latency OLAP) + operational consistency (OLTP).
+
+**Answer:** Three-tier architecture:
+1. **OLTP (Postgres):** strong consistency, operational source of truth
+2. **Hot cache (Redis):** pre-aggregated metrics updated every 30s (e.g., `surge:\{zone\}:\{interval\}`)
+3. **OLAP (Snowflake):** nightly historical load for deep analysis
+
+If 30s stale is too old → push OLTP results to Kafka → aggregate in Flink every 5 minutes → write to both Redis (dashboards) and Snowflake (history). Cost ~30-50% higher, but gets you real-time + consistency + historical analysis.
+
+### Q3: "How do you prevent an OLAP query from blocking OLTP writes?"
+
+**Answer:** Four strategies:
+1. **Separate databases** — OLTP master, OLAP read replica (lag ~1s)
+2. **Query isolation** — connection pools with different priorities; OLAP queries limited to off-peak hours
+3. **Columnar representation** — if you must use one database, switch to ClickHouse (OLAP-optimized but can handle some OLTP)
+4. **Streaming ingestion** — don't batch load; use Kafka/Flink to feed data warehouse continuously so it's always near-current
+
+### Q4: "What's the difference between a data warehouse and a data lake?"
+
+**Data warehouse** (structured): Snowflake, BigQuery — schema enforced on write, clean data, slower ingestion, faster queries.
+
+**Data lake** (unstructured): S3 + Spark/Presto — raw files (JSON, Parquet, CSV), schema-on-read, fast ingestion, slower queries.
+
+**Answer:** For interview: "I'd use a data warehouse for operational analytics (revenue, churn, KPIs) where consistency matters. Data lake for ML (raw user events, unstructured logs) where ingestion speed matters more than consistency."
+
+### Q5: "How would you optimize this OLAP query: 'Top 10 restaurants by revenue, aggregated by hour for the past 6 months'?"
+
+**Naive approach:**
+```sql
+SELECT restaurant_id, DATE_TRUNC(hour, order_time), SUM(revenue)
+FROM orders
+WHERE order_time >= NOW() - INTERVAL 6 MONTHS
+GROUP BY 1, 2
+ORDER BY 3 DESC
+LIMIT 10
+```
+
+**Optimizations:**
+1. **Partitioning:** Table already partitioned by `order_date`; query filters to 180 partitions (fast)
+2. **Columnar:** Only scan restaurant_id + order_time + revenue columns
+3. **Pre-aggregation:** Materialized view `hourly_restaurant_revenue` pre-computes sums every hour; query becomes a simple filter + sort
+4. **Clustering:** Data clustered by restaurant_id within each partition; top-10 restaurants are sequential reads, not random seeks
+
+**Result:** 2–5 seconds instead of 30+ seconds.
+
+---
+
+## Summary: When to Use Each
+
+| Question                                       | Answer      |
+| ---------------------------------------------- | ----------- |
+| "Real-time payment processing?"                | OLTP        |
+| "Daily revenue dashboard?"                     | OLAP        |
+| "User write 1M events/sec?"                    | OLTP (scale) |
+| "Analyst query 1 year of data?"                | OLAP        |
+| "Need ACID transactions?"                      | OLTP        |
+| "Sub-100ms p99 latency?"                       | OLTP        |
+| "Can accept 1–10 minute latency?"              | OLAP        |
+| "Complex joins across many tables?"            | OLTP/OLAP   |
+| "Billion-row full scans?"                      | OLAP        |
+| "Money is involved?"                           | OLTP        |

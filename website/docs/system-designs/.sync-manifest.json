@@ -396,6 +396,10 @@
       "hash": "77146e6c92d60339945bce8bc3cd4f3403a1fb5a4d43e5b599d083816831e0cf",
       "docRelative": "pastebin.mdx"
     },
+    "system-designs/patterns/OLAPvsOTLP.mdx": {
+      "hash": "10d5f4ee45cf2431235951d6281cc5ff9ba8c7742063455263cf8b980967cc6e",
+      "docRelative": "patterns/OLAPvsOTLP.mdx"
+    },
     "system-designs/patterns/flink.mdx": {
       "hash": "591a31859ae3eb95fca95d1b704eb6448f76a069ccbb65d76ad851c3c03ac02f",
       "docRelative": "patterns/flink.mdx"
@@ -437,7 +441,7 @@
       "docRelative": "ride_hailing.mdx"
     },
     "system-designs/teleoperations.mdx": {
-      "hash": "a9a1386f0d91dc3d528a90449fa721dcf57882ffdda4faf08f46025ea4c4fdcb",
+      "hash": "724008fcfa2bf83744df1194757cbbdd2502c7007b891fbbfa497f9f5a9ed850",
       "docRelative": "teleoperations.mdx"
     },
     "system-designs/ticketmaster.mdx": {
@@ -477,7 +481,7 @@
       "docRelative": "miscellaneous/_index.mdx"
     },
     "__nav__:patterns": {
-      "hash": "ea22561283764d2a8f22820ea5aa100213eadf94178551c8f6601214821b8189",
+      "hash": "18bfde03842e73dd3e5e520e60701157fd987c5705ce71f974c72b8686fdd5aa",
       "docRelative": "patterns/_index.mdx"
     }
   }
