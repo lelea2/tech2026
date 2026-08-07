@@ -12,6 +12,10 @@
       "hash": "7a0cbffda26828101df3fe6090bea98aa270b1d6af91c1284562153c0e10e216",
       "docRelative": "frontend/interview/AIEfficiency.mdx"
     },
+    "frontend/interview/Calculator.js": {
+      "hash": "05a050ed39a4e62dfef12ae65b436bc3eae59105431963041e8dace5181161b3",
+      "docRelative": "frontend/interview/Calculator.mdx"
+    },
     "frontend/interview/ConnectionPool.js": {
       "hash": "ae60d7953a5283afa27cb684b895a390fc70172fbd29abe80af2dfb796777109",
       "docRelative": "frontend/interview/ConnectionPool.mdx"
@@ -27,6 +31,10 @@
     "frontend/interview/FileSystem.js": {
       "hash": "4df303d31bc59ad5b15ea36dccabd816b593e05cd29e1416e4ecc9df56cff1da",
       "docRelative": "frontend/interview/FileSystem.mdx"
+    },
+    "frontend/interview/FlightBooking.js": {
+      "hash": "362774ca2e503e78f0d2b3ee29abae4e3451ba6e0af2a8a145154a79df74f400",
+      "docRelative": "frontend/interview/FlightBooking.mdx"
     },
     "frontend/interview/InMemoryTable.js": {
       "hash": "d32ee60cf7d403cc454b05841ea18816771caf8084c04f2e81d043d698dc1b89",
@@ -1745,7 +1753,7 @@
       "docRelative": "frontend/css/_index.mdx"
     },
     "__nav__:frontend/interview": {
-      "hash": "7b0ec55bc3739b970797e2f856c74129c115fc099d2d331639e8e7f3c748e583",
+      "hash": "40c1bbce4a62c586f7182a24d10232f9662276eca84bf43c5258b58c200fb1fd",
       "docRelative": "frontend/interview/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {

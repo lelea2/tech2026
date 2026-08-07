@@ -1,0 +1,229 @@
+class Mutex {
+  constructor() {
+    this.locked = false;
+    this.queue = [];
+  }
+
+  async lock() {
+    return new Promise((resolve) => {
+      const acquire = () => {
+        this.locked = true;
+
+        resolve(() => {
+          const next = this.queue.shift();
+
+          if (next) {
+            next();
+          } else {
+            this.locked = false;
+          }
+        });
+      };
+
+      if (this.locked) {
+        this.queue.push(acquire);
+      } else {
+        acquire();
+      }
+    });
+  }
+}
+
+class FlightReservationSystem {
+  constructor() {
+    // flightNumber -> flight
+    this.flights = new Map();
+
+    // timestamp -> Set<flightNumber>
+    this.departureIndex = new Map();
+
+    // bookingId -> booking
+    this.bookings = new Map();
+
+    // flightNumber -> Mutex
+    this.locks = new Map();
+
+    this.nextBookingId = 1;
+  }
+
+  addFlight({
+    flightNumber,
+    departureTime,
+    seatCount,
+    totalTicketPrice
+  }) {
+    if (this.flights.has(flightNumber)) {
+      throw new Error("Flight already exists");
+    }
+
+    if (seatCount <= 0) {
+      throw new Error("Seat count must be positive");
+    }
+
+    const flight = {
+      flightNumber,
+      departureTime,
+      totalSeats: seatCount,
+      availableSeats: seatCount,
+      totalTicketPrice
+    };
+
+    this.flights.set(flightNumber, flight);
+    this.locks.set(flightNumber, new Mutex());
+
+    const timestamp = departureTime.getTime();
+
+    if (!this.departureIndex.has(timestamp)) {
+      this.departureIndex.set(timestamp, new Set());
+    }
+
+    this.departureIndex
+      .get(timestamp)
+      .add(flightNumber);
+
+    return { ...flight };
+  }
+
+  getFlightByNumber(flightNumber) {
+    const flight = this.flights.get(flightNumber);
+
+    return flight ? { ...flight } : null;
+  }
+
+  getFlightsByDepartureTime(departureTime) {
+    const timestamp = departureTime.getTime();
+
+    const flightNumbers =
+      this.departureIndex.get(timestamp);
+
+    if (!flightNumbers) {
+      return [];
+    }
+
+    return [...flightNumbers]
+      .map((flightNumber) =>
+        this.flights.get(flightNumber)
+      )
+      .filter(Boolean)
+      .map((flight) => ({ ...flight }));
+  }
+
+  async bookSeats(flightNumber, seatCount) {
+    if (seatCount <= 0) {
+      throw new Error("Seat count must be positive");
+    }
+
+    const flight = this.flights.get(flightNumber);
+
+    if (!flight) {
+      throw new Error("Flight not found");
+    }
+
+    const mutex = this.locks.get(flightNumber);
+    const unlock = await mutex.lock();
+
+    try {
+      if (flight.availableSeats < seatCount) {
+        throw new Error(
+          `Insufficient seats. Available: ${flight.availableSeats}`
+        );
+      }
+
+      flight.availableSeats -= seatCount;
+
+      const booking = {
+        bookingId: `B${this.nextBookingId++}`,
+        flightNumber,
+        seatCount
+      };
+
+      this.bookings.set(
+        booking.bookingId,
+        booking
+      );
+
+      return { ...booking };
+    } finally {
+      unlock();
+    }
+  }
+
+  async cancelBooking(bookingId) {
+    const booking = this.bookings.get(bookingId);
+
+    if (!booking) {
+      throw new Error("Booking not found");
+    }
+
+    const flight =
+      this.flights.get(booking.flightNumber);
+
+    if (!flight) {
+      throw new Error("Flight not found");
+    }
+
+    const mutex =
+      this.locks.get(booking.flightNumber);
+
+    const unlock = await mutex.lock();
+
+    try {
+      // Re-check after getting the lock.
+      const currentBooking =
+        this.bookings.get(bookingId);
+
+      if (!currentBooking) {
+        throw new Error(
+          "Booking already cancelled"
+        );
+      }
+
+      flight.availableSeats +=
+        currentBooking.seatCount;
+
+      this.bookings.delete(bookingId);
+    } finally {
+      unlock();
+    }
+  }
+}
+
+// async function testConcurrentBookings() {
+//   const system =
+//     new FlightReservationSystem();
+
+//   system.addFlight({
+//     flightNumber: "ZX300",
+//     departureTime: new Date(),
+//     seatCount: 10,
+//     totalTicketPrice: 200
+//   });
+
+//   // 20 users simultaneously try
+//   // to book 1 seat.
+//   const requests = Array.from(
+//     { length: 20 },
+//     () =>
+//       system
+//         .bookSeats("ZX300", 1)
+//         .then(() => true)
+//         .catch(() => false)
+//   );
+
+//   const results =
+//     await Promise.all(requests);
+
+//   const successes =
+//     results.filter(Boolean).length;
+
+//   console.assert(successes === 10);
+
+//   console.assert(
+//     system.getFlightByNumber("ZX300")
+//       .availableSeats === 0
+//   );
+
+//   console.log(
+//     "Concurrency test passed"
+//   );
+// }
