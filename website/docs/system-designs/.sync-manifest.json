@@ -48,9 +48,9 @@
       "hash": "b080d3e5fb2d1eab6830a319f1b0ce464e122d830e3fbb215d59884fbe064f1d",
       "docRelative": "assets/ml_lifecycle_feedback_loop_chart.png"
     },
-    "system-designs/automated-jira-to-pr.svg": {
-      "hash": "5bc28c76b80c3584f65833d9e0bee836080811be58e964f23f43a3fb40efd3a7",
-      "docRelative": "automated-jira-to-pr.svg"
+    "system-designs/automate-jira-ticket.png": {
+      "hash": "b54605bc53e78ac8d40af13f674af25311dad2713082e403ef1a0b62568f5972",
+      "docRelative": "automate-jira-ticket.png"
     },
     "system-designs/bitly.png": {
       "hash": "c008aa0a7d33e3db180971c7486f9fe4d565dd0b00a846766a43ad4906b3eaad",
@@ -293,7 +293,7 @@
       "docRelative": "agentic-system-design/text-to-image-system-design.mdx"
     },
     "system-designs/automated-jira-to-pr.mdx": {
-      "hash": "908a1b74357dca96d44ff1c4b4e8864383ac62ac95331c6d8df3664ca0114c39",
+      "hash": "ea39c9697f2318b7b1f30de63ed9dfc27b3276bcfe7696a2a23d2b3c59f76ebe",
       "docRelative": "automated-jira-to-pr.mdx"
     },
     "system-designs/bitly.mdx": {
@@ -483,10 +483,6 @@
     "system-designs/yelp.mdx": {
       "hash": "79221ade813c027f69c039f6e7106fb4db6fd4266b39bbfdb5582478162743f2",
       "docRelative": "yelp.mdx"
-    },
-    "system-designs/zoox_quant_math_physics_interview_prep.mdx": {
-      "hash": "211bfcb93d10fe4583a0fd4cf8e1999f0b94a27dd2d9599bca9eeb2986a643c5",
-      "docRelative": "zoox_quant_math_physics_interview_prep.mdx"
     },
     "__nav__:agentic-system-design": {
       "hash": "c829da6b1c3576d57fb1ddd1b99f7640e17a1d70ed4d4801dea2878f7132f83f",
