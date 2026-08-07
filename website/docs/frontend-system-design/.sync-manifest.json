@@ -60,6 +60,10 @@
       "hash": "c1c22d48ce6ba69ad3d57540e8d32e3229a73c9080857d0d3d97689da0ba0a6e",
       "docRelative": "poll-widget.png"
     },
+    "frontend-system-design/react-performance-tools-comparison.svg": {
+      "hash": "f3d32e8524fe0025521b5091d13417bd18050bf218217f86261485fd05a6b17c",
+      "docRelative": "react-performance-tools-comparison.svg"
+    },
     "frontend-system-design/richtexteditor.png": {
       "hash": "592701c33e1c48937a82965d23d439d3ee486403cb4a542bb40003df2e51c187",
       "docRelative": "richtexteditor.png"
@@ -151,6 +155,10 @@
     "frontend-system-design/poll-widget.mdx": {
       "hash": "bf5a18a53921d34476249da4e972f118906c8c1347abcb0d17b619b5d3cc442f",
       "docRelative": "poll-widget.mdx"
+    },
+    "frontend-system-design/react-performance.mdx": {
+      "hash": "56cce4e97a2274d78e28502d12e0c965722a294d5240eac53a1acdf6cafc1c49",
+      "docRelative": "react-performance.mdx"
     },
     "frontend-system-design/rich-text-editor.mdx": {
       "hash": "cb1d3c631db998eea07f3fffa2fb37f312fdf8d887da477fa4e1e24a6812eee0",

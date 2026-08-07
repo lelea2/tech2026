@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1450" viewBox="0 0 1800 1450">
+  <defs>
+    <style>
+      .bg { fill:#f8fafc; }
+      .title { font: 700 34px Arial, sans-serif; fill:#0f172a; }
+      .subtitle { font: 500 18px Arial, sans-serif; fill:#475569; }
+      .h2 { font: 700 24px Arial, sans-serif; fill:#0f172a; }
+      .h3 { font: 700 18px Arial, sans-serif; fill:#0f172a; }
+      .body { font: 15px Arial, sans-serif; fill:#334155; }
+      .small { font: 13px Arial, sans-serif; fill:#475569; }
+      .code { font: 14px "Courier New", monospace; fill:#0f172a; }
+      .card { fill:#ffffff; stroke:#cbd5e1; stroke-width:1.5; rx:16; }
+      .memo { fill:#fff7ed; stroke:#fdba74; }
+      .green { fill:#ecfdf5; stroke:#86efac; }
+      .blue { fill:#eff6ff; stroke:#93c5fd; }
+      .purple { fill:#f5f3ff; stroke:#c4b5fd; }
+      .pink { fill:#fdf2f8; stroke:#f9a8d4; }
+      .yellow { fill:#fefce8; stroke:#fde047; }
+      .gray { fill:#f8fafc; stroke:#cbd5e1; }
+      .dark { fill:#0f172a; }
+      .white { fill:#ffffff; }
+      .line { stroke:#94a3b8; stroke-width:2; marker-end:url(#arrow); }
+      .dash { stroke:#94a3b8; stroke-width:2; stroke-dasharray:6 6; }
+      .pill { fill:#e2e8f0; rx:10; }
+      .pilltext { font:700 12px Arial,sans-serif; fill:#334155; }
+      .accent { font:700 15px Arial,sans-serif; fill:#b45309; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1800" height="1450"/>
+
+  <text x="70" y="65" class="title">React Performance: Which Tool Solves Which Problem?</text>
+  <text x="70" y="98" class="subtitle">Staff-level mental model: identify the bottleneck first — unnecessary render, expensive compute, urgent UX, external state, CPU work, or animation.</text>
+
+  <!-- React.memo -->
+  <rect x="70" y="135" width="1660" height="235" class="card memo"/>
+  <text x="95" y="175" class="h2">Why doesn’t React.memo fix every performance issue?</text>
+  <text x="95" y="210" class="body">React.memo only skips a child render when its props are shallow-equal. It does NOT make rendering, computation, layout, network, or browser work inherently cheaper.</text>
+
+  <text x="110" y="250" class="h3">It fails to help when:</text>
+  <text x="110" y="282" class="body">• Parent passes new object / array / function references every render → shallow comparison sees “changed”.</text>
+  <text x="110" y="310" class="body">• Component reads changing Context or its own state → it still renders.</text>
+  <text x="110" y="338" class="body">• The expensive work happens before props reach the memoized child, or in effects / layout / paint.</text>
+
+  <text x="930" y="250" class="h3">It can also hurt:</text>
+  <text x="930" y="282" class="body">• Every render now pays a prop-comparison cost.</text>
+  <text x="930" y="310" class="body">• Over-memoization adds complexity and stale-dependency bugs.</text>
+  <text x="930" y="338" class="accent">Interview line: “React.memo is a render-skipping optimization, not a general performance strategy.”</text>
+
+  <!-- Decision flow -->
+  <text x="70" y="420" class="h2">Choose by bottleneck</text>
+
+  <rect x="70" y="450" width="250" height="92" class="card gray"/>
+  <text x="95" y="484" class="h3">What is slow?</text>
+  <text x="95" y="514" class="small">Measure first: React Profiler,</text>
+  <text x="95" y="534" class="small">Performance panel, long tasks.</text>
+
+  <line x1="320" y1="496" x2="390" y2="496" class="line"/>
+
+  <rect x="400" y="435" width="250" height="122" class="card blue"/>
+  <text x="425" y="470" class="h3">Unnecessary re-render?</text>
+  <text x="425" y="500" class="body">React.memo</text>
+  <text x="425" y="525" class="small">Stabilize props only if needed.</text>
+
+  <line x1="650" y1="496" x2="720" y2="496" class="line"/>
+
+  <rect x="730" y="435" width="250" height="122" class="card green"/>
+  <text x="755" y="470" class="h3">Expensive calculation?</text>
+  <text x="755" y="500" class="body">useMemo</text>
+  <text x="755" y="525" class="small">Cache derived value.</text>
+
+  <line x1="980" y1="496" x2="1050" y2="496" class="line"/>
+
+  <rect x="1060" y="435" width="250" height="122" class="card purple"/>
+  <text x="1085" y="470" class="h3">Urgent + non-urgent UI?</text>
+  <text x="1085" y="500" class="body">useDeferredValue / transition</text>
+  <text x="1085" y="525" class="small">Prioritize responsiveness.</text>
+
+  <line x1="1310" y1="496" x2="1380" y2="496" class="line"/>
+
+  <rect x="1390" y="435" width="340" height="122" class="card pink"/>
+  <text x="1415" y="470" class="h3">Heavy CPU / browser coordination?</text>
+  <text x="1415" y="500" class="body">Web Worker / requestAnimationFrame</text>
+  <text x="1415" y="525" class="small">Move work off main thread or align to paint.</text>
+
+  <!-- Matrix -->
+  <text x="70" y="620" class="h2">Comparison matrix</text>
+
+  <!-- Headers -->
+  <rect x="70" y="650" width="230" height="62" class="dark" rx="12"/>
+  <rect x="300" y="650" width="390" height="62" class="dark"/>
+  <rect x="690" y="650" width="390" height="62" class="dark"/>
+  <rect x="1080" y="650" width="330" height="62" class="dark"/>
+  <rect x="1410" y="650" width="320" height="62" class="dark" rx="12"/>
+  <text x="90" y="690" class="h3 white">Tool</text>
+  <text x="320" y="690" class="h3 white">Use when</text>
+  <text x="710" y="690" class="h3 white">What it does</text>
+  <text x="1100" y="690" class="h3 white">Avoid / caveat</text>
+  <text x="1430" y="690" class="h3 white">Typical example</text>
+
+  <!-- row helper manually -->
+  <!-- useMemo -->
+  <rect x="70" y="712" width="1660" height="105" class="card green"/>
+  <text x="90" y="748" class="h3">useMemo</text>
+  <text x="320" y="742" class="body">Derived value is expensive to recompute</text>
+  <text x="320" y="767" class="body">and dependencies change relatively rarely.</text>
+  <text x="710" y="742" class="body">Caches a computed value between renders.</text>
+  <text x="710" y="767" class="code">const rows = useMemo(() =&gt; sort(data), [data])</text>
+  <text x="1100" y="742" class="body">Don’t memoize trivial work.</text>
+  <text x="1100" y="767" class="body">Cache can add memory + dependency complexity.</text>
+  <text x="1430" y="742" class="body">Sorting/filtering 10k rows,</text>
+  <text x="1430" y="767" class="body">building expensive chart data.</text>
+
+  <!-- useCallback -->
+  <rect x="70" y="817" width="1660" height="105" class="card blue"/>
+  <text x="90" y="853" class="h3">useCallback</text>
+  <text x="320" y="847" class="body">Function identity matters.</text>
+  <text x="320" y="872" class="body">Usually with memoized children or hook deps.</text>
+  <text x="710" y="847" class="body">Caches a function reference, not the result.</text>
+  <text x="710" y="872" class="code">const onSelect = useCallback(id =&gt; ..., [x])</text>
+  <text x="1100" y="847" class="body">Doesn’t make function execution faster.</text>
+  <text x="1100" y="872" class="body">Useless if consumer doesn’t care about identity.</text>
+  <text x="1430" y="847" class="body">Stable handler passed into</text>
+  <text x="1430" y="872" class="body">React.memo’d row components.</text>
+
+  <!-- useDeferredValue -->
+  <rect x="70" y="922" width="1660" height="105" class="card purple"/>
+  <text x="90" y="958" class="h3">useDeferredValue</text>
+  <text x="320" y="952" class="body">A value changes urgently, but expensive UI</text>
+  <text x="320" y="977" class="body">derived from it may lag slightly.</text>
+  <text x="710" y="952" class="body">Keeps urgent UI responsive while React renders</text>
+  <text x="710" y="977" class="body">a lower-priority version of the value.</text>
+  <text x="1100" y="952" class="body">Not debouncing; work may still happen.</text>
+  <text x="1100" y="977" class="body">Does not offload CPU from the main thread.</text>
+  <text x="1430" y="952" class="body">Search box updates immediately;</text>
+  <text x="1430" y="977" class="body">large filtered list trails behind.</text>
+
+  <!-- startTransition -->
+  <rect x="70" y="1027" width="1660" height="105" class="card purple"/>
+  <text x="90" y="1063" class="h3">startTransition</text>
+  <text x="320" y="1057" class="body">You control the state update and can mark it</text>
+  <text x="320" y="1082" class="body">non-urgent.</text>
+  <text x="710" y="1057" class="body">Schedules state updates as interruptible,</text>
+  <text x="710" y="1082" class="body">lower-priority transition work.</text>
+  <text x="1100" y="1057" class="body">Don’t use for controlled input’s direct value.</text>
+  <text x="1100" y="1082" class="body">Still executes render work on main thread.</text>
+  <text x="1430" y="1057" class="body">Tab/navigation result update,</text>
+  <text x="1430" y="1082" class="body">large result pane refresh.</text>
+
+  <!-- useSyncExternalStore -->
+  <rect x="70" y="1132" width="1660" height="105" class="card yellow"/>
+  <text x="90" y="1168" class="h3">useSyncExternalStore</text>
+  <text x="320" y="1162" class="body">React reads state owned outside React:</text>
+  <text x="320" y="1187" class="body">Redux-like store, browser API, custom cache.</text>
+  <text x="710" y="1162" class="body">Provides concurrency-safe subscription + snapshot</text>
+  <text x="710" y="1187" class="body">semantics and avoids tearing.</text>
+  <text x="1100" y="1162" class="body">Not primarily a speed optimization.</text>
+  <text x="1100" y="1187" class="body">Use when integrating external mutable stores.</text>
+  <text x="1430" y="1162" class="body">Subscribe to viewport store,</text>
+  <text x="1430" y="1187" class="body">shared client cache, custom state lib.</text>
+
+  <!-- Web Worker -->
+  <rect x="70" y="1237" width="1660" height="105" class="card pink"/>
+  <text x="90" y="1273" class="h3">Web Worker</text>
+  <text x="320" y="1267" class="body">CPU-heavy pure computation creates long tasks</text>
+  <text x="320" y="1292" class="body">and blocks input / scrolling / paint.</text>
+  <text x="710" y="1267" class="body">Runs JavaScript on another thread.</text>
+  <text x="710" y="1292" class="body">Communicate via messages / transferable data.</text>
+  <text x="1100" y="1267" class="body">No direct DOM access; serialization has cost.</text>
+  <text x="1100" y="1292" class="body">Not worth it for tiny jobs.</text>
+  <text x="1430" y="1267" class="body">Parse huge file, layout graph,</text>
+  <text x="1430" y="1292" class="body">image/data processing.</text>
+
+  <!-- rAF -->
+  <rect x="70" y="1342" width="1660" height="82" class="card gray"/>
+  <text x="90" y="1377" class="h3">requestAnimationFrame</text>
+  <text x="320" y="1370" class="body">Visual DOM/canvas updates should sync with browser paint.</text>
+  <text x="710" y="1370" class="body">Runs callback before next repaint; coalesce animation work.</text>
+  <text x="1100" y="1370" class="body">Not a background thread; heavy callback still blocks.</text>
+  <text x="1430" y="1370" class="body">Drag, scroll-linked visuals, canvas animation.</text>
+
+  <!-- Footer note -->
+  <text x="70" y="1440" class="small">Rule of thumb: React.memo/useMemo/useCallback reduce repeated React work; deferred/transition prioritize React work; Worker moves CPU work off-thread; rAF coordinates work with browser paint.</text>
+</svg>
