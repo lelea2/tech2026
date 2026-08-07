@@ -9,8 +9,6 @@ tags:
 sidebar_label: Quant Math & Physics
 ---
 
-# Zoox / Quantitative Reasoning Interview Prep
-
 Use this as a **talking guide**, not just an answer sheet. For each problem:
 
 1. State assumptions.
@@ -21,120 +19,110 @@ Use this as a **talking guide**, not just an answer sheet. For each problem:
 
 ---
 
-# 1. Given the area of a regular hexagon, find its side length
+# 1. Given the area of a hexagon, find its side length
 
-## Formula
+## Setup
 
-A regular hexagon can be divided into 6 equilateral triangles.
+A regular hexagon splits into 6 equilateral triangles of side $s$.
 
-For side length \(s\):
+Area of one equilateral triangle:
 
-\[
-A = 6\left(\frac{\sqrt{3}}{4}s^2\right)
-\]
+$$
+A_\triangle = \frac{\sqrt{3}}{4}s^2
+$$
 
-Therefore:
+So the hexagon area is:
 
-\[
-A = \frac{3\sqrt{3}}{2}s^2
-\]
+$$
+A = 6 \cdot \frac{\sqrt{3}}{4}s^2 = \frac{3\sqrt{3}}{2}s^2
+$$
 
-Solve for \(s\):
+## Answer
 
-\[
+Solving for $s$:
+
+$$
 \boxed{
 s = \sqrt{\frac{2A}{3\sqrt{3}}}
 }
-\]
+$$
 
-## Example
+## Worked example
 
-If:
+If $A = 54\sqrt{3}$:
 
-\[
-A = 54\sqrt{3}
-\]
+$$
+s^2 = \frac{2\left(54\sqrt{3}\right)}{3\sqrt{3}} = \frac{108\sqrt{3}}{3\sqrt{3}} = 36
+$$
 
-then:
+$$
+\boxed{s = 6}
+$$
 
-\[
-s^2 =
-\frac{2(54\sqrt3)}{3\sqrt3}
-= 36
-\]
+## Sanity check
 
-\[
-\boxed{s=6}
-\]
+Area scales as $s^2$, so doubling the side quadruples the area — consistent with the square root in the formula.
 
 ## What to say aloud
 
-> A regular hexagon is six equilateral triangles. I use the equilateral-triangle area formula, multiply by six, then solve for the side length.
+> A regular hexagon is six equilateral triangles. I use the equilateral-triangle area formula, multiply by six, then invert to solve for the side length.
 
 ---
+
 
 # 2. Why is summer hotter than winter?
 
-The main reason is **Earth's axial tilt**, not Earth's distance from the Sun.
+## Answer
 
-Earth's axis is tilted by approximately:
+**Earth's axial tilt (~23.5°), not distance from the Sun.**
 
-\[
-23.5^\circ
-\]
+The tilt changes the **angle of incidence** of sunlight, which changes energy delivered per unit ground area, and it changes **day length**, which changes total daily energy.
 
-During summer in a hemisphere:
+## The incidence-angle math
 
-- sunlight strikes the ground more directly;
-- the same solar energy is concentrated over a smaller surface area;
-- days are longer;
-- sunlight travels through slightly less atmosphere.
+Let $\theta$ be the angle between incoming sunlight and the surface normal.
 
-During winter:
+A beam of cross-sectional area $A_\text{beam}$ spreads over ground area:
 
-- sunlight arrives at a shallower angle;
-- the same energy is spread over a larger area;
-- days are shorter.
+$$
+A_\text{ground} = \frac{A_\text{beam}}{\cos\theta}
+$$
 
-## Incidence-angle intuition
+So intensity per unit ground area is:
 
-Suppose sunlight arrives at angle \(\theta\) relative to the surface normal.
+$$
+\boxed{I = I_0 \cos\theta}
+$$
 
-The received power per unit horizontal area is approximately proportional to:
+| Sun angle from vertical $\theta$ | $\cos\theta$ | Relative heating |
+| --- | --- | --- |
+| $0^\circ$ (overhead) | 1.00 | 100% |
+| $30^\circ$ | 0.87 | 87% |
+| $60^\circ$ | 0.50 | 50% |
+| $75^\circ$ | 0.26 | 26% |
 
-\[
-\boxed{I \propto \cos \theta}
-\]
+At 60° off vertical, the same sunlight is smeared over **twice** the ground area — half the heating.
 
-At normal incidence:
+## The two compounding effects
 
-\[
-\theta=0^\circ
-\Rightarrow
-\cos\theta = 1
-\]
+| Effect | Summer | Winter |
+| --- | --- | --- |
+| Incidence angle | Near-vertical → high $\cos\theta$ | Shallow → low $\cos\theta$ |
+| Day length | Longer (more hours of input) | Shorter |
+| Atmospheric path | Shorter (less scattering/absorption) | Longer |
 
-At:
+Total daily energy $\approx$ intensity $\times$ duration, so both factors push the same direction — the effect is multiplicative, not additive.
 
-\[
-\theta=60^\circ
-\]
+## The trap to avoid
 
-the same incoming energy is spread over roughly twice the area:
-
-\[
-\cos60^\circ = 0.5
-\]
-
-## Important interview point
-
-Earth is actually near **perihelion in early January**, so distance from the Sun does not explain Northern Hemisphere summer.
+Earth is at **perihelion (closest to the Sun) in early January** — during Northern Hemisphere winter. Distance varies only ~3%, and it works *against* the naive "closer = hotter" explanation. If distance were the driver, both hemispheres would have summer at the same time; they don't.
 
 ## What to say aloud
 
-> Earth's tilt changes both the incidence angle and daylight duration. More direct sunlight means greater energy per square meter, and longer summer days increase the total daily energy received.
+> It's the axial tilt, not distance. Tilt changes the incidence angle, and intensity scales with the cosine of that angle — at 60° off vertical you get half the energy per square meter. Longer summer days compound it. The giveaway that distance isn't the cause is that the hemispheres have opposite seasons, and Earth is actually closest to the Sun in January.
 
 ---
+
 
 # 3. Two spheres, same material and density
 
@@ -142,55 +130,55 @@ The larger sphere has a diameter **50% larger** than the smaller sphere.
 
 Therefore its linear scale factor is:
 
-\[
+$$
 k = 1.5
-\]
+$$
 
 For the same density:
 
-\[
+$$
 m \propto V
-\]
+$$
 
 Sphere volume scales as the cube of diameter:
 
-\[
+$$
 V \propto d^3
-\]
+$$
 
 Therefore:
 
-\[
+$$
 \frac{m_L}{m_S}
 =
 (1.5)^3
 =
 3.375
-\]
+$$
 
 Given:
 
-\[
+$$
 m_S = 8 \text{ lb}
-\]
+$$
 
 then:
 
-\[
+$$
 m_L
 =
 8(3.375)
 =
 27
-\]
+$$
 
-\[
+$$
 \boxed{27\text{ lb}}
-\]
+$$
 
 ## What to say aloud
 
-> Mass scales with volume, and volume scales with the cube of diameter. A 1.5× diameter therefore gives \(1.5^3=3.375\) times the mass.
+> Mass scales with volume, and volume scales with the cube of diameter. A 1.5× diameter therefore gives $1.5^3=3.375$ times the mass.
 
 ---
 
@@ -216,51 +204,51 @@ Assume:
 
 Bytes per frame:
 
-\[
+$$
 1920 \times 1080 \times 3
 =
 6{,}220{,}800
-\]
+$$
 
 Bytes per second:
 
-\[
+$$
 6{,}220{,}800 \times 30
 =
 186{,}624{,}000
-\]
+$$
 
 Approximately:
 
-\[
+$$
 186.6 \text{ MB/s}
-\]
+$$
 
 Using decimal:
 
-\[
+$$
 1\text{ TB}=10^{12}\text{ bytes}
-\]
+$$
 
 Seconds:
 
-\[
+$$
 \frac{10^{12}}{186{,}624{,}000}
 \approx
 5358\text{ sec}
-\]
+$$
 
 Minutes:
 
-\[
+$$
 \boxed{\approx 89.3\text{ minutes}}
-\]
+$$
 
 So **raw 1080p30 RGB** gives roughly:
 
-\[
+$$
 \boxed{90\text{ minutes}}
-\]
+$$
 
 ---
 
@@ -268,44 +256,44 @@ So **raw 1080p30 RGB** gives roughly:
 
 General formula:
 
-\[
+$$
 \text{duration seconds}
 =
 \frac{\text{storage bits}}{\text{bitrate}}
-\]
+$$
 
 For a 1 TB decimal drive:
 
-\[
+$$
 1\text{ TB}
 =
 8\times10^{12}\text{ bits}
-\]
+$$
 
 ### At 5 Mbps
 
-\[
+$$
 \frac{8\times10^{12}}
 {5\times10^6}
 =
 1.6\times10^6\text{ sec}
-\]
+$$
 
-\[
+$$
 \approx 26{,}667\text{ min}
-\]
+$$
 
 ### At 10 Mbps
 
-\[
+$$
 \boxed{\approx 13{,}333\text{ min}}
-\]
+$$
 
 ### At 20 Mbps
 
-\[
+$$
 \boxed{\approx 6{,}667\text{ min}}
-\]
+$$
 
 ## Interview lesson
 
@@ -313,9 +301,9 @@ The strongest response is not to immediately calculate.
 
 First identify that:
 
-\[
+$$
 \boxed{\text{storage depends on bitrate / encoding}}
-\]
+$$
 
 ---
 
@@ -323,9 +311,9 @@ First identify that:
 
 Assume:
 
-\[
+$$
 \rho*{\text{stone}} > \rho*{\text{water}}
-\]
+$$
 
 so the stone sinks.
 
@@ -333,9 +321,9 @@ Question:
 
 Does the swimming-pool water level rise or fall?
 
-\[
+$$
 \boxed{\text{It falls}}
-\]
+$$
 
 ---
 
@@ -343,13 +331,13 @@ Does the swimming-pool water level rise or fall?
 
 While the stone is inside the floating boat, the boat must displace water equal to the **stone's weight**.
 
-If stone mass is \(m\), displaced water volume attributable to the stone is:
+If stone mass is $m$, displaced water volume attributable to the stone is:
 
-\[
+$$
 V\_{\text{before}}
 =
 \frac{m}{\rho_w}
-\]
+$$
 
 ---
 
@@ -357,38 +345,38 @@ V\_{\text{before}}
 
 The stone displaces only its own physical volume:
 
-\[
+$$
 V\_{\text{after}}
 =
 \frac{m}{\rho_s}
-\]
+$$
 
 Because:
 
-\[
+$$
 \rho_s > \rho_w
-\]
+$$
 
 we have:
 
-\[
+$$
 \frac{m}{\rho_s}
 
 <
 \frac{m}{\rho_w}
-\]
+$$
 
 Therefore:
 
-\[
+$$
 V*{\text{after}} < V*{\text{before}}
-\]
+$$
 
 and the water level:
 
-\[
+$$
 \boxed{\text{falls}}
-\]
+$$
 
 ## What to say aloud
 
@@ -404,41 +392,41 @@ Usually assume annual compounding.
 
 At 100% interest:
 
-\[
+$$
 r = 1
-\]
+$$
 
 Compound interest:
 
-\[
+$$
 A=P(1+r)^n
-\]
+$$
 
-\[
+$$
 A=1000(2)^{20}
-\]
+$$
 
 Since:
 
-\[
+$$
 2^{20}=1{,}048{,}576
-\]
+$$
 
-\[
+$$
 A
 =
 1000(1{,}048{,}576)
-\]
+$$
 
-\[
+$$
 \boxed{\$1{,}048{,}576{,}000}
-\]
+$$
 
 Approximately:
 
-\[
+$$
 \boxed{\$1.05\text{ billion}}
-\]
+$$
 
 ## Why this question matters
 
@@ -452,9 +440,9 @@ At 100% compounded annually, the money **doubles every year**.
 
 Assume:
 
-\[
+$$
 P(D_6)=P(D_8)=\frac12
-\]
+$$
 
 ---
 
@@ -462,48 +450,48 @@ P(D_6)=P(D_8)=\frac12
 
 For the six-sided die:
 
-\[
+$$
 P(3|D_6)=\frac16
-\]
+$$
 
 For the eight-sided die:
 
-\[
+$$
 P(3|D_8)=\frac18
-\]
+$$
 
 Total probability:
 
-\[
+$$
 P(3)
 =
 P(D_6)P(3|D_6)
 
 - P(D_8)P(3|D_8)
-  \]
+  $$
 
-# \[
+# $$
 
 \frac12\frac16
 
 - \frac12\frac18
-  \]
+  $$
 
-# \[
+# $$
 
 \frac1{12}+\frac1{16}
-\]
+$$
 
 LCM = 48:
 
-# \[
+# $$
 
 \frac4{48}+\frac3{48}
-\]
+$$
 
-\[
+$$
 \boxed{\frac7{48}}
-\]
+$$
 
 ---
 
@@ -511,41 +499,41 @@ LCM = 48:
 
 Use Bayes' theorem:
 
-\[
+$$
 P(D_6|3)
 =
 \frac{P(3|D_6)P(D_6)}
 {P(3)}
-\]
+$$
 
-# \[
+# $$
 
 \frac{
 \frac16\cdot\frac12
 }{
 \frac7{48}
 }
-\]
+$$
 
-# \[
+# $$
 
 \frac{1/12}{7/48}
-\]
+$$
 
-# \[
+# $$
 
 \frac{4}{7}
-\]
+$$
 
-\[
+$$
 \boxed{\frac47}
-\]
+$$
 
 Likewise:
 
-\[
+$$
 P(D_8|3)=\frac37
-\]
+$$
 
 ---
 
@@ -553,64 +541,64 @@ P(D_8|3)=\frac37
 
 Expected value of d6:
 
-\[
+$$
 E[D_6]
 =
 \frac{1+2+3+4+5+6}{6}
 =
 3.5
-\]
+$$
 
 Expected value of d8:
 
-\[
+$$
 E[D_8]
 =
 \frac{1+2+\cdots+8}{8}
 =
 4.5
-\]
+$$
 
 After observing the first roll was 3, posterior probabilities are:
 
-\[
+$$
 P(D_6|3)=\frac47
-\]
+$$
 
-\[
+$$
 P(D_8|3)=\frac37
-\]
+$$
 
 Therefore:
 
-\[
+$$
 E[X]
 =
 \frac47(3.5)
 
 - \frac37(4.5)
-  \]
+  $$
 
-# \[
+# $$
 
 2+\frac{13.5}{7}
-\]
+$$
 
 or directly:
 
-# \[
+# $$
 
 \frac{14}{7}
 
 - # \frac{13.5}{7}
   \frac{27.5}{7}
-  \]
+  $$
 
-\[
+$$
 \boxed{
 E[X] = \frac{55}{14}\approx3.93
 }
-\]
+$$
 
 ---
 
@@ -618,40 +606,40 @@ E[X] = \frac{55}{14}\approx3.93
 
 For a simple interview model, if weekdays are approximately uniformly distributed:
 
-\[
+$$
 \boxed{\frac17}
-\]
+$$
 
 But over the real Gregorian calendar, weekday frequencies are **not perfectly uniform**.
 
 The Gregorian calendar repeats every:
 
-\[
+$$
 400 \text{ years}
-\]
+$$
 
 Number of months:
 
-\[
+$$
 400\times12=4800
-\]
+$$
 
 The exact probability that the 13th falls on Friday is:
 
-\[
+$$
 \boxed{
 \frac{688}{4800}
 =
 \frac{43}{300}
 \approx 14.333\%
 }
-\]
+$$
 
 Compare:
 
-\[
+$$
 \frac17\approx14.286\%
-\]
+$$
 
 So Friday is slightly more common than perfect uniformity would imply.
 
@@ -669,7 +657,7 @@ The useful ideas are:
 
 If no calendar model is specified:
 
-> Assuming the weekday of the 13th is uniform, \(1/7\). If you mean the exact Gregorian-calendar frequency, it is \(688/4800 = 43/300\).
+> Assuming the weekday of the 13th is uniform, $1/7$. If you mean the exact Gregorian-calendar frequency, it is $688/4800 = 43/300$.
 
 ---
 
@@ -677,29 +665,29 @@ If no calendar model is specified:
 
 Assume a:
 
-\[
+$$
 4\times4\times4
-\]
+$$
 
 3D tic-tac-toe cube and a win requires 4 cells in a straight line.
 
 Answer:
 
-\[
+$$
 \boxed{76}
-\]
+$$
 
 However, if the intended board is:
 
-\[
+$$
 3\times3\times3
-\]
+$$
 
 then the number of winning lines is:
 
-\[
+$$
 \boxed{49}
-\]
+$$
 
 Since your supplied answer is **49**, the intended problem is a **3×3×3** board.
 
@@ -717,17 +705,17 @@ Three directions:
 
 For each direction there are:
 
-\[
+$$
 3\times3=9
-\]
+$$
 
 lines.
 
 Thus:
 
-\[
+$$
 3\times9=27
-\]
+$$
 
 ---
 
@@ -735,25 +723,25 @@ Thus:
 
 There are:
 
-\[
+$$
 6
-\]
+$$
 
 faces.
 
 Each face has:
 
-\[
+$$
 2
-\]
+$$
 
 diagonals.
 
 Thus:
 
-\[
+$$
 6\times2=12
-\]
+$$
 
 ---
 
@@ -763,9 +751,9 @@ There are three families of planes parallel to the coordinate planes.
 
 The middle plane in each orientation contributes 2 new diagonals not lying on the outside faces:
 
-\[
+$$
 3\times2=6
-\]
+$$
 
 ---
 
@@ -773,9 +761,9 @@ The middle plane in each orientation contributes 2 new diagonals not lying on th
 
 A cube has:
 
-\[
+$$
 4
-\]
+$$
 
 main body diagonals.
 
@@ -783,11 +771,11 @@ main body diagonals.
 
 Total:
 
-\[
+$$
 27+12+6+4
 =
 \boxed{49}
-\]
+$$
 
 ---
 
@@ -795,19 +783,19 @@ Total:
 
 Plane:
 
-\[
+$$
 Ax+By+Cz+D=0
-\]
+$$
 
 Point:
 
-\[
+$$
 P=(x_0,y_0,z_0)
-\]
+$$
 
 Distance:
 
-\[
+$$
 \boxed{
 d=
 \frac{
@@ -816,7 +804,7 @@ d=
 \sqrt{A^2+B^2+C^2}
 }
 }
-\]
+$$
 
 ---
 
@@ -824,30 +812,30 @@ d=
 
 The plane normal vector is:
 
-\[
+$$
 \vec n=(A,B,C)
-\]
+$$
 
-Choose any point \(Q\) on the plane.
+Choose any point $Q$ on the plane.
 
 The perpendicular distance is the magnitude of the projection of:
 
-\[
+$$
 P-Q
-\]
+$$
 
 onto the unit normal.
 
 Thus:
 
-\[
+$$
 d
 =
 \left|
 (P-Q)\cdot
 \frac{\vec n}{\|\vec n\|}
 \right|
-\]
+$$
 
 which simplifies to the formula above.
 
@@ -857,21 +845,21 @@ which simplifies to the formula above.
 
 Known rough value:
 
-\[
+$$
 \boxed{384{,}400\text{ km}}
-\]
+$$
 
 or:
 
-\[
+$$
 \boxed{239{,}000\text{ miles}}
-\]
+$$
 
 A good interview estimate:
 
-\[
+$$
 \boxed{4\times10^5\text{ km}}
-\]
+$$
 
 ---
 
@@ -879,25 +867,25 @@ A good interview estimate:
 
 Earth radius:
 
-\[
+$$
 R_E \approx 6400\text{ km}
-\]
+$$
 
 The Moon is roughly:
 
-\[
+$$
 60
-\]
+$$
 
 Earth radii away.
 
 Therefore:
 
-\[
+$$
 60\times6400
 =
 384{,}000\text{ km}
-\]
+$$
 
 which matches the known value closely.
 
@@ -905,27 +893,27 @@ which matches the known value closely.
 
 Speed of light:
 
-\[
+$$
 3\times10^5\text{ km/s}
-\]
+$$
 
 Moon distance:
 
-\[
+$$
 3.84\times10^5\text{ km}
-\]
+$$
 
 Therefore light travel time:
 
-\[
+$$
 \approx1.28\text{ s}
-\]
+$$
 
 ---
 
 # 12. Expected number of times `max` is updated
 
-Suppose we scan a random permutation of \(n\) distinct values.
+Suppose we scan a random permutation of $n$ distinct values.
 
 Pseudo-code:
 
@@ -947,98 +935,98 @@ How many times do we expect `max` to change?
 
 ## Key observation
 
-At position \(i\), the element is a new maximum exactly when it is the largest among the first \(i\) elements.
+At position $i$, the element is a new maximum exactly when it is the largest among the first $i$ elements.
 
-Every one of those \(i\) positions is equally likely to contain the largest value.
+Every one of those $i$ positions is equally likely to contain the largest value.
 
 Therefore:
 
-\[
+$$
 P(\text{update at }i)=\frac1i
-\]
+$$
 
 Define indicator:
 
-\[
+$$
 X_i=
 \begin{cases}
 1 & \text{if position }i\text{ sets a new max}\\
 0 & \text{otherwise}
 \end{cases}
-\]
+$$
 
 Then:
 
-\[
+$$
 X=\sum\_{i=1}^nX_i
-\]
+$$
 
 By linearity of expectation:
 
-\[
+$$
 E[X]
 =
 \sum\_{i=1}^nE[X_i]
-\]
+$$
 
-# \[
+# $$
 
 \sum\_{i=1}^n\frac1i
-\]
+$$
 
 Thus:
 
-\[
+$$
 \boxed{
 E[X]=H_n
 }
-\]
+$$
 
-where \(H_n\) is the \(n\)-th harmonic number.
+where $H_n$ is the $n$-th harmonic number.
 
 Approximation:
 
-\[
+$$
 H_n
 \approx
 \ln n+\gamma
-\]
+$$
 
 where:
 
-\[
+$$
 \gamma\approx0.57721
-\]
+$$
 
 Therefore:
 
-\[
+$$
 \boxed{
 E[X]\approx\ln n+\gamma
 }
-\]
+$$
 
 ## Example
 
 For:
 
-\[
+$$
 n=1{,}000{,}000
-\]
+$$
 
-\[
+$$
 E[X]
 \approx
 \ln(10^6)+0.577
-\]
+$$
 
-\[
+$$
 \approx13.815+0.577
-\]
+$$
 
-\[
+$$
 \boxed{\approx14.4}
-\]
+$$
 
 Interesting result:
 
@@ -1050,15 +1038,15 @@ Even with one million values, the maximum changes only about 14 times on average
 
 Infinite plane with parallel vertical lines spaced:
 
-\[
+$$
 D=1
-\]
+$$
 
 A stick of length:
 
-\[
+$$
 L=1
-\]
+$$
 
 is dropped randomly.
 
@@ -1066,39 +1054,39 @@ What is the probability it crosses a line?
 
 For:
 
-\[
+$$
 L\le D
-\]
+$$
 
 Buffon's needle formula is:
 
-\[
+$$
 \boxed{
 P=\frac{2L}{\pi D}
 }
-\]
+$$
 
 Thus for:
 
-\[
+$$
 L=D=1
-\]
+$$
 
-\[
+$$
 \boxed{
 P=\frac{2}{\pi}
 }
-\]
+$$
 
 ### Important correction
 
-The supplied answer \(1/\pi\) is not the standard answer under the usual Buffon's Needle assumptions.
+The supplied answer $1/\pi$ is not the standard answer under the usual Buffon's Needle assumptions.
 
 The standard probability is:
 
-\[
+$$
 \boxed{\frac{2}{\pi}}
-\]
+$$
 
 ---
 
@@ -1106,32 +1094,32 @@ The standard probability is:
 
 Let:
 
-- \(\theta\) be the acute angle between the needle and the parallel lines.
-- \(x\) be the distance from the needle's center to the nearest line.
+- $\theta$ be the acute angle between the needle and the parallel lines.
+- $x$ be the distance from the needle's center to the nearest line.
 
 Because of symmetry:
 
-\[
+$$
 0\le\theta\le\frac{\pi}{2}
-\]
+$$
 
 and:
 
-\[
+$$
 0\le x\le\frac{D}{2}
-\]
+$$
 
 The needle crosses a line if its perpendicular half-length reaches the line:
 
-\[
+$$
 x
 \le
 \frac{L}{2}\sin\theta
-\]
+$$
 
-For fixed \(\theta\), the probability over uniformly distributed \(x\) is:
+For fixed $\theta$, the probability over uniformly distributed $x$ is:
 
-\[
+$$
 P(\text{cross}|\theta)
 =
 \frac{
@@ -1139,47 +1127,47 @@ P(\text{cross}|\theta)
 }{
 D/2
 }
-\]
+$$
 
-# \[
+# $$
 
 \frac{L}{D}\sin\theta
-\]
+$$
 
 Average over uniformly distributed angle:
 
-\[
+$$
 P
 =
 \frac{2}{\pi}
 \int_0^{\pi/2}
 \frac{L}{D}\sin\theta\,d\theta
-\]
+$$
 
-# \[
+# $$
 
 \frac{2L}{\pi D}
 [-\cos\theta]\_0^{\pi/2}
-\]
+$$
 
-# \[
+# $$
 
 \boxed{
 \frac{2L}{\pi D}
 }
-\]
+$$
 
 When:
 
-\[
+$$
 L=D=1
-\]
+$$
 
-\[
+$$
 \boxed{
 P=\frac2\pi
 }
-\]
+$$
 
 ---
 
@@ -1187,8 +1175,8 @@ P=\frac2\pi
 
 You have:
 
-- source / template set \(S\), small;
-- target set \(T\), large;
+- source / template set $S$, small;
+- target set $T$, large;
 - allowed transformation: **rotation + translation**;
 - no scaling.
 
@@ -1206,85 +1194,85 @@ This is a form of:
 
 ## Case A — Point correspondences are known
 
-Suppose source points \(p_i\) correspond to target points \(q_i\).
+Suppose source points $p_i$ correspond to target points $q_i$.
 
 We want:
 
-\[
+$$
 q_i \approx Rp_i+t
-\]
+$$
 
 where:
 
-- \(R\) is a 2D rotation matrix;
-- \(t\) is a translation.
+- $R$ is a 2D rotation matrix;
+- $t$ is a translation.
 
 ### Step 1 — Compute centroids
 
-\[
+$$
 \bar p
 =
 \frac1n\sum p_i
-\]
+$$
 
-\[
+$$
 \bar q
 =
 \frac1n\sum q_i
-\]
+$$
 
 ### Step 2 — Center the points
 
-\[
+$$
 p_i'=p_i-\bar p
-\]
+$$
 
-\[
+$$
 q_i'=q_i-\bar q
-\]
+$$
 
 ### Step 3 — Solve rotation
 
 Minimize:
 
-\[
+$$
 \sum_i
 \|q_i'-Rp_i'\|^2
-\]
+$$
 
 Use SVD / Kabsch algorithm.
 
 For matrix:
 
-\[
+$$
 H=\sum_i p_i' q_i'^T
-\]
+$$
 
 compute:
 
-\[
+$$
 H=U\Sigma V^T
-\]
+$$
 
 then:
 
-\[
+$$
 R=VU^T
-\]
+$$
 
 with determinant correction if necessary.
 
 ### Step 4 — Translation
 
-\[
+$$
 t=\bar q-R\bar p
-\]
+$$
 
 Complexity:
 
-\[
+$$
 \boxed{O(n)}
-\]
+$$
 
 aside from constant-size SVD.
 
@@ -1300,11 +1288,11 @@ Possible approaches:
 
 Because rotation and translation preserve distances:
 
-\[
+$$
 \|p_i-p_j\|
 =
 \|q_a-q_b\|
-\]
+$$
 
 Use pairwise distances as rigid invariants.
 
@@ -1324,11 +1312,11 @@ Use:
 
 Candidate verification:
 
-\[
+$$
 O(m\log N)
-\]
+$$
 
-for template size \(m\).
+for template size $m$.
 
 ---
 
@@ -1404,21 +1392,21 @@ Optional ICP refinement
 
 Given:
 
-\[
+$$
 P(R)=0.25
-\]
+$$
 
 So:
 
-\[
+$$
 P(\neg R)=0.75
-\]
+$$
 
 Each friend tells the truth with probability:
 
-\[
+$$
 \frac23
-\]
+$$
 
 Assume:
 
@@ -1436,19 +1424,19 @@ All three say:
 
 Each friend says rain with probability:
 
-\[
+$$
 \frac23
-\]
+$$
 
 Thus:
 
-\[
+$$
 P(YYY|R)
 =
 \left(\frac23\right)^3
 =
 \frac8{27}
-\]
+$$
 
 ---
 
@@ -1456,25 +1444,25 @@ P(YYY|R)
 
 A friend says rain only by lying:
 
-\[
+$$
 P(Y|\neg R)=\frac13
-\]
+$$
 
 Thus:
 
-\[
+$$
 P(YYY|\neg R)
 =
 \left(\frac13\right)^3
 =
 \frac1{27}
-\]
+$$
 
 ---
 
 ## Bayes' theorem
 
-\[
+$$
 P(R|YYY)
 =
 \frac{
@@ -1484,11 +1472,11 @@ P(YYY|R)P(R)
 
 - P(YYY|\neg R)P(\neg R)
   }
-  \]
+  $$
 
 Substitute:
 
-# \[
+# $$
 
 \frac{
 \frac8{27}\cdot\frac14
@@ -1497,24 +1485,24 @@ Substitute:
 
 - \frac1{27}\cdot\frac34
   }
-  \]
+  $$
 
-Multiply numerator and denominator by \(108\):
+Multiply numerator and denominator by $108$:
 
-# \[
+# $$
 
 \frac8{8+3}
-\]
+$$
 
-\[
+$$
 \boxed{\frac8{11}}
-\]
+$$
 
 Approximately:
 
-\[
+$$
 \boxed{72.7\%}
-\]
+$$
 
 ---
 
@@ -1524,9 +1512,9 @@ This problem needs clarification.
 
 If circles may overlap arbitrarily and the plane is **fully covered**, then the union can cover:
 
-\[
+$$
 \boxed{100\%}
-\]
+$$
 
 of the plane.
 
@@ -1544,50 +1532,50 @@ Place circle centers at the vertices of equilateral triangles.
 
 Let each circle have radius:
 
-\[
+$$
 r
-\]
+$$
 
 Adjacent centers are:
 
-\[
+$$
 2r
-\]
+$$
 
 apart.
 
-An equilateral triangle of side \(2r\) has area:
+An equilateral triangle of side $2r$ has area:
 
-\[
+$$
 A\_\triangle
 =
 \frac{\sqrt3}{4}(2r)^2
-\]
+$$
 
-# \[
+# $$
 
 \sqrt3r^2
-\]
+$$
 
 Each triangle contains three 60° sectors, one from each circle.
 
 Total circle area inside the triangle:
 
-\[
+$$
 3
 \left(
 \frac{60^\circ}{360^\circ}\pi r^2
 \right)
-\]
+$$
 
-# \[
+# $$
 
 \frac12\pi r^2
-\]
+$$
 
 Density:
 
-\[
+$$
 \eta
 =
 \frac{
@@ -1595,29 +1583,29 @@ Density:
 }{
 \sqrt3r^2
 }
-\]
+$$
 
-# \[
+# $$
 
 \boxed{
 \frac{\pi}{2\sqrt3}
 }
-\]
+$$
 
 Equivalent:
 
-\[
+$$
 \boxed{
 \frac{\pi}{\sqrt{12}}
 \approx0.9069
 }
-\]
+$$
 
 So approximately:
 
-\[
+$$
 \boxed{90.69\%}
-\]
+$$
 
 of the plane can be occupied by non-overlapping equal circles in the densest packing.
 
@@ -1627,9 +1615,9 @@ of the plane can be occupied by non-overlapping equal circles in the densest pac
 
 Assume a lattice of:
 
-\[
+$$
 4\times4=16
-\]
+$$
 
 points.
 
@@ -1644,35 +1632,35 @@ We count both:
 
 For a grid with 4 points on each side, square side lengths can be:
 
-\[
+$$
 1,2,3
-\]
+$$
 
 ### Side length 1
 
-\[
+$$
 3^2=9
-\]
+$$
 
 ### Side length 2
 
-\[
+$$
 2^2=4
-\]
+$$
 
 ### Side length 3
 
-\[
+$$
 1^2=1
-\]
+$$
 
 Total axis-aligned:
 
-\[
+$$
 9+4+1
 =
 14
-\]
+$$
 
 ---
 
@@ -1680,15 +1668,15 @@ Total axis-aligned:
 
 A convenient way to count is by possible edge vectors:
 
-\[
+$$
 (a,b)
-\]
+$$
 
 A perpendicular edge is:
 
-\[
+$$
 (-b,a)
-\]
+$$
 
 For a 4×4 point lattice, valid rotated configurations produce:
 
@@ -1697,19 +1685,19 @@ For a 4×4 point lattice, valid rotated configurations produce:
 
 Thus:
 
-\[
+$$
 8
-\]
+$$
 
 rotated squares.
 
 Total:
 
-\[
+$$
 14+8
 =
 \boxed{22}
-\]
+$$
 
 ---
 
@@ -1717,44 +1705,44 @@ Total:
 
 Total ways to choose 4 points:
 
-\[
+$$
 \binom{16}{4}
-\]
+$$
 
-# \[
+# $$
 
 1820
-\]
+$$
 
 There are:
 
-\[
+$$
 22
-\]
+$$
 
 sets of four points forming squares.
 
 Therefore:
 
-\[
+$$
 P
 =
 \frac{22}{1820}
-\]
+$$
 
 Simplify:
 
-\[
+$$
 \boxed{
 \frac{11}{910}
 }
-\]
+$$
 
 Approximately:
 
-\[
+$$
 \boxed{1.21\%}
-\]
+$$
 
 ---
 
@@ -1770,9 +1758,9 @@ For visual pattern questions, use this framework.
 
 Count edges in each figure:
 
-\[
+$$
 E_1,E_2,E_3,E_4,\dots
-\]
+$$
 
 ---
 
@@ -1780,15 +1768,15 @@ E_1,E_2,E_3,E_4,\dots
 
 Compute:
 
-\[
+$$
 \Delta E*n=E*{n+1}-E_n
-\]
+$$
 
 If constant:
 
-\[
+$$
 E_n=an+b
-\]
+$$
 
 ---
 
@@ -1796,15 +1784,15 @@ E_n=an+b
 
 If first differences are not constant, compute:
 
-\[
+$$
 \Delta^2E_n
-\]
+$$
 
 Constant second differences suggest a quadratic:
 
-\[
+$$
 E_n=an^2+bn+c
-\]
+$$
 
 ---
 
@@ -1812,7 +1800,7 @@ E_n=an^2+bn+c
 
 Instead of relying only on numerical pattern matching, count geometrically:
 
-\[
+$$
 \boxed{
 \text{new edges}
 =
@@ -1820,49 +1808,49 @@ Instead of relying only on numerical pattern matching, count geometrically:
 
 - \text{shared edges}
   }
-  \]
+  $$
 
 For shapes made of repeated polygons:
 
-\[
+$$
 E*n
 =
 nE*{\text{shape}}
 
 - E\_{\text{shared}}
-  \]
+  $$
 
-Example: \(n\) squares in a row.
+Example: $n$ squares in a row.
 
 One square has:
 
-\[
+$$
 4
-\]
+$$
 
 edges.
 
 Each additional square shares one edge, so it contributes only:
 
-\[
+$$
 3
-\]
+$$
 
 new edges.
 
 Therefore:
 
-\[
+$$
 E_n
 =
 4+3(n-1)
-\]
+$$
 
-\[
+$$
 \boxed{
 E_n=3n+1
 }
-\]
+$$
 
 ---
 
@@ -1870,26 +1858,26 @@ E_n=3n+1
 
 | Problem                          | Key answer                                 |
 | -------------------------------- | ------------------------------------------ | ---------------- | ----------------------- |
-| Regular hexagon from area        | \(s=\sqrt{\frac{2A}{3\sqrt3}}\)            |
+| Regular hexagon from area        | $s=\sqrt{\frac{2A}{3\sqrt3}}$            |
 | Summer vs winter                 | Axial tilt → incidence angle + longer days |
-| Sphere 50% larger diameter       | \(8(1.5)^3=27\) lb                         |
+| Sphere 50% larger diameter       | $8(1.5)^3=27$ lb                         |
 | 1 TB video                       | Need bitrate; raw RGB 1080p30 ≈ 89 min     |
 | Stone from boat                  | Water level falls                          |
 | $1000, 100%, 20 yrs              | \$1,048,576,000                            |
-| d6/d8: roll a 3                  | \(7/48\)                                   |
-| \(P(d6\mid3)\)                   | \(4/7\)                                    |
-| Next-roll expected value         | \(55/14\approx3.93\)                       |
-| Friday the 13th                  | Approx \(1/7\); exact Gregorian \(43/300\) |
+| d6/d8: roll a 3                  | $7/48$                                   |
+| $P(d6\mid3)$                   | $4/7$                                    |
+| Next-roll expected value         | $55/14\approx3.93$                       |
+| Friday the 13th                  | Approx $1/7$; exact Gregorian $43/300$ |
 | 3×3×3 tic-tac-toe                | 49 winning lines                           |
-| Point-plane distance             | \(\frac{                                   | Ax_0+By_0+Cz_0+D | }{\sqrt{A^2+B^2+C^2}}\) |
+| Point-plane distance             | $\frac{                                   | Ax_0+By_0+Cz_0+D | }{\sqrt{A^2+B^2+C^2}}$ |
 | Earth–Moon                       | ≈ 384,400 km                               |
-| Expected max updates             | \(H_n\approx\ln n+\gamma\)                 |
-| Buffon's needle \(L=D\)          | \(2/\pi\), not \(1/\pi\)                   |
+| Expected max updates             | $H_n\approx\ln n+\gamma$                 |
+| Buffon's needle $L=D$          | $2/\pi$, not $1/\pi$                   |
 | Rigid point-set match            | invariants + RANSAC/KD-tree + ICP          |
-| Seattle rain                     | \(8/11\)                                   |
-| Hex circle packing               | \(\pi/(2\sqrt3)\approx90.69\%\)            |
+| Seattle rain                     | $8/11$                                   |
+| Hex circle packing               | $\pi/(2\sqrt3)\approx90.69\%$            |
 | 4×4 lattice squares              | 22                                         |
-| Probability 4 points form square | \(11/910\approx1.21\%\)                    |
+| Probability 4 points form square | $11/910\approx1.21\%$                    |
 
 ---
 
@@ -1929,24 +1917,24 @@ For tic-tac-toe:
 
 ## Geometry
 
-\[
+$$
 A\_{\text{hex}}
 =
 \frac{3\sqrt3}{2}s^2
-\]
+$$
 
-\[
+$$
 V\_{\text{sphere}}
 =
 \frac43\pi r^3
-\]
+$$
 
-\[
+$$
 d\_{\text{point-plane}}
 =
 \frac{|Ax_0+By_0+Cz_0+D|}
 {\sqrt{A^2+B^2+C^2}}
-\]
+$$
 
 ---
 
@@ -1954,30 +1942,30 @@ d\_{\text{point-plane}}
 
 Bayes:
 
-\[
+$$
 P(A|B)
 =
 \frac{P(B|A)P(A)}
 {P(B)}
-\]
+$$
 
 Expected value:
 
-\[
+$$
 E[X]
 =
 \sum_xxP(X=x)
-\]
+$$
 
 Linearity:
 
-\[
+$$
 E[X+Y]
 =
 E[X]+E[Y]
-\]
+$$
 
-even when \(X\) and \(Y\) are not independent.
+even when $X$ and $Y$ are not independent.
 
 ---
 
@@ -1985,49 +1973,49 @@ even when \(X\) and \(Y\) are not independent.
 
 Length scale:
 
-\[
+$$
 L\to kL
-\]
+$$
 
 Area:
 
-\[
+$$
 A\to k^2A
-\]
+$$
 
 Volume / mass at fixed density:
 
-\[
+$$
 V,m\to k^3
-\]
+$$
 
 ---
 
 ## Harmonic series
 
-\[
+$$
 H*n
 =
 \sum*{i=1}^n\frac1i
-\]
+$$
 
-\[
+$$
 H_n
 \approx
 \ln n+\gamma
-\]
+$$
 
 ---
 
 ## Circle packing
 
-\[
+$$
 \eta\_{\max}
 =
 \frac{\pi}{2\sqrt3}
 \approx
 0.9069
-\]
+$$
 
 ---
 
@@ -2035,15 +2023,15 @@ H_n
 
 For:
 
-\[
+$$
 L\le D
-\]
+$$
 
-\[
+$$
 P(\text{cross})
 =
 \frac{2L}{\pi D}
-\]
+$$
 
 ---
 
@@ -2053,9 +2041,9 @@ P(\text{cross})
 
 A sphere 50% larger in diameter is **not** 50% heavier.
 
-\[
+$$
 1.5^3=3.375
-\]
+$$
 
 ---
 
@@ -2065,9 +2053,9 @@ A sphere 50% larger in diameter is **not** 50% heavier.
 
 You need:
 
-\[
+$$
 \boxed{\text{bits per pixel or bitrate}}
-\]
+$$
 
 ---
 
@@ -2090,17 +2078,17 @@ After seeing a 3, d6 and d8 are no longer equally probable.
 
 ### Trap 5 — Assuming a supplied answer is automatically correct
 
-The standard Buffon's Needle answer for \(L=D\) is:
+The standard Buffon's Needle answer for $L=D$ is:
 
-\[
+$$
 \boxed{2/\pi}
-\]
+$$
 
 not:
 
-\[
+$$
 1/\pi
-\]
+$$
 
 ---
 
@@ -2108,56 +2096,56 @@ not:
 
 Useful approximations:
 
-\[
+$$
 \sqrt3\approx1.732
-\]
+$$
 
-\[
+$$
 \pi\approx3.14
-\]
+$$
 
-\[
+$$
 \frac{2}{\pi}\approx0.637
-\]
+$$
 
-\[
+$$
 \frac1\pi\approx0.318
-\]
+$$
 
-\[
+$$
 \ln10\approx2.303
-\]
+$$
 
-\[
+$$
 2^{10}=1024\approx10^3
-\]
+$$
 
 Therefore:
 
-\[
+$$
 2^{20}\approx10^6
-\]
+$$
 
 and exactly:
 
-\[
+$$
 2^{20}=1{,}048{,}576
-\]
+$$
 
 Earth radius:
 
-\[
+$$
 \approx6400\text{ km}
-\]
+$$
 
 Earth–Moon:
 
-\[
+$$
 \approx60R_E
-\]
+$$
 
 Speed of light:
 
-\[
+$$
 \approx3\times10^5\text{ km/s}
-\]
+$$

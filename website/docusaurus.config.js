@@ -7,6 +7,8 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import path from 'path';
 import {fileURLToPath} from 'url';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -74,6 +76,8 @@ const config = {
         docs: {
           sidebarPath: './sidebars.js',
           exclude: ['tutorial-basics/**', 'tutorial-extras/**'],
+          remarkPlugins: [remarkMath],
+          rehypePlugins: [rehypeKatex],
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
@@ -106,6 +110,16 @@ const config = {
         },
       }),
     ],
+  ],
+
+  stylesheets: [
+    {
+      href: 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css',
+      type: 'text/css',
+      integrity:
+        'sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV',
+      crossorigin: 'anonymous',
+    },
   ],
 
   themeConfig:
