@@ -8,10 +8,6 @@
       "hash": "d989178b9ef619ce004e557fd5081352cc2349195b10aea60b833fce514432b8",
       "docRelative": "100k_node.svg"
     },
-    "frontend-system-design/agentic_ai_tool_flow_interview.svg": {
-      "hash": "b2229181da739af4e05f0c09588ebc2bc0242797716746a8d7f284aa6ceef20b",
-      "docRelative": "agentic_ai_tool_flow_interview.svg"
-    },
     "frontend-system-design/autocomplete.png": {
       "hash": "797ef9fa174fbbe6b5070cddece591262249b09794dd60309cc06d89f198ab53",
       "docRelative": "autocomplete.png"
@@ -47,10 +43,6 @@
     "frontend-system-design/google-docs.png": {
       "hash": "5f7d52ded9e724121f726355a02a21194b7607ffead8fd7fa186ee1ee18a9254",
       "docRelative": "google-docs.png"
-    },
-    "frontend-system-design/mcp-system-design.png": {
-      "hash": "ae345171a2128edd42bbfad66bd637354aece082fdb9588349e1ea9390c929ae",
-      "docRelative": "mcp-system-design.png"
     },
     "frontend-system-design/newsfeed.png": {
       "hash": "7c32bed9378a970683aa76380ad349cac4434cec781db46acf6504823a8b8857",
@@ -95,10 +87,6 @@
     "frontend-system-design/100k_node.mdx": {
       "hash": "c5bd0aa53f0098a70da8bd38998aa9be31da72b005b3be8991b9e52d32b14b15",
       "docRelative": "100k_node.mdx"
-    },
-    "frontend-system-design/agentic-ai-tool-flow.mdx": {
-      "hash": "6994351acd49b5de683b45db0e36b1649eb43390c0036a423e631dcbc4a8fa74",
-      "docRelative": "agentic-ai-tool-flow.mdx"
     },
     "frontend-system-design/autocomplete.mdx": {
       "hash": "886fedf4755486b440d1d56cead08a807cb7bd0160905feb919b28095b3ef0e4",

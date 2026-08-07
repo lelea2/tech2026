@@ -8,6 +8,10 @@
       "hash": "162ddb6b7e20827a7469d444a9de2884ad18168a60bf00491d8f121583722a04",
       "docRelative": "agentic-system-design/agent-execution-ide.png"
     },
+    "system-designs/agentic-system-design/agentic_ai_tool_flow_interview.svg": {
+      "hash": "b2229181da739af4e05f0c09588ebc2bc0242797716746a8d7f284aa6ceef20b",
+      "docRelative": "agentic-system-design/agentic_ai_tool_flow_interview.svg"
+    },
     "system-designs/agentic-system-design/express-prompt-integration.png": {
       "hash": "3c09217ece6e2853065aaff79adfe8b5244669ea3b2c10b937c3a5a5c86e6c0e",
       "docRelative": "agentic-system-design/express-prompt-integration.png"
@@ -19,6 +23,10 @@
     "system-designs/agentic-system-design/marketing-ai-agent.png": {
       "hash": "0d2ba5cd301f2b9c3fabad44957866b006adcae6d4f71cded4b9752aff056155",
       "docRelative": "agentic-system-design/marketing-ai-agent.png"
+    },
+    "system-designs/agentic-system-design/mcp-system-design.png": {
+      "hash": "ae345171a2128edd42bbfad66bd637354aece082fdb9588349e1ea9390c929ae",
+      "docRelative": "agentic-system-design/mcp-system-design.png"
     },
     "system-designs/agentic-system-design/sandbox-cloud-ide-architecture.svg": {
       "hash": "d5408f61ecbc42342093ce1e8146a463301811b1e086baad983a1e48a306a08a",
@@ -257,12 +265,8 @@
       "docRelative": "yelp.png"
     },
     "system-designs/agentic-system-design/agentic-mcp-copilot-system-design.mdx": {
-      "hash": "d7ee53856ea27dbf9d4ec85d83c0e7c888893451ad88cab0359634226786d0ef",
+      "hash": "e2174c5c54c1484b72e90950d9f321fd7a2c99613f767dbb0bd9f7f8eb436f72",
       "docRelative": "agentic-system-design/agentic-mcp-copilot-system-design.mdx"
-    },
-    "system-designs/agentic-system-design/agentic-mcp-interview-qa.mdx": {
-      "hash": "c132c5f3ca58df9614de08aeeba4912f377688b9bf6256f9f85c905d0ccb98fa",
-      "docRelative": "agentic-system-design/agentic-mcp-interview-qa.mdx"
     },
     "system-designs/agentic-system-design/express-prompt-integration.mdx": {
       "hash": "348ded05848e5a1fd83dadc2727a4fb751549c73eef9a476f9ae564f36024150",
@@ -275,6 +279,10 @@
     "system-designs/agentic-system-design/marketing-ai-agent.mdx": {
       "hash": "1d61337e8fc2b424184dda0521a8acb7af210b6f759254af1643fe9de1680647",
       "docRelative": "agentic-system-design/marketing-ai-agent.mdx"
+    },
+    "system-designs/agentic-system-design/mcp-agentic-ai.mdx": {
+      "hash": "a9f68de193564d4bb35d54e2294a18a799e8f11c15cda882be259e3e7367f437",
+      "docRelative": "agentic-system-design/mcp-agentic-ai.mdx"
     },
     "system-designs/agentic-system-design/model_eval_training_llm_design.mdx": {
       "hash": "b138a64827a51cefb6c0329dfa9ba9edcc2ef4df174f123585fb128ce15fbe2e",
@@ -485,7 +493,7 @@
       "docRelative": "yelp.mdx"
     },
     "__nav__:agentic-system-design": {
-      "hash": "c829da6b1c3576d57fb1ddd1b99f7640e17a1d70ed4d4801dea2878f7132f83f",
+      "hash": "aea156fe997a04332b140c3271d03ee4997c41ca063f53375a106057f8a26f49",
       "docRelative": "agentic-system-design/_index.mdx"
     },
     "__nav__:key-technologies": {
