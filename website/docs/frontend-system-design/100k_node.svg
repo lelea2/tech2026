@@ -1,0 +1,195 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1400" viewBox="0 0 1800 1400">
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .panel { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 18; }
+      .title { font: 700 34px Arial, sans-serif; fill: #0f172a; }
+      .h2 { font: 700 22px Arial, sans-serif; fill: #0f172a; }
+      .h3 { font: 700 18px Arial, sans-serif; fill: #1e293b; }
+      .text { font: 16px Arial, sans-serif; fill: #334155; }
+      .small { font: 14px Arial, sans-serif; fill: #475569; }
+      .mono { font: 14px "Courier New", monospace; fill: #0f172a; }
+      .box { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.5; rx: 12; }
+      .accent { fill: #eef2ff; stroke: #6366f1; stroke-width: 1.5; rx: 12; }
+      .green { fill: #ecfdf5; stroke: #10b981; stroke-width: 1.5; rx: 12; }
+      .amber { fill: #fffbeb; stroke: #f59e0b; stroke-width: 1.5; rx: 12; }
+      .red { fill: #fef2f2; stroke: #ef4444; stroke-width: 1.5; rx: 12; }
+      .line { stroke: #64748b; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .thin { stroke: #94a3b8; stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
+      .divider { stroke: #e2e8f0; stroke-width: 1.5; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1800" height="1400"/>
+
+  <text class="title" x="60" y="60">Optimize Rendering Thousands of Nodes on a Map</text>
+  <text class="text" x="60" y="92">Interview cheat sheet: render architecture, trade-offs, JS placeholders, and technology choices</text>
+
+  <!-- LEFT: Architecture -->
+  <rect class="panel" x="40" y="125" width="560" height="1215" rx="18"/>
+  <text class="h2" x="70" y="165">1. Recommended Architecture</text>
+
+  <rect class="accent" x="115" y="205" width="410" height="70"/>
+  <text class="h3" x="250" y="235">WebSocket / SSE</text>
+  <text class="small" x="190" y="258">incremental realtime updates</text>
+
+  <path class="line" d="M320 275 L320 320"/>
+
+  <rect class="box" x="115" y="320" width="410" height="85"/>
+  <text class="h3" x="235" y="350">Normalized Store</text>
+  <text class="mono" x="210" y="376">Map&lt;nodeId, Node&gt;</text>
+
+  <path class="line" d="M320 405 L320 450"/>
+
+  <rect class="amber" x="115" y="450" width="410" height="92"/>
+  <text class="h3" x="225" y="482">Update Buffer</text>
+  <text class="small" x="165" y="507">batch with requestAnimationFrame()</text>
+  <text class="small" x="165" y="527">incoming rate ≠ visual render rate</text>
+
+  <path class="line" d="M320 542 L320 590"/>
+
+  <rect class="green" x="115" y="590" width="410" height="160"/>
+  <text class="h3" x="245" y="620">Web Worker</text>
+  <text class="small" x="155" y="650">• spatial index query</text>
+  <text class="small" x="155" y="674">• viewport filtering</text>
+  <text class="small" x="155" y="698">• clustering / LOD</text>
+  <text class="small" x="155" y="722">• geometry / projection</text>
+
+  <path class="line" d="M320 750 L320 800"/>
+
+  <rect class="box" x="115" y="800" width="410" height="82"/>
+  <text class="h3" x="245" y="830">Render Model</text>
+  <text class="small" x="170" y="855">only visible / useful objects</text>
+
+  <path class="thin" d="M240 882 L170 945"/>
+  <path class="thin" d="M400 882 L470 945"/>
+
+  <rect class="accent" x="70" y="945" width="220" height="130"/>
+  <text class="h3" x="125" y="978">Canvas / WebGL</text>
+  <text class="small" x="95" y="1008">thousands of nodes</text>
+  <text class="small" x="95" y="1032">routes / overlays</text>
+  <text class="small" x="95" y="1056">GPU-friendly scene</text>
+
+  <rect class="box" x="350" y="945" width="220" height="130"/>
+  <text class="h3" x="422" y="978">React</text>
+  <text class="small" x="375" y="1008">filters / controls</text>
+  <text class="small" x="375" y="1032">selected node panel</text>
+  <text class="small" x="375" y="1056">alerts / details</text>
+
+  <line class="divider" x1="70" y1="1110" x2="570" y2="1110"/>
+  <text class="h3" x="70" y="1145">Key rule</text>
+  <text class="text" x="70" y="1175">Keep React out of the hot scene-render loop.</text>
+  <text class="text" x="70" y="1202">Optimize the render architecture before memoizing.</text>
+
+  <rect class="red" x="70" y="1240" width="500" height="65"/>
+  <text class="small" x="92" y="1268">Avoid: 10K–100K React components / DOM markers</text>
+  <text class="small" x="92" y="1292">Memoization does not remove fundamental DOM cost.</text>
+
+  <!-- CENTER: Options -->
+  <rect class="panel" x="620" y="125" width="600" height="1215" rx="18"/>
+  <text class="h2" x="650" y="165">2. Rendering Optimization Options</text>
+
+  <!-- option rows -->
+  <rect class="box" x="650" y="195" width="540" height="105"/>
+  <text class="h3" x="675" y="225">A. Viewport Culling</text>
+  <text class="small" x="675" y="252">Render only objects intersecting current bounds.</text>
+  <text class="mono" x="675" y="279">visible = index.search(viewport)</text>
+
+  <rect class="box" x="650" y="315" width="540" height="115"/>
+  <text class="h3" x="675" y="345">B. Spatial Index</text>
+  <text class="small" x="675" y="372">R-tree / Quadtree / H3 / Geohash / S2</text>
+  <text class="small" x="675" y="396">Goal: scale with visible objects, not total fleet size.</text>
+
+  <rect class="box" x="650" y="445" width="540" height="120"/>
+  <text class="h3" x="675" y="475">C. Clustering + Level of Detail</text>
+  <text class="small" x="675" y="502">Low zoom → clusters; medium → simple markers;</text>
+  <text class="small" x="675" y="526">high zoom → full icon + label + status.</text>
+  <text class="mono" x="675" y="550">if (zoom &lt; 6) renderClusters()</text>
+
+  <rect class="box" x="650" y="580" width="540" height="125"/>
+  <text class="h3" x="675" y="610">D. Canvas</text>
+  <text class="small" x="675" y="637">Best for ~1K–50K simple objects.</text>
+  <text class="small" x="675" y="661">+ simple / one DOM node / fast batched draw</text>
+  <text class="small" x="675" y="685">− manual hit testing and accessibility</text>
+
+  <rect class="box" x="650" y="720" width="540" height="125"/>
+  <text class="h3" x="675" y="750">E. WebGL / deck.gl</text>
+  <text class="small" x="675" y="777">Best for 50K+ and animation-heavy scenes.</text>
+  <text class="small" x="675" y="801">+ GPU buffers / huge scale / few draw calls</text>
+  <text class="small" x="675" y="825">− complexity / GPU picking / accessibility layer</text>
+
+  <rect class="box" x="650" y="860" width="540" height="125"/>
+  <text class="h3" x="675" y="890">F. Web Worker / OffscreenCanvas</text>
+  <text class="small" x="675" y="917">Move CPU-heavy clustering, indexing, geometry off main thread.</text>
+  <text class="small" x="675" y="941">Optionally move Canvas rendering with OffscreenCanvas.</text>
+  <text class="small" x="675" y="965">Keep pointer/UI interactions responsive.</text>
+
+  <rect class="box" x="650" y="1000" width="540" height="125"/>
+  <text class="h3" x="675" y="1030">G. Batch Realtime Updates</text>
+  <text class="mono" x="675" y="1057">pending.set(id, update)</text>
+  <text class="mono" x="675" y="1080">requestAnimationFrame(flush)</text>
+  <text class="small" x="675" y="1105">Deduplicate by node ID before each visual frame.</text>
+
+  <rect class="box" x="650" y="1140" width="540" height="150"/>
+  <text class="h3" x="675" y="1170">H. Server-side Aggregation</text>
+  <text class="small" x="675" y="1197">Low zoom: return H3/grid aggregates instead of raw nodes.</text>
+  <text class="small" x="675" y="1221">High zoom: fetch only viewport entities.</text>
+  <text class="mono" x="675" y="1247">GET /vehicles?bbox=...&amp;zoom=8</text>
+  <text class="small" x="675" y="1273">Sometimes the best FE optimization is sending less data.</text>
+
+  <!-- RIGHT: decision tree + code -->
+  <rect class="panel" x="1240" y="125" width="520" height="1215" rx="18"/>
+  <text class="h2" x="1270" y="165">3. Decision Tree + JS Placeholders</text>
+
+  <rect class="accent" x="1280" y="195" width="440" height="82"/>
+  <text class="h3" x="1412" y="225">Node Count</text>
+  <text class="small" x="1320" y="252">&lt;500 DOM/SVG | 1K–20K Canvas | 20K+ WebGL</text>
+
+  <path class="line" d="M1500 277 L1500 320"/>
+  <rect class="box" x="1280" y="320" width="440" height="82"/>
+  <text class="h3" x="1380" y="350">Are all nodes visible?</text>
+  <text class="small" x="1380" y="377">No → viewport culling</text>
+
+  <path class="line" d="M1500 402 L1500 445"/>
+  <rect class="box" x="1280" y="445" width="440" height="82"/>
+  <text class="h3" x="1390" y="475">Zoomed out?</text>
+  <text class="small" x="1380" y="502">Yes → clustering + LOD</text>
+
+  <path class="line" d="M1500 527 L1500 570"/>
+  <rect class="box" x="1280" y="570" width="440" height="82"/>
+  <text class="h3" x="1360" y="600">High update frequency?</text>
+  <text class="small" x="1365" y="627">Yes → rAF batching</text>
+
+  <path class="line" d="M1500 652 L1500 695"/>
+  <rect class="box" x="1280" y="695" width="440" height="82"/>
+  <text class="h3" x="1375" y="725">Heavy computation?</text>
+  <text class="small" x="1365" y="752">Yes → Web Worker</text>
+
+  <path class="line" d="M1500 777 L1500 820"/>
+  <rect class="box" x="1280" y="820" width="440" height="82"/>
+  <text class="h3" x="1360" y="850">Huge source dataset?</text>
+  <text class="small" x="1340" y="877">Yes → server aggregation</text>
+
+  <line class="divider" x1="1270" y1="930" x2="1730" y2="930"/>
+  <text class="h3" x="1270" y="965">JS: batch updates</text>
+  <text class="mono" x="1270" y="994">pending.set(update.id, update);</text>
+  <text class="mono" x="1270" y="1018">if (!scheduled) {</text>
+  <text class="mono" x="1290" y="1042">scheduled = true;</text>
+  <text class="mono" x="1290" y="1066">requestAnimationFrame(() =&gt; {</text>
+  <text class="mono" x="1310" y="1090">applyPending();</text>
+  <text class="mono" x="1310" y="1114">render();</text>
+  <text class="mono" x="1310" y="1138">scheduled = false;</text>
+  <text class="mono" x="1290" y="1162">});</text>
+  <text class="mono" x="1270" y="1186">}</text>
+
+  <line class="divider" x1="1270" y1="1210" x2="1730" y2="1210"/>
+  <text class="h3" x="1270" y="1243">Zoox-style recommended stack</text>
+  <text class="small" x="1270" y="1272">React → controls / filters / selected vehicle</text>
+  <text class="small" x="1270" y="1296">WebGL/deck.gl → fleet + routes + overlays</text>
+  <text class="small" x="1270" y="1320">Worker + spatial index + rAF batching</text>
+
+  <text class="small" x="60" y="1375">Interview phrase: “I optimize the render architecture before I optimize individual React components.”</text>
+</svg>
