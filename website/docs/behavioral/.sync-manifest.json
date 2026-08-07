@@ -53,19 +53,23 @@
       "docRelative": "model_foundry_agent_qna_system_design.mdx"
     },
     "behavorial/model_foundry_interview_script.mdx": {
-      "hash": "743d7e6fd0e2fb93cd06ddae964a202127b5af0cc132264e695e32ed599ce331",
+      "hash": "498cfad8066710fa7705dbd67d449e7b199bd684d1b9d151e2d87201f6ddf3bd",
       "docRelative": "model_foundry_interview_script.mdx"
     },
     "behavorial/polymorphism_vs_inheritance.mdx": {
       "hash": "948ccc62fb65768433b96dfcc7a15bbc570b5166494af1b394665a42b69ce27d",
       "docRelative": "polymorphism_vs_inheritance.mdx"
     },
+    "behavorial/quant_math_physics_interview_prep.mdx": {
+      "hash": "bfa8b6500e8cd6c47f34c55dcbdf0218327fc35310d573712e0e0ea4bdd74424",
+      "docRelative": "quant_math_physics_interview_prep.mdx"
+    },
     "behavorial/staff_frontend_platform_interview_prep.mdx": {
-      "hash": "d747b4eb43974a912ee7c738412f77e06306e5044f5ada92e3be8c8e84c96c56",
+      "hash": "7ddd227890027126bead7fd3987f75cb383b9d9e80466c7d10ffd2189c11d9d7",
       "docRelative": "staff_frontend_platform_interview_prep.mdx"
     },
     "behavorial/staff_frontend_web_experience_interview.mdx": {
-      "hash": "9d79bcec24febb9e660c4c41802d58a16db390dbd9c39f2d9d7cdcd32b8507a8",
+      "hash": "f57af264f4d222028f922bd1d4522dd2285e16fdb07c4f907d819992b4b8f682",
       "docRelative": "staff_frontend_web_experience_interview.mdx"
     },
     "behavorial/stencil_shared_component_staff_interview.mdx": {

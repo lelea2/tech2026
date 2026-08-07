@@ -1,0 +1,276 @@
+class Calculator {
+  constructor() {
+    this.reset();
+  }
+
+  reset() {
+    this.display = "0";
+    this.result = null;
+    this.operator = null;
+    this.waitingForOperand = false;
+
+    return this.display;
+  }
+
+  inputDigit(digit) {
+    if (this.waitingForOperand) {
+      this.display = String(digit);
+      this.waitingForOperand = false;
+    } else {
+      this.display =
+          this.display === "0"
+            ? String(digit)
+            : this.display + digit;
+    }
+
+    return this.display;
+  }
+
+  inputDecimal() {
+    if (this.waitingForOperand) {
+      this.display = "0.";
+      this.waitingForOperand = false;
+    } else if (!this.display.includes(".")) {
+      this.display += ".";
+    }
+
+    return this.display;
+  }
+
+  inputOperator(nextOperator) {
+    const value = Number(this.display);
+
+    // First operator: remember the left operand.
+    if (this.result === null) {
+      this.result = value;
+    }
+
+    // Evaluate previous operation immediately.
+    // Example:
+    // 1 + 100 +  -> display becomes 101
+    else if (this.operator && !this.waitingForOperand) {
+      this.result = this.calculate(
+        this.result,
+        value,
+        this.operator
+      );
+
+      this.display = String(this.result);
+    }
+
+    // Consecutive operators replace the pending operator.
+    // 10 + * 2 => 10 * 2
+    this.operator = nextOperator;
+    this.waitingForOperand = true;
+
+    return this.display;
+  }
+
+  equals() {
+    if (!this.operator || this.waitingForOperand) {
+      return this.display;
+    }
+
+    const value = Number(this.display);
+
+    this.result = this.calculate(
+      this.result,
+      value,
+      this.operator
+    );
+
+    this.display = String(this.result);
+
+    this.operator = null;
+    this.waitingForOperand = true;
+
+    return this.display;
+  }
+
+  backspace() {
+    if (this.waitingForOperand) {
+      return this.display;
+    }
+
+    if (this.display.length <= 1) {
+      this.display = "0";
+    } else {
+      this.display = this.display.slice(0, -1);
+    }
+
+    return this.display;
+  }
+
+  calculate(left, right, operator) {
+    switch (operator) {
+      case "+":
+        return left + right;
+
+      case "-":
+        return left - right;
+
+      case "*":
+        return left * right;
+
+      case "/":
+        if (right === 0) {
+          throw new Error("Cannot divide by zero");
+        }
+
+        return left / right;
+
+      default:
+        throw new Error("Invalid operator");
+    }
+  }
+
+  getDisplay() {
+    return this.display;
+  }
+}
+
+// ------------------------------
+// UI
+// ------------------------------
+
+const calculator = new Calculator();
+
+const displayElement =
+    document.querySelector("#display");
+
+const buttonsElement =
+    document.querySelector("#buttons");
+
+function render() {
+  displayElement.textContent = calculator.getDisplay();
+}
+
+function run(action) {
+  try {
+    action();
+  } catch (error) {
+    console.error(error);
+
+    displayElement.textContent = "Error";
+
+    // Reset calculator state so the user can continue.
+    calculator.reset();
+
+    return;
+  }
+
+  render();
+}
+
+// Event delegation
+buttonsElement.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+
+  if (!button) {
+    return;
+  }
+
+  const number = button.dataset.number;
+  const operator = button.dataset.operator;
+  const action = button.dataset.action;
+
+  if (number !== undefined) {
+    run(() => {
+      calculator.inputDigit(Number(number));
+    });
+
+    return;
+  }
+
+  if (operator !== undefined) {
+    run(() => {
+      calculator.inputOperator(operator);
+    });
+
+    return;
+  }
+
+  switch (action) {
+    case "decimal":
+      run(() => {
+        calculator.inputDecimal();
+      });
+      break;
+
+    case "equals":
+      run(() => {
+        calculator.equals();
+      });
+      break;
+
+    case "reset":
+      run(() => {
+        calculator.reset();
+      });
+      break;
+
+    case "backspace":
+      run(() => {
+        calculator.backspace();
+      });
+      break;
+  }
+});
+
+// ------------------------------
+// Keyboard support
+// ------------------------------
+
+document.addEventListener("keydown", (event) => {
+  const key = event.key;
+
+  if (/^\d$/.test(key)) {
+    run(() => {
+      calculator.inputDigit(Number(key));
+    });
+
+    return;
+  }
+
+  if (["+", "-", "*", "/"].includes(key)) {
+    run(() => {
+      calculator.inputOperator(key);
+    });
+
+    return;
+  }
+
+  if (key === ".") {
+    run(() => {
+      calculator.inputDecimal();
+    });
+
+    return;
+  }
+
+  if (key === "Enter" || key === "=") {
+    event.preventDefault();
+
+    run(() => {
+      calculator.equals();
+    });
+
+    return;
+  }
+
+  if (key === "Backspace") {
+    run(() => {
+      calculator.backspace();
+    });
+
+    return;
+  }
+
+  if (key === "Escape") {
+    run(() => {
+      calculator.reset();
+    });
+  }
+});
+
+render();

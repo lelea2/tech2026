@@ -1,0 +1,2156 @@
+---
+title: zoox_quant_math_physics_interview_prep
+---
+
+# Zoox / Quantitative Reasoning Interview Prep
+
+Use this as a **talking guide**, not just an answer sheet. For each problem:
+
+1. State assumptions.
+2. Write the governing equation.
+3. Do the smallest amount of algebra needed.
+4. Sanity-check units and magnitude.
+5. Explain the intuition.
+
+---
+
+# 1. Given the area of a regular hexagon, find its side length
+
+## Formula
+
+A regular hexagon can be divided into 6 equilateral triangles.
+
+For side length \(s\):
+
+\[
+A = 6\left(\frac\{\sqrt\{3\}\}\{4\}s^2\right)
+\]
+
+Therefore:
+
+\[
+A = \frac\{3\sqrt\{3\}\}\{2\}s^2
+\]
+
+Solve for \(s\):
+
+\[
+\boxed\{
+s = \sqrt\{\frac\{2A\}\{3\sqrt\{3\}\}\}
+\}
+\]
+
+## Example
+
+If:
+
+\[
+A = 54\sqrt\{3\}
+\]
+
+then:
+
+\[
+s^2 =
+\frac\{2(54\sqrt3)\}\{3\sqrt3\}
+= 36
+\]
+
+\[
+\boxed\{s=6\}
+\]
+
+## What to say aloud
+
+> A regular hexagon is six equilateral triangles. I use the equilateral-triangle area formula, multiply by six, then solve for the side length.
+
+---
+
+# 2. Why is summer hotter than winter?
+
+The main reason is **Earth's axial tilt**, not Earth's distance from the Sun.
+
+Earth's axis is tilted by approximately:
+
+\[
+23.5^\circ
+\]
+
+During summer in a hemisphere:
+
+- sunlight strikes the ground more directly;
+- the same solar energy is concentrated over a smaller surface area;
+- days are longer;
+- sunlight travels through slightly less atmosphere.
+
+During winter:
+
+- sunlight arrives at a shallower angle;
+- the same energy is spread over a larger area;
+- days are shorter.
+
+## Incidence-angle intuition
+
+Suppose sunlight arrives at angle \(\theta\) relative to the surface normal.
+
+The received power per unit horizontal area is approximately proportional to:
+
+\[
+\boxed\{I \propto \cos \theta\}
+\]
+
+At normal incidence:
+
+\[
+\theta=0^\circ
+\Rightarrow
+\cos\theta = 1
+\]
+
+At:
+
+\[
+\theta=60^\circ
+\]
+
+the same incoming energy is spread over roughly twice the area:
+
+\[
+\cos60^\circ = 0.5
+\]
+
+## Important interview point
+
+Earth is actually near **perihelion in early January**, so distance from the Sun does not explain Northern Hemisphere summer.
+
+## What to say aloud
+
+> Earth's tilt changes both the incidence angle and daylight duration. More direct sunlight means greater energy per square meter, and longer summer days increase the total daily energy received.
+
+---
+
+# 3. Two spheres, same material and density
+
+The larger sphere has a diameter **50% larger** than the smaller sphere.
+
+Therefore its linear scale factor is:
+
+\[
+k = 1.5
+\]
+
+For the same density:
+
+\[
+m \propto V
+\]
+
+Sphere volume scales as the cube of diameter:
+
+\[
+V \propto d^3
+\]
+
+Therefore:
+
+\[
+\frac\{m_L\}\{m_S\}
+=
+(1.5)^3
+=
+3.375
+\]
+
+Given:
+
+\[
+m_S = 8 \text\{ lb\}
+\]
+
+then:
+
+\[
+m_L
+=
+8(3.375)
+=
+27
+\]
+
+\[
+\boxed\{27\text\{ lb\}\}
+\]
+
+## What to say aloud
+
+> Mass scales with volume, and volume scales with the cube of diameter. A 1.5× diameter therefore gives \(1.5^3=3.375\) times the mass.
+
+---
+
+# 4. How many minutes of 1920×1080 video at 30 FPS fit on 1 TB?
+
+This question is **underspecified unless the encoding or bitrate is known**.
+
+Resolution and FPS alone do not determine storage for compressed video.
+
+You should clarify:
+
+> Should I assume raw RGB video or a compressed bitrate?
+
+---
+
+## Case A — Raw RGB video
+
+Assume:
+
+- 1920 × 1080 pixels
+- 30 frames/sec
+- 24 bits/pixel = 3 bytes/pixel
+
+Bytes per frame:
+
+\[
+1920 \times 1080 \times 3
+=
+6\{,\}220\{,\}800
+\]
+
+Bytes per second:
+
+\[
+6\{,\}220\{,\}800 \times 30
+=
+186\{,\}624\{,\}000
+\]
+
+Approximately:
+
+\[
+186.6 \text\{ MB/s\}
+\]
+
+Using decimal:
+
+\[
+1\text\{ TB\}=10^\{12\}\text\{ bytes\}
+\]
+
+Seconds:
+
+\[
+\frac\{10^\{12\}\}\{186\{,\}624\{,\}000\}
+\approx
+5358\text\{ sec\}
+\]
+
+Minutes:
+
+\[
+\boxed\{\approx 89.3\text\{ minutes\}\}
+\]
+
+So **raw 1080p30 RGB** gives roughly:
+
+\[
+\boxed\{90\text\{ minutes\}\}
+\]
+
+---
+
+## Case B — Compressed video
+
+General formula:
+
+\[
+\text\{duration seconds\}
+=
+\frac\{\text\{storage bits\}\}\{\text\{bitrate\}\}
+\]
+
+For a 1 TB decimal drive:
+
+\[
+1\text\{ TB\}
+=
+8\times10^\{12\}\text\{ bits\}
+\]
+
+### At 5 Mbps
+
+\[
+\frac\{8\times10^\{12\}\}
+\{5\times10^6\}
+=
+1.6\times10^6\text\{ sec\}
+\]
+
+\[
+\approx 26\{,\}667\text\{ min\}
+\]
+
+### At 10 Mbps
+
+\[
+\boxed\{\approx 13\{,\}333\text\{ min\}\}
+\]
+
+### At 20 Mbps
+
+\[
+\boxed\{\approx 6\{,\}667\text\{ min\}\}
+\]
+
+## Interview lesson
+
+The strongest response is not to immediately calculate.
+
+First identify that:
+
+\[
+\boxed\{\text\{storage depends on bitrate / encoding\}\}
+\]
+
+---
+
+# 5. Drop a dense stone from a floating boat into the water
+
+Assume:
+
+\[
+\rho_\{\text\{stone\}\} > \rho_\{\text\{water\}\}
+\]
+
+so the stone sinks.
+
+Question:
+
+Does the swimming-pool water level rise or fall?
+
+\[
+\boxed\{\text\{It falls\}\}
+\]
+
+---
+
+## Before the stone is dropped
+
+While the stone is inside the floating boat, the boat must displace water equal to the **stone's weight**.
+
+If stone mass is \(m\), displaced water volume attributable to the stone is:
+
+\[
+V_\{\text\{before\}\}
+=
+\frac\{m\}\{\rho_w\}
+\]
+
+---
+
+## After the stone sinks
+
+The stone displaces only its own physical volume:
+
+\[
+V_\{\text\{after\}\}
+=
+\frac\{m\}\{\rho_s\}
+\]
+
+Because:
+
+\[
+\rho_s > \rho_w
+\]
+
+we have:
+
+\[
+\frac\{m\}\{\rho_s\}
+<
+\frac\{m\}\{\rho_w\}
+\]
+
+Therefore:
+
+\[
+V_\{\text\{after\}\} < V_\{\text\{before\}\}
+\]
+
+and the water level:
+
+\[
+\boxed\{\text\{falls\}\}
+\]
+
+## What to say aloud
+
+> In the boat, the stone causes displacement equal to its weight. Once submerged, it displaces only its volume. Because the stone is denser than water, that physical volume is smaller than the equivalent-weight volume of water.
+
+---
+
+# 6. $1000 at 100% interest for 20 years
+
+This depends on whether interest is **simple** or **compound**.
+
+Usually assume annual compounding.
+
+At 100% interest:
+
+\[
+r = 1
+\]
+
+Compound interest:
+
+\[
+A=P(1+r)^n
+\]
+
+\[
+A=1000(2)^\{20\}
+\]
+
+Since:
+
+\[
+2^\{20\}=1\{,\}048\{,\}576
+\]
+
+\[
+A
+=
+1000(1\{,\}048\{,\}576)
+\]
+
+\[
+\boxed\{\$1\{,\}048\{,\}576\{,\}000\}
+\]
+
+Approximately:
+
+\[
+\boxed\{\$1.05\text\{ billion\}\}
+\]
+
+## Why this question matters
+
+It tests whether you understand exponential growth.
+
+At 100% compounded annually, the money **doubles every year**.
+
+---
+
+# 7. Choose a d6 or d8 randomly and roll it
+
+Assume:
+
+\[
+P(D_6)=P(D_8)=\frac12
+\]
+
+---
+
+## Part A — Probability of rolling a 3
+
+For the six-sided die:
+
+\[
+P(3|D_6)=\frac16
+\]
+
+For the eight-sided die:
+
+\[
+P(3|D_8)=\frac18
+\]
+
+Total probability:
+
+\[
+P(3)
+=
+P(D_6)P(3|D_6)
++
+P(D_8)P(3|D_8)
+\]
+
+\[
+=
+\frac12\frac16
++
+\frac12\frac18
+\]
+
+\[
+=
+\frac1\{12\}+\frac1\{16\}
+\]
+
+LCM = 48:
+
+\[
+=
+\frac4\{48\}+\frac3\{48\}
+\]
+
+\[
+\boxed\{\frac7\{48\}\}
+\]
+
+---
+
+## Part B — Given that a 3 was rolled, probability it was the d6
+
+Use Bayes' theorem:
+
+\[
+P(D_6|3)
+=
+\frac\{P(3|D_6)P(D_6)\}
+\{P(3)\}
+\]
+
+\[
+=
+\frac\{
+\frac16\cdot\frac12
+\}\{
+\frac7\{48\}
+\}
+\]
+
+\[
+=
+\frac\{1/12\}\{7/48\}
+\]
+
+\[
+=
+\frac\{4\}\{7\}
+\]
+
+\[
+\boxed\{\frac47\}
+\]
+
+Likewise:
+
+\[
+P(D_8|3)=\frac37
+\]
+
+---
+
+## Part C — Roll the same die again. Expected value?
+
+Expected value of d6:
+
+\[
+E[D_6]
+=
+\frac\{1+2+3+4+5+6\}\{6\}
+=
+3.5
+\]
+
+Expected value of d8:
+
+\[
+E[D_8]
+=
+\frac\{1+2+\cdots+8\}\{8\}
+=
+4.5
+\]
+
+After observing the first roll was 3, posterior probabilities are:
+
+\[
+P(D_6|3)=\frac47
+\]
+
+\[
+P(D_8|3)=\frac37
+\]
+
+Therefore:
+
+\[
+E[X]
+=
+\frac47(3.5)
++
+\frac37(4.5)
+\]
+
+\[
+=
+2+\frac\{13.5\}\{7\}
+\]
+
+or directly:
+
+\[
+=
+\frac\{14\}\{7\}
++
+\frac\{13.5\}\{7\}
+=
+\frac\{27.5\}\{7\}
+\]
+
+\[
+\boxed\{
+E[X] = \frac\{55\}\{14\}\approx3.93
+\}
+\]
+
+---
+
+# 8. Probability that the 13th day of a month is Friday
+
+For a simple interview model, if weekdays are approximately uniformly distributed:
+
+\[
+\boxed\{\frac17\}
+\]
+
+But over the real Gregorian calendar, weekday frequencies are **not perfectly uniform**.
+
+The Gregorian calendar repeats every:
+
+\[
+400 \text\{ years\}
+\]
+
+Number of months:
+
+\[
+400\times12=4800
+\]
+
+The exact probability that the 13th falls on Friday is:
+
+\[
+\boxed\{
+\frac\{688\}\{4800\}
+=
+\frac\{43\}\{300\}
+\approx 14.333\%
+\}
+\]
+
+Compare:
+
+\[
+\frac17\approx14.286\%
+\]
+
+So Friday is slightly more common than perfect uniformity would imply.
+
+## About “Fermat's Little Theorem”
+
+Fermat's Little Theorem is not normally the key theorem for solving this problem.
+
+The useful ideas are:
+
+- arithmetic modulo 7;
+- leap-year rules;
+- the Gregorian calendar's 400-year repetition.
+
+## Interview answer
+
+If no calendar model is specified:
+
+> Assuming the weekday of the 13th is uniform, \(1/7\). If you mean the exact Gregorian-calendar frequency, it is \(688/4800 = 43/300\).
+
+---
+
+# 9. 3D tic-tac-toe: how many winning lines?
+
+Assume a:
+
+\[
+4\times4\times4
+\]
+
+3D tic-tac-toe cube and a win requires 4 cells in a straight line.
+
+Answer:
+
+\[
+\boxed\{76\}
+\]
+
+However, if the intended board is:
+
+\[
+3\times3\times3
+\]
+
+then the number of winning lines is:
+
+\[
+\boxed\{49\}
+\]
+
+Since your supplied answer is **49**, the intended problem is a **3×3×3** board.
+
+---
+
+## Derivation for 3×3×3
+
+### 1. Axis-parallel lines
+
+Three directions:
+
+- x
+- y
+- z
+
+For each direction there are:
+
+\[
+3\times3=9
+\]
+
+lines.
+
+Thus:
+
+\[
+3\times9=27
+\]
+
+---
+
+### 2. Face diagonals
+
+There are:
+
+\[
+6
+\]
+
+faces.
+
+Each face has:
+
+\[
+2
+\]
+
+diagonals.
+
+Thus:
+
+\[
+6\times2=12
+\]
+
+---
+
+### 3. Diagonals through middle slices
+
+There are three families of planes parallel to the coordinate planes.
+
+The middle plane in each orientation contributes 2 new diagonals not lying on the outside faces:
+
+\[
+3\times2=6
+\]
+
+---
+
+### 4. Space diagonals
+
+A cube has:
+
+\[
+4
+\]
+
+main body diagonals.
+
+---
+
+Total:
+
+\[
+27+12+6+4
+=
+\boxed\{49\}
+\]
+
+---
+
+# 10. Distance from a point to a plane in 3D
+
+Plane:
+
+\[
+Ax+By+Cz+D=0
+\]
+
+Point:
+
+\[
+P=(x_0,y_0,z_0)
+\]
+
+Distance:
+
+\[
+\boxed\{
+d=
+\frac\{
+|Ax_0+By_0+Cz_0+D|
+\}\{
+\sqrt\{A^2+B^2+C^2\}
+\}
+\}
+\]
+
+---
+
+## Why?
+
+The plane normal vector is:
+
+\[
+\vec n=(A,B,C)
+\]
+
+Choose any point \(Q\) on the plane.
+
+The perpendicular distance is the magnitude of the projection of:
+
+\[
+P-Q
+\]
+
+onto the unit normal.
+
+Thus:
+
+\[
+d
+=
+\left|
+(P-Q)\cdot
+\frac\{\vec n\}\{\|\vec n\|\}
+\right|
+\]
+
+which simplifies to the formula above.
+
+---
+
+# 11. Estimate the Earth–Moon distance
+
+Known rough value:
+
+\[
+\boxed\{384\{,\}400\text\{ km\}\}
+\]
+
+or:
+
+\[
+\boxed\{239\{,\}000\text\{ miles\}\}
+\]
+
+A good interview estimate:
+
+\[
+\boxed\{4\times10^5\text\{ km\}\}
+\]
+
+---
+
+## Possible estimation approach
+
+Earth radius:
+
+\[
+R_E \approx 6400\text\{ km\}
+\]
+
+The Moon is roughly:
+
+\[
+60
+\]
+
+Earth radii away.
+
+Therefore:
+
+\[
+60\times6400
+=
+384\{,\}000\text\{ km\}
+\]
+
+which matches the known value closely.
+
+## Light-time sanity check
+
+Speed of light:
+
+\[
+3\times10^5\text\{ km/s\}
+\]
+
+Moon distance:
+
+\[
+3.84\times10^5\text\{ km\}
+\]
+
+Therefore light travel time:
+
+\[
+\approx1.28\text\{ s\}
+\]
+
+---
+
+# 12. Expected number of times `max` is updated
+
+Suppose we scan a random permutation of \(n\) distinct values.
+
+Pseudo-code:
+
+```ts
+let max = -Infinity;
+
+for (const x of values) {
+  if (x > max) {
+    max = x;
+  }
+}
+```
+
+Question:
+
+How many times do we expect `max` to change?
+
+---
+
+## Key observation
+
+At position \(i\), the element is a new maximum exactly when it is the largest among the first \(i\) elements.
+
+Every one of those \(i\) positions is equally likely to contain the largest value.
+
+Therefore:
+
+\[
+P(\text\{update at \}i)=\frac1i
+\]
+
+Define indicator:
+
+\[
+X_i=
+\begin\{cases\}
+1 & \text\{if position \}i\text\{ sets a new max\}\\
+0 & \text\{otherwise\}
+\end\{cases\}
+\]
+
+Then:
+
+\[
+X=\sum_\{i=1\}^nX_i
+\]
+
+By linearity of expectation:
+
+\[
+E[X]
+=
+\sum_\{i=1\}^nE[X_i]
+\]
+
+\[
+=
+\sum_\{i=1\}^n\frac1i
+\]
+
+Thus:
+
+\[
+\boxed\{
+E[X]=H_n
+\}
+\]
+
+where \(H_n\) is the \(n\)-th harmonic number.
+
+Approximation:
+
+\[
+H_n
+\approx
+\ln n+\gamma
+\]
+
+where:
+
+\[
+\gamma\approx0.57721
+\]
+
+Therefore:
+
+\[
+\boxed\{
+E[X]\approx\ln n+\gamma
+\}
+\]
+
+## Example
+
+For:
+
+\[
+n=1\{,\}000\{,\}000
+\]
+
+\[
+E[X]
+\approx
+\ln(10^6)+0.577
+\]
+
+\[
+\approx13.815+0.577
+\]
+
+\[
+\boxed\{\approx14.4\}
+\]
+
+Interesting result:
+
+Even with one million values, the maximum changes only about 14 times on average.
+
+---
+
+# 13. Buffon's Needle
+
+Infinite plane with parallel vertical lines spaced:
+
+\[
+D=1
+\]
+
+A stick of length:
+
+\[
+L=1
+\]
+
+is dropped randomly.
+
+What is the probability it crosses a line?
+
+For:
+
+\[
+L\le D
+\]
+
+Buffon's needle formula is:
+
+\[
+\boxed\{
+P=\frac\{2L\}\{\pi D\}
+\}
+\]
+
+Thus for:
+
+\[
+L=D=1
+\]
+
+\[
+\boxed\{
+P=\frac\{2\}\{\pi\}
+\}
+\]
+
+### Important correction
+
+The supplied answer \(1/\pi\) is not the standard answer under the usual Buffon's Needle assumptions.
+
+The standard probability is:
+
+\[
+\boxed\{\frac\{2\}\{\pi\}\}
+\]
+
+---
+
+## Proof
+
+Let:
+
+- \(\theta\) be the acute angle between the needle and the parallel lines.
+- \(x\) be the distance from the needle's center to the nearest line.
+
+Because of symmetry:
+
+\[
+0\le\theta\le\frac\{\pi\}\{2\}
+\]
+
+and:
+
+\[
+0\le x\le\frac\{D\}\{2\}
+\]
+
+The needle crosses a line if its perpendicular half-length reaches the line:
+
+\[
+x
+\le
+\frac\{L\}\{2\}\sin\theta
+\]
+
+For fixed \(\theta\), the probability over uniformly distributed \(x\) is:
+
+\[
+P(\text\{cross\}|\theta)
+=
+\frac\{
+(L/2)\sin\theta
+\}\{
+D/2
+\}
+\]
+
+\[
+=
+\frac\{L\}\{D\}\sin\theta
+\]
+
+Average over uniformly distributed angle:
+
+\[
+P
+=
+\frac\{2\}\{\pi\}
+\int_0^\{\pi/2\}
+\frac\{L\}\{D\}\sin\theta\,d\theta
+\]
+
+\[
+=
+\frac\{2L\}\{\pi D\}
+[-\cos\theta]_0^\{\pi/2\}
+\]
+
+\[
+=
+\boxed\{
+\frac\{2L\}\{\pi D\}
+\}
+\]
+
+When:
+
+\[
+L=D=1
+\]
+
+\[
+\boxed\{
+P=\frac2\pi
+\}
+\]
+
+---
+
+# 14. Match a small 2D point set inside a larger point set
+
+You have:
+
+- source / template set \(S\), small;
+- target set \(T\), large;
+- allowed transformation: **rotation + translation**;
+- no scaling.
+
+Goal:
+
+Find the transformation producing the best alignment.
+
+This is a form of:
+
+- rigid point-set registration;
+- geometric matching;
+- Procrustes alignment / ICP, depending on correspondence assumptions.
+
+---
+
+## Case A — Point correspondences are known
+
+Suppose source points \(p_i\) correspond to target points \(q_i\).
+
+We want:
+
+\[
+q_i \approx Rp_i+t
+\]
+
+where:
+
+- \(R\) is a 2D rotation matrix;
+- \(t\) is a translation.
+
+### Step 1 — Compute centroids
+
+\[
+\bar p
+=
+\frac1n\sum p_i
+\]
+
+\[
+\bar q
+=
+\frac1n\sum q_i
+\]
+
+### Step 2 — Center the points
+
+\[
+p_i'=p_i-\bar p
+\]
+
+\[
+q_i'=q_i-\bar q
+\]
+
+### Step 3 — Solve rotation
+
+Minimize:
+
+\[
+\sum_i
+\|q_i'-Rp_i'\|^2
+\]
+
+Use SVD / Kabsch algorithm.
+
+For matrix:
+
+\[
+H=\sum_i p_i' q_i'^T
+\]
+
+compute:
+
+\[
+H=U\Sigma V^T
+\]
+
+then:
+
+\[
+R=VU^T
+\]
+
+with determinant correction if necessary.
+
+### Step 4 — Translation
+
+\[
+t=\bar q-R\bar p
+\]
+
+Complexity:
+
+\[
+\boxed\{O(n)\}
+\]
+
+aside from constant-size SVD.
+
+---
+
+## Case B — Correspondences are unknown
+
+Now the harder problem is finding which target points correspond to source points.
+
+Possible approaches:
+
+### Approach 1 — Anchor-pair hashing
+
+Because rotation and translation preserve distances:
+
+\[
+\|p_i-p_j\|
+=
+\|q_a-q_b\|
+\]
+
+Use pairwise distances as rigid invariants.
+
+Steps:
+
+1. Compute characteristic distances in template.
+2. Search target pairs with approximately matching distances.
+3. Each matching pair defines a candidate rotation and translation.
+4. Transform all template points.
+5. Use a spatial index to score how many transformed points match target points.
+
+Use:
+
+- KD-tree;
+- spatial hash;
+- R-tree.
+
+Candidate verification:
+
+\[
+O(m\log N)
+\]
+
+for template size \(m\).
+
+---
+
+### Approach 2 — RANSAC
+
+Useful with noise and outliers.
+
+1. Pick a minimal sample from template.
+2. Pick candidate points from target.
+3. Infer rigid transform.
+4. Count inliers.
+5. Repeat.
+6. Refine best transform.
+
+Pros:
+
+- robust to outliers;
+- easy to explain.
+
+Cons:
+
+- probabilistic;
+- can require many iterations.
+
+---
+
+### Approach 3 — ICP
+
+Iterative Closest Point:
+
+1. Start from initial transform.
+2. Match each source point to nearest target point.
+3. solve optimal rigid transform;
+4. repeat.
+
+Pros:
+
+- good local refinement.
+
+Cons:
+
+- local optimum;
+- needs good initialization.
+
+---
+
+## Strong interview architecture
+
+For a small template in a large dataset:
+
+```text
+Template
+  ↓
+Invariant features
+(pairwise distances / angles)
+  ↓
+Candidate target anchors
+  ↓
+Infer R,t
+  ↓
+Transform template
+  ↓
+KD-tree nearest-neighbor scoring
+  ↓
+RANSAC / best score
+  ↓
+Optional ICP refinement
+```
+
+---
+
+# 15. Seattle rain + three friends
+
+Given:
+
+\[
+P(R)=0.25
+\]
+
+So:
+
+\[
+P(\neg R)=0.75
+\]
+
+Each friend tells the truth with probability:
+
+\[
+\frac23
+\]
+
+Assume:
+
+- friends are independent conditioned on whether it is raining;
+- if telling the truth, they correctly report rain/no rain;
+- if lying, they say the opposite.
+
+All three say:
+
+> It is raining.
+
+---
+
+## Likelihood if it really is raining
+
+Each friend says rain with probability:
+
+\[
+\frac23
+\]
+
+Thus:
+
+\[
+P(YYY|R)
+=
+\left(\frac23\right)^3
+=
+\frac8\{27\}
+\]
+
+---
+
+## Likelihood if it is not raining
+
+A friend says rain only by lying:
+
+\[
+P(Y|\neg R)=\frac13
+\]
+
+Thus:
+
+\[
+P(YYY|\neg R)
+=
+\left(\frac13\right)^3
+=
+\frac1\{27\}
+\]
+
+---
+
+## Bayes' theorem
+
+\[
+P(R|YYY)
+=
+\frac\{
+P(YYY|R)P(R)
+\}\{
+P(YYY|R)P(R)
++
+P(YYY|\neg R)P(\neg R)
+\}
+\]
+
+Substitute:
+
+\[
+=
+\frac\{
+\frac8\{27\}\cdot\frac14
+\}\{
+\frac8\{27\}\cdot\frac14
++
+\frac1\{27\}\cdot\frac34
+\}
+\]
+
+Multiply numerator and denominator by \(108\):
+
+\[
+=
+\frac8\{8+3\}
+\]
+
+\[
+\boxed\{\frac8\{11\}\}
+\]
+
+Approximately:
+
+\[
+\boxed\{72.7\%\}
+\]
+
+---
+
+# 16. Infinite plane covered / packed with circles
+
+This problem needs clarification.
+
+If circles may overlap arbitrarily and the plane is **fully covered**, then the union can cover:
+
+\[
+\boxed\{100\%\}
+\]
+
+of the plane.
+
+But the hint about equilateral triangles strongly suggests the intended problem is:
+
+> What fraction of the plane is occupied in the densest packing of equal, non-overlapping circles?
+
+That is **hexagonal circle packing**.
+
+---
+
+## Hexagonal packing density
+
+Place circle centers at the vertices of equilateral triangles.
+
+Let each circle have radius:
+
+\[
+r
+\]
+
+Adjacent centers are:
+
+\[
+2r
+\]
+
+apart.
+
+An equilateral triangle of side \(2r\) has area:
+
+\[
+A_\triangle
+=
+\frac\{\sqrt3\}\{4\}(2r)^2
+\]
+
+\[
+=
+\sqrt3r^2
+\]
+
+Each triangle contains three 60° sectors, one from each circle.
+
+Total circle area inside the triangle:
+
+\[
+3
+\left(
+\frac\{60^\circ\}\{360^\circ\}\pi r^2
+\right)
+\]
+
+\[
+=
+\frac12\pi r^2
+\]
+
+Density:
+
+\[
+\eta
+=
+\frac\{
+\pi r^2/2
+\}\{
+\sqrt3r^2
+\}
+\]
+
+\[
+=
+\boxed\{
+\frac\{\pi\}\{2\sqrt3\}
+\}
+\]
+
+Equivalent:
+
+\[
+\boxed\{
+\frac\{\pi\}\{\sqrt\{12\}\}
+\approx0.9069
+\}
+\]
+
+So approximately:
+
+\[
+\boxed\{90.69\%\}
+\]
+
+of the plane can be occupied by non-overlapping equal circles in the densest packing.
+
+---
+
+# 17. 4×4 grid of points: how many squares?
+
+Assume a lattice of:
+
+\[
+4\times4=16
+\]
+
+points.
+
+We count both:
+
+- axis-aligned squares;
+- rotated squares.
+
+---
+
+## Axis-aligned squares
+
+For a grid with 4 points on each side, square side lengths can be:
+
+\[
+1,2,3
+\]
+
+### Side length 1
+
+\[
+3^2=9
+\]
+
+### Side length 2
+
+\[
+2^2=4
+\]
+
+### Side length 3
+
+\[
+1^2=1
+\]
+
+Total axis-aligned:
+
+\[
+9+4+1
+=
+14
+\]
+
+---
+
+## Rotated squares
+
+A convenient way to count is by possible edge vectors:
+
+\[
+(a,b)
+\]
+
+A perpendicular edge is:
+
+\[
+(-b,a)
+\]
+
+For a 4×4 point lattice, valid rotated configurations produce:
+
+- 6 smallest tilted squares;
+- 2 larger tilted squares.
+
+Thus:
+
+\[
+8
+\]
+
+rotated squares.
+
+Total:
+
+\[
+14+8
+=
+\boxed\{22\}
+\]
+
+---
+
+## Probability that 4 randomly selected points form a square
+
+Total ways to choose 4 points:
+
+\[
+\binom\{16\}\{4\}
+\]
+
+\[
+=
+1820
+\]
+
+There are:
+
+\[
+22
+\]
+
+sets of four points forming squares.
+
+Therefore:
+
+\[
+P
+=
+\frac\{22\}\{1820\}
+\]
+
+Simplify:
+
+\[
+\boxed\{
+\frac\{11\}\{910\}
+\}
+\]
+
+Approximately:
+
+\[
+\boxed\{1.21\%\}
+\]
+
+---
+
+# 18. Find the pattern in the number of edges
+
+The prompt references an image (`edges.img`) that is not included, so the exact intended sequence cannot be determined.
+
+For visual pattern questions, use this framework.
+
+---
+
+## Step 1 — Create a sequence
+
+Count edges in each figure:
+
+\[
+E_1,E_2,E_3,E_4,\dots
+\]
+
+---
+
+## Step 2 — First differences
+
+Compute:
+
+\[
+\Delta E_n=E_\{n+1\}-E_n
+\]
+
+If constant:
+
+\[
+E_n=an+b
+\]
+
+---
+
+## Step 3 — Second differences
+
+If first differences are not constant, compute:
+
+\[
+\Delta^2E_n
+\]
+
+Constant second differences suggest a quadratic:
+
+\[
+E_n=an^2+bn+c
+\]
+
+---
+
+## Step 4 — Structural counting
+
+Instead of relying only on numerical pattern matching, count geometrically:
+
+\[
+\boxed\{
+\text\{new edges\}
+=
+\text\{edges added by new unit\}
+-
+\text\{shared edges\}
+\}
+\]
+
+For shapes made of repeated polygons:
+
+\[
+E_n
+=
+nE_\{\text\{shape\}\}
+-
+E_\{\text\{shared\}\}
+\]
+
+Example: \(n\) squares in a row.
+
+One square has:
+
+\[
+4
+\]
+
+edges.
+
+Each additional square shares one edge, so it contributes only:
+
+\[
+3
+\]
+
+new edges.
+
+Therefore:
+
+\[
+E_n
+=
+4+3(n-1)
+\]
+
+\[
+\boxed\{
+E_n=3n+1
+\}
+\]
+
+---
+
+# Fast Review Sheet
+
+| Problem | Key answer |
+|---|---|
+| Regular hexagon from area | \(s=\sqrt\{\frac\{2A\}\{3\sqrt3\}\}\) |
+| Summer vs winter | Axial tilt → incidence angle + longer days |
+| Sphere 50% larger diameter | \(8(1.5)^3=27\) lb |
+| 1 TB video | Need bitrate; raw RGB 1080p30 ≈ 89 min |
+| Stone from boat | Water level falls |
+| $1000, 100%, 20 yrs | \$1,048,576,000 |
+| d6/d8: roll a 3 | \(7/48\) |
+| \(P(d6\mid3)\) | \(4/7\) |
+| Next-roll expected value | \(55/14\approx3.93\) |
+| Friday the 13th | Approx \(1/7\); exact Gregorian \(43/300\) |
+| 3×3×3 tic-tac-toe | 49 winning lines |
+| Point-plane distance | \(\frac\{|Ax_0+By_0+Cz_0+D|\}\{\sqrt\{A^2+B^2+C^2\}\}\) |
+| Earth–Moon | ≈ 384,400 km |
+| Expected max updates | \(H_n\approx\ln n+\gamma\) |
+| Buffon's needle \(L=D\) | \(2/\pi\), not \(1/\pi\) |
+| Rigid point-set match | invariants + RANSAC/KD-tree + ICP |
+| Seattle rain | \(8/11\) |
+| Hex circle packing | \(\pi/(2\sqrt3)\approx90.69\%\) |
+| 4×4 lattice squares | 22 |
+| Probability 4 points form square | \(11/910\approx1.21\%\) |
+
+---
+
+# Interview Strategy
+
+For these questions, the interviewer is usually testing **reasoning more than memorization**.
+
+Use this structure:
+
+```text
+1. Clarify assumptions.
+2. Identify the physical / mathematical invariant.
+3. Express it as a formula.
+4. Solve symbolically before substituting numbers.
+5. Check the units.
+6. Check limiting cases.
+7. Explain the intuition in one sentence.
+```
+
+## Examples of strong clarification
+
+For video storage:
+
+> Resolution and FPS aren't enough to determine storage if the video is compressed. Should I assume raw RGB or a target bitrate?
+
+For circle coverage:
+
+> Do you mean a true covering where circles may overlap, or densest packing of equal non-overlapping circles?
+
+For tic-tac-toe:
+
+> Since 49 is the expected answer, I'll assume a 3×3×3 board where three aligned cells win.
+
+---
+
+# High-Value Concepts to Memorize
+
+## Geometry
+
+\[
+A_\{\text\{hex\}\}
+=
+\frac\{3\sqrt3\}\{2\}s^2
+\]
+
+\[
+V_\{\text\{sphere\}\}
+=
+\frac43\pi r^3
+\]
+
+\[
+d_\{\text\{point-plane\}\}
+=
+\frac\{|Ax_0+By_0+Cz_0+D|\}
+\{\sqrt\{A^2+B^2+C^2\}\}
+\]
+
+---
+
+## Probability
+
+Bayes:
+
+\[
+P(A|B)
+=
+\frac\{P(B|A)P(A)\}
+\{P(B)\}
+\]
+
+Expected value:
+
+\[
+E[X]
+=
+\sum_xxP(X=x)
+\]
+
+Linearity:
+
+\[
+E[X+Y]
+=
+E[X]+E[Y]
+\]
+
+even when \(X\) and \(Y\) are not independent.
+
+---
+
+## Scaling laws
+
+Length scale:
+
+\[
+L\to kL
+\]
+
+Area:
+
+\[
+A\to k^2A
+\]
+
+Volume / mass at fixed density:
+
+\[
+V,m\to k^3
+\]
+
+---
+
+## Harmonic series
+
+\[
+H_n
+=
+\sum_\{i=1\}^n\frac1i
+\]
+
+\[
+H_n
+\approx
+\ln n+\gamma
+\]
+
+---
+
+## Circle packing
+
+\[
+\eta_\{\max\}
+=
+\frac\{\pi\}\{2\sqrt3\}
+\approx
+0.9069
+\]
+
+---
+
+## Buffon's needle
+
+For:
+
+\[
+L\le D
+\]
+
+\[
+P(\text\{cross\})
+=
+\frac\{2L\}\{\pi D\}
+\]
+
+---
+
+# Common Traps
+
+### Trap 1 — Linear vs cubic scaling
+
+A sphere 50% larger in diameter is **not** 50% heavier.
+
+\[
+1.5^3=3.375
+\]
+
+---
+
+### Trap 2 — Ignoring missing information
+
+1080p30 does not uniquely specify file size.
+
+You need:
+
+\[
+\boxed\{\text\{bits per pixel or bitrate\}\}
+\]
+
+---
+
+### Trap 3 — Confusing weight displacement with volume displacement
+
+Stone in boat:
+
+```text
+boat → displacement proportional to stone weight
+water → displacement equal to stone volume
+```
+
+---
+
+### Trap 4 — Forgetting posterior probabilities
+
+After seeing a 3, d6 and d8 are no longer equally probable.
+
+---
+
+### Trap 5 — Assuming a supplied answer is automatically correct
+
+The standard Buffon's Needle answer for \(L=D\) is:
+
+\[
+\boxed\{2/\pi\}
+\]
+
+not:
+
+\[
+1/\pi
+\]
+
+---
+
+# 60-Second Mental Math Reminders
+
+Useful approximations:
+
+\[
+\sqrt3\approx1.732
+\]
+
+\[
+\pi\approx3.14
+\]
+
+\[
+\frac\{2\}\{\pi\}\approx0.637
+\]
+
+\[
+\frac1\pi\approx0.318
+\]
+
+\[
+\ln10\approx2.303
+\]
+
+\[
+2^\{10\}=1024\approx10^3
+\]
+
+Therefore:
+
+\[
+2^\{20\}\approx10^6
+\]
+
+and exactly:
+
+\[
+2^\{20\}=1\{,\}048\{,\}576
+\]
+
+Earth radius:
+
+\[
+\approx6400\text\{ km\}
+\]
+
+Earth–Moon:
+
+\[
+\approx60R_E
+\]
+
+Speed of light:
+
+\[
+\approx3\times10^5\text\{ km/s\}
+\]

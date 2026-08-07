@@ -1,0 +1,913 @@
+---
+title: Automated Jira-to-PR
+description: Staff-level system design for converting well-scoped Jira tickets into safe, reviewable pull requests with LLM-powered code generation, bounded iteration, and deterministic recovery.
+tags:
+  - code-generation
+  - llm
+  - workflow-automation
+  - safety-boundaries
+  - auditability
+sidebar_label: Jira-to-PR System
+---
+
+# Design an Automated Jira-Ticket-to-PR System
+
+> Staff-level system design: convert a well-scoped Jira ticket into a safe, reviewable pull request while preserving human control, auditability, and deterministic recovery.
+
+---
+
+## 1. Problem Statement
+
+Build a system that:
+
+1. Detects or receives an eligible Jira ticket.
+2. Understands the ticket and repository context.
+3. Plans the code change.
+4. Creates an isolated workspace.
+5. Edits code with an LLM/code agent.
+6. Runs formatting, linting, type checks, unit/integration tests, and security checks.
+7. Iterates on failures within bounded limits.
+8. Pushes a branch and opens a pull request.
+9. Links the PR back to Jira and reports progress.
+10. Stops or escalates when confidence, permissions, policy, or test quality are insufficient.
+
+### Non-goal
+
+This is **not** an autonomous merge system by default. The safest baseline ends at a draft PR. Auto-merge can be enabled only for tightly scoped, low-risk repositories and change classes.
+
+---
+
+## 2. Functional Requirements
+
+- Trigger from Jira webhook, Jira Automation, or an explicit `Generate PR` action.
+- Support allowlisted repositories and ticket types.
+- Resolve ticket → repo/component ownership.
+- Fetch relevant Jira fields, comments, linked docs, acceptance criteria, and dependencies.
+- Retrieve repository context: tree, code search, README, ownership, tests, build commands, coding rules.
+- Generate an implementation plan before editing.
+- Support multi-file edits.
+- Run validation in an isolated sandbox.
+- Retry with bounded agent loops.
+- Open a draft PR with:
+  - Jira link
+  - summary
+  - implementation plan
+  - files changed
+  - tests run/results
+  - risk notes
+  - generated-by metadata
+- Update Jira with status and PR link.
+- Human can cancel, approve, rerun, or request changes.
+- Persist full audit trail.
+
+---
+
+## 3. Non-Functional Requirements
+
+| Requirement   | Target / Design Choice                                                          |
+| ------------- | ------------------------------------------------------------------------------- |
+| Safety        | No direct writes to protected branches; least-privilege GitHub App tokens       |
+| Isolation     | One ephemeral sandbox per run                                                   |
+| Reliability   | Durable workflow with resumable steps                                           |
+| Idempotency   | One logical run per `(ticket, repo, revision, trigger)`                         |
+| Latency       | Typical small ticket PR in 2–10 min; long builds async                          |
+| Scale         | Thousands of concurrent workflows, horizontally scalable workers                |
+| Auditability  | Immutable event log + artifacts + tool-call trace                               |
+| Cost          | Token, runtime, retry, and test budgets per run                                 |
+| Security      | Secret redaction, egress controls, dependency policy, signed actions            |
+| Human control | Draft PR by default, optional approval gates before branch push/PR              |
+| Observability | Per-step duration, failure reason, token cost, sandbox cost, PR acceptance rate |
+
+---
+
+## 4. Core Entities
+
+```ts
+type TicketAutomationRun = {
+  runId: string;
+  ticketKey: string;
+  repositoryId: string;
+  baseRevision: string;
+  state: RunState;
+  trigger: 'jira_webhook' | 'manual' | 'api';
+  riskLevel: 'low' | 'medium' | 'high';
+  idempotencyKey: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type AgentTask = {
+  taskId: string;
+  runId: string;
+  kind: 'analyze' | 'plan' | 'edit' | 'test_fix' | 'summarize';
+  attempt: number;
+  model: string;
+  inputArtifactIds: string[];
+  outputArtifactIds: string[];
+};
+
+type Workspace = {
+  workspaceId: string;
+  runId: string;
+  repoUrl: string;
+  branchName: string;
+  baseSha: string;
+  sandboxProvider: string;
+  expiresAt: string;
+};
+
+type ValidationResult = {
+  runId: string;
+  check: 'format' | 'lint' | 'typecheck' | 'unit' | 'integration' | 'security';
+  status: 'passed' | 'failed' | 'skipped';
+  summary: string;
+  artifactId?: string;
+};
+
+type PullRequestRecord = {
+  runId: string;
+  repo: string;
+  prNumber: number;
+  branch: string;
+  headSha: string;
+  url: string;
+  status: 'draft' | 'open' | 'merged' | 'closed';
+};
+```
+
+### Run State Machine
+
+```text
+RECEIVED
+  -> ELIGIBILITY_CHECK
+  -> CONTEXT_GATHERING
+  -> PLANNING
+  -> WAITING_FOR_APPROVAL?       (optional policy gate)
+  -> WORKSPACE_PROVISIONING
+  -> EDITING
+  -> VALIDATING
+      -> FIXING -> VALIDATING     (bounded loop)
+  -> SECURITY_REVIEW
+  -> PUSHING_BRANCH
+  -> CREATING_PR
+  -> JIRA_UPDATE
+  -> COMPLETED
+
+Any state -> CANCELLED
+Any state -> NEEDS_HUMAN
+Any retryable state -> RETRYING
+Any terminal technical error -> FAILED
+```
+
+---
+
+## 5. High-Level Architecture
+
+```text
+                 +----------------------+
+                 |        Jira          |
+                 | Ticket + Webhook     |
+                 +----------+-----------+
+                            |
+                            v
++------------+     +--------+---------+      +------------------+
+| Web / UI   | --> | Trigger/API      | ---> | Policy + Eligibility|
+| Run status |     | Gateway          |      | Engine            |
++------------+     +--------+---------+      +---------+--------+
+                            |                          |
+                            v                          v
+                   +--------+--------------------------+------+
+                   | Durable Workflow Orchestrator            |
+                   | Temporal / equivalent                    |
+                   +--+--------------+-------------+----------+
+                      |              |             |
+              context |       agent  |      sandbox|
+                      v              v             v
+              +-------+------+ +-----+------+ +---+----------------+
+              | Context      | | Agent      | | Sandbox Manager    |
+              | Service      | | Runtime    | | Firecracker/K8s Job|
+              +---+------+---+ +-----+------+ +----+---------------+
+                  |      |           |             |
+          +-------+      |           |             v
+          v              v           v      +------+-------------+
+     +----+----+   +-----+-----+ +---+---+  | Build/Test Tooling |
+     | Jira    |   | GitHub /  | | LLM   |  | lint/test/SAST     |
+     | API     |   | Git data  | | APIs  |  +------+-------------+
+     +---------+   +-----------+ +-------+         |
+                                                   v
+                                             +-----+------+
+                                             | GitHub App |
+                                             | branch + PR|
+                                             +-----+------+
+                                                   |
+                                                   v
+                                            +------+------+
+                                            | Jira update |
+                                            +-------------+
+
+Shared platform: Postgres metadata, object storage artifacts, event bus, secrets broker,
+metrics/logs/traces, audit log, rate/cost limiter.
+```
+
+---
+
+## 6. Major Components and Technology Picks
+
+| Component              | Pick                                                                                | Why                                                                     | Alternatives / Tradeoff                                                                  |
+| ---------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Workflow orchestration | **Temporal**                                                                        | Durable state, retries, timers, cancellation, human wait states, replay | Step Functions simpler in AWS; queues alone become ad-hoc state machines                 |
+| Metadata DB            | **PostgreSQL**                                                                      | Transactions, unique idempotency constraints, searchable run metadata   | DynamoDB works at huge scale but workflows require more app-side coordination            |
+| Artifact storage       | **S3/GCS**                                                                          | Cheap logs, patches, test output, plans                                 | DB blobs are expensive and hurt DB performance                                           |
+| Trigger transport      | **Webhook → API → durable workflow**                                                | Immediate + resumable                                                   | Polling Jira is simpler but wasteful and slower                                          |
+| Repo auth              | **GitHub App installation tokens**                                                  | Fine-grained, short-lived, auditable                                    | PATs are long-lived and dangerous                                                        |
+| Sandbox                | **Ephemeral Kubernetes Job + gVisor** initially; Firecracker for stronger isolation | Mature scheduling with stronger-than-container isolation                | Plain Docker is cheaper but weaker isolation; VM per job is stronger but slower/costlier |
+| Agent runtime          | **Tool-constrained code agent**                                                     | Explicit filesystem/search/test/git tools, easier audit                 | Unrestricted shell is flexible but high-risk                                             |
+| Context retrieval      | **Git grep/ripgrep + AST/LSP + repo docs**                                          | Fresh source-of-truth, precise                                          | Vector DB useful for large monorepos/docs but can return stale context                   |
+| LLM routing            | **Small model for classify/summarize; stronger coding model for plan/edit**         | Cost/latency optimization                                               | One large model simplifies routing but wastes cost                                       |
+| Event stream           | **Kafka / managed pub-sub** for analytics + event fan-out                           | Decoupled lifecycle events                                              | Not required for core workflow correctness if Temporal is source of truth                |
+| Cache                  | **Redis**                                                                           | dedupe transient lookups, rate limits, repo metadata cache              | Avoid using cache as workflow source of truth                                            |
+| Secrets                | **Vault / cloud secrets manager + short-lived brokered credentials**                | no persistent secret in sandbox                                         | Environment variables alone risk exfiltration                                            |
+| Observability          | **OpenTelemetry + metrics/log backend**                                             | trace Jira trigger to PR                                                | Vendor-specific instrumentation is quicker but less portable                             |
+
+### Why Temporal instead of “Kafka + workers only”?
+
+Because this problem is a **long-running state machine**, not just background job execution. A run may wait for approval, retry test failures, sleep for API backoff, be cancelled, and resume after process crashes. Temporal makes those states durable instead of forcing us to reconstruct them from queues and database flags.
+
+---
+
+## 7. End-to-End Flow
+
+### Step 1 — Jira trigger
+
+Jira sends an authenticated webhook when a ticket transitions to `Ready for Agent` or a user presses `Generate PR`.
+
+```http
+POST /v1/jira/events
+X-Webhook-Signature: ...
+
+{
+  "ticketKey": "PAY-1842",
+  "eventId": "jira-event-8821",
+  "transition": "READY_FOR_AGENT"
+}
+```
+
+The API:
+
+1. verifies webhook signature,
+2. deduplicates `eventId`,
+3. fetches current ticket revision,
+4. resolves project/component → repository,
+5. evaluates eligibility,
+6. starts a workflow using deterministic `runId` / idempotency key.
+
+### Step 2 — Eligibility and risk classification
+
+Reject or require human approval when:
+
+- ticket lacks acceptance criteria,
+- repo is not allowlisted,
+- touching authentication, payments, IAM, migrations, or production infra,
+- estimated diff exceeds threshold,
+- required linked design/spec is unavailable,
+- ticket asks for destructive data changes,
+- generated plan requires secrets or forbidden network access.
+
+Possible risk score:
+
+```text
+risk = file_sensitivity
+     + diff_size_estimate
+     + dependency_changes
+     + migration_presence
+     + security_surface
+     + test_coverage_gap
+```
+
+### Step 3 — Context gathering
+
+Build a structured `ContextBundle` rather than dumping the whole repository into a prompt.
+
+```text
+Ticket context
+- title, description, acceptance criteria
+- comments, labels, linked tickets
+- linked product/design docs
+
+Repository context
+- repository instructions / AGENTS.md
+- README / architecture docs
+- CODEOWNERS
+- package/build manifests
+- relevant source files
+- nearby tests
+- type symbols + references
+- recent history around target files
+
+Policy context
+- forbidden paths
+- commands allowed in sandbox
+- dependency policy
+- test requirements
+```
+
+#### Retrieval strategy
+
+1. Deterministic signals first: file paths, stack traces, ticket component, CODEOWNERS.
+2. Text/code search (`ripgrep`, GitHub code search).
+3. Symbol-aware lookup (LSP/AST).
+4. Embeddings only for broad semantic discovery in very large repositories.
+
+**Reason:** code changes require precise, fresh context. Vector retrieval is useful, but should not become the source of truth.
+
+---
+
+## 8. Agent Architecture
+
+Use a bounded planner/executor loop.
+
+```text
+Planner
+  -> understand requirements
+  -> identify files
+  -> state assumptions
+  -> create implementation + validation plan
+
+Executor
+  -> read/search
+  -> edit patch
+  -> run targeted checks
+  -> inspect failures
+  -> revise patch
+
+Verifier
+  -> run required validation suite
+  -> compare change against acceptance criteria
+  -> produce risk/confidence summary
+```
+
+### Tool surface
+
+The model should call narrow tools, not receive blanket machine control:
+
+```ts
+interface AgentTools {
+  searchCode(query: string): SearchResult[];
+  readFile(path: string, range?: Range): string;
+  listFiles(path: string): string[];
+  applyPatch(patch: UnifiedDiff): PatchResult;
+  runApprovedCommand(commandId: string, args: string[]): CommandResult;
+  getGitDiff(): string;
+  getDiagnostics(paths?: string[]): Diagnostic[];
+}
+```
+
+`runApprovedCommand` maps IDs such as `unit_test`, `lint`, `typecheck` to repository-owned command templates. Avoid arbitrary shell by default.
+
+---
+
+## 9. Sandbox Design
+
+Every run gets an ephemeral isolated workspace.
+
+### Baseline
+
+```text
+Sandbox namespace/job
+- read-only base image
+- ephemeral writable volume
+- checked-out repository at exact SHA
+- CPU/memory/time quotas
+- no cloud metadata endpoint
+- deny outbound network by default
+- allowlisted package registries only when required
+- brokered Git credential only at push step
+- secrets injected just-in-time, scoped, short-lived
+```
+
+### Why not let the LLM agent run in a shared worker?
+
+Repository code is untrusted input. Build scripts can execute arbitrary commands. A malicious ticket, dependency, or prompt injection in repository text could try to steal credentials or alter neighboring runs. Isolation is a hard security boundary.
+
+### Kubernetes + gVisor vs Firecracker
+
+|                        | K8s + gVisor             | Firecracker                                      |
+| ---------------------- | ------------------------ | ------------------------------------------------ |
+| Startup                | Fast                     | Moderate                                         |
+| Isolation              | Strong container sandbox | VM-grade                                         |
+| Operational complexity | Lower if already on K8s  | Higher                                           |
+| Density                | High                     | Good, but more overhead                          |
+| Best use               | Most internal repos      | Untrusted/external repositories, higher security |
+
+A pragmatic design starts with K8s Jobs + gVisor and moves high-risk workloads to microVMs.
+
+---
+
+## 10. Validation Pipeline
+
+Validation should be deterministic and policy-driven.
+
+```text
+1. format check
+2. lint
+3. type check / compile
+4. affected unit tests
+5. broader unit tests if risk > threshold
+6. integration tests when available
+7. dependency/license policy
+8. secret scan
+9. SAST / code security scan
+10. acceptance-criteria verifier
+```
+
+### Agent repair loop
+
+```text
+MAX_REPAIR_ATTEMPTS = 3
+MAX_TOTAL_AGENT_STEPS = 30
+MAX_SANDBOX_MINUTES = 20
+MAX_TOKEN_BUDGET = policy-based
+```
+
+A failing deterministic test is fed back into the agent with only necessary log excerpts. After the bounded retry limit, mark `NEEDS_HUMAN` and open either no PR or a draft PR labeled `agent-needs-help`, based on policy.
+
+---
+
+## 11. Git and PR Strategy
+
+### Branch naming
+
+```text
+agent/PAY-1842-add-refund-reason
+```
+
+### GitHub App permissions
+
+- Contents: read/write only on allowlisted repos.
+- Pull requests: write.
+- Checks: read.
+- Metadata: read.
+- Never grant admin or workflow modification permissions unless explicitly required.
+
+### PR creation
+
+```http
+POST /v1/runs/{runId}/publish
+Idempotency-Key: run-123:publish:v1
+```
+
+The publisher verifies:
+
+- workflow is in publishable state,
+- base SHA has not drifted beyond policy,
+- patch matches approved artifact hash,
+- no protected-path violation,
+- required checks passed.
+
+Then:
+
+1. creates branch from expected base,
+2. commits signed or bot-attributed change,
+3. pushes branch,
+4. creates draft PR,
+5. writes PR record transactionally,
+6. updates Jira.
+
+### Base branch moved: what happens?
+
+Do **not** silently push an old patch.
+
+- small non-conflicting drift → rebase in sandbox + rerun affected tests,
+- conflicting or semantically large drift → new analysis or `NEEDS_HUMAN`.
+
+---
+
+## 12. Idempotency and Exactly-Once Effects
+
+End-to-end exactly-once execution is unrealistic across Jira, workflow engine, GitHub, and network retries. Design for **at-least-once execution + idempotent side effects**.
+
+### Key examples
+
+```text
+trigger idempotency:
+  jiraEventId -> processed once
+
+run idempotency:
+  hash(ticketKey, ticketRevision, repo, baseSha, policyVersion)
+
+branch idempotency:
+  deterministic branch name + recorded head SHA
+
+PR idempotency:
+  lookup by run marker / branch before create
+
+Jira comment idempotency:
+  embed runId marker and upsert
+```
+
+Postgres unique constraints enforce logical uniqueness.
+
+---
+
+## 13. Consistency and Sources of Truth
+
+| Data                         | Source of truth  |
+| ---------------------------- | ---------------- |
+| Ticket content               | Jira             |
+| Source code/base SHA         | Git provider     |
+| Workflow state               | Temporal history |
+| Run metadata/queryable state | Postgres         |
+| Generated artifacts          | Object storage   |
+| PR state                     | Git provider     |
+| Analytics events             | Kafka/warehouse  |
+
+Avoid making Kafka or Redis authoritative for workflow correctness.
+
+---
+
+## 14. API Design
+
+### Start manually
+
+```http
+POST /v1/automation-runs
+Idempotency-Key: PAY-1842:rev-17:repo-api:8ab12
+
+{
+  "ticketKey": "PAY-1842",
+  "repository": "payments/api",
+  "baseBranch": "main",
+  "mode": "draft_pr"
+}
+```
+
+```json
+{
+  "runId": "run_01K...",
+  "state": "CONTEXT_GATHERING"
+}
+```
+
+### Fetch run
+
+```http
+GET /v1/automation-runs/{runId}
+```
+
+### Event stream for UI
+
+```http
+GET /v1/automation-runs/{runId}/events
+Accept: text/event-stream
+Last-Event-ID: 481
+```
+
+```text
+event: step.completed
+id: 482
+data: {"step":"unit_tests","status":"passed","durationMs":12942}
+```
+
+### Cancel
+
+```http
+POST /v1/automation-runs/{runId}/cancel
+```
+
+### Approve plan
+
+```http
+POST /v1/automation-runs/{runId}/approvals
+
+{
+  "decision": "approve",
+  "planHash": "sha256:..."
+}
+```
+
+---
+
+## 15. Frontend / Operator Console
+
+A useful UI has three views.
+
+### Ticket panel
+
+- ticket and acceptance criteria
+- eligibility status
+- repo/base SHA
+- risk score
+- start/cancel/rerun
+
+### Live run timeline
+
+```text
+✓ Eligibility
+✓ Context gathered
+✓ Plan created
+✓ Workspace ready
+● Editing files...
+○ Validation
+○ Security review
+○ PR creation
+```
+
+Use **SSE** for one-way workflow progress. WebSockets add complexity without much value unless the UI supports interactive two-way agent sessions.
+
+### Diff/approval panel
+
+- plan diff
+- source diff
+- test results
+- warnings
+- requested reviewers
+- publish approval when policy requires it
+
+---
+
+## 16. Security Deep Dive
+
+### Threats
+
+1. Prompt injection from Jira text.
+2. Prompt injection from repository files.
+3. Malicious build scripts.
+4. Secret exfiltration through tool calls or network.
+5. Agent modifies CI/workflow/security policy files.
+6. Dependency confusion / malicious package install.
+7. GitHub token abuse.
+8. Cross-tenant repository leakage.
+
+### Controls
+
+```text
+Input is untrusted data, never system instruction.
+↓
+Policy layer separates instructions from retrieved content.
+↓
+Tool authorization is enforced outside the model.
+↓
+Filesystem path allow/deny policy.
+↓
+Sandbox with no default egress.
+↓
+Short-lived scoped credentials injected only when needed.
+↓
+Protected files require human approval.
+↓
+Final diff independently scanned before publish.
+```
+
+#### Critical rule
+
+**The LLM never decides its own permissions.** It may request a tool call; a deterministic policy service decides whether that call is allowed.
+
+---
+
+## 17. Multi-Tenant Isolation
+
+For a SaaS version:
+
+- Every run has `tenant_id`.
+- Jira installation and GitHub installation are tenant-scoped.
+- Postgres row-level or service-level tenant enforcement.
+- Object storage prefixes/buckets scoped by tenant.
+- encryption keys optionally per tenant.
+- sandbox network policy per tenant.
+- credentials minted per installation, never shared across tenants.
+- cache keys include tenant namespace.
+
+---
+
+## 18. Failure Handling
+
+| Failure                    | Response                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------- |
+| Duplicate Jira webhook     | Deduplicate by event ID                                                         |
+| Jira unavailable           | Workflow retry with backoff                                                     |
+| Git clone fails            | Retry transient errors; fail invalid auth                                       |
+| LLM timeout                | Retry same task; possibly route alternate model                                 |
+| Agent emits invalid patch  | Reject patch and request repair                                                 |
+| Tests fail                 | Bounded repair loop                                                             |
+| Sandbox dies               | Provision fresh sandbox and replay from persisted patch/context artifact        |
+| GitHub PR create times out | Query branch/PR before retrying creation                                        |
+| Base branch changes        | Rebase + revalidate or escalate                                                 |
+| User cancels               | Temporal cancellation → terminate sandbox → revoke credentials                  |
+| Ticket edited mid-run      | Compare Jira revision; restart or require confirmation depending on materiality |
+
+---
+
+## 19. Cost Controls
+
+Track cost per run:
+
+```text
+LLM input tokens
+LLM output tokens
+sandbox CPU-minutes
+sandbox memory-minutes
+build cache bandwidth
+artifact storage
+external API calls
+```
+
+Optimization order:
+
+1. retrieve less but better context,
+2. use deterministic tooling before LLM,
+3. use smaller model for classification/summarization,
+4. cache immutable repo indexing by commit SHA,
+5. target tests based on changed dependency graph,
+6. cap retries and repair loops,
+7. reuse package/build caches safely across isolated jobs.
+
+Do not reuse writable workspaces across tenants/runs.
+
+---
+
+## 20. Observability and Product Metrics
+
+### Platform SLIs
+
+- workflow success rate
+- P50/P95 ticket→draft-PR latency
+- sandbox provisioning latency
+- LLM/tool error rate
+- validation failure rate
+- GitHub/Jira API error rate
+- stuck workflow count
+
+### Quality metrics
+
+- PR acceptance rate
+- % PRs merged without human code edits
+- average reviewer edits per generated PR
+- revert rate
+- production incident rate attributable to generated changes
+- tests added / test coverage delta
+- human approval rejection rate
+
+### Agent evaluation
+
+Offline benchmark set of historical tickets:
+
+```text
+ticket + repository snapshot
+          ↓
+       agent run
+          ↓
+compare against:
+- compile/test pass
+- semantic assertions
+- expected files touched
+- security policy
+- diff size
+- reference implementation (optional, not exact-match)
+```
+
+Run evaluations on every model/prompt/tool-policy update before production rollout.
+
+---
+
+## 21. Scalability
+
+Assume:
+
+- 100K enabled engineers
+- 20K eligible tickets/day
+- 5K peak concurrent workflows
+- each workflow 1–20 minutes
+
+The bottleneck is not the API gateway; it is sandbox compute, repository clone/build time, and LLM throughput.
+
+### Scale independently
+
+```text
+Trigger/API workers        stateless, horizontally scale
+Workflow workers           CPU-light, horizontally scale
+Context/index workers      CPU/memory; cache by commit SHA
+Agent workers              external model quotas / inference capacity
+Sandbox build workers      largest compute pool
+Publisher workers          rate-limited Git provider API calls
+```
+
+### Backpressure
+
+Use per-tenant and global concurrency limits:
+
+```text
+max_active_runs_per_tenant
+max_sandboxes_per_repo
+max_llm_requests_per_model
+max_publish_qps_per_github_installation
+```
+
+Temporal task queues can be partitioned by workload class / tenant tier / repository risk.
+
+---
+
+## 22. Deep-Dive Interview Questions
+
+### Q1. Why not have one LLM prompt generate the whole patch?
+
+Because it reduces observability, context quality, failure recovery, and control. Planning, editing, deterministic validation, and bounded repair should be separate stages. The system should rely on compilers/tests/scanners for truth whenever possible.
+
+### Q2. Why not put the entire repository into a vector database?
+
+Use embeddings as a discovery aid, not as the canonical code view. Indexes can lag and embeddings are weak for exact symbol relationships. Read the actual files from the checked-out commit before editing.
+
+### Q3. What if Jira changes after the run starts?
+
+Record a Jira revision/version at start. Before publishing, fetch the current revision. If changed fields are materially relevant—description, acceptance criteria, linked design—pause, reanalyze, or restart. Non-material changes such as assignee can be ignored.
+
+### Q4. How do you prevent duplicate PRs after a timeout?
+
+Use deterministic branch/run markers. If `create PR` times out, first query GitHub for a PR from that branch/run marker. Only create if none exists.
+
+### Q5. How do you stop an agent from leaking source code to an unauthorized model provider?
+
+Model routing is policy-controlled. Repositories are tagged with allowed model/data-processing classes. Sensitive repos may use enterprise zero-retention endpoints or self-hosted models. Tool layer redacts secrets and only sends selected snippets.
+
+### Q6. How do you safely support package installation?
+
+Default deny network. Permit only allowlisted registries through egress proxy; enforce lockfiles/checksums; block new dependencies or require approval for dependency changes; scan licenses and vulnerabilities.
+
+### Q7. How do you know the generated change actually solves the ticket?
+
+Three layers:
+
+1. deterministic repository tests,
+2. acceptance-criteria-specific tests/assertions when available,
+3. independent verifier model comparing requirements ↔ diff ↔ test evidence.
+
+The verifier is advisory; deterministic failures override model confidence.
+
+### Q8. What happens if tests take 45 minutes?
+
+Separate fast pre-PR validation from CI. The agent runs targeted fast checks, opens a draft PR, and normal CI performs full regression. The automation can consume CI check events and optionally attempt a follow-up repair commit.
+
+### Q9. Would you auto-merge?
+
+Only for a narrow policy class: low-risk repo, tiny diff, no dependency/schema/config/security changes, all mandatory checks pass, model confidence above threshold, historical agent quality is strong, and organization explicitly enables it. Otherwise draft PR + human review.
+
+### Q10. Why SSE for frontend status?
+
+The server primarily sends a linear event stream to the browser. SSE provides auto-reconnect and simple HTTP infrastructure. Use `Last-Event-ID` to replay persisted run events. WebSocket is justified only for interactive bidirectional agent sessions.
+
+---
+
+## 23. Recommended MVP → V2 → V3
+
+### MVP
+
+- manual Jira action
+- one GitHub organization
+- allowlisted repositories
+- Jira + GitHub App
+- Temporal
+- Postgres
+- K8s sandbox
+- tool-constrained code agent
+- lint/type/unit tests
+- draft PR only
+- no arbitrary network access
+
+### V2
+
+- automatic Jira transitions
+- semantic repo search/indexing
+- plan approval rules
+- CI repair loop
+- per-team policy config
+- quality dashboard
+- model routing
+
+### V3
+
+- multi-repo tickets
+- dependency-aware coordinated PRs
+- verified migration workflows
+- organization-level learned retrieval
+- safe low-risk auto-merge
+- continuous evaluation / adaptive model routing
+
+---
+
+## 24. 90-Second Interview Answer
+
+> I’d model Jira-to-PR as a durable, policy-governed workflow rather than a single agent call. A Jira webhook starts a Temporal workflow after an eligibility and risk check. The system captures the exact Jira revision and Git base SHA, gathers targeted repository context using code search and symbol-aware lookup, then asks a planner to create a bounded implementation plan. The executor runs in an ephemeral sandbox with no default network access and only narrow tools for reading files, applying patches, and invoking approved build commands. After each edit we run deterministic validation—lint, typecheck, targeted tests, security scans—and allow only a small repair loop. The publisher uses a short-lived GitHub App token, verifies the final artifact hash and base branch, creates a deterministic branch, opens a draft PR idempotently, and links it back to Jira. Temporal is the workflow source of truth, Postgres stores searchable metadata, object storage keeps plans, patches and logs, and every external side effect is idempotent because Jira and GitHub APIs are at-least-once in practice. My biggest deep dives would be sandbox isolation, prompt-injection/tool authorization, idempotent PR creation, handling base-branch or ticket drift, and how we measure whether generated PRs are actually useful and safe.
+
+---
+
+## 25. What I Would Draw First in an Interview
+
+1. Jira → Trigger/API → Policy → Temporal.
+2. Temporal fan-out to Context Service, Agent Runtime, Sandbox Manager.
+3. Sandbox runs edit + validation loop.
+4. GitHub App publishes draft PR.
+5. Jira gets PR/status update.
+6. Underline platform services: Postgres, object storage, secrets, observability.
+7. Circle the three critical deep dives:
+   - security boundary at the tool/sandbox layer,
+   - durable/idempotent workflow,
+   - deterministic validation + human gate.
