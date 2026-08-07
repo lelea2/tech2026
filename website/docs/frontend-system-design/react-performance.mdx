@@ -19,16 +19,16 @@ sidebar_label: React Performance
 
 **The framing that earns staff-level signal:** don't reach for a tool, **identify the bottleneck first**. Every React performance API solves exactly one category of problem, and using the wrong one adds complexity without moving the metric.
 
-| Bottleneck | Tool |
-| --- | --- |
-| Unnecessary child re-render | `React.memo` (+ stable props) |
-| Expensive derived computation | `useMemo` |
-| Function identity churn breaking memoization | `useCallback` |
-| Urgent input vs. expensive downstream UI | `useDeferredValue` |
-| A state update you own is non-urgent | `startTransition` |
-| State owned outside React (tearing risk) | `useSyncExternalStore` |
-| Long CPU tasks blocking the main thread | Web Worker |
-| Visual updates that must align with paint | `requestAnimationFrame` |
+| Bottleneck                                   | Tool                          |
+| -------------------------------------------- | ----------------------------- |
+| Unnecessary child re-render                  | `React.memo` (+ stable props) |
+| Expensive derived computation                | `useMemo`                     |
+| Function identity churn breaking memoization | `useCallback`                 |
+| Urgent input vs. expensive downstream UI     | `useDeferredValue`            |
+| A state update you own is non-urgent         | `startTransition`             |
+| State owned outside React (tearing risk)     | `useSyncExternalStore`        |
+| Long CPU tasks blocking the main thread      | Web Worker                    |
+| Visual updates that must align with paint    | `requestAnimationFrame`       |
 
 **Rule of thumb:** `React.memo` / `useMemo` / `useCallback` **reduce repeated React work**. `useDeferredValue` / `startTransition` **prioritize** React work. Web Workers **move CPU work off-thread**. `requestAnimationFrame` **coordinates** work with browser paint.
 
@@ -76,12 +76,12 @@ What is slow?
 
 ### `useMemo`
 
-| | |
-| --- | --- |
-| **Use when** | Derived value is expensive to recompute and dependencies change relatively rarely |
-| **What it does** | Caches a computed value between renders |
-| **Avoid / caveat** | Don't memoize trivial work. Cache adds memory and dependency complexity |
-| **Typical example** | Sorting/filtering 10k rows, building expensive chart data |
+|                     |                                                                                   |
+| ------------------- | --------------------------------------------------------------------------------- |
+| **Use when**        | Derived value is expensive to recompute and dependencies change relatively rarely |
+| **What it does**    | Caches a computed value between renders                                           |
+| **Avoid / caveat**  | Don't memoize trivial work. Cache adds memory and dependency complexity           |
+| **Typical example** | Sorting/filtering 10k rows, building expensive chart data                         |
 
 ```jsx
 const rows = useMemo(() => sort(data), [data]);
@@ -89,27 +89,27 @@ const rows = useMemo(() => sort(data), [data]);
 
 ### `useCallback`
 
-| | |
-| --- | --- |
-| **Use when** | Function identity matters — usually with memoized children or hook dependency arrays |
-| **What it does** | Caches a **function reference**, not the result |
-| **Avoid / caveat** | Doesn't make function execution faster. Useless if the consumer doesn't care about identity |
-| **Typical example** | Stable handler passed into `React.memo`'d row components |
+|                     |                                                                                             |
+| ------------------- | ------------------------------------------------------------------------------------------- |
+| **Use when**        | Function identity matters — usually with memoized children or hook dependency arrays        |
+| **What it does**    | Caches a **function reference**, not the result                                             |
+| **Avoid / caveat**  | Doesn't make function execution faster. Useless if the consumer doesn't care about identity |
+| **Typical example** | Stable handler passed into `React.memo`'d row components                                    |
 
 ```jsx
 const onSelect = useCallback((id) => selectItem(id), [selectItem]);
 ```
 
-**Key distinction:** `useMemo` caches a *value*; `useCallback` caches a *reference*. `useCallback(fn, deps)` is exactly `useMemo(() => fn, deps)`.
+**Key distinction:** `useMemo` caches a _value_; `useCallback` caches a _reference_. `useCallback(fn, deps)` is exactly `useMemo(() => fn, deps)`.
 
 ### `useDeferredValue`
 
-| | |
-| --- | --- |
-| **Use when** | A value changes urgently, but expensive UI derived from it may lag slightly |
-| **What it does** | Keeps urgent UI responsive while React renders a lower-priority version of the value |
-| **Avoid / caveat** | **Not debouncing** — the work may still happen. Does not offload CPU from the main thread |
-| **Typical example** | Search box updates immediately; large filtered list trails behind |
+|                     |                                                                                           |
+| ------------------- | ----------------------------------------------------------------------------------------- |
+| **Use when**        | A value changes urgently, but expensive UI derived from it may lag slightly               |
+| **What it does**    | Keeps urgent UI responsive while React renders a lower-priority version of the value      |
+| **Avoid / caveat**  | **Not debouncing** — the work may still happen. Does not offload CPU from the main thread |
+| **Typical example** | Search box updates immediately; large filtered list trails behind                         |
 
 ```jsx
 const [query, setQuery] = useState('');
@@ -120,18 +120,18 @@ const results = useMemo(() => filter(items, deferredQuery), [items, deferredQuer
 
 ### `startTransition`
 
-| | |
-| --- | --- |
-| **Use when** | You control the state update and can mark it non-urgent |
-| **What it does** | Schedules state updates as interruptible, lower-priority transition work |
-| **Avoid / caveat** | Don't use for a controlled input's direct value. Still executes render work on the main thread |
-| **Typical example** | Tab/navigation result update, large result pane refresh |
+|                     |                                                                                                |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| **Use when**        | You control the state update and can mark it non-urgent                                        |
+| **What it does**    | Schedules state updates as interruptible, lower-priority transition work                       |
+| **Avoid / caveat**  | Don't use for a controlled input's direct value. Still executes render work on the main thread |
+| **Typical example** | Tab/navigation result update, large result pane refresh                                        |
 
 ```jsx
 const [isPending, startTransition] = useTransition();
 
 function onTabChange(tab) {
-  setActiveTab(tab);            // urgent — tab highlight updates instantly
+  setActiveTab(tab); // urgent — tab highlight updates instantly
   startTransition(() => {
     setTabContent(loadTab(tab)); // non-urgent — interruptible
   });
@@ -142,18 +142,18 @@ function onTabChange(tab) {
 
 ### `useSyncExternalStore`
 
-| | |
-| --- | --- |
-| **Use when** | React reads state owned outside React — Redux-like store, browser API, custom cache |
-| **What it does** | Provides concurrency-safe subscription + snapshot semantics and **avoids tearing** |
-| **Avoid / caveat** | **Not primarily a speed optimization** — use when integrating external mutable stores |
-| **Typical example** | Subscribe to viewport store, shared client cache, custom state library |
+|                     |                                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------- |
+| **Use when**        | React reads state owned outside React — Redux-like store, browser API, custom cache   |
+| **What it does**    | Provides concurrency-safe subscription + snapshot semantics and **avoids tearing**    |
+| **Avoid / caveat**  | **Not primarily a speed optimization** — use when integrating external mutable stores |
+| **Typical example** | Subscribe to viewport store, shared client cache, custom state library                |
 
 ```jsx
 const width = useSyncExternalStore(
   subscribeToResize,
-  () => window.innerWidth,   // client snapshot
-  () => 1024                  // server snapshot (SSR)
+  () => window.innerWidth, // client snapshot
+  () => 1024 // server snapshot (SSR)
 );
 ```
 
@@ -161,12 +161,12 @@ const width = useSyncExternalStore(
 
 ### Web Worker
 
-| | |
-| --- | --- |
-| **Use when** | CPU-heavy pure computation creates long tasks and blocks input / scrolling / paint |
-| **What it does** | Runs JavaScript on **another thread**; communicates via messages / transferable data |
-| **Avoid / caveat** | No direct DOM access; serialization has cost. Not worth it for tiny jobs |
-| **Typical example** | Parse huge file, layout graph, image/data processing |
+|                     |                                                                                      |
+| ------------------- | ------------------------------------------------------------------------------------ |
+| **Use when**        | CPU-heavy pure computation creates long tasks and blocks input / scrolling / paint   |
+| **What it does**    | Runs JavaScript on **another thread**; communicates via messages / transferable data |
+| **Avoid / caveat**  | No direct DOM access; serialization has cost. Not worth it for tiny jobs             |
+| **Typical example** | Parse huge file, layout graph, image/data processing                                 |
 
 ```jsx
 const worker = useMemo(() => new Worker(new URL('./parse.worker.js', import.meta.url)), []);
@@ -181,12 +181,12 @@ useEffect(() => {
 
 ### `requestAnimationFrame`
 
-| | |
-| --- | --- |
-| **Use when** | Visual DOM/canvas updates should sync with browser paint |
-| **What it does** | Runs callback before the next repaint; coalesces animation work |
-| **Avoid / caveat** | **Not a background thread** — a heavy callback still blocks |
-| **Typical example** | Drag, scroll-linked visuals, canvas animation |
+|                     |                                                                 |
+| ------------------- | --------------------------------------------------------------- |
+| **Use when**        | Visual DOM/canvas updates should sync with browser paint        |
+| **What it does**    | Runs callback before the next repaint; coalesces animation work |
+| **Avoid / caveat**  | **Not a background thread** — a heavy callback still blocks     |
+| **Typical example** | Drag, scroll-linked visuals, canvas animation                   |
 
 ```jsx
 useEffect(() => {
@@ -196,7 +196,10 @@ useEffect(() => {
     raf = requestAnimationFrame(() => updateParallax(window.scrollY));
   };
   window.addEventListener('scroll', onScroll, { passive: true });
-  return () => { window.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); };
+  return () => {
+    window.removeEventListener('scroll', onScroll);
+    cancelAnimationFrame(raf);
+  };
 }, []);
 ```
 
@@ -206,14 +209,14 @@ useEffect(() => {
 
 ## Common Anti-Patterns
 
-| Anti-pattern | Why it's wrong | Do instead |
-| --- | --- | --- |
-| Wrapping every component in `React.memo` | Adds comparison cost everywhere; masks the real bottleneck | Profile first, memoize the specific hot component |
-| `useMemo` on trivial computations | Hook bookkeeping costs more than the work | Only memoize measurably expensive work |
-| `useCallback` on handlers passed to plain DOM elements | DOM elements don't care about function identity | Only stabilize callbacks consumed by memoized children or hook deps |
-| Using `useDeferredValue` as a debounce | The work still runs — it's just lower priority | Actually debounce if you want to *skip* work |
-| Moving trivial work to a Web Worker | Serialization overhead exceeds the compute saved | Only offload genuinely long tasks (>50ms) |
-| Optimizing before measuring | You'll optimize the wrong thing | React Profiler → Performance panel → then act |
+| Anti-pattern                                           | Why it's wrong                                             | Do instead                                                          |
+| ------------------------------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------- |
+| Wrapping every component in `React.memo`               | Adds comparison cost everywhere; masks the real bottleneck | Profile first, memoize the specific hot component                   |
+| `useMemo` on trivial computations                      | Hook bookkeeping costs more than the work                  | Only memoize measurably expensive work                              |
+| `useCallback` on handlers passed to plain DOM elements | DOM elements don't care about function identity            | Only stabilize callbacks consumed by memoized children or hook deps |
+| Using `useDeferredValue` as a debounce                 | The work still runs — it's just lower priority             | Actually debounce if you want to _skip_ work                        |
+| Moving trivial work to a Web Worker                    | Serialization overhead exceeds the compute saved           | Only offload genuinely long tasks (>50ms)                           |
+| Optimizing before measuring                            | You'll optimize the wrong thing                            | React Profiler → Performance panel → then act                       |
 
 ---
 
@@ -221,11 +224,11 @@ useEffect(() => {
 
 1. **"Why didn't `React.memo` help here?"** — Check whether the parent passes new object/array/function references each render, whether the component reads context, or whether the expensive work is upstream of the memo boundary entirely.
 
-2. **"What's the difference between `useDeferredValue` and debouncing?"** — Debouncing *skips* work by delaying and cancelling. `useDeferredValue` *still does* the work, just at interruptible lower priority — the UI stays responsive but the CPU cost is unchanged.
+2. **"What's the difference between `useDeferredValue` and debouncing?"** — Debouncing _skips_ work by delaying and cancelling. `useDeferredValue` _still does_ the work, just at interruptible lower priority — the UI stays responsive but the CPU cost is unchanged.
 
 3. **"When would `useCallback` be pointless?"** — When the consumer doesn't compare identity: passing a handler to a plain `<button onClick>`, or to a non-memoized child that re-renders anyway.
 
-4. **"How do you decide between `startTransition` and a Web Worker?"** — `startTransition` reprioritizes *React render* work on the main thread; it doesn't reduce total CPU. If a single task exceeds ~50ms and blocks input, no amount of React scheduling helps — you need a Worker.
+4. **"How do you decide between `startTransition` and a Web Worker?"** — `startTransition` reprioritizes _React render_ work on the main thread; it doesn't reduce total CPU. If a single task exceeds ~50ms and blocks input, no amount of React scheduling helps — you need a Worker.
 
 5. **"What is tearing and which API prevents it?"** — Under concurrent rendering, an external store mutating mid-render can cause different components in one commit to read different values. `useSyncExternalStore` guarantees a consistent snapshot.
 
