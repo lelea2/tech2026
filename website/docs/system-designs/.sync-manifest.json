@@ -72,14 +72,6 @@
       "hash": "a0f6609205251e276eb477905a159a17a323263d664dff8b58752013a831b408",
       "docRelative": "chat-gpt.png"
     },
-    "system-designs/chess-live-game-fe-wireframe.svg": {
-      "hash": "f8b04c9f05d4e5d509d01cbc3992d3ab261d28372e7d4e8b70a43124b8124e82",
-      "docRelative": "chess-live-game-fe-wireframe.svg"
-    },
-    "system-designs/chess-online-system-architecture.svg": {
-      "hash": "3f99872af8c4dd8fc20245934555cf735dad56eacaacb89213369edcf4b1c691",
-      "docRelative": "chess-online-system-architecture.svg"
-    },
     "system-designs/cicd.png": {
       "hash": "8988ef9fcaa24a21b3763564f1a43e0641e433a9fcd3cd09a09507d966974778",
       "docRelative": "cicd.png"
@@ -187,6 +179,10 @@
     "system-designs/news-aggregator.png": {
       "hash": "dbc251b15f94a785ed3f2e1c166f9e22d6b3200e069c6c37f274016b9b8b1bd0",
       "docRelative": "news-aggregator.png"
+    },
+    "system-designs/online-auction.png": {
+      "hash": "9a199dce7165f179793e86359c059226f1f0c2ff7cd96ad78daece23880b6996",
+      "docRelative": "online-auction.png"
     },
     "system-designs/online-chess.png": {
       "hash": "474a7b1e623893b8a93033756dced3243a13a5234e4ec7ad888204e9413b1ed6",
@@ -348,10 +344,6 @@
       "hash": "19b247dbf720c63bcbab360fe12e3cfd6742d76ed9036c5d27665e1734787aef",
       "docRelative": "i18n-design.mdx"
     },
-    "system-designs/immutable_audit_log_system.mdx": {
-      "hash": "7d34245d9b1ae8ed4e4757c63e72e7ec8580804ed3db6709c1f1e7ea63faabbc",
-      "docRelative": "immutable_audit_log_system.mdx"
-    },
     "system-designs/job-scheduler.mdx": {
       "hash": "c2c20a8c58d7145293135b4c31ab75b293ed4ba8386abaf22a7894fff9463a0c",
       "docRelative": "job-scheduler.mdx"
@@ -415,6 +407,10 @@
     "system-designs/news-aggregator.mdx": {
       "hash": "515e3f1dc9be787119e71ad9d198b22745b761b7d265a5aa7aac9d2903d4a8de",
       "docRelative": "news-aggregator.mdx"
+    },
+    "system-designs/online-auction.mdx": {
+      "hash": "a16210c4d6e1758aee2fd32a98a7d5fd2c65bc01f43ea842f03daf8cf4e84475",
+      "docRelative": "online-auction.mdx"
     },
     "system-designs/online-chess.mdx": {
       "hash": "ab00a683b9618b258d594db81c0c6f4526537cabefd1d272696fabb2e8bf1a9e",
