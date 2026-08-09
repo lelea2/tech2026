@@ -1,0 +1,539 @@
+---
+title: 'Operational Transformation vs CRDT: Conflict-Free Collaboration'
+description: 'Staff-level guide to choosing between Operational Transformation (OT) and Conflict-free Replicated Data Types (CRDT) for real-time collaborative editing and offline-first systems.'
+tags:
+  - ot
+  - crdt
+  - collaborative-editing
+  - conflict-resolution
+  - distributed-systems
+  - offline-first
+sidebar_label: 'OT vs CRDT'
+---
+
+## Interview Summary
+
+| Aspect                 | Operational Transformation (OT)                                      | CRDT                                                      |
+| ---------------------- | -------------------------------------------------------------------- | --------------------------------------------------------- |
+| **Architecture**       | Centralized server orders operations; clients transform against them | Distributed; each replica is equal; eventual convergence  |
+| **Consistency**        | Strong (through server ordering)                                     | Eventual (all replicas converge to same state)            |
+| **Offline support**    | Limited; needs to reconnect and reconcile                            | Native; works offline indefinitely                        |
+| **Operation size**     | Small (e.g., "insert char at pos 5")                                 | Larger (includes metadata: user ID, timestamp, unique ID) |
+| **Transform logic**    | Complex; operations must commute for all interleavings               | Less transform logic; convergence built into design       |
+| **Memory overhead**    | Minimal                                                              | High (tombstones, metadata, version vectors)              |
+| **Latency**            | Depends on round-trip to server                                      | Immediate local execution                                 |
+| **Garbage collection** | Natural                                                              | Requires careful tombstone cleanup                        |
+| **Best for**           | Document editing with stable server (Google Docs, Figma)             | Offline-first apps, peer-to-peer (Automerge, Yjs)         |
+
+**The rule of thumb:**
+
+- **OT**: You have a server you trust; users expect consistent ordering
+- **CRDT**: Users work offline; eventual consistency is acceptable; peer-to-peer merging is critical
+
+---
+
+## Operational Transformation (OT)
+
+### Core Concept
+
+OT is a technique where **operations are defined locally, then transformed when received from other clients** to account for concurrent operations. The server acts as the canonical source of ordering.
+
+```
+User A (Alice):          User B (Bob):
+  "Hello"                 "Hello"
+     ↓ (A inserts "!" at pos 5)     ↓ (B inserts "?" at pos 5)
+  "Hello!"               "Hello?"
+     ↓ (OT transforms)    ↓ (OT transforms)
+  "Hello?!"              "Hello!?"
+```
+
+### How It Works
+
+1. **Local execution**: User types → operation applied locally immediately
+2. **Send to server**: Operation sent with version number (lamport clock or sequence)
+3. **Server receives**: Server applies operations in order; maintains a history
+4. **Transform & broadcast**: For each operation, server transforms it against all concurrent operations and broadcasts the canonical version
+5. **Clients receive**: Clients transform incoming operations against their local history
+
+**Key insight**: Two operations can commute if they don't conflict.
+
+```javascript
+// Example: Insert operations on a string
+// Alice: Insert "!" at position 5
+// Bob: Insert "?" at position 3
+
+// At server:
+// Version 0: "Hello" (both start here)
+// Alice's op1: Insert(5, "!")  → "Hello!"
+// Bob's op2: Insert(3, "?")    → needs transformation
+
+// Transform Bob's op2 against Alice's op1:
+// Bob's original op: Insert(3, "?")
+// Alice's op: Insert(5, "!")  (doesn't affect position 3, so no transform needed)
+// Result: Insert(3, "?") → "He?llo!"
+
+// Alice receives Bob's transformed op: Insert(3, "?")
+// Alice locally has: "Hello!" (from her own op)
+// Transform Insert(3, "?") against her Insert(5, "!"):
+// Since ? is before !, no adjustment needed
+// Result: "He?llo!"
+
+// Both converge to "He?llo!"
+```
+
+### Advantages
+
+✅ **Small operation representation** — just diff (e.g., "insert char at pos 5")
+✅ **Centralized ordering is straightforward** — server decides canonical order
+✅ **Proven for text collaboration** — Google Docs, Figma, VS Code Live Share
+✅ **Minimal metadata overhead** — operations don't carry version vectors
+✅ **Instant consistency** — with server acknowledgment, users see consistent state
+
+### Disadvantages
+
+❌ **Transform logic becomes complex** — must handle all possible interleavings of concurrent operations
+❌ **Operations must be carefully defined** — commutative property must hold for safety
+❌ **Server is critical dependency** — no offline editing; must reconcile on reconnect
+❌ **Difficult to scale to many concurrent users** — transform matrix grows exponentially
+❌ **Hard to reason about correctness** — requires formal proofs of commutative properties
+
+### Code Example: Simple OT for Text
+
+```javascript
+// Operation: { type: 'insert', pos: number, char: string, version: number }
+// or:        { type: 'delete', pos: number, version: number }
+
+class OTEditor {
+  constructor() {
+    this.doc = '';
+    this.version = 0;
+    this.pendingOps = [];
+  }
+
+  // Local insert
+  localInsert(pos, char) {
+    this.doc = this.doc.slice(0, pos) + char + this.doc.slice(pos);
+    const op = { type: 'insert', pos, char, version: this.version };
+    this.pendingOps.push(op);
+    this.sendToServer(op);
+  }
+
+  // Transform an incoming op against local pending ops
+  transformOp(incomingOp) {
+    let transformedOp = { ...incomingOp };
+    for (const pendingOp of this.pendingOps) {
+      transformedOp = this.transform(transformedOp, pendingOp);
+    }
+    return transformedOp;
+  }
+
+  // Transform two operations against each other
+  // This is where the complexity lives
+  transform(op1, op2) {
+    if (op1.type === 'insert' && op2.type === 'insert') {
+      // If both insert at same position, use tie-breaker (e.g., user ID)
+      if (op1.pos === op2.pos) {
+        return op1.userId < op2.userId ? op1 : { ...op1, pos: op1.pos + 1 };
+      }
+      if (op1.pos < op2.pos) {
+        return op1; // op1 doesn't affect op2's position
+      }
+      return { ...op1, pos: op1.pos + 1 }; // op2 shifted everything after it
+    }
+    if (op1.type === 'insert' && op2.type === 'delete') {
+      if (op1.pos <= op2.pos) {
+        return op1; // insert before delete, no change
+      }
+      return { ...op1, pos: op1.pos - 1 }; // insert after delete, shift left
+    }
+    if (op1.type === 'delete' && op2.type === 'insert') {
+      if (op1.pos < op2.pos) {
+        return op1; // delete before insert, no change
+      }
+      return { ...op1, pos: op1.pos + 1 }; // delete after insert, shift right
+    }
+    if (op1.type === 'delete' && op2.type === 'delete') {
+      if (op1.pos === op2.pos) {
+        return null; // Both delete same char, second is no-op
+      }
+      if (op1.pos < op2.pos) {
+        return op1;
+      }
+      return { ...op1, pos: op1.pos - 1 };
+    }
+    return op1;
+  }
+
+  // Server receives operation, applies it canonically
+  serverApplyOp(op) {
+    // Execute op on server state
+    if (op.type === 'insert') {
+      this.doc = this.doc.slice(0, op.pos) + op.char + this.doc.slice(op.pos);
+    } else if (op.type === 'delete') {
+      this.doc = this.doc.slice(0, op.pos) + this.doc.slice(op.pos + 1);
+    }
+    this.version++;
+  }
+
+  // Receive operation from server (already transformed)
+  receiveOp(op) {
+    // Remove from pending if this is our own op echoed back
+    this.pendingOps = this.pendingOps.filter((p) => !(p.pos === op.pos && p.char === op.char));
+
+    // Transform and apply
+    const transformed = this.transformOp(op);
+    if (transformed.type === 'insert') {
+      this.doc =
+        this.doc.slice(0, transformed.pos) + transformed.char + this.doc.slice(transformed.pos);
+    } else if (transformed.type === 'delete') {
+      this.doc = this.doc.slice(0, transformed.pos) + this.doc.slice(transformed.pos + 1);
+    }
+  }
+}
+```
+
+### When to Use OT
+
+- ✅ Document editing with a **trusted server** (Google Docs, Figma)
+- ✅ **Low latency** is critical; users expect instant feedback
+- ✅ **Small operations** (character-level edits)
+- ✅ **Consistency** is more important than availability
+- ✅ **Limited offline support** is acceptable
+
+---
+
+## CRDT (Conflict-free Replicated Data Types)
+
+### Core Concept
+
+CRDT is a data structure where **operations commute by design**. Every replica can apply operations in any order and still converge to the same state. No central server needed.
+
+```
+User A (Alice):          User B (Bob):
+  "Hello"                 "Hello"
+     ↓ (A inserts "!" at pos 5 with ID=A1)   ↓ (B inserts "?" at pos 5 with ID=B1)
+  "Hello!"               "Hello?"
+     ↓ (Merge via unique IDs)    ↓ (Merge via unique IDs)
+  "Hello!?"              "Hello!?"
+     (or "Hello?!" depending on ID ordering)
+```
+
+The key: operations are **idempotent and commutative** because they include unique identifiers.
+
+### How It Works
+
+1. **Local execution**: User types → operation applied locally with unique ID
+2. **Broadcast**: Operation sent to all replicas (via network, sync, merge)
+3. **Receive**: Any replica receives operation → applies it directly
+4. **Convergence**: All replicas converge because operations commute
+
+**Key insight**: Order doesn't matter; just the set of operations and their metadata.
+
+```javascript
+// Example: CRDT Insert using unique (user_id, timestamp) pairs
+// Alice (user_id=1): Insert character "!" at logical position
+//   -> { char: "!", id: (1, 100), tombstone: false }
+// Bob (user_id=2): Insert character "?" at logical position
+//   -> { char: "?", id: (2, 200), tombstone: false }
+
+// Position is determined by ID ordering:
+// If sorting by (user_id, timestamp):
+//   (1, 100) < (2, 200)  →  "Hello!?"
+//   Characters sorted by their unique ID, not insertion order
+
+// Merge order doesn't matter:
+// Alice sees: Bob's op → apply directly → "Hello!?"
+// Bob sees: Alice's op → apply directly → "Hello!?"
+// Both end up at "Hello!?" because operation order is determined by ID, not time
+```
+
+### Advantages
+
+✅ **Natural offline merging** — edit offline, merge when you reconnect
+✅ **Eventual convergence** — no central server needed; all replicas eventually agree
+✅ **Less reliance on central ordering** — each replica is equal
+✅ **Peer-to-peer friendly** — no server dependency
+✅ **Simpler reasoning** — "just apply all operations, they commute"
+✅ **Immediate local execution** — no round-trip to server
+
+### Disadvantages
+
+❌ **Metadata overhead** — each character/element carries unique ID (e.g., user_id + timestamp)
+❌ **Tombstones** — deleted items often remain as "tombstones" for convergence
+❌ **Memory bloat** — metadata and tombstones consume significant space
+❌ **Complex implementation** — choosing the right CRDT type is non-trivial
+❌ **Garbage collection** — requires careful cleanup of tombstones
+❌ **Disk sync overhead** — more data to sync between devices
+
+### Popular CRDT Types
+
+| Type              | Use case                          | Example                   |
+| ----------------- | --------------------------------- | ------------------------- |
+| **LWW Register**  | Last-Write-Wins for single values | User's name, email        |
+| **Vector Clocks** | Track causal ordering             | Version control           |
+| **Text CRDTs**    | Character-by-character editing    | Automerge, Yjs            |
+| **ORSet**         | Observational Ordered Set         | Unordered collections     |
+| **RGA**           | Replicated Growable Array         | Rich text with formatting |
+
+### Code Example: Simple CRDT Text (Position-based)
+
+```javascript
+// Each character has a unique (replicaId, clock) pair
+// Position is determined by sorting these pairs
+
+class CRDTText {
+  constructor(replicaId) {
+    this.replicaId = replicaId;
+    this.clock = 0;
+    this.chars = []; // Array of { id: (replicaId, clock), char, tombstone }
+    this.tombstones = new Set(); // For garbage collection
+  }
+
+  // Insert a character
+  insert(pos, char) {
+    const id = [this.replicaId, ++this.clock];
+    const newChar = { id, char, tombstone: false };
+
+    // Insert in sorted order (by ID)
+    this.chars.push(newChar);
+    this.chars.sort((a, b) => this.compareIds(a.id, b.id));
+
+    return newChar;
+  }
+
+  // Delete a character (logical delete)
+  delete(pos) {
+    const char = this.chars[pos];
+    char.tombstone = true;
+    this.tombstones.add(char.id);
+  }
+
+  // Apply a remote operation
+  applyRemoteOp(op) {
+    if (op.type === 'insert') {
+      // Insert character with its original ID
+      const newChar = { id: op.id, char: op.char, tombstone: false };
+      this.chars.push(newChar);
+      this.chars.sort((a, b) => this.compareIds(a.id, b.id));
+    } else if (op.type === 'delete') {
+      const charToDelete = this.chars.find((c) => c.id[0] === op.id[0] && c.id[1] === op.id[1]);
+      if (charToDelete) {
+        charToDelete.tombstone = true;
+        this.tombstones.add(charToDelete.id);
+      }
+    }
+  }
+
+  // Compare IDs: (replicaId, clock) tuples
+  compareIds(id1, id2) {
+    if (id1[0] !== id2[0]) return id1[0] - id2[0]; // Compare replicaId
+    return id1[1] - id2[1]; // Then compare clock
+  }
+
+  // Render visible text (skip tombstones)
+  getText() {
+    return this.chars
+      .filter((c) => !c.tombstone)
+      .map((c) => c.char)
+      .join('');
+  }
+
+  // Garbage collect tombstones (after all replicas have seen them)
+  garbageCollect() {
+    this.chars = this.chars.filter((c) => !c.tombstone);
+    this.tombstones.clear();
+  }
+
+  // Merge with another replica's state
+  merge(other) {
+    for (const char of other.chars) {
+      // Only add if not already present
+      if (!this.chars.find((c) => c.id[0] === char.id[0] && c.id[1] === char.id[1])) {
+        this.chars.push({ ...char });
+      }
+    }
+    this.chars.sort((a, b) => this.compareIds(a.id, b.id));
+  }
+}
+
+// Usage
+const alice = new CRDTText('alice');
+const bob = new CRDTText('bob');
+
+// Alice types
+alice.insert(0, 'H');
+alice.insert(1, 'i');
+// Alice: "Hi"
+
+// Bob types offline
+bob.insert(0, 'B');
+bob.insert(1, 'y');
+// Bob: "By"
+
+// Merge via sending operations
+const aliceOps = alice.chars;
+const bobOps = bob.chars;
+
+// Alice receives Bob's ops
+alice.merge(bob);
+console.log(alice.getText()); // "BHiy" or "HBiy" (depends on replica ID ordering)
+
+// Bob receives Alice's ops
+bob.merge(alice);
+console.log(bob.getText()); // Same result as Alice
+```
+
+### When to Use CRDT
+
+- ✅ **Offline-first applications** (mobile, P2P)
+- ✅ **Peer-to-peer collaboration** (no central server required)
+- ✅ **Eventual consistency** is acceptable
+- ✅ **Long-lived documents** where conflict resolution must be automatic
+- ✅ **Distributed systems** where network partitions happen
+- ✅ Examples: Automerge, Yjs, Logux, Replicache
+
+---
+
+## Detailed Comparison
+
+### Editing Scenarios
+
+| Scenario                          | OT                                           | CRDT                                          |
+| --------------------------------- | -------------------------------------------- | --------------------------------------------- |
+| **Local edit, instant feedback**  | Server round-trip; optimistic update locally | Instant; already applied locally              |
+| **Offline editing**               | Edits queued; need to sync when online       | Works indefinitely offline; sync on reconnect |
+| **Concurrent edits by 10+ users** | Transform matrix explodes; slow              | Scales better; relies on merge logic          |
+| **Undo/redo**                     | Tricky; must un-transform previous ops       | Easier; just remove the operation             |
+| **Formatting + text**             | Complex; extend OT for rich text             | Use RGA or similar; more natural              |
+
+### Collaboration Topology
+
+**OT (Star):**
+
+```
+   Server
+    / | \
+   A  B  C
+```
+
+All clients connect to server; server is SPOF (single point of failure).
+
+**CRDT (Mesh):**
+
+```
+  A ←→ B
+  ↑    ↓
+  C ←→ D
+```
+
+Any topology works; peer-to-peer, client-server, hybrid.
+
+### Memory Overhead Per Character
+
+**OT:**
+
+- Character: 1 byte
+- Position: 4 bytes (integer)
+- Total: ~5 bytes per character
+
+**CRDT (with ID + tombstone):**
+
+- Character: 1 byte
+- Unique ID: (4 bytes replicaId + 8 bytes clock) = 12 bytes
+- Tombstone flag: 1 byte
+- Total: ~14 bytes per character
+- **10x overhead** for large documents
+
+### Offline Data Handling
+
+| Aspect                  | OT                                           | CRDT                                    |
+| ----------------------- | -------------------------------------------- | --------------------------------------- |
+| **Offline edits**       | Queued locally; lost if app crashes          | Persisted to local DB; survives crash   |
+| **Reconnection**        | Must resolve queued ops against server state | Merge local changes with remote changes |
+| **Conflict resolution** | Server decides; client accepts               | Automatic via CRDT merge rules          |
+| **User visibility**     | "Syncing..." state needed                    | Transparent; changes appear immediately |
+| **Sync latency**        | Minutes to hours (unpredictable)             | Seconds to minutes (predictable)        |
+
+---
+
+## Anti-Patterns
+
+| Pattern                               | Problem                                         | Solution                                  |
+| ------------------------------------- | ----------------------------------------------- | ----------------------------------------- |
+| **Using OT without a server**         | No canonical ordering; forks possible           | Use CRDT instead                          |
+| **Using CRDT for strong consistency** | Eventual consistency causes surprise divergence | Use OT with central server                |
+| **Not handling tombstones in CRDT**   | Memory leaks; document grows unbounded          | Implement GC after quorum ack             |
+| **Transform logic with edge cases**   | One bug breaks all concurrent editing           | Formal verification or use proven library |
+| **No offline support design**         | Users lose work when offline                    | Persist queue to disk before sending      |
+| **Assuming merge is free**            | Network overhead; bandwidth spikes              | Compress deltas; batch merges             |
+
+---
+
+## Hybrid Approach
+
+### Central Server + CRDT
+
+**Best of both:**
+
+- Use CRDT locally for offline-first UX
+- Use server as **authority & compaction point**
+- Server periodically creates **snapshots** (garbage-collected state)
+- Clients merge against server snapshots for efficiency
+
+```
+Client A (CRDT locally) ↔ Server (CRDT + snapshots) ↔ Client B (CRDT locally)
+
+Workflow:
+1. Client A edits offline → applies to local CRDT
+2. Client A reconnects → sends deltas to server
+3. Server merges deltas, creates snapshot every 1000 ops
+4. Server broadcasts new snapshot + deltas to Client B
+5. Client B merges incrementally; fast sync
+```
+
+### OT for Interactive Features + CRDT for Async Merges
+
+- Use **OT for real-time interactive editing** (requires low latency)
+- Use **CRDT for async changes** (e.g., comments, branches merging back)
+
+Example: Google Docs
+
+- Main doc: OT with server
+- Comments: CRDT-like (can merge without global ordering)
+- Suggestion Mode: Hybrid (server orders; clients preview with CRDT)
+
+---
+
+## Interview Follow-ups
+
+1. **"Google Docs uses OT; Figma uses OT; why not CRDT?"**
+   - Answer: They need **strong consistency** and **instant global ordering**. OT is proven and scales for their use case. CRDT trades consistency for offline capability—not needed for desktop apps with always-on connectivity.
+
+2. **"How do you handle undo/redo in OT vs CRDT?"**
+   - OT: Store all operations; undo = invert last op and transform everything after it (complex).
+   - CRDT: Track which user performed which op; undo = send "delete" for that op. Redo = reinsert. Simpler.
+
+3. **"What if a CRDT replica is offline for 1 month?"**
+   - Merge is still correct, but slow. Modern CRDTs use **compression**: send only diffs since last checkpoint. Automerge can compress 1 month of edits into KB.
+
+4. **"Can you use OT without a server?"**
+   - Theoretically possible (peer-to-peer), but operations must be ordered somehow. You'd need a **consensus algorithm** (Raft, Paxos) to agree on order—that's effectively building a server. CRDT avoids this complexity.
+
+5. **"How do you detect and resolve conflicts in CRDT?"**
+   - Conflicts are **automatically resolved by operation order**. No explicit conflict resolution needed. If two users insert at same position, CRDT uses ID tie-breaker (e.g., user ID or timestamp). Result is deterministic on all replicas.
+
+6. **"What's the difference between CRDT and eventual consistency databases?"**
+   - CRDT: Specifies **how to merge** operations deterministically.
+   - Eventual consistency (e.g., Cassandra): Specifies **which replica wins** (last-write-wins). CRDTs are a specific implementation of eventual consistency with deterministic merge logic.
+
+7. **"How do you choose the CRDT type for your data structure?"**
+   - **Register** (single value): LWW, MVRegister
+   - **Set** (unordered): ORSet, LWWSet
+   - **Sequence/text** (ordered): RGA, Fugue, Yjs
+   - **Graph**: Use CRDTs for nodes + edges separately
+   - If unsure: Start with library (Automerge, Yjs) that handles it.
+
+8. **"What's the cost of using a CRDT library vs building OT from scratch?"**
+   - CRDT library: Easy, mature, handles edge cases. Overhead: ~10x memory, slower merges.
+   - OT from scratch: Small ops, fast execution. Risk: transform logic bugs.
+   - Answer: Use CRDT library unless you need extreme performance (financial systems, massive documents).

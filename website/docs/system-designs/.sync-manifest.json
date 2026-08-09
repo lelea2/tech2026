@@ -24,6 +24,10 @@
       "hash": "0d2ba5cd301f2b9c3fabad44957866b006adcae6d4f71cded4b9752aff056155",
       "docRelative": "agentic-system-design/marketing-ai-agent.png"
     },
+    "system-designs/agentic-system-design/mcp-cache.png": {
+      "hash": "b6f0d34a10066202c681eb8da952bcc30787e8fdbe8529015a4009aa121a8491",
+      "docRelative": "agentic-system-design/mcp-cache.png"
+    },
     "system-designs/agentic-system-design/mcp-system-design.png": {
       "hash": "ae345171a2128edd42bbfad66bd637354aece082fdb9588349e1ea9390c929ae",
       "docRelative": "agentic-system-design/mcp-system-design.png"
@@ -256,9 +260,9 @@
       "hash": "d366b6708b9e15795e5d15d0850a27c0a8b7c92cdf423b9ebeb8aecd829ccc82",
       "docRelative": "webhook-callback-system.png"
     },
-    "system-designs/whatsapp-chat.png": {
-      "hash": "1dcfcb6a205693ba8d5c4450babffc7845dd3a483b139fcd4b4757f94c6b7832",
-      "docRelative": "whatsapp-chat.png"
+    "system-designs/whatsapp.png": {
+      "hash": "f011589ab876300bf55f48700c64ac4c71b2ef0632644624ac2946f2543d5e98",
+      "docRelative": "whatsapp.png"
     },
     "system-designs/yelp.png": {
       "hash": "a91d3d6f4cf75408c397ba3c423078d6bf442b8106fc97f13a54d0d339b7921d",
@@ -281,7 +285,7 @@
       "docRelative": "agentic-system-design/marketing-ai-agent.mdx"
     },
     "system-designs/agentic-system-design/mcp-agentic-ai.mdx": {
-      "hash": "a9f68de193564d4bb35d54e2294a18a799e8f11c15cda882be259e3e7367f437",
+      "hash": "414f1d2d5f2238dbea387dd71a7925b2c87397a85d4f3277182b3de9f0b0327a",
       "docRelative": "agentic-system-design/mcp-agentic-ai.mdx"
     },
     "system-designs/agentic-system-design/model_eval_training_llm_design.mdx": {
@@ -424,6 +428,10 @@
       "hash": "b4f7aa5a57fb6f81033dae3f373794cffcd9304a362b395385b96c280dd99e6c",
       "docRelative": "patterns/OLAPvsOTLP.mdx"
     },
+    "system-designs/patterns/OT_vs_CRDT.mdx": {
+      "hash": "8828ec89fdb53b4a2e9c86d98cd45d4a131109cd261d9ce420e71c34dd7cf7a3",
+      "docRelative": "patterns/OT_vs_CRDT.mdx"
+    },
     "system-designs/patterns/flink.mdx": {
       "hash": "591a31859ae3eb95fca95d1b704eb6448f76a069ccbb65d76ad851c3c03ac02f",
       "docRelative": "patterns/flink.mdx"
@@ -485,7 +493,7 @@
       "docRelative": "webhook-callback-system.mdx"
     },
     "system-designs/whatsapp-chat-app.mdx": {
-      "hash": "d3b802722eef544d2fb1c8d2dddfe9d325389945af3e7362890c6b034ef29dcd",
+      "hash": "a06baa8a5b2af60249c290b4dd0059a729e5c715d8ad5b1594a595f9a4ec858c",
       "docRelative": "whatsapp-chat-app.mdx"
     },
     "system-designs/yelp.mdx": {
@@ -505,7 +513,7 @@
       "docRelative": "miscellaneous/_index.mdx"
     },
     "__nav__:patterns": {
-      "hash": "18bfde03842e73dd3e5e520e60701157fd987c5705ce71f974c72b8686fdd5aa",
+      "hash": "479506a05ee78fc2702866bf1430e74acae25f04b8f403b01340769ab6d1a630",
       "docRelative": "patterns/_index.mdx"
     }
   }
