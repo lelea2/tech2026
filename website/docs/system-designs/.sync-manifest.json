@@ -224,6 +224,10 @@
       "hash": "d589f93fdf1e90354c534928bcad8fba3b68eeed5f170a1491848cb771f113b0",
       "docRelative": "payment-system.png"
     },
+    "system-designs/price-tracking-service.png": {
+      "hash": "4985cbb2a4a23c97944195f33bd84dcddf792ee9a7d9a57a530ad5a0090cc0d6",
+      "docRelative": "price-tracking-service.png"
+    },
     "system-designs/rate-limiter.png": {
       "hash": "cbc9857f856770f79e74b98e7b38ddc52eada83f69b2b8cc91f44340fd050530",
       "docRelative": "rate-limiter.png"
@@ -269,7 +273,7 @@
       "docRelative": "yelp.png"
     },
     "system-designs/ad-click-aggregator.mdx": {
-      "hash": "7cc085a9b0e96705e5caf74c94f4bdabb9207c2bc2d65acc3edc96b87e4e6de9",
+      "hash": "9d48daa0af663cec231cac224f8b8a613b443a53b5bf6dc14853752dc1fc38b1",
       "docRelative": "ad-click-aggregator.mdx"
     },
     "system-designs/agentic-system-design/agentic-mcp-copilot-system-design.mdx": {
@@ -467,6 +471,10 @@
     "system-designs/payment-system.mdx": {
       "hash": "e137fd2d0e9e8e54e0709923ff00644b8fbcd0d18cfa17ce556ae4517a605f8f",
       "docRelative": "payment-system.mdx"
+    },
+    "system-designs/price-tracking-service.mdx": {
+      "hash": "17ce07043eca67547c0438d269b814db50105537db835d9759d61ff031c0d0ef",
+      "docRelative": "price-tracking-service.mdx"
     },
     "system-designs/rate-limit.mdx": {
       "hash": "a62a344d5c71f09dade78a20324ea1052d2ae53ae9670a39c5b9fe124a1c1355",
