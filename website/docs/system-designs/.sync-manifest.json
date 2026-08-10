@@ -1,5 +1,9 @@
 {
   "files": {
+    "system-designs/ad-click-aggregator.png": {
+      "hash": "e1d92290ca13aa7a95eb6f92de5356edd14834c52962b44c813dab9aafc9d622",
+      "docRelative": "ad-click-aggregator.png"
+    },
     "system-designs/agentic-system-design/agent-design.png": {
       "hash": "c80fee034d3ddaa278e0e575d453894fa40e0480b36a82193ab9811b8ea0a8f6",
       "docRelative": "agentic-system-design/agent-design.png"
@@ -264,6 +268,10 @@
       "hash": "a91d3d6f4cf75408c397ba3c423078d6bf442b8106fc97f13a54d0d339b7921d",
       "docRelative": "yelp.png"
     },
+    "system-designs/ad-click-aggregator.mdx": {
+      "hash": "7cc085a9b0e96705e5caf74c94f4bdabb9207c2bc2d65acc3edc96b87e4e6de9",
+      "docRelative": "ad-click-aggregator.mdx"
+    },
     "system-designs/agentic-system-design/agentic-mcp-copilot-system-design.mdx": {
       "hash": "e2174c5c54c1484b72e90950d9f321fd7a2c99613f767dbb0bd9f7f8eb436f72",
       "docRelative": "agentic-system-design/agentic-mcp-copilot-system-design.mdx"
@@ -413,7 +421,7 @@
       "docRelative": "online-auction.mdx"
     },
     "system-designs/online-chess.mdx": {
-      "hash": "ab00a683b9618b258d594db81c0c6f4526537cabefd1d272696fabb2e8bf1a9e",
+      "hash": "6d82f693b871c729ca38679aa0720990ec2f47a9b47d3da9fb3b45944632053c",
       "docRelative": "online-chess.mdx"
     },
     "system-designs/pastebin.mdx": {
