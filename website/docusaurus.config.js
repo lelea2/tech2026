@@ -40,12 +40,12 @@ const config = {
   url: 'https://lelea2.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/tech2026/',
+  baseUrl: '/algorithm-prep/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'lelea2', // Usually your GitHub org/user name.
-  projectName: 'tech2026', // Usually your repo name.
+  projectName: 'algorithm-prep', // Usually your repo name.
 
   onBrokenLinks: 'ignore',
 
@@ -92,7 +92,7 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/lelea2/tech2026/tree/main/website/',
+            'https://github.com/lelea2/algorithm-prep/tree/main/website/',
           async sidebarItemsGenerator({defaultSidebarItemsGenerator, ...args}) {
             const items = await defaultSidebarItemsGenerator(args);
             function sortItems(list) {
@@ -195,7 +195,7 @@ const config = {
             label: 'Company',
           },
           {
-            href: 'https://github.com/lelea2/tech2026',
+            href: 'https://github.com/lelea2/algorithm-prep',
             label: 'GitHub',
             position: 'right',
           },
