@@ -20,6 +20,10 @@
       "hash": "741e11d14f71cc531184f06f78cfc51d05aefb43deb1119fd40c56c1194efe9e",
       "docRelative": "quizzes/graphql_staff_engineer_interview_questions.mdx"
     },
+    "backend/quizzes/huge-file-merge-external-sort-interview.mdx": {
+      "hash": "c2c961b78b68617438a6c44b7ee9ad96d7e48eec8406e4477c13f4d1b97b8e29",
+      "docRelative": "quizzes/huge-file-merge-external-sort-interview.mdx"
+    },
     "backend/quizzes/linkedin-graphql-architecture-interview.mdx": {
       "hash": "c286beb1ff4c79462717fac6741065d910e7c8a0024fb150a8c853b3dc78aad0",
       "docRelative": "quizzes/linkedin-graphql-architecture-interview.mdx"
@@ -33,7 +37,7 @@
       "docRelative": "quizzes/rest-vs-graphql-vs-gRPC.mdx"
     },
     "__nav__:quizzes": {
-      "hash": "59ad4b19068d7b1db09562f202b1992b62c68edb8da58fcf46e4361f7cd89a32",
+      "hash": "50a24118b1e376f44b8fbb7fd44530877a407bda437ba7a9eb1634217e55fad7",
       "docRelative": "quizzes/_index.mdx"
     }
   }
