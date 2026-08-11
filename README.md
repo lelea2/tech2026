@@ -1,19 +1,19 @@
-# tech2026
+# algorithm-prep
 
-Interview prep for 2026
+Interview preparation curated for my experience
 
 ## Docusaurus GitHub Pages
 
 This repository now includes a Docusaurus site in `website` configured for GitHub Pages.
 
-- Local dev: `cd website && npm start`, then open `http://localhost:3000/tech2026/`
+- Local dev: `cd website && npm start`, then open `http://localhost:3000/algorithm-prep/`
 - Production build: `cd website && npm run build`
 - Source docs sync: `cd website && npm run sync:source-docs`
 - GitHub Pages deploy: push to `main` to trigger the workflow in `.github/workflows/deploy-docusaurus.yml`
 
 Expected site URL:
 
-https://lelea2.github.io/tech2026/
+https://lelea2.github.io/algorithm-prep/
 
 ## Copilot Skill: Sync Source Docs
 
