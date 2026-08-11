@@ -124,6 +124,10 @@
       "hash": "418ff47387e7a6f3b32595b65eabbaacc9e67f99b7bebea0ae302e9841b7ef1a",
       "docRelative": "google-calendar.png"
     },
+    "system-designs/gpu-telemetry-metrics.png": {
+      "hash": "1d449ab21a0ca876c32b7eb37d2cc67be48bfd7c652f9692055f8007b2d6a190",
+      "docRelative": "gpu-telemetry-metrics.png"
+    },
     "system-designs/i18n.png": {
       "hash": "fd6d2e9fd5a69d3c6947665db4ad8c5ba879e38af192f7896612c2b95d8c2583",
       "docRelative": "i18n.png"
@@ -355,6 +359,10 @@
     "system-designs/github-actions-system-design.mdx": {
       "hash": "8b7228fa984e56358456d7e53fc2484433e81761db105f0c6f007e708e30c7a9",
       "docRelative": "github-actions-system-design.mdx"
+    },
+    "system-designs/gpu-telemetry-metrics.mdx": {
+      "hash": "64b8994d40edad4c262229b4833ad28bcbdf4694f3f6ef70b3a3bb5aea30e7b9",
+      "docRelative": "gpu-telemetry-metrics.mdx"
     },
     "system-designs/i18n-design.mdx": {
       "hash": "19b247dbf720c63bcbab360fe12e3cfd6742d76ed9036c5d27665e1734787aef",
