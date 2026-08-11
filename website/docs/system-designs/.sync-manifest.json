@@ -232,6 +232,10 @@
       "hash": "cbc9857f856770f79e74b98e7b38ddc52eada83f69b2b8cc91f44340fd050530",
       "docRelative": "rate-limiter.png"
     },
+    "system-designs/recommendation.png": {
+      "hash": "aacb443d125c734b85e02b54123b725a4e8543aacd5c527bac23fc74aeff0e0e",
+      "docRelative": "recommendation.png"
+    },
     "system-designs/ride-hailing.png": {
       "hash": "b0ddcee377e7b82750f0819bbf74ba6ac34583a5d1b1c994dde48f377e3d6cca",
       "docRelative": "ride-hailing.png"
@@ -479,6 +483,10 @@
     "system-designs/rate-limit.mdx": {
       "hash": "a62a344d5c71f09dade78a20324ea1052d2ae53ae9670a39c5b9fe124a1c1355",
       "docRelative": "rate-limit.mdx"
+    },
+    "system-designs/recommendation.mdx": {
+      "hash": "adf9bbcffcf5c8ed735966663b5b1c5223d5a98d9c79d7dac71fd1342fbae098",
+      "docRelative": "recommendation.mdx"
     },
     "system-designs/ride_hailing.mdx": {
       "hash": "fd0c91c71e4db2ee07b437acef4df6dbf6a07656bb3adee3a21beb1496961331",
