@@ -16,7 +16,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'tech2026',
+  title: 'algorithm-prep',
   tagline: 'Interview prep for 2026',
   favicon: 'img/favicon.ico',
 
@@ -148,9 +148,9 @@ const config = {
         },
       },
       navbar: {
-        title: 'tech2026',
+        title: 'algorithm-prep',
         logo: {
-          alt: 'tech2026 Logo',
+          alt: 'algorithm-prep Logo',
           src: 'img/logo.svg',
         },
         items: [
@@ -203,7 +203,7 @@ const config = {
       },
       footer: {
         style: 'dark',
-        copyright: `Copyright © ${new Date().getFullYear()} tech2026. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} algorithm-prep. Built with Docusaurus.`,
       },
       prism: {
         theme: prismThemes.github,
