@@ -1,6 +1,6 @@
 ---
-title: "Merge Huge Sorted Files & External Merge Sort"
-description: "Interview-ready guide for merging TB-scale sorted files and globally sorting N huge files."
+title: 'Merge Huge Sorted Files & External Merge Sort'
+description: 'Interview-ready guide for merging TB-scale sorted files and globally sorting N huge files.'
 ---
 
 # Merge Huge Sorted Files & External Merge Sort
@@ -313,8 +313,7 @@ class MinHeap {
         break;
       }
 
-      [this.data[parent], this.data[i]] =
-        [this.data[i], this.data[parent]];
+      [this.data[parent], this.data[i]] = [this.data[i], this.data[parent]];
 
       i = parent;
     }
@@ -335,24 +334,17 @@ class MinHeap {
         const left = i * 2 + 1;
         const right = i * 2 + 2;
 
-        if (
-          left < this.data.length &&
-          this.compare(this.data[left], this.data[smallest]) < 0
-        ) {
+        if (left < this.data.length && this.compare(this.data[left], this.data[smallest]) < 0) {
           smallest = left;
         }
 
-        if (
-          right < this.data.length &&
-          this.compare(this.data[right], this.data[smallest]) < 0
-        ) {
+        if (right < this.data.length && this.compare(this.data[right], this.data[smallest]) < 0) {
           smallest = right;
         }
 
         if (smallest === i) break;
 
-        [this.data[i], this.data[smallest]] =
-          [this.data[smallest], this.data[i]];
+        [this.data[i], this.data[smallest]] = [this.data[smallest], this.data[i]];
 
         i = smallest;
       }
@@ -375,7 +367,7 @@ async function kWayMerge(readers, writer) {
     if (value !== null) {
       heap.push({
         value,
-        fileIndex: i
+        fileIndex: i,
       });
     }
   }
@@ -390,7 +382,7 @@ async function kWayMerge(readers, writer) {
     if (nextValue !== null) {
       heap.push({
         value: nextValue,
-        fileIndex
+        fileIndex,
       });
     }
   }
@@ -656,7 +648,7 @@ Then sort each range independently:
          shard0     shard1     shard2
 ```
 
-If every shard is internally sorted and all keys in shard `i` are <= all keys in shard `i+1`, the overall dataset is globally sorted.
+If every shard is internally sorted and all keys in shard `i` are `<=` all keys in shard `i+1`, the overall dataset is globally sorted.
 
 ---
 

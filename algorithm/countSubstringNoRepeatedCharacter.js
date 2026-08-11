@@ -21,4 +21,4 @@ function solve(s) {
   return total;
 }
 
-// O(n) time, O(1) space (constant space for lastSeen array of size 26)
+// O(n) time, O(1) space (constant space for lastSeen array of size 26r)

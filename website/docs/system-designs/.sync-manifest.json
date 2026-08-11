@@ -216,6 +216,10 @@
       "hash": "40ce64fb9c130132d4a978bb4ea6f7105d0c69e1b6a9d740148859b8f9258eaf",
       "docRelative": "patterns/realtime-updates.png"
     },
+    "system-designs/patterns/scale-write.png": {
+      "hash": "05fb92b952f95183cda889cfdb086a07753a7240d4069c3dbc46821f54df0754",
+      "docRelative": "patterns/scale-write.png"
+    },
     "system-designs/patterns/scale_read_write.png": {
       "hash": "8d1079abbfb32121a542a0ff585f67ad1d8ce2f11b3f4277b91668baf8371851",
       "docRelative": "patterns/scale_read_write.png"
@@ -259,6 +263,10 @@
     "system-designs/ticketmaster.png": {
       "hash": "21c11e2efac8a45fecd2c9e3911c126e2dc5528dfdaa904d86cedb6402a64af3",
       "docRelative": "ticketmaster.png"
+    },
+    "system-designs/token-api-scale.png": {
+      "hash": "ff2a93835d9d3d490bc8e3992b26992db8029d423620143a728d601e52ed7e34",
+      "docRelative": "token-api-scale.png"
     },
     "system-designs/uber.png": {
       "hash": "cd7acb614cac5698d4f3a8abac986eb8def2a309ec6339dc104b2f46c2fe11a1",
@@ -477,7 +485,7 @@
       "docRelative": "patterns/real-time-updates.mdx"
     },
     "system-designs/patterns/scale-db-read-write.mdx": {
-      "hash": "950a10a21ed7d38b830034c3c7ca7d344f2e86028b2876248289a6763cface86",
+      "hash": "868e8cf0d29e66abf1168b1b9bc412724a54e29e0aab18e8d14013a111dab456",
       "docRelative": "patterns/scale-db-read-write.mdx"
     },
     "system-designs/payment-system.mdx": {
@@ -507,6 +515,10 @@
     "system-designs/ticketmaster.mdx": {
       "hash": "d662f2fd0247f984733ef8cac66bf2bf9ed0f58b37bf4e83c4a610a33ff145b2",
       "docRelative": "ticketmaster.mdx"
+    },
+    "system-designs/token-api-scale.mdx": {
+      "hash": "7d6b308356839c9bca7abe2989b2db555f4fc420f978c0f78d8552c714ef0a7e",
+      "docRelative": "token-api-scale.mdx"
     },
     "system-designs/uber.mdx": {
       "hash": "f06103d7cefd942912141bbcda5c46bb76a7a45ebf4642cbf2432331f8d47c46",
