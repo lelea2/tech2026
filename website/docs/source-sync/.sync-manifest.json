@@ -1812,6 +1812,10 @@
       "hash": "55e6487d0eb23db41d50a1fcbfcc9cc9940ce52e3788ff6895d923faf7975a95",
       "docRelative": "algorithm/array/maxSumSubArray.mdx"
     },
+    "algorithm/array/mergeSortedArray.js": {
+      "hash": "537c1c55b200a162ce649ef16730242bf6a6a6082b341192fbf666a35f88f44b",
+      "docRelative": "algorithm/array/mergeSortedArray.mdx"
+    },
     "algorithm/array/overlapInterval.js": {
       "hash": "3180d31d9579f45a7a71d8a30efecf156da6dbf60c6c8e98c6e9e4976c374452",
       "docRelative": "algorithm/array/overlapInterval.mdx"
@@ -2141,7 +2145,7 @@
       "docRelative": "algorithm/_index.mdx"
     },
     "__nav__:algorithm/array": {
-      "hash": "49d4019193868ab1ecd8654fdb054aa05b45af813c040fa45bf6dc9a0eeeca96",
+      "hash": "44e77cec653d805639c9991886d79ba77f7d507de9122a06cae2fbfa0499b950",
       "docRelative": "algorithm/array/_index.mdx"
     },
     "__nav__:algorithm/bit": {
