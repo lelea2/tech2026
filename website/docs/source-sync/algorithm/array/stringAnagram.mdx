@@ -5,16 +5,14 @@ title: stringAnagram
 # stringAnagram
 
 ~~~javascript
-// Time: O(n), Space: O(1)
+/**
+ * Interview thought process:
+ *
+ * Anagrams must:
+ * 1. Have the same length.
+ * 2. Contain the same characters with the same frequency.
+ */
 export default function isAnagram(str1, str2) {
-  /**
-   * Interview thought process:
-   *
-   * Anagrams must:
-   * 1. Have the same length.
-   * 2. Contain the same characters with the same frequency.
-   */
-
   // Quick fail: different lengths cannot be anagrams.
   if (str1.length !== str2.length) {
     return false;
@@ -27,11 +25,6 @@ export default function isAnagram(str1, str2) {
     frequencyMap.set(char, (frequencyMap.get(char) ?? 0) + 1);
   }
 
-  /**
-   * Traverse str2 and remove characters from the frequency map.
-   * If a character doesn't exist or count becomes negative,
-   * the strings cannot be anagrams.
-   */
   for (const char of str2) {
     const count = frequencyMap.get(char);
 

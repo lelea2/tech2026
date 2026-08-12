@@ -1,0 +1,37 @@
+---
+title: findSharpestPoint
+---
+
+# findSharpestPoint
+
+~~~javascript
+/**
+ * Returns the index where the height profile changes direction most sharply.
+ * Endpoints are excluded because they do not have two neighbors.
+ *
+ * @param {number[]} height
+ * @returns {number} Sharpest point index, or -1 when fewer than 3 points exist.
+ */
+function findSharpestPointIndex(height) {
+  if (!Array.isArray(height) || height.length < 3) {
+    return -1;
+  }
+
+  let sharpestIndex = 1;
+  let maxSharpness = -Infinity;
+
+  for (let i = 1; i < height.length - 1; i++) {
+    const leftSlope = height[i] - height[i - 1];
+    const rightSlope = height[i + 1] - height[i];
+
+    const sharpness = Math.abs(rightSlope - leftSlope);
+
+    if (sharpness > maxSharpness) {
+      maxSharpness = sharpness;
+      sharpestIndex = i;
+    }
+  }
+
+  return sharpestIndex;
+}
+~~~

@@ -1,0 +1,43 @@
+---
+title: hourGlassSum
+---
+
+# hourGlassSum
+
+~~~javascript
+function hourglassSum(arr) {
+  let maxSum = -Infinity;
+
+  for (let row = 0; row < 4; row++) {
+    for (let col = 0; col < 4; col++) {
+      const sum =
+        arr[row][col] +
+        arr[row][col + 1] +
+        arr[row][col + 2] +
+
+        arr[row + 1][col + 1] +
+
+        arr[row + 2][col] +
+        arr[row + 2][col + 1] +
+        arr[row + 2][col + 2];
+
+      maxSum = Math.max(maxSum, sum);
+    }
+  }
+
+  return maxSum;
+}
+
+// a b c
+//   d
+// e f g
+
+// 1 1 1 0 0 0
+// 0 1 0 0 0 0
+// 1 1 1 0 0 0
+// 0 0 2 4 4 0
+// 0 0 0 2 0 0
+// 0 0 1 2 4 0
+
+// First hourglass: 1 + 1 + 1 + 1 + 1 + 1 + 1 = 7
+~~~

@@ -1,0 +1,32 @@
+---
+title: countSubstringNoRepeatedCharacter
+---
+
+# countSubstringNoRepeatedCharacter
+
+~~~javascript
+// Input: s = 'abcabc'
+// Output: 15
+// Possible valid substrings: a, b, c, ab, bc, ca, abc, bca, cab, abc, bca, cab, abc, bc, c.
+// Count by ending position: 1 + 2 + 3 + 3 + 3 + 3.
+function solve(s) {
+  const lastSeen = new Array(26).fill(-1);
+
+  let left = 0;
+  let total = 0;
+
+  for (let right = 0; right < s.length; right++) {
+    const index = s.charCodeAt(right) - 97;
+
+    left = Math.max(left, lastSeen[index] + 1);
+    lastSeen[index] = right;
+
+    // Number of distinct-character substrings ending at `right`
+    total += right - left + 1;
+  }
+
+  return total;
+}
+
+// O(n) time, O(1) space (constant space for lastSeen array of size 26r)
+~~~

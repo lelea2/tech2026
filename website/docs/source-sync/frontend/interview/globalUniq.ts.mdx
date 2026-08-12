@@ -1,0 +1,433 @@
+---
+title: globalUniq.ts
+---
+
+# globalUniq.ts
+
+~~~typescript
+// In memory, I use a Set, which gives average O(n) time and preserves 
+// first-occurrence order by emitting a value only the first time it is seen.
+
+// If the unique set cannot fit in memory, 
+// I stream the input and attach an increasing sequence number to every item. 
+// I hash-partition records by their deduplication key, ensuring all duplicates go to the same partition. 
+// I then process each partition independently, keeping the record with the minimum sequence number for each key.
+
+// Because partition order does not match original order, 
+// I sort each partition’s surviving records by sequence number and perform a k-way merge across partitions. 
+// This emits unique values in the order of their first appearance. 
+// If a partition is still too large, I recursively repartition it.
+
+async function externalGlobalUniqImpl<T, K>(
+  input: AsyncIterable<T>,
+  getKey: (item: T) => K,
+  partitionCount: number
+): Promise<AsyncIterable<T>> {
+  // Phase 1:
+  // Stream input and write each record to:
+  // hash(getKey(item)) % partitionCount
+  //
+  // Record written:
+  // { key, value: item, position }
+
+  // Phase 2:
+  // For each partition:
+  //   deduplicate by key
+  //   keep smallest position
+  //   sort surviving records by position
+  //   write sorted partition output
+
+  // Phase 3:
+  // Perform a k-way merge of all sorted partition outputs.
+  // Emit records in ascending position order.
+
+  throw new Error("Storage implementation omitted");
+}
+
+
+import {
+  createReadStream,
+  createWriteStream,
+  promises as fs
+} from "node:fs";
+import { once } from "node:events";
+import { createInterface } from "node:readline";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+type StoredRecord<T> = {
+  serializedKey: string;
+  value: T;
+  position: number;
+};
+
+type HeapEntry<T> = {
+  record: StoredRecord<T>;
+  partitionIndex: number;
+};
+
+class MinHeap<T> {
+  private items: T[] = [];
+
+  constructor(
+    private readonly compare: (a: T, b: T) => number
+  ) {}
+
+  get size(): number {
+    return this.items.length;
+  }
+
+  push(value: T): void {
+    this.items.push(value);
+    this.bubbleUp(this.items.length - 1);
+  }
+
+  pop(): T | undefined {
+    if (this.items.length === 0) {
+      return undefined;
+    }
+
+    const first = this.items[0];
+    const last = this.items.pop()!;
+
+    if (this.items.length > 0) {
+      this.items[0] = last;
+      this.bubbleDown(0);
+    }
+
+    return first;
+  }
+
+  private bubbleUp(index: number): void {
+    while (index > 0) {
+      const parentIndex = Math.floor((index - 1) / 2);
+
+      if (
+        this.compare(
+          this.items[index],
+          this.items[parentIndex]
+        ) >= 0
+      ) {
+        break;
+      }
+
+      [this.items[index], this.items[parentIndex]] = [
+        this.items[parentIndex],
+        this.items[index]
+      ];
+
+      index = parentIndex;
+    }
+  }
+
+  private bubbleDown(index: number): void {
+    while (true) {
+      const leftIndex = index * 2 + 1;
+      const rightIndex = index * 2 + 2;
+      let smallestIndex = index;
+
+      if (
+        leftIndex < this.items.length &&
+        this.compare(
+          this.items[leftIndex],
+          this.items[smallestIndex]
+        ) < 0
+      ) {
+        smallestIndex = leftIndex;
+      }
+
+      if (
+        rightIndex < this.items.length &&
+        this.compare(
+          this.items[rightIndex],
+          this.items[smallestIndex]
+        ) < 0
+      ) {
+        smallestIndex = rightIndex;
+      }
+
+      if (smallestIndex === index) {
+        break;
+      }
+
+      [this.items[index], this.items[smallestIndex]] = [
+        this.items[smallestIndex],
+        this.items[index]
+      ];
+
+      index = smallestIndex;
+    }
+  }
+}
+
+/**
+ * Simple deterministic string hash.
+ *
+ * Equal serialized keys always produce the same partition.
+ */
+function hashString(value: string): number {
+  let hash = 2166136261;
+
+  for (let i = 0; i < value.length; i++) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return hash >>> 0;
+}
+
+/**
+ * Writes one JSON line and waits when the stream buffer is full.
+ */
+async function writeJsonLine<T>(
+  stream: NodeJS.WritableStream,
+  value: T
+): Promise<void> {
+  const line = JSON.stringify(value) + "\n";
+
+  if (!stream.write(line)) {
+    await once(stream, "drain");
+  }
+}
+
+/**
+ * Reads a JSONL file as an async iterable.
+ */
+async function* readJsonLines<T>(
+  filePath: string
+): AsyncGenerator<T> {
+  const stream = createReadStream(filePath, {
+    encoding: "utf8"
+  });
+
+  const lines = createInterface({
+    input: stream,
+    crlfDelay: Infinity
+  });
+
+  for await (const line of lines) {
+    if (line.trim() === "") {
+      continue;
+    }
+
+    yield JSON.parse(line) as T;
+  }
+}
+
+/**
+ * Closes a writable stream and waits until all data is flushed.
+ */
+async function closeWriteStream(
+  stream: NodeJS.WritableStream
+): Promise<void> {
+  stream.end();
+  await once(stream, "finish");
+}
+
+/**
+ * Creates a one-item lookahead iterator for one sorted partition file.
+ */
+function createPartitionIterator<T>(
+  filePath: string
+): AsyncIterator<StoredRecord<T>> {
+  return readJsonLines<StoredRecord<T>>(filePath)[
+    Symbol.asyncIterator
+  ]();
+}
+
+/**
+ * Produces globally unique values while preserving the order of each
+ * value's first occurrence.
+ *
+ * Important:
+ * - Each individual partition must fit in memory during Phase 2.
+ * - getKey(item) must return a JSON-serializable value.
+ * - JSON.stringify(getKey(item)) must be stable for equivalent keys.
+ */
+async function externalGlobalUniq<T, K>(
+  input: AsyncIterable<T>,
+  getKey: (item: T) => K,
+  partitionCount: number
+): Promise<AsyncIterable<T>> {
+  if (!Number.isInteger(partitionCount) || partitionCount <= 0) {
+    throw new Error(
+      "partitionCount must be a positive integer"
+    );
+  }
+
+  const workingDirectory = await fs.mkdtemp(
+    join(tmpdir(), "global-uniq-")
+  );
+
+  const rawPartitionPaths = Array.from(
+    { length: partitionCount },
+    (_, index) => join(workingDirectory, `raw-${index}.jsonl`)
+  );
+
+  const sortedPartitionPaths = Array.from(
+    { length: partitionCount },
+    (_, index) => join(workingDirectory, `sorted-${index}.jsonl`)
+  );
+
+  try {
+    /*
+     * Phase 1:
+     * Partition every input record by key.
+     */
+    const partitionStreams = rawPartitionPaths.map(path =>
+      createWriteStream(path, {
+        encoding: "utf8"
+      })
+    );
+
+    let position = 0;
+
+    try {
+      for await (const value of input) {
+        const key = getKey(value);
+        const serializedKey = JSON.stringify(key);
+
+        if (serializedKey === undefined) {
+          throw new Error(
+            "getKey must return a JSON-serializable value"
+          );
+        }
+
+        const partitionIndex =
+          hashString(serializedKey) % partitionCount;
+
+        const record: StoredRecord<T> = {
+          serializedKey,
+          value,
+          position
+        };
+
+        await writeJsonLine(
+          partitionStreams[partitionIndex],
+          record
+        );
+
+        position++;
+      }
+    } finally {
+      await Promise.all(
+        partitionStreams.map(closeWriteStream)
+      );
+    }
+
+    /*
+     * Phase 2:
+     * Process each partition independently.
+     *
+     * Because records were written in input order, the first record
+     * encountered for a key is already its earliest occurrence.
+     */
+    for (let partitionIndex = 0;
+      partitionIndex < partitionCount;
+      partitionIndex++
+    ) {
+      const earliestByKey = new Map<
+        string,
+        StoredRecord<T>
+      >();
+
+      for await (
+        const record of readJsonLines<StoredRecord<T>>(
+          rawPartitionPaths[partitionIndex]
+        )
+      ) {
+        if (!earliestByKey.has(record.serializedKey)) {
+          earliestByKey.set(record.serializedKey, record);
+        }
+      }
+
+      const uniqueRecords = [
+        ...earliestByKey.values()
+      ].sort((a, b) => a.position - b.position);
+
+      const outputStream = createWriteStream(
+        sortedPartitionPaths[partitionIndex],
+        { encoding: "utf8" }
+      );
+
+      try {
+        for (const record of uniqueRecords) {
+          await writeJsonLine(outputStream, record);
+        }
+      } finally {
+        await closeWriteStream(outputStream);
+      }
+
+      // The raw partition is no longer needed.
+      await fs.unlink(rawPartitionPaths[partitionIndex]);
+    }
+
+    /*
+     * Phase 3 is lazy.
+     *
+     * The returned generator performs a k-way merge over all sorted
+     * partition files.
+     */
+    async function* mergePartitions(): AsyncGenerator<T> {
+      const iterators = sortedPartitionPaths.map(
+        createPartitionIterator<T>
+      );
+
+      const heap = new MinHeap<HeapEntry<T>>(
+        (a, b) =>
+          a.record.position - b.record.position
+      );
+
+      try {
+        // Load the first record from every partition.
+        for (
+          let partitionIndex = 0;
+          partitionIndex < iterators.length;
+          partitionIndex++
+        ) {
+          const result =
+            await iterators[partitionIndex].next();
+
+          if (!result.done) {
+            heap.push({
+              record: result.value,
+              partitionIndex
+            });
+          }
+        }
+
+        while (heap.size > 0) {
+          const entry = heap.pop()!;
+
+          yield entry.record.value;
+
+          const nextResult =
+            await iterators[entry.partitionIndex].next();
+
+          if (!nextResult.done) {
+            heap.push({
+              record: nextResult.value,
+              partitionIndex: entry.partitionIndex
+            });
+          }
+        }
+      } finally {
+        // Remove all temporary files, even if iteration stops early.
+        await fs.rm(workingDirectory, {
+          recursive: true,
+          force: true
+        });
+      }
+    }
+
+    return mergePartitions();
+  } catch (error) {
+    await fs.rm(workingDirectory, {
+      recursive: true,
+      force: true
+    });
+
+    throw error;
+  }
+}
+~~~

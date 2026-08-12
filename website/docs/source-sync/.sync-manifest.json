@@ -12,13 +12,29 @@
       "hash": "7a0cbffda26828101df3fe6090bea98aa270b1d6af91c1284562153c0e10e216",
       "docRelative": "frontend/interview/AIEfficiency.mdx"
     },
+    "frontend/interview/Calculator.js": {
+      "hash": "05a050ed39a4e62dfef12ae65b436bc3eae59105431963041e8dace5181161b3",
+      "docRelative": "frontend/interview/Calculator.mdx"
+    },
     "frontend/interview/ConnectionPool.js": {
       "hash": "ae60d7953a5283afa27cb684b895a390fc70172fbd29abe80af2dfb796777109",
       "docRelative": "frontend/interview/ConnectionPool.mdx"
     },
+    "frontend/interview/EmployeeTrainingDay.java": {
+      "hash": "d78d6ae13265aa1da798fab7c5d41818e42e5a5e81d1eaf9b8406cba61f56a5f",
+      "docRelative": "frontend/interview/EmployeeTrainingDay.java.mdx"
+    },
+    "frontend/interview/EmployeeTrainingDay.ts": {
+      "hash": "5327b5d8cca3430c8578d2ea7099496c775aeacf1c66115cf942b0d69cbd6078",
+      "docRelative": "frontend/interview/EmployeeTrainingDay.ts.mdx"
+    },
     "frontend/interview/FileSystem.js": {
       "hash": "4df303d31bc59ad5b15ea36dccabd816b593e05cd29e1416e4ecc9df56cff1da",
       "docRelative": "frontend/interview/FileSystem.mdx"
+    },
+    "frontend/interview/FlightBooking.js": {
+      "hash": "362774ca2e503e78f0d2b3ee29abae4e3451ba6e0af2a8a145154a79df74f400",
+      "docRelative": "frontend/interview/FlightBooking.mdx"
     },
     "frontend/interview/InMemoryTable.js": {
       "hash": "d32ee60cf7d403cc454b05841ea18816771caf8084c04f2e81d043d698dc1b89",
@@ -80,6 +96,14 @@
       "hash": "17a0b3e651bf7098108195a13fd1695605dfb1a494c58d0f062332db02266cd1",
       "docRelative": "frontend/interview/duplicateFiles.mdx"
     },
+    "frontend/interview/findMissingCoverage.ts": {
+      "hash": "8427a5ff384602e38b1399ab178ed61b17ad60d056dd6e2da0a60585e7229cd5",
+      "docRelative": "frontend/interview/findMissingCoverage.mdx"
+    },
+    "frontend/interview/findOverDueWindow.ts": {
+      "hash": "9e12c55ac51ec5762d76ea4799568e1c08be1494f4b932c1a439b10349cf8492",
+      "docRelative": "frontend/interview/findOverDueWindow.mdx"
+    },
     "frontend/interview/flatMap.js": {
       "hash": "8b53c322d2cd52134c21202687941dc5b93ecb108d65ba5daf2c38a7ceda8364",
       "docRelative": "frontend/interview/flatMap.mdx"
@@ -92,9 +116,21 @@
       "hash": "4e1f05ee24200c73b47c9aadad5790e82d1acd8834a5bc2de9f8e20226d8f118",
       "docRelative": "frontend/interview/getAvailableTime.mdx"
     },
+    "frontend/interview/globalUniq.py": {
+      "hash": "0ce4e5ff8212a9658d965282c60e9b15fffc241ce170e4ad4eecd0224b0d0775",
+      "docRelative": "frontend/interview/globalUniq.py.mdx"
+    },
+    "frontend/interview/globalUniq.ts": {
+      "hash": "efbedd298f21b9eda3dae881bb8042b607481b948867fb43af8e70471c3f980b",
+      "docRelative": "frontend/interview/globalUniq.ts.mdx"
+    },
     "frontend/interview/highestHydrationScore.js": {
       "hash": "2f38429c3bf6305f1638df37e594647812db17290e827d083b4469ecff1d2a1d",
       "docRelative": "frontend/interview/highestHydrationScore.mdx"
+    },
+    "frontend/interview/inMemoryUniq.ts": {
+      "hash": "e82e48abcf11b3e057fa1e2640398c7db90535db2cc1294660272ef59467d613",
+      "docRelative": "frontend/interview/inMemoryUniq.mdx"
     },
     "frontend/interview/inferColumnTypes.js": {
       "hash": "9dd22ca848e218c09b3f6d90f8caf68ce6f929f8cf7df48ff506ae8f229ef414",
@@ -108,6 +144,14 @@
       "hash": "c9d3dc5b8f79fe300e624aae2aece5a2053fdad9c6a102b789ebf24c6774cbc3",
       "docRelative": "frontend/interview/laneChange.mdx"
     },
+    "frontend/interview/matchMetaPattern.ts": {
+      "hash": "c5b6ca8e41b9477dc4150edfd6e071ac8ecfe8053ad6f00d8380eceef3bb202a",
+      "docRelative": "frontend/interview/matchMetaPattern.mdx"
+    },
+    "frontend/interview/mergeInterval.ts": {
+      "hash": "b563b3589097fb4f6fb0fd94fedc3f25aafe6cdffed00342f5b12e3432cbb3a7",
+      "docRelative": "frontend/interview/mergeInterval.mdx"
+    },
     "frontend/interview/packageDependencies.js": {
       "hash": "fa052b68caad1468fc20377cf567c69a3db715fbc5f8bf303c2834c2d5504d8b",
       "docRelative": "frontend/interview/packageDependencies.mdx"
@@ -115,6 +159,10 @@
     "frontend/interview/parseQueryString.js": {
       "hash": "67f71be7a31321c6e75e951f95317c3a10297499daff41657d32ea15d4ae1a8f",
       "docRelative": "frontend/interview/parseQueryString.mdx"
+    },
+    "frontend/interview/removeDuplicateString.js": {
+      "hash": "67069ee5b6c20c2d9c10ce49118028854d808199f0af67c2a5147d077185ca37",
+      "docRelative": "frontend/interview/removeDuplicateString.mdx"
     },
     "frontend/interview/rollerCoasterPeformance.js": {
       "hash": "87846cb1d825731d7594976bf92e571f21f1bff33f5e9cb86b430735602d4e0d",
@@ -125,12 +173,20 @@
       "docRelative": "frontend/interview/spreadsheet.mdx"
     },
     "frontend/interview/topilogicalSortGeneric.js": {
-      "hash": "c5fedec5d44148e1fffa999eeac819efabf36cc40b44abb68e484dcd2eac1389",
+      "hash": "759123c278e45eaf980ac371fdf70f7d56bf42eb124c61174d52c8173f253b96",
       "docRelative": "frontend/interview/topilogicalSortGeneric.mdx"
     },
     "frontend/interview/topilogicalSortGenericWithSuccessor.js": {
       "hash": "5c942659aaefe78c6b8c4e2c784fce690774c95cf99a58e82f7addcfee82e132",
       "docRelative": "frontend/interview/topilogicalSortGenericWithSuccessor.mdx"
+    },
+    "frontend/interview/topologicalCanFinishTask.js": {
+      "hash": "6e2ad9d3ad01366d61cd0d671bcf16873ed3c68a23965049523ee33c0e07a2c9",
+      "docRelative": "frontend/interview/topologicalCanFinishTask.mdx"
+    },
+    "frontend/interview/topologicalGetBlockedTask.js": {
+      "hash": "569bc2d41c053943b81fb995bab352c0a1bdb729d920513cfff467aad1d36ada",
+      "docRelative": "frontend/interview/topologicalGetBlockedTask.mdx"
     },
     "frontend/interview/topologicalSort.js": {
       "hash": "f298e3bad6a9c17232eec9986de0ad1c66030a4ef63710457e4f9a9226d18957",
@@ -1645,12 +1701,8 @@
       "docRelative": "frontend/uicoding/ui-prototype-js/whack-a-mole/styles.module.mdx"
     },
     "frontend/uicoding/ui-prototype-js/wordle/Wordle.js": {
-      "hash": "1ed152ac434c9a8c2fcce76d51f111175fcc6ffc7c2f3fb58081806c9a6b1c81",
+      "hash": "2509997a3851954d858ace28c3735a593984bf68c83fa2efb211c5eb2a985235",
       "docRelative": "frontend/uicoding/ui-prototype-js/wordle/Wordle.mdx"
-    },
-    "frontend/uicoding/ui-prototype-js/wordle/styles.module.css": {
-      "hash": "362023d89c5150438c4b140d5192674b7984730b570d7e951189243d5ee3d07c",
-      "docRelative": "frontend/uicoding/ui-prototype-js/wordle/styles.module.mdx"
     },
     "backend/quizzes/apollo_vs_relay_staff_frontend.mdx": {
       "hash": "b0f003d9b18c36b9d23d09c19df98ff431524d3f8c5c2b544a3ac283d1789dd3",
@@ -1671,6 +1723,10 @@
     "backend/quizzes/graphql_staff_engineer_interview_questions.mdx": {
       "hash": "741e11d14f71cc531184f06f78cfc51d05aefb43deb1119fd40c56c1194efe9e",
       "docRelative": "backend/quizzes/graphql_staff_engineer_interview_questions.mdx"
+    },
+    "backend/quizzes/huge-file-merge-external-sort-interview.mdx": {
+      "hash": "b212ef4efa2e8141623f6c919b123bf2933dafac21d42009e096fbf34db4fd69",
+      "docRelative": "backend/quizzes/huge-file-merge-external-sort-interview.mdx"
     },
     "backend/quizzes/linkedin-graphql-architecture-interview.mdx": {
       "hash": "c286beb1ff4c79462717fac6741065d910e7c8a0024fb150a8c853b3dc78aad0",
@@ -1716,6 +1772,14 @@
       "hash": "b31f1f8845a3386c1796c5874eaf5778dbd4986796ef512f94126d437a0abc53",
       "docRelative": "algorithm/array/findMissingNumberInSequence.mdx"
     },
+    "algorithm/array/findSharpestPoint.js": {
+      "hash": "dad662c41ac83a73eb7134b4987e5f456e34429838a922fd7230cea160f7a738",
+      "docRelative": "algorithm/array/findSharpestPoint.mdx"
+    },
+    "algorithm/array/hourGlassSum.js": {
+      "hash": "41c5e245e64e0abb89df57705b82c9b43720f60376ddf37f24d7306b6c0342f7",
+      "docRelative": "algorithm/array/hourGlassSum.mdx"
+    },
     "algorithm/array/kRowPascalTriangle.py": {
       "hash": "836137b0c35eef0a193d474574390f8a7ac911e449e2d88f694a161118b26b06",
       "docRelative": "algorithm/array/kRowPascalTriangle.mdx"
@@ -1729,7 +1793,7 @@
       "docRelative": "algorithm/array/maxProductSubArray.mdx"
     },
     "algorithm/array/maxProfit.js": {
-      "hash": "96d6b154ceca50c5ad73324800076852edecdc164bc03b4c19a41796c0d199b3",
+      "hash": "5bee2a253625e73209d5e6f8a61016977eb3fa3ac4d8183684c58d820ecc2d5e",
       "docRelative": "algorithm/array/maxProfit.mdx"
     },
     "algorithm/array/maxSumSubArray.py": {
@@ -1744,8 +1808,12 @@
       "hash": "3180d31d9579f45a7a71d8a30efecf156da6dbf60c6c8e98c6e9e4976c374452",
       "docRelative": "algorithm/array/overlapInterval.mdx"
     },
+    "algorithm/array/stringAnagram.js": {
+      "hash": "ab077d06cd071e85d9a711a88cf3817c5bbdab62c1b321d5896433d72aa6bec9",
+      "docRelative": "algorithm/array/stringAnagram.mdx"
+    },
     "algorithm/array/twoSum.js": {
-      "hash": "3eabc32d94e9c490cb307d0a254e4f04a0bc2aadd80892bf724a6ed49ce45763",
+      "hash": "d889993cf0437ecd27d9c0902b386cf589e306e48511890c5b758164320c9df4",
       "docRelative": "algorithm/array/twoSum.mdx"
     },
     "algorithm/array/zigzag.js": {
@@ -1771,6 +1839,10 @@
     "algorithm/climbingStairs.js": {
       "hash": "5ff648b132b5b748e81ece369455cafa32cbea94b0e61da9d1f2a9e48eb8fec7",
       "docRelative": "algorithm/climbingStairs.mdx"
+    },
+    "algorithm/countSubstringNoRepeatedCharacter.js": {
+      "hash": "1387b3193b6eadac7223674ad4989eb2152ea561d65cce30fdf2f80bde40532e",
+      "docRelative": "algorithm/countSubstringNoRepeatedCharacter.mdx"
     },
     "algorithm/dfs/boggle.js": {
       "hash": "a174035c326bfe38419253faabeb95f5009fe6aea7a6ccd4faee807c2a026559",
@@ -1895,10 +1967,6 @@
     "algorithm/stack/isBalanceBracket.js": {
       "hash": "534a99755859d20db8c3271cf0d1b069408de8d64123186325accbc59419480e",
       "docRelative": "algorithm/stack/isBalanceBracket.mdx"
-    },
-    "algorithm/stringAnagram.js": {
-      "hash": "3f57432222fbf231b5a6e003564f7511653395cb1a511ef132fa7d4a013ac7a4",
-      "docRelative": "algorithm/stringAnagram.mdx"
     },
     "algorithm/tree/BinaryTree.js": {
       "hash": "40d5127a13aa754b0f5a904f73bd240376b72661a37606b5ec65091ba3fcff3f",
@@ -2036,6 +2104,10 @@
       "hash": "10f8eefdb66f9c37ee39bbce594cc2db0874191d8954e981127a44a075c662f3",
       "docRelative": "algorithm/two-pointers/minimumMoveToMakePalindrome.mdx"
     },
+    "algorithm/two-pointers/minimumTripsWeight.js": {
+      "hash": "da477367f582312ba87d9f419175c37732bf4a43a558c75ff18bd71debe9a8a2",
+      "docRelative": "algorithm/two-pointers/minimumTripsWeight.mdx"
+    },
     "algorithm/two-pointers/removeNthLasNode.js": {
       "hash": "b44c1f72f6b810f60a96e96124fec229d021add17a0c31a53743310dc344952d",
       "docRelative": "algorithm/two-pointers/removeNthLasNode.mdx"
@@ -2053,11 +2125,11 @@
       "docRelative": "algorithm/two-pointers/twoNumberSum.mdx"
     },
     "__nav__:algorithm": {
-      "hash": "86f92e372f43bbb7a6ca6791f40105ddedbe1900c49a56e48a9f7d14646529d5",
+      "hash": "c912eb5082a8ce85350d1b4703ffd74dbe277deb6531ad4e418704dcd34a4522",
       "docRelative": "algorithm/_index.mdx"
     },
     "__nav__:algorithm/array": {
-      "hash": "122d97a5cc2be4ed5e55457f7b3286eebca2c5cf9b82238b9227f3f45c329bcb",
+      "hash": "f3b9cf55102553caebcec09f5ecaf856822275546c4aa97514aadfa699a5aaeb",
       "docRelative": "algorithm/array/_index.mdx"
     },
     "__nav__:algorithm/bit": {
@@ -2101,7 +2173,7 @@
       "docRelative": "algorithm/trie/_index.mdx"
     },
     "__nav__:algorithm/two-pointers": {
-      "hash": "a5f6120d4811d714b2cbe3279aa22353147476e9d6615f85f0fb248d27c9d8ba",
+      "hash": "7a2d3f8821c0d6ad60842fb01923bc3aecb57d75e700a6274e8a45703c235611",
       "docRelative": "algorithm/two-pointers/_index.mdx"
     },
     "__nav__:backend": {
@@ -2109,7 +2181,7 @@
       "docRelative": "backend/_index.mdx"
     },
     "__nav__:backend/quizzes": {
-      "hash": "59ad4b19068d7b1db09562f202b1992b62c68edb8da58fcf46e4361f7cd89a32",
+      "hash": "50a24118b1e376f44b8fbb7fd44530877a407bda437ba7a9eb1634217e55fad7",
       "docRelative": "backend/quizzes/_index.mdx"
     },
     "__nav__:frontend": {
@@ -2121,7 +2193,7 @@
       "docRelative": "frontend/css/_index.mdx"
     },
     "__nav__:frontend/interview": {
-      "hash": "ef91fe552b20ac674b5be7c1abd7727101be2c5e9057a7084578ca6bcf4325f5",
+      "hash": "40c1bbce4a62c586f7182a24d10232f9662276eca84bf43c5258b58c200fb1fd",
       "docRelative": "frontend/interview/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
@@ -2501,7 +2573,7 @@
       "docRelative": "frontend/uicoding/ui-prototype-js/whack-a-mole/_index.mdx"
     },
     "__nav__:frontend/uicoding/ui-prototype-js/wordle": {
-      "hash": "4b9ce6952230d0814dd7055daeba7759a55f426fb2c63c45ce1c0438a528188e",
+      "hash": "349665f0799b0d27e553b0f0d854ce3f537e86930f060a08aee6fc2cfa536c61",
       "docRelative": "frontend/uicoding/ui-prototype-js/wordle/_index.mdx"
     }
   }

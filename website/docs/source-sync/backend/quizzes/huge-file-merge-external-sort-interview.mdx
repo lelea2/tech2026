@@ -1,0 +1,956 @@
+---
+title: 'Merge Huge Sorted Files & External Merge Sort'
+description: 'Interview-ready guide for merging TB-scale sorted files and globally sorting N huge files.'
+---
+
+# Merge Huge Sorted Files & External Merge Sort
+
+## 1. Problem framing
+
+Two common variants:
+
+```text
+A. Two or N files are already individually sorted.
+   Goal: merge them into one globally sorted result.
+
+B. N huge files are not sorted.
+   Goal: globally sort all records.
+```
+
+Constraints:
+
+```text
+- Input files may be TB-scale.
+- Output may also be TB-scale.
+- Memory cannot hold complete inputs or output.
+- Reads and writes should be sequential.
+```
+
+The key idea is:
+
+```text
+stream input
+→ keep bounded state
+→ emit output incrementally
+```
+
+Memory should depend on buffer size, not total dataset size.
+
+---
+
+# 2. Two Huge Sorted Files
+
+Suppose:
+
+```text
+A: 1 2 4 8
+B: 1 3 5 8 9
+```
+
+Output:
+
+```text
+1 1 2 3 4 5 8 8 9
+```
+
+## Algorithm
+
+```text
+1. Read one current record from A and B.
+2. Compare them.
+3. Write the smaller one.
+4. Advance only the file that produced that record.
+5. Repeat.
+6. Drain the remaining file when the other reaches EOF.
+```
+
+## JavaScript
+
+```js
+async function mergeSortedFiles(readNextA, readNextB, write) {
+  let a = await readNextA();
+  let b = await readNextB();
+
+  while (a !== null && b !== null) {
+    if (a <= b) {
+      await write(a);
+      a = await readNextA();
+    } else {
+      await write(b);
+      b = await readNextB();
+    }
+  }
+
+  while (a !== null) {
+    await write(a);
+    a = await readNextA();
+  }
+
+  while (b !== null) {
+    await write(b);
+    b = await readNextB();
+  }
+}
+```
+
+Duplicates are naturally preserved because equal values are consumed one at a time.
+
+---
+
+# 3. Why It Works When Files Do Not Fit in Memory
+
+Conceptually:
+
+```text
+File A → [read buffer] → current A ─┐
+                                    ├→ compare → [output buffer] → Output
+File B → [read buffer] → current B ─┘
+```
+
+At any point, memory contains only:
+
+```text
+- bounded buffer from A
+- bounded buffer from B
+- bounded output buffer
+- a few pointers/current values
+```
+
+So:
+
+```text
+Algorithmic extra memory: O(1)
+Including buffers: O(B)
+```
+
+where `B` is configurable.
+
+Complexity:
+
+```text
+N = records in A
+M = records in B
+
+Time:   O(N + M)
+Memory: O(1) algorithmically
+        O(B) including buffers
+```
+
+I/O is sequential:
+
+```text
+read A once
+read B once
+write output once
+```
+
+---
+
+# 4. The Output Is Also Too Large for Memory
+
+That is fine.
+
+Do not accumulate the full output:
+
+```text
+merge records
+   ↓
+append to output buffer
+   ↓
+buffer fills
+   ↓
+flush sequentially
+   ↓
+reuse buffer
+```
+
+Example:
+
+```text
+A read buffer:    16 MB
+B read buffer:    16 MB
+Output buffer:    32 MB
+
+Total data:       multiple TB
+```
+
+Memory stays bounded.
+
+---
+
+# 5. Avoid Tiny Reads and Writes
+
+The simple pseudocode uses `readNext()` and `write()`, but a real implementation should not perform one physical I/O operation per record.
+
+Bad:
+
+```text
+read 1 line
+read 1 line
+read 1 line
+
+write 1 line
+write 1 line
+write 1 line
+```
+
+Better:
+
+```text
+read 8–64 MB
+parse many records locally
+merge many records
+write 8–64 MB
+```
+
+This amortizes:
+
+```text
+- network latency
+- system-call overhead
+- RPC overhead
+- TLS overhead
+- object-store request overhead
+```
+
+---
+
+# 6. Distributed Filesystem / Object Storage
+
+For S3/GCS/HDFS/Azure Blob:
+
+## Input
+
+Use:
+
+```text
+large sequential/range reads
++ async read-ahead
++ bounded double buffering
+```
+
+Example:
+
+```text
+Current A chunk → being consumed
+Next A chunk    → downloading
+
+Current B chunk → being consumed
+Next B chunk    → downloading
+```
+
+## Output
+
+Prefer:
+
+```text
+large buffered writes
+or
+multipart upload
+```
+
+instead of appending individual records.
+
+---
+
+# 7. N Huge Files That Are Already Sorted
+
+Use a **k-way merge with a min-heap**.
+
+Each file contributes one current candidate:
+
+```text
+file1 → 10 ─┐
+file2 → 12 ─┤
+file3 →  4 ─┼→ min heap → output
+file4 → 19 ─┤
+...         │
+fileN →  8 ─┘
+```
+
+The minimum heap entry is always the globally smallest unconsumed record.
+
+## Algorithm
+
+```text
+1. Read the first record from each file.
+2. Push each into a min-heap.
+3. Pop the smallest.
+4. Write it.
+5. Read the next record from the file it came from.
+6. Push that new record.
+7. Repeat until the heap is empty.
+```
+
+Heap entry:
+
+```js
+{
+  value: 42,
+  fileIndex: 7
+}
+```
+
+---
+
+# 8. JavaScript Min-Heap + K-Way Merge
+
+```js
+class MinHeap {
+  constructor(compare) {
+    this.data = [];
+    this.compare = compare;
+  }
+
+  push(value) {
+    this.data.push(value);
+    let i = this.data.length - 1;
+
+    while (i > 0) {
+      const parent = Math.floor((i - 1) / 2);
+
+      if (this.compare(this.data[parent], this.data[i]) <= 0) {
+        break;
+      }
+
+      [this.data[parent], this.data[i]] = [this.data[i], this.data[parent]];
+
+      i = parent;
+    }
+  }
+
+  pop() {
+    if (this.data.length === 0) return null;
+
+    const result = this.data[0];
+    const last = this.data.pop();
+
+    if (this.data.length > 0) {
+      this.data[0] = last;
+      let i = 0;
+
+      while (true) {
+        let smallest = i;
+        const left = i * 2 + 1;
+        const right = i * 2 + 2;
+
+        if (left < this.data.length && this.compare(this.data[left], this.data[smallest]) < 0) {
+          smallest = left;
+        }
+
+        if (right < this.data.length && this.compare(this.data[right], this.data[smallest]) < 0) {
+          smallest = right;
+        }
+
+        if (smallest === i) break;
+
+        [this.data[i], this.data[smallest]] = [this.data[smallest], this.data[i]];
+
+        i = smallest;
+      }
+    }
+
+    return result;
+  }
+
+  isEmpty() {
+    return this.data.length === 0;
+  }
+}
+
+async function kWayMerge(readers, writer) {
+  const heap = new MinHeap((a, b) => a.value - b.value);
+
+  for (let i = 0; i < readers.length; i++) {
+    const value = await readers[i].next();
+
+    if (value !== null) {
+      heap.push({
+        value,
+        fileIndex: i,
+      });
+    }
+  }
+
+  while (!heap.isEmpty()) {
+    const { value, fileIndex } = heap.pop();
+
+    await writer.write(value);
+
+    const nextValue = await readers[fileIndex].next();
+
+    if (nextValue !== null) {
+      heap.push({
+        value: nextValue,
+        fileIndex,
+      });
+    }
+  }
+}
+```
+
+Complexity:
+
+```text
+K = number of files
+R = total number of records
+
+Time:   O(R log K)
+Memory: O(K) heap entries
+        + bounded I/O buffers
+```
+
+---
+
+# 9. What If K Is Extremely Large?
+
+If there are 1,000,000 files, opening every file simultaneously is a bad idea.
+
+Problems:
+
+```text
+- too many file descriptors
+- too many network connections
+- too much buffer memory
+- object-store throttling
+```
+
+Use **multi-pass merging**.
+
+Example fan-in = 100:
+
+```text
+Round 1:
+100 files → merge → run-001
+100 files → merge → run-002
+100 files → merge → run-003
+
+Round 2:
+100 runs → merge → larger-run-001
+100 runs → merge → larger-run-002
+
+...
+
+Final round:
+remaining runs → final sorted result
+```
+
+Choose fan-in based on:
+
+```text
+- available memory
+- input buffer size
+- file descriptor limits
+- network connection limits
+- storage throughput
+```
+
+---
+
+# 10. N Huge Files That Are Not Sorted
+
+This becomes **External Merge Sort**.
+
+Two phases:
+
+```text
+Phase 1: Create sorted runs
+Phase 2: K-way merge the runs
+```
+
+---
+
+# 11. Phase 1 — Create Sorted Runs
+
+Read only a bounded chunk:
+
+```text
+read chunk that fits in memory
+   ↓
+sort in memory
+   ↓
+write immutable sorted run
+```
+
+Repeat:
+
+```text
+chunk 1 → sort → run-001
+chunk 2 → sort → run-002
+chunk 3 → sort → run-003
+...
+```
+
+Conceptual JavaScript:
+
+```js
+async function createSortedRuns(reader, maxRecords, writeRun) {
+  const runs = [];
+
+  while (true) {
+    const chunk = [];
+
+    while (chunk.length < maxRecords) {
+      const value = await reader.next();
+
+      if (value === null) break;
+
+      chunk.push(value);
+    }
+
+    if (chunk.length === 0) break;
+
+    chunk.sort((a, b) => a - b);
+
+    const run = await writeRun(chunk);
+    runs.push(run);
+  }
+
+  return runs;
+}
+```
+
+A production implementation usually budgets by bytes rather than record count.
+
+---
+
+# 12. Phase 2 — Merge the Runs
+
+Now each run is sorted:
+
+```text
+run-001 ─┐
+run-002 ─┤
+run-003 ─┼→ min heap → globally sorted output
+...      │
+run-N ───┘
+```
+
+If there are too many runs, use multiple merge passes.
+
+This is the classic **external merge sort**.
+
+---
+
+# 13. External Merge Sort Diagram
+
+```text
+                 UNSORTED DATA
+                       │
+                       ▼
+            ┌────────────────────┐
+            │ Read bounded chunk │
+            │ Sort in memory     │
+            └──────────┬─────────┘
+                       │
+        ┌──────────────┼──────────────┐
+        ▼              ▼              ▼
+    sorted run     sorted run     sorted run
+       001            002            003
+        │              │              │
+        └──────────────┼──────────────┘
+                       ▼
+                  K-WAY MERGE
+                       │
+                       ▼
+             GLOBAL SORTED OUTPUT
+```
+
+---
+
+# 14. How Should the Final Result Be Stored?
+
+At TB scale, one giant physical file is often inconvenient.
+
+Prefer multiple immutable ordered shards:
+
+```text
+/output/
+  part-00000
+  part-00001
+  part-00002
+  ...
+```
+
+Maintain:
+
+```text
+max(part-00000) <= min(part-00001)
+max(part-00001) <= min(part-00002)
+...
+```
+
+Then the dataset is globally ordered even though it is physically split across files.
+
+---
+
+# 15. Store a Manifest
+
+Example:
+
+```json
+{
+  "files": [
+    {
+      "path": "part-00000",
+      "minKey": 0,
+      "maxKey": 99999,
+      "records": 123456789
+    },
+    {
+      "path": "part-00001",
+      "minKey": 100000,
+      "maxKey": 199999,
+      "records": 119234211
+    }
+  ]
+}
+```
+
+Benefits:
+
+```text
+- range pruning
+- parallel reads
+- validation
+- retries
+- easier compaction
+- easy publication/versioning
+```
+
+---
+
+# 16. Distributed Sorting at Large Scale
+
+For very large datasets, do not funnel all records through one merge worker.
+
+Use **range partitioning**:
+
+```text
+Partition 0: key < 1,000,000
+Partition 1: 1,000,000 <= key < 2,000,000
+Partition 2: 2,000,000 <= key < 3,000,000
+```
+
+Then sort each range independently:
+
+```text
+                    INPUT
+                      │
+               range partition
+           ┌──────────┼──────────┐
+           ▼          ▼          ▼
+       partition0 partition1 partition2
+           │          │          │
+          sort       sort       sort
+           │          │          │
+           ▼          ▼          ▼
+         shard0     shard1     shard2
+```
+
+If every shard is internally sorted and all keys in shard `i` are `<=` all keys in shard `i+1`, the overall dataset is globally sorted.
+
+---
+
+# 17. Avoid Skew When Choosing Range Boundaries
+
+Equal numeric ranges may produce very uneven partitions.
+
+Example:
+
+```text
+90% of records are between keys 1 and 100.
+```
+
+Bad:
+
+```text
+partition by fixed numeric ranges
+```
+
+Better:
+
+```text
+sample input keys
+→ estimate distribution
+→ choose approximate quantiles
+→ use quantiles as range boundaries
+```
+
+Goal:
+
+```text
+roughly equal data volume per partition
+```
+
+not equal numeric width.
+
+---
+
+# 18. Failure Handling
+
+Prefer immutable intermediate files.
+
+Example:
+
+```text
+job-123/
+  runs/
+    run-0001
+    run-0002
+    run-0003
+```
+
+If one worker fails:
+
+```text
+retry only that run/merge task
+```
+
+rather than restarting the entire sort.
+
+Publication pattern:
+
+```text
+write temporary output
+→ checksum/verify
+→ publish manifest atomically
+```
+
+The manifest becomes the commit point.
+
+---
+
+# 19. Backpressure
+
+If output storage becomes slow:
+
+```text
+output buffer fills
+      ↓
+merge pauses
+      ↓
+input readers pause
+```
+
+Do not continue reading unbounded data.
+
+This keeps memory bounded.
+
+---
+
+# 20. Interview Decision Tree
+
+If interviewer says:
+
+```text
+"Two huge sorted files"
+```
+
+Answer:
+
+```text
+Two-way streaming merge
+Time: O(N + M)
+Memory: O(1) algorithmically
+```
+
+If interviewer says:
+
+```text
+"N huge files, each already sorted"
+```
+
+Answer:
+
+```text
+K-way min-heap merge
+Time: O(R log K)
+```
+
+If interviewer says:
+
+```text
+"Too many files to open simultaneously"
+```
+
+Answer:
+
+```text
+Multi-pass / hierarchical merge
+```
+
+If interviewer says:
+
+```text
+"N huge unsorted files"
+```
+
+Answer:
+
+```text
+External merge sort:
+1. build sorted runs
+2. k-way merge runs
+```
+
+If interviewer says:
+
+```text
+"TB/PB-scale distributed system"
+```
+
+Discuss:
+
+```text
+- range partitioning
+- sampled/quantile boundaries
+- parallel sorting
+- immutable output shards
+- manifest
+- large sequential I/O
+- retry/idempotency
+- skew
+```
+
+---
+
+# 21. Staff-Level Interview Answer
+
+```text
+Because the files are larger than memory, I treat this as an
+external-memory problem.
+
+For two already-sorted files, I use a streaming two-way merge. I keep
+only the current record or a bounded buffer from each input, compare the
+front records, emit the smaller one into a bounded output buffer, and
+advance only that input. This gives O(N + M) time and O(1) algorithmic
+memory.
+
+For N sorted files, I generalize this to a k-way merge using a min-heap
+containing one candidate from each input. Each output record costs
+O(log K), so total complexity is O(R log K).
+
+If K is too large to keep every input open simultaneously, I perform
+multi-pass merges with bounded fan-in based on memory, file descriptor,
+and network constraints.
+
+If the files are not already sorted, I use external merge sort: read a
+memory-sized chunk, sort it in memory, write an immutable sorted run,
+then merge the runs using the same k-way merge.
+
+At distributed scale, I would normally store the result as multiple
+globally ordered immutable shards rather than one enormous physical
+file. A manifest records each shard's key range and metadata. I would
+also use multi-megabyte input/output buffers, async read-ahead, and
+multipart or sequential writes to minimize storage and network overhead.
+
+For very large parallel sorts, I would range-partition the key space,
+ideally using sampled quantiles to avoid skew, sort each range
+independently, and preserve ordered shard boundaries so the complete
+dataset is globally sorted.
+```
+
+---
+
+# 22. Common Follow-Ups
+
+## Why not concatenate sorted files?
+
+```text
+A: 1 100
+B: 2 3
+```
+
+Concatenation gives:
+
+```text
+1 100 2 3
+```
+
+which is not globally sorted.
+
+---
+
+## Why use a heap for N files?
+
+We repeatedly need:
+
+```text
+minimum among N current candidates
+```
+
+A heap gives:
+
+```text
+peek min: O(1)
+pop:      O(log N)
+push:     O(log N)
+```
+
+Scanning every candidate for every record would cost:
+
+```text
+O(R × N)
+```
+
+instead of:
+
+```text
+O(R log N)
+```
+
+---
+
+## What if all records have the same key?
+
+Nothing breaks.
+
+Duplicates are preserved because every physical record is emitted.
+
+---
+
+## Is O(N) heap memory acceptable?
+
+If `N` is moderate, yes.
+
+If `N` is huge:
+
+```text
+use bounded fan-in + multi-pass merge
+```
+
+---
+
+## Can merging be parallelized?
+
+A single sorted stream has ordering dependencies.
+
+At very large scale, parallelize by:
+
+```text
+range partitioning
+```
+
+Each worker sorts or merges an independent key range, and shard ordering gives global ordering.
+
+---
+
+# 23. One-Line Takeaway
+
+```text
+Two sorted huge files
+→ streaming two-way merge
+
+N sorted huge files
+→ min-heap k-way merge
+
+Too many files
+→ multi-pass merge
+
+N unsorted huge files
+→ external merge sort
+
+Distributed scale
+→ range partition + independently sorted ordered shards
+```

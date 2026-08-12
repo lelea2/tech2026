@@ -1,0 +1,81 @@
+---
+title: EmployeeTrainingDay.ts
+---
+
+# EmployeeTrainingDay.ts
+
+~~~typescript
+// Time complexity is O(1) per employee and O(n) for a list of employees.
+
+type TrainingStatus =
+  | "not_required"
+  | "completed"
+  | "pending"
+  | "overdue";
+
+interface Employee {
+  startDay: number;
+  trainedDay: number | null;
+  groupId: string | null;
+}
+
+interface StatusResult {
+  status: TrainingStatus;
+  overdueDays: number;
+}
+
+function getTrainingStatus(
+  employee: Employee,
+  trainingWindow: number,
+  checkDay: number
+): StatusResult {
+  if (!employee.groupId) {
+    return {
+      status: "not_required",
+      overdueDays: 0
+    };
+  }
+
+  const dueDay = employee.startDay + trainingWindow;
+
+  if (employee.trainedDay !== null) {
+    if (employee.trainedDay <= dueDay) {
+      return {
+        status: "completed",
+        overdueDays: 0
+      };
+    }
+
+    return {
+      status: "overdue",
+      overdueDays: employee.trainedDay - dueDay
+    };
+  }
+
+  if (checkDay <= dueDay) {
+    return {
+      status: "pending",
+      overdueDays: 0
+    };
+  }
+
+  return {
+    status: "overdue",
+    overdueDays: checkDay - dueDay
+  };
+}
+
+// Example
+const employee: Employee = {
+  startDay: 1,
+  trainedDay: null,
+  groupId: "A"
+};
+
+console.log(getTrainingStatus(employee, 10, 16));
+
+// {
+//   status: "overdue",
+//   overdueDays: 5
+// }
+~~~
