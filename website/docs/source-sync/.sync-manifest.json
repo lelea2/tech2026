@@ -1776,6 +1776,10 @@
       "hash": "dad662c41ac83a73eb7134b4987e5f456e34429838a922fd7230cea160f7a738",
       "docRelative": "algorithm/array/findSharpestPoint.mdx"
     },
+    "algorithm/array/groupAnagram.js": {
+      "hash": "e539354aa05e092018349ffe379b41214322aae101c3161c6568020fb8b776f1",
+      "docRelative": "algorithm/array/groupAnagram.mdx"
+    },
     "algorithm/array/hourGlassSum.js": {
       "hash": "41c5e245e64e0abb89df57705b82c9b43720f60376ddf37f24d7306b6c0342f7",
       "docRelative": "algorithm/array/hourGlassSum.mdx"
@@ -1787,6 +1791,10 @@
     "algorithm/array/kRowPascalTriangle.js": {
       "hash": "836137b0c35eef0a193d474574390f8a7ac911e449e2d88f694a161118b26b06",
       "docRelative": "algorithm/array/kRowPascalTriangle.mdx"
+    },
+    "algorithm/array/lengthOfLongestSubString.js": {
+      "hash": "e2c8530fed53e71a13c86d509a5c0c400245ff6593023373ce86be88ad9511a8",
+      "docRelative": "algorithm/array/lengthOfLongestSubString.mdx"
     },
     "algorithm/array/maxProductSubArray.js": {
       "hash": "fdc737315b57bce9dc5dd8c861117c181c29d5c98f0c7f09d2396a58e2142f83",
@@ -1815,6 +1823,10 @@
     "algorithm/array/twoSum.js": {
       "hash": "d889993cf0437ecd27d9c0902b386cf589e306e48511890c5b758164320c9df4",
       "docRelative": "algorithm/array/twoSum.mdx"
+    },
+    "algorithm/array/validAnagram.js": {
+      "hash": "ac84413aed63244cf20a8ec6cbbb073e98782e33c950d4859f42c44a8730429c",
+      "docRelative": "algorithm/array/validAnagram.mdx"
     },
     "algorithm/array/zigzag.js": {
       "hash": "2188af883f67da3f8791a4fa1c9b99a1d21082683e4c73c832a0233ad5d1b957",
@@ -2129,7 +2141,7 @@
       "docRelative": "algorithm/_index.mdx"
     },
     "__nav__:algorithm/array": {
-      "hash": "f3b9cf55102553caebcec09f5ecaf856822275546c4aa97514aadfa699a5aaeb",
+      "hash": "49d4019193868ab1ecd8654fdb054aa05b45af813c040fa45bf6dc9a0eeeca96",
       "docRelative": "algorithm/array/_index.mdx"
     },
     "__nav__:algorithm/bit": {

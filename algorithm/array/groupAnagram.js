@@ -1,0 +1,37 @@
+// Valid Anagram
+//     ↓
+// Compare character frequencies
+// between TWO strings
+
+// Group Anagrams
+//     ↓
+// Build a common signature/key
+// for MANY strings
+function groupAnagrams(strs) {
+  const groups = new Map();
+
+  for (const word of strs) {
+    // Create the same key for all anagrams
+    const key = word
+      .split("")
+      .sort()
+      .join("");
+
+    if (!groups.has(key)) {
+      groups.set(key, []);
+    }
+
+    groups.get(key).push(word);
+  }
+
+  return [...groups.values()];
+}
+
+// [
+//   ["eat", "tea", "ate"],
+//   ["tan", "nat"],
+//   ["bat"]
+// ]
+
+// Time complexity: O(n * k log k) - n is the number of words, k is the average length of a word
+// Space complexity: O(n * k) - storing the grouped anagrams in the map
