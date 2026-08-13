@@ -76,9 +76,13 @@
       "hash": "f57af264f4d222028f922bd1d4522dd2285e16fdb07c4f907d819992b4b8f682",
       "docRelative": "staff_frontend_web_experience_interview.mdx"
     },
-    "behavorial/stencil_shared_component_staff_interview.mdx": {
-      "hash": "3e0f9c7edfbfb87aae4cc8441a0b3c74662829ae8aff052057f9c44b86576bb4",
-      "docRelative": "stencil_shared_component_staff_interview.mdx"
+    "behavorial/stencil-design-system-interview-story.mdx": {
+      "hash": "f0967569006542275501b7f25d5a079450bfe46b344fbfcb8923b0d610ef020f",
+      "docRelative": "stencil-design-system-interview-story.mdx"
+    },
+    "behavorial/stencil_shared_component.mdx": {
+      "hash": "a31f582233d076b6dfac6accebde31e1866fbe9d812e77cec28a1d7239a78f17",
+      "docRelative": "stencil_shared_component.mdx"
     },
     "behavorial/strength-vs-weakness.mdx": {
       "hash": "7b5aa30ebd7422aa3b2e9af01d6c8038a0ce6e15d2aee0470426e87297977c77",

@@ -1,0 +1,834 @@
+---
+title: "Why Stencil? Staff-Level Design System Story"
+description: "Interview-ready narrative for evaluating Stencil vs React for a cross-framework design system."
+---
+
+# Why Stencil? — Staff-Level Design System Story
+
+## 1. The Story I Want to Tell
+
+I would **not start by saying “we should use Stencil.”**
+
+I would start with the organizational problem:
+
+> We need a shared design system that can scale across many teams, frameworks, and product surfaces without duplicating accessibility, interaction behavior, styling rules, and release processes.
+
+My job as a Staff Engineer is to determine whether the organization actually needs a **framework-independent component foundation**, or whether a simpler framework-native library is the better choice.
+
+The key principle:
+
+```text
+Technology should follow constraints.
+
+Not:
+
+"We like Stencil → let's build Web Components."
+
+Instead:
+
+"These are our consumers, release constraints, SSR needs,
+versioning requirements, accessibility requirements,
+and customization needs → now choose the architecture."
+```
+
+## 2. Start With Clarifying Questions
+
+Before picking Stencil, React, or another approach, I would ask:
+
+```text
+1. Can multiple library versions appear on one page?
+2. Which frameworks and major versions are supported?
+3. Is SSR a hard requirement?
+4. Who owns tokens, icons, and accessibility standards?
+5. How much styling override should consumers receive?
+6. Which controls require native form participation?
+7. How are accessibility regressions detected today?
+8. Is there existing release and codemod infrastructure?
+9. How do teams request and discover shared components?
+10. Which adoption and performance metrics define success?
+```
+
+These questions are not implementation details. They determine whether Stencil is a good architectural fit.
+
+## 3. The Main Decision
+
+The first question I want answered is:
+
+```text
+What is the framework landscape?
+```
+
+### Case A — Mostly React
+
+```text
+Product ecosystem
+    |
+    +-- React
+    +-- React
+    +-- React
+    +-- Next.js
+    +-- React
+```
+
+If 90%+ of applications are React:
+
+```text
+Prefer React-native components
+```
+
+Why?
+
+```text
++ better React ergonomics
++ simpler SSR / hydration
++ native event handling
++ easier forms integration
++ easier typing
++ fewer abstraction layers
++ existing React tooling works naturally
+```
+
+In this environment, I would **not introduce Web Components simply for architectural purity**.
+
+### Case B — Heterogeneous Organization
+
+Imagine the company has:
+
+```text
+App A → React 18
+App B → React 19
+App C → Angular
+App D → Vue
+Legacy app → Vanilla JS
+Future app → unknown
+```
+
+Now the cost of framework-specific libraries becomes much larger.
+
+Without a shared runtime:
+
+```text
+                   Design spec
+                       |
+          +------------+------------+
+          |            |            |
+       React        Angular        Vue
+     component     component     component
+          |            |            |
+       Team A        Team B        Team C
+```
+
+Problems:
+
+```text
+- behavior drifts
+- accessibility implementations differ
+- bug fixes must be repeated
+- releases move at different speeds
+- visual behavior diverges
+- documentation becomes fragmented
+```
+
+This is where Stencil becomes much more compelling.
+
+## 4. Why Stencil
+
+Stencil lets us implement the core component behavior once and distribute standards-based Web Components.
+
+```text
+             Design Tokens
+                  |
+                  v
+          +----------------+
+          | Stencil Core   |
+          | Components     |
+          +----------------+
+                  |
+                  v
+          Web Components
+                  |
+      +-----------+-----------+
+      |           |           |
+    React       Angular       Vue
+   wrapper      wrapper      wrapper
+      |
+   Product UI
+```
+
+The value proposition is:
+
+```text
+Implement once
+       ↓
+Centralize:
+- semantics
+- accessibility
+- keyboard behavior
+- focus behavior
+- visual states
+- tokens
+- component APIs
+       ↓
+Consume from multiple frameworks
+```
+
+## 5. What Belongs in the Shared Component Layer?
+
+Good Stencil candidates:
+
+```text
+<Button>
+<TextField>
+<Checkbox>
+<Radio>
+<Select>
+<Tabs>
+<Tooltip>
+<Modal>
+<Avatar>
+<Progress>
+<Badge>
+```
+
+These primarily own:
+
+```text
+DOM semantics
+ARIA attributes
+keyboard interactions
+focus management
+visual states
+design tokens
+disabled state
+validation state
+```
+
+They should generally **not own product application state**.
+
+Bad candidates for the core design system:
+
+```text
+<SearchResultsPage>
+<CheckoutFlow>
+<CampaignBuilder>
+<AnalyticsDashboard>
+```
+
+Those usually contain:
+
+```text
+routing
+business logic
+React Query
+Redux / app stores
+application-specific API calls
+feature-specific workflows
+```
+
+My boundary:
+
+```text
+Design System
+    =
+Reusable interaction + presentation primitives
+
+Application
+    =
+Product-specific orchestration + business logic
+```
+
+## 6. Deep Dive: Multiple Versions on One Page
+
+Suppose we have a microfrontend architecture:
+
+```text
+                  Shell
+                    |
+          +---------+---------+
+          |                   |
+        MFE A               MFE B
+          |                   |
+        DS v2               DS v3
+```
+
+Both versions may attempt to register:
+
+```html
+<ds-button>
+```
+
+But Custom Elements use a global registry:
+
+```js
+customElements.define("ds-button", Button);
+```
+
+That creates a versioning constraint.
+
+So I would ask:
+
+> Can multiple versions of the component library appear on one page?
+
+If yes, this becomes an architectural requirement.
+
+Potential strategies:
+
+```text
+Option 1
+Centralize design-system version at the shell
+        ↓
+Preferred when possible
+```
+
+```text
+Option 2
+Maintain strong backwards compatibility
+        ↓
+Old consumers can run against newer runtime
+```
+
+```text
+Option 3
+Version custom-element names
+
+<ds-v2-button>
+<ds-v3-button>
+```
+
+I would avoid Option 3 unless absolutely necessary because:
+
+```text
+- versions leak into markup
+- migrations become ugly
+- documentation becomes harder
+- consumers become coupled to release versions
+```
+
+**Interview takeaway:**
+
+> Framework independence solves one class of coupling, but Web Components introduce a global element-registration constraint. I want to understand our microfrontend/versioning model before committing to Stencil.
+
+## 7. Deep Dive: SSR
+
+Question:
+
+> Is SSR a hard requirement?
+
+If SSR is critical for:
+
+```text
+SEO
+first paint
+Core Web Vitals
+public landing pages
+content-heavy pages
+```
+
+then I would validate Stencil SSR and hydration behavior carefully.
+
+If the entire ecosystem is heavily Next.js-based:
+
+```text
+React-native DS
+```
+
+may be operationally simpler.
+
+My interview answer:
+
+> If server rendering is a hard requirement across most products, I would prototype critical components and measure hydration cost, FOUC risk, event readiness, and integration complexity before choosing Web Components.
+
+## 8. Deep Dive: Styling and Encapsulation
+
+Question:
+
+> How much styling override should consumers receive?
+
+Two competing goals:
+
+```text
+Design-system consistency
+vs
+Product flexibility
+```
+
+Too little control:
+
+```text
+Product teams cannot adapt components
+to legitimate use cases.
+```
+
+Too much control:
+
+```text
+Every product restyles everything
+→ visual inconsistency
+→ accessibility regressions
+→ upgrade difficulty
+```
+
+Customization hierarchy:
+
+```text
+Level 1
+Design Tokens
+color
+spacing
+radius
+typography
+motion
+```
+
+```text
+Level 2
+Supported component variants
+
+<Button size="sm">
+<Button variant="primary">
+```
+
+```text
+Level 3
+Documented CSS custom properties / parts
+when necessary
+```
+
+Avoid consumers reaching into internal DOM structure.
+
+Principle:
+
+> Consumers should customize through stable contracts, not implementation details.
+
+## 9. Deep Dive: Forms
+
+Ask:
+
+> Which controls require native form participation?
+
+Especially:
+
+```text
+Input
+Checkbox
+Radio
+Select
+DatePicker
+Combobox
+```
+
+We need expected behavior around:
+
+```text
+<form>
+submit
+reset
+validation
+required
+disabled
+name/value
+browser autofill
+keyboard interaction
+```
+
+Preference:
+
+```text
+Use native HTML semantics internally
+whenever possible.
+```
+
+Rule:
+
+> The design system should enhance platform semantics, not fight the browser.
+
+## 10. Deep Dive: Accessibility Ownership
+
+Stencil does not automatically make a component accessible.
+
+Ask:
+
+> How are accessibility regressions detected today?
+
+I want several layers:
+
+```text
+Static checks
+    |
+    +-- lint rules
+    +-- TypeScript APIs
+```
+
+```text
+Automated tests
+    |
+    +-- axe
+    +-- keyboard interaction
+    +-- focus tests
+    +-- semantic assertions
+```
+
+```text
+Integration tests
+    |
+    +-- Storybook
+    +-- Playwright
+    +-- visual regression
+```
+
+```text
+Manual validation
+    |
+    +-- screen reader testing
+    +-- keyboard-only workflows
+```
+
+The leverage:
+
+```text
+Fix accessibility once
+        ↓
+All consuming applications improve
+```
+
+## 11. Tokens, Icons, and Components Are Different Layers
+
+Architecture:
+
+```text
+            Design Language
+                  |
+       +----------+----------+
+       |          |          |
+     Tokens      Icons    Guidelines
+       |          |          |
+       +----------+----------+
+                  |
+                  v
+           Component Core
+                  |
+                  v
+        Framework Adapters
+```
+
+Possible packages:
+
+```text
+@company/tokens
+@company/icons
+@company/components
+@company/react
+@company/angular
+@company/vue
+```
+
+## 12. Release Strategy Matters as Much as Component Architecture
+
+Ask:
+
+> Is there existing release and codemod infrastructure?
+
+Typical lifecycle:
+
+```text
+v1 component API
+      ↓
+new accessibility requirement
+      ↓
+v2 API
+      ↓
+100+ consuming applications
+```
+
+With platform infrastructure:
+
+```text
+Release
+   |
+   +-- changelog
+   +-- deprecation warning
+   +-- codemod
+   +-- automated PR
+   +-- migration dashboard
+```
+
+Staff-level principle:
+
+> The hard part of a design system isn't creating components. It's evolving them without freezing hundreds of consumers.
+
+## 13. Component Discovery and Governance
+
+Ask:
+
+> How do teams request and discover shared components?
+
+Desired flow:
+
+```text
+Product request
+      |
+      v
+Design-system intake
+      |
+      +-- Is this reusable?
+      +-- Does something already exist?
+      +-- Primitive or product component?
+      |
+      v
+RFC / proposal
+      |
+      v
+Implementation
+      |
+      v
+Storybook + docs
+      |
+      v
+Release
+```
+
+Discovery should include:
+
+```text
+Storybook
+component search
+usage examples
+accessibility guidelines
+do / don't examples
+status:
+- experimental
+- stable
+- deprecated
+```
+
+## 14. How I Measure Success
+
+I would reject:
+
+```text
+"We built 80 components."
+```
+
+as the primary success metric.
+
+Instead:
+
+### Adoption
+
+```text
+% applications using design system
+% UI built from shared primitives
+```
+
+### Duplication
+
+```text
+Number of product-local:
+buttons
+modals
+inputs
+date pickers
+```
+
+### Migration
+
+```text
+Time from release
+      ↓
+80% adoption
+```
+
+### Accessibility
+
+```text
+a11y defects per release
+WCAG violations
+keyboard regressions
+```
+
+### Performance
+
+```text
+bundle contribution
+component initialization
+hydration cost
+render latency
+Core Web Vitals impact
+```
+
+### Developer Experience
+
+```text
+time to build common workflows
+support tickets
+component discovery success
+upgrade effort
+```
+
+## 15. Why I Might Reject Stencil
+
+I would reject Stencil if:
+
+```text
+Nearly all products are React
+
+AND
+
+Next.js SSR is critical
+
+AND
+
+teams heavily depend on React-specific composition
+
+AND
+
+multiple DS versions frequently coexist
+
+AND
+
+there is already mature React release/codemod infrastructure
+```
+
+Then:
+
+```text
+React-native design system
+     >
+additional Web Component abstraction
+```
+
+Interview statement:
+
+> I don't want framework independence unless the organization actually has a framework-independence problem.
+
+## 16. Why I Would Choose Stencil
+
+I would favor Stencil if:
+
+```text
+Multiple frameworks exist today
+
+AND
+
+framework migration happens over time
+
+AND
+
+the DS is expected to live for many years
+
+AND
+
+accessibility behavior needs central ownership
+
+AND
+
+teams need consistent primitives
+
+AND
+
+we want the component runtime decoupled
+from application framework choice
+```
+
+Then:
+
+```text
+                       Design Language
+                              |
+                    +---------+---------+
+                    |                   |
+                  Tokens              Icons
+                    |                   |
+                    +---------+---------+
+                              |
+                              v
+                       Stencil Core
+                              |
+                              v
+                      Web Components
+                              |
+          +-------------------+-------------------+
+          |                   |                   |
+       React App          Angular App          Vue App
+```
+
+## 17. Staff-Level Tradeoff Summary
+
+| Area | Stencil / Web Components | React-Native |
+|---|---|---|
+| Cross-framework | Strong | Weak |
+| React ergonomics | Good with wrappers | Excellent |
+| Framework independence | Strong | Low |
+| SSR integration | Requires validation | Natural in React/Next |
+| Forms | More care required | Natural React integration |
+| Styling isolation | Strong | Depends on CSS architecture |
+| Multiple versions/page | Can be challenging | Easier with bundler isolation |
+| Accessibility centralization | Strong | Strong |
+| Long-lived primitives | Excellent fit | Good |
+| React-specific product components | Poor fit | Excellent |
+| Migration tooling | Still required | Still required |
+
+## 18. The 60-Second Interview Answer
+
+> I wouldn't start by choosing Stencil. I'd first understand the framework landscape, SSR requirements, versioning model, customization needs, form behavior, and existing release infrastructure.
+>
+> If we're mostly React and Next.js, I'd probably build a React-native design system because the integration is simpler and we don't gain enough from another abstraction.
+>
+> If we're supporting React, Angular, Vue, legacy applications, and expect the design system to survive multiple framework generations, Stencil becomes compelling because we can implement core semantics, accessibility, keyboard behavior, and styling once and distribute standards-based Web Components with framework adapters.
+>
+> Before committing, I would specifically investigate whether multiple library versions need to coexist on one page because the global Custom Element registry creates an important constraint. I'd also validate SSR, native form participation, and styling boundaries.
+>
+> Finally, I wouldn't measure success by how many components we ship. I'd measure adoption, reduction in duplicated UI, accessibility regressions, migration time, bundle cost, and how quickly product teams can ship using the platform.
+
+## 19. Two-Minute Story Version
+
+### Situation
+
+> We had multiple product teams building UI independently, potentially across different frontend frameworks. Shared behaviors such as accessibility, focus management, component styling, and interaction patterns were starting to diverge.
+
+### Task
+
+> My responsibility was not simply to choose a component technology. It was to establish an architecture that allowed the design system to scale across teams while remaining maintainable for years.
+
+### Action
+
+> I started by clarifying the actual constraints: supported frameworks, whether multiple design-system versions could coexist, SSR requirements, native form behavior, customization needs, accessibility ownership, and existing release and migration tooling.
+
+> If those answers showed a heterogeneous framework ecosystem, I would use Stencil to keep the core component implementation framework-independent while exposing framework-specific adapters.
+
+> I would keep tokens and icons separate from the runtime, enforce accessibility at the shared primitive layer, restrict styling customization to stable contracts, and build release/codemod infrastructure so we could evolve APIs without forcing manual migrations across every team.
+
+### Result
+
+> The goal is not simply a component library. The outcome is a UI platform where teams ship faster, accessibility fixes propagate centrally, duplicate components decrease, framework migrations become less disruptive, and the organization has measurable adoption and performance standards.
+
+## 20. Staff-Level Closing Principle
+
+```text
+Junior decision:
+
+"Stencil supports Web Components,
+so let's use Stencil."
+
+
+Senior decision:
+
+"We support many frameworks,
+so Stencil helps."
+
+
+Staff decision:
+
+"Our organization has these specific
+framework, ownership, versioning,
+SSR, migration, accessibility,
+and governance constraints.
+
+Stencil solves the highest-cost
+constraints with acceptable tradeoffs.
+
+Here is how we will measure
+whether that decision remains correct."
+```
+
+That is the story I want the interviewer to remember.

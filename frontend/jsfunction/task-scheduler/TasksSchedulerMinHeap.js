@@ -1,0 +1,121 @@
+// Task scheduler backed by a min-heap.
+// Schedules functions to run after a delay and always runs the earliest task
+// first. Tasks with the same scheduled time run in FIFO insertion order.
+//
+// Example:
+// const scheduler = new TaskScheduler();
+// scheduler.schedule(() => console.log('runs second'), 1000);
+// scheduler.schedule(() => console.log('runs first'), 500);
+// Output after ~500 ms: 'runs first'
+// Output after ~1000 ms: 'runs second'
+// Asked at Nvidia
+class TaskScheduler {
+  constructor() {
+    this.sequence = 0;
+
+    this.tasks = new MinHeap((a, b) => {
+      if (a.runAt !== b.runAt) {
+        return a.runAt - b.runAt;
+      }
+
+      // FIFO when two tasks have same runAt
+      return a.sequence - b.sequence;
+    });
+
+    this.timer = null;
+  }
+
+  schedule(taskFn, delayMs) {
+    const task = {
+      runAt: Date.now() + delayMs,
+      sequence: this.sequence++,
+      taskFn
+    };
+
+    this.tasks.push(task);
+
+    // A newly scheduled task may be earlier than
+    // the task we're currently waiting for.
+    this.#scheduleNext();
+  }
+
+  // Cancel every task that has been scheduled but has not run yet.
+  // Returns the number of cancelled tasks.
+  cancelTasks() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+
+    let cancelledCount = 0;
+
+    while (this.tasks.size() > 0) {
+      this.tasks.pop();
+      cancelledCount++;
+    }
+
+    return cancelledCount;
+  }
+
+  #scheduleNext() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+
+    const nextTask = this.tasks.peek();
+
+    if (!nextTask) return;
+
+    const delay = Math.max(
+      0,
+      nextTask.runAt - Date.now()
+    );
+
+    this.timer = setTimeout(() => {
+      this.#runDueTasks();
+    }, delay);
+  }
+
+  #runDueTasks() {
+    const now = Date.now();
+
+    while (
+      this.tasks.size() > 0 &&
+      this.tasks.peek().runAt <= now
+    ) {
+      const task = this.tasks.pop();
+
+      try {
+        Promise.resolve(task.taskFn()).catch(console.error);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    this.#scheduleNext();
+  }
+}
+
+// Test: tasks run in scheduled-time order, and pending tasks are cancelled.
+function testTaskScheduler() {
+  const scheduler = new TaskScheduler();
+  const executedTasks = [];
+
+  scheduler.schedule(() => executedTasks.push('runs second'), 40);
+  scheduler.schedule(() => executedTasks.push('runs first'), 10);
+  scheduler.schedule(() => executedTasks.push('cancelled task'), 100);
+
+  setTimeout(() => {
+    const cancelledCount = scheduler.cancelTasks();
+
+    console.log('Cancelled tasks:', cancelledCount); // 1
+  }, 60);
+
+  setTimeout(() => {
+    console.log(executedTasks);
+    // Expected: ['runs first', 'runs second']
+  }, 120);
+}
+
+testTaskScheduler();

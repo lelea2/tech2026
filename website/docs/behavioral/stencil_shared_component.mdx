@@ -1,5 +1,5 @@
 ---
-title: 'Staff Frontend Interview: Shared Components with Stencil.js'
+title: 'Shared Components with Stencil.js'
 description: 'Staff-level interview guide for designing, building, distributing, and operating a cross-framework component library with Stencil.js, including a comparison with Lit.'
 sidebar_label: 'Stencil Shared Components'
 tags:
@@ -69,16 +69,16 @@ Once consumers depend on these surfaces, they must be treated like public APIs.
 
 ### Non-functional
 
-| Requirement | Goal |
-|---|---|
-| Accessibility | WCAG 2.2 AA behavior and automated checks |
-| Performance | Per-component bundle budgets and lazy loading |
-| Reliability | Component failure does not crash the product shell |
-| Compatibility | Explicit browser and framework support matrix |
-| Upgrade safety | SemVer, codemods, deprecation periods, canaries |
-| Observability | Version drift, errors, load latency, usage |
-| Security | No unsafe HTML by default; dependency scanning |
-| Developer experience | Types, docs, examples, wrappers, test helpers |
+| Requirement          | Goal                                               |
+| -------------------- | -------------------------------------------------- |
+| Accessibility        | WCAG 2.2 AA behavior and automated checks          |
+| Performance          | Per-component bundle budgets and lazy loading      |
+| Reliability          | Component failure does not crash the product shell |
+| Compatibility        | Explicit browser and framework support matrix      |
+| Upgrade safety       | SemVer, codemods, deprecation periods, canaries    |
+| Observability        | Version drift, errors, load latency, usage         |
+| Security             | No unsafe HTML by default; dependency scanning     |
+| Developer experience | Types, docs, examples, wrappers, test helpers      |
 
 ---
 
@@ -129,19 +129,9 @@ The wrappers should remain thin. Shared behavior must live in the Web Component 
 ```tsx
 // src/components/ds-button/ds-button.tsx
 
-import {
-  Component,
-  Event,
-  EventEmitter,
-  h,
-  Host,
-  Prop,
-} from '@stencil/core';
+import { Component, Event, EventEmitter, h, Host, Prop } from '@stencil/core';
 
-export type ButtonVariant =
-  | 'primary'
-  | 'secondary'
-  | 'danger';
+export type ButtonVariant = 'primary' | 'secondary' | 'danger';
 
 @Component({
   tag: 'ds-button',
@@ -189,12 +179,7 @@ export class DsButton {
   render() {
     return (
       <Host>
-        <button
-          type="button"
-          class="button"
-          disabled={this.disabled}
-          onClick={this.handleClick}
-        >
+        <button type="button" class="button" disabled={this.disabled} onClick={this.handleClick}>
           <span class="label">
             <slot />
           </span>
@@ -265,9 +250,7 @@ Use attributes for values that are:
 - Meaningful before JavaScript loads.
 
 ```html
-<ds-button variant="danger" disabled>
-  Delete
-</ds-button>
+<ds-button variant="danger" disabled> Delete </ds-button>
 ```
 
 Use properties for complex data:
@@ -481,14 +464,7 @@ Do not require consumers to query or style private Shadow DOM markup.
 Use native form participation rather than duplicating form integration in every framework wrapper.
 
 ```tsx
-import {
-  AttachInternals,
-  Component,
-  ElementInternals,
-  h,
-  Prop,
-  Watch,
-} from '@stencil/core';
+import { AttachInternals, Component, ElementInternals, h, Prop, Watch } from '@stencil/core';
 
 @Component({
   tag: 'ds-checkbox',
@@ -508,9 +484,7 @@ export class DsCheckbox {
 
   @Watch('checked')
   syncFormValue(): void {
-    this.internals.setFormValue(
-      this.checked ? this.value : null,
-    );
+    this.internals.setFormValue(this.checked ? this.value : null);
   }
 
   componentWillLoad(): void {
@@ -524,9 +498,7 @@ export class DsCheckbox {
           type="checkbox"
           checked={this.checked}
           onChange={(event) => {
-            this.checked = (
-              event.target as HTMLInputElement
-            ).checked;
+            this.checked = (event.target as HTMLInputElement).checked;
           }}
         />
         <slot />
@@ -599,10 +571,7 @@ export class DsUserSummary {
 
     try {
       this.error = undefined;
-      this.user = await fetchUser(
-        this.userId,
-        this.request.signal,
-      );
+      this.user = await fetchUser(this.userId, this.request.signal);
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
         this.error = 'Unable to load user';
@@ -647,8 +616,7 @@ export const config: Config = {
     },
     {
       type: 'dist-custom-elements',
-      customElementsExportBehavior:
-        'auto-define-custom-elements',
+      customElementsExportBehavior: 'auto-define-custom-elements',
     },
     {
       type: 'docs-json',
@@ -657,15 +625,12 @@ export const config: Config = {
 
     reactOutputTarget({
       outDir: '../react/src/generated',
-      customElementsDir:
-        'company-web-components/dist/components',
+      customElementsDir: 'company-web-components/dist/components',
     }),
 
     angularOutputTarget({
-      componentCorePackage:
-        '@company/web-components',
-      directivesProxyFile:
-        '../angular/src/generated/proxies.ts',
+      componentCorePackage: '@company/web-components',
+      directivesProxyFile: '../angular/src/generated/proxies.ts',
     }),
   ],
 };
@@ -726,9 +691,7 @@ Also publish `dist` when legacy or script-tag consumers require it.
 Prefer explicit registration for predictable tree shaking:
 
 ```ts
-import {
-  defineCustomElement as defineButton,
-} from '@company/web-components/components/ds-button';
+import { defineCustomElement as defineButton } from '@company/web-components/components/ds-button';
 
 defineButton();
 ```
@@ -742,18 +705,12 @@ Be careful with `sideEffects: false` when registration relies on side-effect imp
 Direct Web Component use:
 
 ```tsx
-import {
-  defineCustomElement as defineDsButton,
-} from '@company/web-components/components/ds-button';
+import { defineCustomElement as defineDsButton } from '@company/web-components/components/ds-button';
 
 defineDsButton();
 
 export function DeleteAction() {
-  return (
-    <ds-button variant="danger">
-      Delete
-    </ds-button>
-  );
+  return <ds-button variant="danger">Delete</ds-button>;
 }
 ```
 
@@ -793,30 +750,20 @@ They should not duplicate component behavior.
 Angular:
 
 ```html
-<ds-button
-  variant="primary"
-  (dsPress)="save($event)">
-  Save
-</ds-button>
+<ds-button variant="primary" (dsPress)="save($event)"> Save </ds-button>
 ```
 
 Vue:
 
 ```vue
 <script setup lang="ts">
-function handlePress(
-  event: CustomEvent<{ source: string }>,
-) {
+function handlePress(event: CustomEvent<{ source: string }>) {
   console.log(event.detail.source);
 }
 </script>
 
 <template>
-  <ds-button
-    variant="primary"
-    @dsPress="handlePress">
-    Save
-  </ds-button>
+  <ds-button variant="primary" @dsPress="handlePress"> Save </ds-button>
 </template>
 ```
 
@@ -901,15 +848,10 @@ export class DsDialog {
   @Watch('open')
   handleOpenChanged(open: boolean): void {
     if (open) {
-      this.previouslyFocused =
-        document.activeElement as HTMLElement;
+      this.previouslyFocused = document.activeElement as HTMLElement;
 
       requestAnimationFrame(() => {
-        this.host.shadowRoot
-          ?.querySelector<HTMLElement>(
-            '[data-initial-focus]',
-          )
-          ?.focus();
+        this.host.shadowRoot?.querySelector<HTMLElement>('[data-initial-focus]')?.focus();
       });
     } else {
       this.previouslyFocused?.focus();
@@ -939,11 +881,7 @@ export class DsDialog {
 
         <slot />
 
-        <button
-          data-initial-focus
-          type="button"
-          onClick={this.close}
-        >
+        <button data-initial-focus type="button" onClick={this.close}>
           Close
         </button>
       </section>
@@ -975,8 +913,7 @@ describe('ds-button', () => {
       `,
     });
 
-    const button =
-      page.root?.shadowRoot?.querySelector('button');
+    const button = page.root?.shadowRoot?.querySelector('button');
 
     expect(button?.disabled).toBe(true);
   });
@@ -995,9 +932,7 @@ it('emits dsPress', async () => {
   const listener = jest.fn();
   page.root?.addEventListener('dsPress', listener);
 
-  page.root?.shadowRoot
-    ?.querySelector('button')
-    ?.click();
+  page.root?.shadowRoot?.querySelector('button')?.click();
 
   expect(listener).toHaveBeenCalledTimes(1);
   expect(listener.mock.calls[0][0].detail).toEqual({
@@ -1087,11 +1022,7 @@ type ComponentTelemetry = {
     | 'upgrade_timeout'
     | 'deprecated_api_used'
     | 'performance_sample';
-  hostFramework?:
-    | 'react'
-    | 'angular'
-    | 'vue'
-    | 'vanilla';
+  hostFramework?: 'react' | 'angular' | 'vue' | 'vanilla';
 };
 ```
 
@@ -1159,40 +1090,30 @@ At enterprise scale, add static usage scanning and codemods rather than relying 
 
 ## 21. Comparison table
 
-| Area | Stencil | Lit |
-|---|---|---|
-| Core model | Compiler and component toolchain | Lightweight runtime library |
-| Authoring | TypeScript, decorators, JSX | TypeScript/JS, decorators optional, tagged templates |
-| Rendering | JSX | `html` tagged templates |
-| Output | Compiled Custom Elements and output targets | Custom Element classes using Lit runtime |
-| Lazy loading | Built-in `dist` loader model | Usually application bundler and dynamic imports |
-| Framework wrappers | Output-target ecosystem | `@lit/react`; other wrappers often custom or ecosystem-driven |
-| Docs metadata | Compiler can generate metadata/docs | Usually external tooling |
-| Testing | Integrated Stencil tooling | Standard browser-testing ecosystem |
-| Composition reuse | Helpers and framework-neutral modules | Reactive Controllers and mixins |
-| Opinionation | Higher | Lower |
-| Best fit | Enterprise multi-framework design system | Lightweight components or teams with existing platform tooling |
+| Area               | Stencil                                     | Lit                                                            |
+| ------------------ | ------------------------------------------- | -------------------------------------------------------------- |
+| Core model         | Compiler and component toolchain            | Lightweight runtime library                                    |
+| Authoring          | TypeScript, decorators, JSX                 | TypeScript/JS, decorators optional, tagged templates           |
+| Rendering          | JSX                                         | `html` tagged templates                                        |
+| Output             | Compiled Custom Elements and output targets | Custom Element classes using Lit runtime                       |
+| Lazy loading       | Built-in `dist` loader model                | Usually application bundler and dynamic imports                |
+| Framework wrappers | Output-target ecosystem                     | `@lit/react`; other wrappers often custom or ecosystem-driven  |
+| Docs metadata      | Compiler can generate metadata/docs         | Usually external tooling                                       |
+| Testing            | Integrated Stencil tooling                  | Standard browser-testing ecosystem                             |
+| Composition reuse  | Helpers and framework-neutral modules       | Reactive Controllers and mixins                                |
+| Opinionation       | Higher                                      | Lower                                                          |
+| Best fit           | Enterprise multi-framework design system    | Lightweight components or teams with existing platform tooling |
 
 ---
 
 ## 22. Equivalent Lit component
 
 ```ts
-import {
-  LitElement,
-  css,
-  html,
-} from 'lit';
+import { LitElement, css, html } from 'lit';
 
-import {
-  customElement,
-  property,
-} from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 
-export type ButtonVariant =
-  | 'primary'
-  | 'secondary'
-  | 'danger';
+export type ButtonVariant = 'primary' | 'secondary' | 'danger';
 
 @customElement('ds-button')
 export class DsButton extends LitElement {
@@ -1220,17 +1141,13 @@ export class DsButton extends LitElement {
         detail: { source: 'pointer' },
         bubbles: true,
         composed: true,
-      }),
+      })
     );
   }
 
   override render() {
     return html`
-      <button
-        type="button"
-        ?disabled=${this.disabled}
-        @click=${this.handleClick}
-      >
+      <button type="button" ?disabled=${this.disabled} @click=${this.handleClick}>
         <slot></slot>
       </button>
     `;
@@ -1278,11 +1195,7 @@ export class Counter {
   }
 
   render() {
-    return (
-      <button onClick={() => this.count++}>
-        Count: {this.count}
-      </button>
-    );
+    return <button onClick={() => this.count++}>Count: {this.count}</button>;
   }
 }
 ```
@@ -1304,11 +1217,7 @@ export class DsCounter extends LitElement {
   }
 
   override render() {
-    return html`
-      <button @click=${() => this.count++}>
-        Count: ${this.count}
-      </button>
-    `;
+    return html` <button @click=${() => this.count++}>Count: ${this.count}</button> `;
   }
 }
 ```
@@ -1322,40 +1231,28 @@ Lit explicitly documents an asynchronous reactive update cycle that batches prop
 Lit has a strong lifecycle-aware reuse mechanism:
 
 ```ts
-import {
-  ReactiveController,
-  ReactiveControllerHost,
-} from 'lit';
+import { ReactiveController, ReactiveControllerHost } from 'lit';
 
-export class EscapeKeyController
-  implements ReactiveController {
+export class EscapeKeyController implements ReactiveController {
   constructor(
     private host: ReactiveControllerHost,
-    private onEscape: () => void,
+    private onEscape: () => void
   ) {
     host.addController(this);
   }
 
-  private handleKeyDown = (
-    event: KeyboardEvent,
-  ): void => {
+  private handleKeyDown = (event: KeyboardEvent): void => {
     if (event.key === 'Escape') {
       this.onEscape();
     }
   };
 
   hostConnected(): void {
-    window.addEventListener(
-      'keydown',
-      this.handleKeyDown,
-    );
+    window.addEventListener('keydown', this.handleKeyDown);
   }
 
   hostDisconnected(): void {
-    window.removeEventListener(
-      'keydown',
-      this.handleKeyDown,
-    );
+    window.removeEventListener('keydown', this.handleKeyDown);
   }
 }
 ```
@@ -1366,22 +1263,16 @@ export class DsPopover extends LitElement {
   @property({ type: Boolean })
   open = false;
 
-  private escapeController =
-    new EscapeKeyController(
-      this,
-      () => {
-        this.open = false;
-      },
-    );
+  private escapeController = new EscapeKeyController(this, () => {
+    this.open = false;
+  });
 }
 ```
 
 Stencil commonly uses explicit helpers or services:
 
 ```ts
-export function listenForEscape(
-  onEscape: () => void,
-): () => void {
+export function listenForEscape(onEscape: () => void): () => void {
   const listener = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
       onEscape();
@@ -1404,10 +1295,9 @@ export class DsPopover {
   private removeEscapeListener?: () => void;
 
   connectedCallback(): void {
-    this.removeEscapeListener =
-      listenForEscape(() => {
-        this.open = false;
-      });
+    this.removeEscapeListener = listenForEscape(() => {
+      this.open = false;
+    });
   }
 
   disconnectedCallback(): void {
@@ -1708,17 +1598,15 @@ The host application should own:
   min="2026-07-20"
   max="2027-07-20"
   locale="en-US"
-  time-zone="America/Los_Angeles">
+  time-zone="America/Los_Angeles"
+>
 </ds-date-picker>
 ```
 
 Complex values should be assigned as properties:
 
 ```ts
-datePicker.disabledDates = [
-  '2026-07-25',
-  '2026-07-26',
-];
+datePicker.disabledDates = ['2026-07-25', '2026-07-26'];
 ```
 
 ```ts
@@ -1727,14 +1615,11 @@ datePicker.addEventListener(
   (
     event: CustomEvent<{
       value: string;
-      reason:
-        | 'pointer'
-        | 'keyboard'
-        | 'programmatic';
-    }>,
+      reason: 'pointer' | 'keyboard' | 'programmatic';
+    }>
   ) => {
     console.log(event.detail.value);
-  },
+  }
 );
 ```
 

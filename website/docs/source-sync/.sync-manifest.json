@@ -976,6 +976,14 @@
       "hash": "e946c612c942016db9c3f8e798df4b1807accc4a80b8302b051cdd2c50f2c1f5",
       "docRelative": "frontend/jsfunction/task-scheduler/TaskScheduler.mdx"
     },
+    "frontend/jsfunction/task-scheduler/TasksScheduler.py": {
+      "hash": "8499399a1173e7e86f9c22070f9a1449abdf892a88a7817ccbff97754f33a270",
+      "docRelative": "frontend/jsfunction/task-scheduler/TasksScheduler.mdx"
+    },
+    "frontend/jsfunction/task-scheduler/TasksSchedulerMinHeap.js": {
+      "hash": "9e73bcd55b207477f85f7ba78949fbdc4bc0aa1b85b68ae9541db8a369d3dd22",
+      "docRelative": "frontend/jsfunction/task-scheduler/TasksSchedulerMinHeap.mdx"
+    },
     "frontend/jsfunction/templateEngine.js": {
       "hash": "9eeb31683f3e91bc7b6e83df2e63417784e8dca2799c11bebd39eec846af9920",
       "docRelative": "frontend/jsfunction/templateEngine.mdx"
@@ -2353,7 +2361,7 @@
       "docRelative": "frontend/jsfunction/styledTextRange/_index.mdx"
     },
     "__nav__:frontend/jsfunction/task-scheduler": {
-      "hash": "b1ca8d7bdd9061ee21a56b298ed042e98999c6111e7142096d9ddcd74b3b45e0",
+      "hash": "dbd98d54a9a96d8c3fceb3e122db98fb80aaefbd9be71248d7898f2e91879ad8",
       "docRelative": "frontend/jsfunction/task-scheduler/_index.mdx"
     },
     "__nav__:frontend/jsfunction/testRunner": {
