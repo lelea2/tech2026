@@ -1,0 +1,36 @@
+---
+title: binaryTreeLeft
+---
+
+# binaryTreeLeft
+
+~~~javascript
+// Problem: Return the left view of a binary tree—the first node visible at
+// each level when viewing the tree from the left side.
+// Example: root = [1, 2, 3, null, 5, null, 4]
+// Output: [1, 2, 5]
+function leftView(root) {
+  if (!root) return [];
+
+  const result = [];
+  const queue = [root];
+
+  while (queue.length > 0) {
+    const levelSize = queue.length;
+
+    for (let i = 0; i < levelSize; i++) {
+      const node = queue.shift();
+
+      // First node at this level
+      if (i === 0) {
+        result.push(node.val);
+      }
+
+      if (node.left) queue.push(node.left);
+      if (node.right) queue.push(node.right);
+    }
+  }
+
+  return result;
+}
+~~~

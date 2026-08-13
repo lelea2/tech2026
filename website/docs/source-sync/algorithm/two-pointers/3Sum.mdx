@@ -183,6 +183,11 @@ export default function threeSum(nums) {
 // console.log(threeSum([0, 1, 1]));             // []
 // console.log(threeSum([0, 0, 0, 0]));          // [[0, 0, 0]]
 
+
+//  * Mini quiz (answers at bottom):
+//  * Q1: Why must we skip repeated nums[i] values?
+//  * Q2: After finding a valid triplet, why skip duplicate left/right values?
+//  * Q3: Why can we stop early when sortedNums[i] > 0?
 // Mini quiz answers:
 // A1: Repeated anchors regenerate the same pair search and duplicate triplets.
 // A2: Adjacent duplicates would output the same value triplet multiple times.

@@ -1,0 +1,41 @@
+// Problem: Construct a maximum binary tree from an array. The largest value
+// becomes the root; recursively build the left and right subtrees from the
+// values to its left and right.
+// Example: nums = [3, 2, 1, 6, 0, 5]
+// Output:       6
+//              / \
+//             3   5
+//              \   /
+//               2 0
+//                \
+//                 1
+class TreeNode {
+  constructor(val, left = null, right = null) {
+    this.val = val;
+    this.left = left;
+    this.right = right;
+  }
+}
+
+function constructMaximumBinaryTree(nums) {
+  function build(left, right) {
+    if (left > right) return null;
+
+    let maxIndex = left;
+
+    for (let i = left + 1; i <= right; i++) {
+      if (nums[i] > nums[maxIndex]) {
+        maxIndex = i;
+      }
+    }
+
+    const root = new TreeNode(nums[maxIndex]);
+
+    root.left = build(left, maxIndex - 1);
+    root.right = build(maxIndex + 1, right);
+
+    return root;
+  }
+
+  return build(0, nums.length - 1);
+}

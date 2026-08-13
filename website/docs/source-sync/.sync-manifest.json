@@ -1776,6 +1776,10 @@
       "hash": "dad662c41ac83a73eb7134b4987e5f456e34429838a922fd7230cea160f7a738",
       "docRelative": "algorithm/array/findSharpestPoint.mdx"
     },
+    "algorithm/array/getRemovableIndices.js": {
+      "hash": "af9302f587973c6c68047794203aaceeb65ec1e5a177f51bb2be039505053f45",
+      "docRelative": "algorithm/array/getRemovableIndices.mdx"
+    },
     "algorithm/array/groupAnagram.js": {
       "hash": "e539354aa05e092018349ffe379b41214322aae101c3161c6568020fb8b776f1",
       "docRelative": "algorithm/array/groupAnagram.mdx"
@@ -1795,6 +1799,10 @@
     "algorithm/array/lengthOfLongestSubString.js": {
       "hash": "e2c8530fed53e71a13c86d509a5c0c400245ff6593023373ce86be88ad9511a8",
       "docRelative": "algorithm/array/lengthOfLongestSubString.mdx"
+    },
+    "algorithm/array/maxCandies.js": {
+      "hash": "6b5e11539aef15442750aea7c6998a931d9c2db5b098f2c7f40479d5ad01d91e",
+      "docRelative": "algorithm/array/maxCandies.mdx"
     },
     "algorithm/array/maxProductSubArray.js": {
       "hash": "fdc737315b57bce9dc5dd8c861117c181c29d5c98f0c7f09d2396a58e2142f83",
@@ -1819,6 +1827,10 @@
     "algorithm/array/overlapInterval.js": {
       "hash": "3180d31d9579f45a7a71d8a30efecf156da6dbf60c6c8e98c6e9e4976c374452",
       "docRelative": "algorithm/array/overlapInterval.mdx"
+    },
+    "algorithm/array/searchRotate.js": {
+      "hash": "e1ef10de97eff713935b69046050d9d7a706d38f3080bce671eae4cd32e7edbe",
+      "docRelative": "algorithm/array/searchRotate.mdx"
     },
     "algorithm/array/stringAnagram.js": {
       "hash": "ab077d06cd071e85d9a711a88cf3817c5bbdab62c1b321d5896433d72aa6bec9",
@@ -1873,12 +1885,12 @@
       "docRelative": "algorithm/dfs/checkPackageDependencies.mdx"
     },
     "algorithm/dfs/countIslandOnGrid.js": {
-      "hash": "32a7bca9542e4ab1359611d2ed5812988bd74475e0916863f73162a4be9486c2",
+      "hash": "fa1523d9fb3d29e4f51a0eff6e25cc1729a02ac43431b14158c016272910b64c",
       "docRelative": "algorithm/dfs/countIslandOnGrid.mdx"
     },
-    "algorithm/dfs/maximizeAmoutAfterTwoDays.js": {
-      "hash": "ff9cecc27dd31dd43f60efadd73c95d18813e9f4199b7a1e450915055203d762",
-      "docRelative": "algorithm/dfs/maximizeAmoutAfterTwoDays.mdx"
+    "algorithm/dfs/maximizeAmountAfterTwoDays.js": {
+      "hash": "599797a7cd4282da4f3834fc26dcc1177fc393734d59608b933b31b471c9a170",
+      "docRelative": "algorithm/dfs/maximizeAmountAfterTwoDays.mdx"
     },
     "algorithm/graph/aliendOrder.js": {
       "hash": "e21cb72c5cd4922e6400530fac743e324f01fceab1993b5cf0c8d03876b3bf06",
@@ -1903,6 +1915,10 @@
     "algorithm/heap/isHeap.js": {
       "hash": "baf61dfa326188d1105fe82f1d7791fab47363359d089a290889b1c73c5d81c0",
       "docRelative": "algorithm/heap/isHeap.mdx"
+    },
+    "algorithm/heap/minSum.js": {
+      "hash": "6f53fb118ebee3e478534c66e1dfd6501a96f043a32572c00e07cc6d461596a0",
+      "docRelative": "algorithm/heap/minSum.mdx"
     },
     "algorithm/heap/shortestPathDistance.js": {
       "hash": "e5a9ce07cad3e794f45ce6bd1706c6af3c5c391506f069a0375b00a8d57db620",
@@ -2008,6 +2024,10 @@
       "hash": "79fdb998864559358c848a6942a15bb6de26203f79f2068536c8e5a439c7cda8",
       "docRelative": "algorithm/tree/binaryTreeFlip.mdx"
     },
+    "algorithm/tree/binaryTreeLeft.js": {
+      "hash": "b6cf1ac27ce8d10a9bcce10e7ee98ed429205d8e94e93ddae610f248b08e9824",
+      "docRelative": "algorithm/tree/binaryTreeLeft.mdx"
+    },
     "algorithm/tree/binaryTreeLevelOrderTraversal.js": {
       "hash": "3f6b518f1e11f39ea19310b7d3d26fc856a503f0123b517048a6b3b7df7b0e01",
       "docRelative": "algorithm/tree/binaryTreeLevelOrderTraversal.mdx"
@@ -2036,6 +2056,10 @@
       "hash": "1105efaa0a53450a06e09a0636ecee872ca81953a24ad52f35a1a1b8d537c0ef",
       "docRelative": "algorithm/tree/graphIsTree.mdx"
     },
+    "algorithm/tree/graphTreePlanting.js": {
+      "hash": "5f3dfc451557220d22f2f8683b698ac69ed91ad81234dc1a94654d67d8c4dd8f",
+      "docRelative": "algorithm/tree/graphTreePlanting.mdx"
+    },
     "algorithm/tree/invertBinaryTree.js": {
       "hash": "9d3eb9024c1f53ce99df4ac9cb4098469b46eeb41043c14e3f1708b59f7994cd",
       "docRelative": "algorithm/tree/invertBinaryTree.mdx"
@@ -2043,6 +2067,10 @@
     "algorithm/tree/isSameBinaryTree.js": {
       "hash": "b2ff39b34610a36c30c3fda09e12f6906fc526e13550310b6382a7a78975124f",
       "docRelative": "algorithm/tree/isSameBinaryTree.mdx"
+    },
+    "algorithm/tree/isSubBinaryTree.js": {
+      "hash": "dd6b1f8c356d8cd273210b1d32b018812b02ef5efc049fc25fe12ef49ca56663",
+      "docRelative": "algorithm/tree/isSubBinaryTree.mdx"
     },
     "algorithm/tree/isSymetricTree.js": {
       "hash": "af1e2511ba602921a4732bd5d8e22cfff66d64d4a16321243cc8659b55328f42",
@@ -2059,6 +2087,10 @@
     "algorithm/tree/maxWaterTrappedBetweenWall.js": {
       "hash": "fb39ed897d9d2258a8cb9e78a7fe860c94a8daecb03ec86112518bdb43af2f8a",
       "docRelative": "algorithm/tree/maxWaterTrappedBetweenWall.mdx"
+    },
+    "algorithm/tree/maximumBinaryTree.js": {
+      "hash": "03083d3d731865e1bc29212c5957aa7dc54fb0a8ab01bcb8508d84cee75bc266",
+      "docRelative": "algorithm/tree/maximumBinaryTree.mdx"
     },
     "algorithm/tree/smallestInRotatedArray.js": {
       "hash": "481d4b3ac6540bf184c5302fb8f99dfb8c0a6bcfcaca738d426396347be16877",
@@ -2085,11 +2117,11 @@
       "docRelative": "algorithm/trie/trie-structure.mdx"
     },
     "algorithm/two-pointers/3Sum.py": {
-      "hash": "1b62a752633d9c2ca7827425563546fb7c04c9150611c3134ff917134ae97c4a",
+      "hash": "ad8c425a2481b607acb5890da2e6274c2a19eb1c1e5f164c3b50120ce02b1459",
       "docRelative": "algorithm/two-pointers/3Sum.mdx"
     },
     "algorithm/two-pointers/3Sum.js": {
-      "hash": "1b62a752633d9c2ca7827425563546fb7c04c9150611c3134ff917134ae97c4a",
+      "hash": "ad8c425a2481b607acb5890da2e6274c2a19eb1c1e5f164c3b50120ce02b1459",
       "docRelative": "algorithm/two-pointers/3Sum.mdx"
     },
     "algorithm/two-pointers/checkSubArraySum.js": {
@@ -2145,7 +2177,7 @@
       "docRelative": "algorithm/_index.mdx"
     },
     "__nav__:algorithm/array": {
-      "hash": "44e77cec653d805639c9991886d79ba77f7d507de9122a06cae2fbfa0499b950",
+      "hash": "aec26b21b40ff60e3e145622f9ba63900f9720ccc58312a40a3836eb0fd90e28",
       "docRelative": "algorithm/array/_index.mdx"
     },
     "__nav__:algorithm/bit": {
@@ -2153,7 +2185,7 @@
       "docRelative": "algorithm/bit/_index.mdx"
     },
     "__nav__:algorithm/dfs": {
-      "hash": "cb0eb65daa30888496ee8d92591a0d6da344575a0840d245f98547e860412dae",
+      "hash": "ebc5b979bb2c6c4534fc62c43675507efa6ae7ded2b7fdf8e280cc1436b38e9a",
       "docRelative": "algorithm/dfs/_index.mdx"
     },
     "__nav__:algorithm/graph": {
@@ -2161,7 +2193,7 @@
       "docRelative": "algorithm/graph/_index.mdx"
     },
     "__nav__:algorithm/heap": {
-      "hash": "12b20a7a984b0a387ad2f4ebf46f474ebc357160c277ebabb4fca674d471200b",
+      "hash": "871705f16c797f6cf02552d808ef0dc7e49c03692b8ab13a145d53fd51ec0902",
       "docRelative": "algorithm/heap/_index.mdx"
     },
     "__nav__:algorithm/linkedlist": {
@@ -2181,7 +2213,7 @@
       "docRelative": "algorithm/stack/_index.mdx"
     },
     "__nav__:algorithm/tree": {
-      "hash": "11f3fc94ac493a546d310825530f6834f716c6075f629434834f685f831c845a",
+      "hash": "cacb8714ca043ac9cd6255d824f7a9db5a5ba61244f13ae15487814b529a3b68",
       "docRelative": "algorithm/tree/_index.mdx"
     },
     "__nav__:algorithm/trie": {
