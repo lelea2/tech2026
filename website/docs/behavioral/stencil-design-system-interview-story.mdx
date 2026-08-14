@@ -1,6 +1,6 @@
 ---
-title: "Why Stencil? Staff-Level Design System Story"
-description: "Interview-ready narrative for evaluating Stencil vs React for a cross-framework design system."
+title: 'Why Stencil?'
+description: 'Interview-ready narrative for evaluating Stencil vs React for a cross-framework design system.'
 ---
 
 # Why Stencil? — Staff-Level Design System Story
@@ -254,13 +254,13 @@ Suppose we have a microfrontend architecture:
 Both versions may attempt to register:
 
 ```html
-<ds-button>
+<ds-button></ds-button>
 ```
 
 But Custom Elements use a global registry:
 
 ```js
-customElements.define("ds-button", Button);
+customElements.define('ds-button', Button);
 ```
 
 That creates a versioning constraint.
@@ -754,19 +754,19 @@ Then:
 
 ## 17. Staff-Level Tradeoff Summary
 
-| Area | Stencil / Web Components | React-Native |
-|---|---|---|
-| Cross-framework | Strong | Weak |
-| React ergonomics | Good with wrappers | Excellent |
-| Framework independence | Strong | Low |
-| SSR integration | Requires validation | Natural in React/Next |
-| Forms | More care required | Natural React integration |
-| Styling isolation | Strong | Depends on CSS architecture |
-| Multiple versions/page | Can be challenging | Easier with bundler isolation |
-| Accessibility centralization | Strong | Strong |
-| Long-lived primitives | Excellent fit | Good |
-| React-specific product components | Poor fit | Excellent |
-| Migration tooling | Still required | Still required |
+| Area                              | Stencil / Web Components | React-Native                  |
+| --------------------------------- | ------------------------ | ----------------------------- |
+| Cross-framework                   | Strong                   | Weak                          |
+| React ergonomics                  | Good with wrappers       | Excellent                     |
+| Framework independence            | Strong                   | Low                           |
+| SSR integration                   | Requires validation      | Natural in React/Next         |
+| Forms                             | More care required       | Natural React integration     |
+| Styling isolation                 | Strong                   | Depends on CSS architecture   |
+| Multiple versions/page            | Can be challenging       | Easier with bundler isolation |
+| Accessibility centralization      | Strong                   | Strong                        |
+| Long-lived primitives             | Excellent fit            | Good                          |
+| React-specific product components | Poor fit                 | Excellent                     |
+| Migration tooling                 | Still required           | Still required                |
 
 ## 18. The 60-Second Interview Answer
 
