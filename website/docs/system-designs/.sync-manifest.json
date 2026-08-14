@@ -388,6 +388,10 @@
       "hash": "1923d4c9ed63e0ee6640ec412c011cc94382724cd80390d4d4c27e648b62c89d",
       "docRelative": "key-technologies/vector-database.mdx"
     },
+    "system-designs/key-technologies/zookeeper.mdx": {
+      "hash": "07d68a412966ff756b4eee650847d908db3c1dd1eb9600baf6863b426b96851c",
+      "docRelative": "key-technologies/zookeeper.mdx"
+    },
     "system-designs/leetcode.mdx": {
       "hash": "b4c83758cacd20067bb1b35cc5403e0d620a610194bb68f693bf195cab5d0893",
       "docRelative": "leetcode.mdx"
@@ -549,7 +553,7 @@
       "docRelative": "agentic-system-design/_index.mdx"
     },
     "__nav__:key-technologies": {
-      "hash": "986b7c4916d7dbf334a8c92ee97335a3b62242d81eef623735e94859e764e30e",
+      "hash": "7dc419ccea91a71efa281eb93d14d2ae6df3187c6f717c36ac8871a5add9d9fa",
       "docRelative": "key-technologies/_index.mdx"
     },
     "__nav__:miscellaneous": {
