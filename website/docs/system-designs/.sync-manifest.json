@@ -149,7 +149,7 @@
       "docRelative": "local-delivery-service.png"
     },
     "system-designs/metrics-monitoring.png": {
-      "hash": "a07d37937a19f64a26371965e0b7614f86a088f72f80fd52cb0f39d7ea5abc84",
+      "hash": "4d752a8fea5a603af68529b6b4fd2b035fad70a4d7f660d24ab75f5c63082bf7",
       "docRelative": "metrics-monitoring.png"
     },
     "system-designs/miscellaneous/SPV-webhook.png": {
@@ -211,10 +211,6 @@
     "system-designs/patterns/long-running-task.png": {
       "hash": "bd6de504af531b6d00c45cc24dcfab74a84dec5583505ed43426224077bca090",
       "docRelative": "patterns/long-running-task.png"
-    },
-    "system-designs/patterns/metrics-monitoring.png": {
-      "hash": "4d752a8fea5a603af68529b6b4fd2b035fad70a4d7f660d24ab75f5c63082bf7",
-      "docRelative": "patterns/metrics-monitoring.png"
     },
     "system-designs/patterns/realtime-updates.png": {
       "hash": "40ce64fb9c130132d4a978bb4ea6f7105d0c69e1b6a9d740148859b8f9258eaf",

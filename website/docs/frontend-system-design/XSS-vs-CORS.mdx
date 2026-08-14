@@ -1,0 +1,177 @@
+---
+title: 'XSS vs CORs'
+---
+
+Both are related to web security, but they solve different problems.
+
+- XSS is an attack vector (a vulnerability class).
+- CORS is a browser security mechanism (an access control policy).
+
+## XSS (Cross-Site Scripting)
+
+XSS happens when untrusted input is rendered as executable script in the browser.
+An attacker can run JavaScript in a victim's session, which may lead to:
+
+- Cookie or token theft
+- Account takeover
+- Unauthorized actions
+- UI/content manipulation
+
+### Types of XSS
+
+1. Stored XSS
+   The malicious payload is saved on the server (for example in comments, profile fields, posts) and served to many users later.
+
+2. Reflected XSS
+   The payload is reflected from request input (query string, form data) back into the response immediately.
+
+3. DOM-based XSS
+   The server response may be safe, but client-side JavaScript writes unsafe data into dangerous DOM sinks.
+
+## CORS (Cross-Origin Resource Sharing)
+
+CORS is enforced by browsers to control cross-origin HTTP requests from frontend code.
+
+By default, the Same-Origin Policy (SOP) restricts JavaScript from reading responses from a different origin (scheme + host + port).
+
+CORS allows a server to explicitly opt in to selected cross-origin access through headers.
+
+### Key CORS headers
+
+- Access-Control-Allow-Origin
+  - Which origin(s) can access the resource.
+- Access-Control-Allow-Methods
+  - Which HTTP methods are allowed.
+- Access-Control-Allow-Headers
+  - Which request headers are allowed.
+- Access-Control-Allow-Credentials
+  - Whether cookies/auth headers can be sent.
+
+### Preflight request
+
+For non-simple requests (for example custom headers, PUT, DELETE), the browser first sends an OPTIONS preflight request to verify policy before the actual request.
+
+## XSS vs CORS
+
+- XSS: attacker executes script in your app's trusted origin.
+- CORS: browser controls whether one origin can read another origin's response.
+- XSS is a vulnerability to prevent in application code.
+- CORS is a policy to configure correctly on server responses.
+
+Important: CORS does not prevent XSS. If your site has XSS, attacker code runs in your own origin and can call your own APIs directly.
+
+---
+
+## Preventing XSS
+
+Use defense-in-depth. No single control is enough.
+
+### 1) Context-aware output encoding
+
+Encode untrusted data before rendering into HTML, attributes, URLs, or JavaScript contexts.
+Different output contexts require different encoding rules.
+
+### 2) Input validation and sanitization
+
+Validate format and length on both client and server. For rich-text HTML input, sanitize with a trusted library.
+
+Client-side validation example:
+
+```js
+function validateInput(input) {
+  const regex = /^[a-zA-Z0-9\s]+$/;
+  return regex.test(input);
+}
+
+const userInput = document.getElementById('user-input').value;
+
+if (!validateInput(userInput)) {
+  alert('Invalid input. Please enter alphanumeric characters only.');
+}
+```
+
+Server-side validation (Node.js/Express):
+
+```js
+app.post('/submitForm', (req, res) => {
+  const userInput = req.body.userInput;
+  const regex = /^[a-zA-Z0-9\s]+$/;
+
+  if (!regex.test(userInput)) {
+    return res.status(400).send('Invalid input. Please enter alphanumeric characters only.');
+  }
+
+  // Process safe input
+  res.sendStatus(204);
+});
+```
+
+### 3) Content Security Policy (CSP)
+
+CSP reduces XSS blast radius by restricting script sources and unsafe execution paths.
+
+```js
+app.use((req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'self' https://cdn.example.com; object-src 'none'; base-uri 'self'"
+  );
+  next();
+});
+```
+
+### 4) Safe DOM APIs and sanitization for HTML
+
+Avoid writing untrusted strings to innerHTML. Prefer textContent.
+If HTML rendering is required, sanitize first.
+
+```js
+const userInput = '<img src="x" onerror="alert(1)">';
+const safeHtml = DOMPurify.sanitize(userInput);
+document.getElementById('output').innerHTML = safeHtml;
+```
+
+### 5) Use frameworks correctly
+
+Frameworks like React/Angular/Vue escape template content by default.
+Risk appears when bypass APIs are used (for example direct HTML injection).
+
+React example:
+
+```jsx
+const userInput = '<img src="x" onerror="alert(1)">';
+const output = <div>{userInput}</div>; // escaped by default
+```
+
+### 6) Avoid dangerous execution APIs
+
+Do not use eval, new Function, or string-based setTimeout/setInterval with untrusted data.
+
+```js
+// Bad: can execute attacker-controlled code
+// eval(userInput);
+```
+
+### 7) Security headers and cookie hardening
+
+- X-Content-Type-Options: nosniff
+- HttpOnly + Secure + SameSite cookies
+- Referrer-Policy
+- frame-ancestors in CSP (or X-Frame-Options where needed)
+
+```js
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  next();
+});
+```
+
+---
+
+## Practical interview summary
+
+- XSS: injected script execution in victim browser.
+- CORS: browser-enforced cross-origin read policy.
+- CORS misconfiguration can expose APIs to unwanted origins.
+- XSS prevention requires encoding, sanitization, CSP, and safe DOM usage.
+- Treat user input as untrusted at all times.
