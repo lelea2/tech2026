@@ -1,0 +1,2820 @@
+---
+title: 'GPU Training Observability + Model Evaluation'
+description: 'Staff-level interview guide for GPU telemetry, distributed training observability, model evaluation, debugging, and promotion architecture.'
+---
+
+# Training Observability + Model Evaluation
+
+## 1. Staff-Level Framing
+
+The system is **not just a GPU metrics dashboard**.
+
+The goal is to let a researcher start with:
+
+```text
+"My model failed."
+"My training run slowed down."
+"My validation loss regressed."
+"Model V142 performs worse than V141."
+```
+
+and trace the problem through:
+
+```text
+Model Quality
+    ↓
+Training Run
+    ↓
+Training Step
+    ↓
+Distributed Rank
+    ↓
+GPU / Node
+    ↓
+Network / Storage / Data
+```
+
+The core Staff-level principle is:
+
+> Build a correlated **training run graph**, not disconnected dashboards.
+
+Every important artifact should be joinable through common identifiers such as:
+
+```text
+experiment_id
+run_id
+job_id
+model_id
+model_version
+checkpoint_id
+node_id
+gpu_id
+rank_id
+dataset_version
+evaluation_id
+```
+
+---
+
+# 2. Requirements
+
+## Functional Requirements
+
+The platform should support:
+
+1. Collect GPU hardware metrics.
+2. Collect training and pretraining metrics.
+3. Collect distributed communication metrics.
+4. Detect stragglers.
+5. Collect data-pipeline and checkpoint metrics.
+6. Correlate infrastructure failures with training steps.
+7. Track model checkpoints and lineage.
+8. Run model evaluations asynchronously.
+9. Compare candidate models against baselines.
+10. Enforce quality and safety gates.
+11. Provide researchers a single debugging UI.
+12. Alert on infrastructure or model-quality regressions.
+
+## Non-Functional Requirements
+
+```text
+High ingestion throughput
+Low query latency
+Large GPU fleet support
+High-cardinality debugging
+Multi-tenant isolation
+Long-term historical analysis
+Fault tolerance
+Minimal training overhead
+Reproducible evaluation
+Cost-efficient retention
+```
+
+---
+
+# 3. High-Level Architecture
+
+```text
+                        ┌────────────────────────────┐
+                        │ Researcher / ML Engineer   │
+                        └──────────────┬─────────────┘
+                                       │
+                                       ▼
+                        ┌────────────────────────────┐
+                        │ Training Platform          │
+                        │ PyTorch / NeMo / Megatron  │
+                        └──────────────┬─────────────┘
+                                       │
+                ┌──────────────────────┼───────────────────────┐
+                │                      │                       │
+                ▼                      ▼                       ▼
+       Training Metrics         GPU / Node Metrics       Logs / Traces
+       loss / lr / step         DCGM Exporter            NCCL / CUDA
+       tokens/sec               node exporter            exceptions
+       grad norm                NIC / storage            profiler
+                │                      │                       │
+                └──────────────────────┼───────────────────────┘
+                                       ▼
+                             ┌─────────────────────┐
+                             │ Telemetry Ingestion │
+                             │ Collector / Kafka   │
+                             └──────────┬──────────┘
+                                        │
+                     ┌──────────────────┼───────────────────┐
+                     │                  │                   │
+                     ▼                  ▼                   ▼
+              Hot Metrics          Analytics DB        Object Store
+           Prometheus/Mimir        ClickHouse          raw traces
+              low-cardinality      high-cardinality    checkpoints
+                     │                  │                   │
+                     └──────────────────┼───────────────────┘
+                                        ▼
+                            ┌────────────────────────┐
+                            │ Correlation / Run Graph │
+                            └───────────┬────────────┘
+                                        │
+                  ┌─────────────────────┼─────────────────────┐
+                  ▼                     ▼                     ▼
+             Grafana              Research Portal        Alert Engine
+                                                             │
+                                                             ▼
+                                                   Failure Diagnosis
+```
+
+---
+
+# 4. Metric Taxonomy
+
+The easiest interview structure is to explain metrics in layers.
+
+```text
+1. Model Quality
+2. Training
+3. Distributed Training
+4. GPU
+5. Node
+6. Data / Storage
+```
+
+---
+
+# 5. GPU Metrics
+
+GPU telemetry is the lowest infrastructure layer.
+
+## 5.1 Compute Metrics
+
+Collect:
+
+```text
+GPU utilization %
+SM utilization %
+Tensor Core utilization
+FP16 / BF16 utilization
+FP32 utilization
+
+SM occupancy
+GPU active cycles
+GPU clock frequency
+```
+
+Important example:
+
+```text
+GPU0  97%
+GPU1  96%
+GPU2  95%
+GPU3  32%   ← suspicious
+```
+
+Potential causes:
+
+```text
+straggler
+data starvation
+communication stall
+hardware issue
+CPU bottleneck
+```
+
+### Key Interview Point
+
+GPU utilization alone is not enough.
+
+A GPU can show:
+
+```text
+GPU utilization = 95%
+```
+
+while executing inefficient kernels.
+
+That is why we also track:
+
+```text
+MFU
+step time
+kernel efficiency
+communication overhead
+```
+
+---
+
+# 6. GPU Memory Metrics
+
+Collect:
+
+```text
+HBM used
+HBM free
+HBM utilization
+HBM bandwidth
+
+memory read throughput
+memory write throughput
+
+allocation failures
+CUDA OOM count
+```
+
+Training-level memory:
+
+```text
+allocated_memory
+reserved_memory
+peak_allocated_memory
+
+activation_memory
+gradient_memory
+optimizer_memory
+```
+
+Example:
+
+```text
+GPU0  77 GB / 80 GB
+GPU1  77 GB / 80 GB
+GPU2  77 GB / 80 GB
+GPU3  79.9 GB / 80 GB
+```
+
+Possible diagnosis:
+
+```text
+sequence length spike
+unexpected batch
+activation growth
+optimizer state growth
+memory leak
+```
+
+A better observability product correlates:
+
+```text
+Memory spike
+    ↓
+Step 48,210
+    ↓
+Sequence length = 32K
+    ↓
+Dataset shard 31
+```
+
+rather than just showing:
+
+```text
+CUDA OOM
+```
+
+---
+
+# 7. GPU Hardware Health
+
+Collect:
+
+```text
+temperature
+power usage
+power limit
+
+GPU clock
+memory clock
+
+thermal throttling
+power throttling
+
+ECC corrected errors
+ECC uncorrected errors
+
+XID errors
+
+PCIe replay errors
+PCIe throughput
+
+NVLink errors
+NVLink bandwidth
+
+GPU reset count
+```
+
+Example:
+
+```text
+training throughput ↓ 18%
+        ↓
+GPU clock ↓
+        ↓
+thermal throttling
+        ↓
+GPU temperature = 91°C
+```
+
+This tells the researcher:
+
+> The model code probably did not regress; the GPU is throttling.
+
+---
+
+# 8. Training Metrics
+
+Researchers usually start here.
+
+Collect:
+
+```text
+train_loss
+validation_loss
+
+learning_rate
+gradient_norm
+weight_norm
+
+step
+epoch
+
+samples_seen
+tokens_seen
+
+batch_size
+sequence_length
+
+tokens/sec
+samples/sec
+
+step_duration
+forward_duration
+backward_duration
+optimizer_duration
+```
+
+For LLM pretraining:
+
+```text
+training_loss
+validation_loss
+perplexity
+
+tokens/sec/GPU
+tokens/sec/job
+
+MFU
+HFU
+```
+
+---
+
+# 9. Model FLOPs Utilization — MFU
+
+MFU is one of the best training efficiency metrics.
+
+Conceptually:
+
+```text
+MFU =
+actual model FLOPs / second
+---------------------------
+theoretical GPU FLOPs / second
+```
+
+Example:
+
+```text
+GPU theoretical = 1000 TFLOPS
+
+Training achieved = 450 TFLOPS
+
+MFU = 45%
+```
+
+Compare runs:
+
+```text
+Baseline MFU = 48%
+Current MFU  = 31%
+```
+
+This can indicate:
+
+```text
+communication regression
+bad kernel choice
+small batch size
+pipeline bubbles
+data starvation
+poor parallelism configuration
+```
+
+### Staff-Level Point
+
+Do not alert only on:
+
+```text
+GPU_UTIL < 80%
+```
+
+because high GPU utilization does not necessarily mean efficient training.
+
+Use combinations such as:
+
+```text
+GPU utilization
+MFU
+step latency
+communication ratio
+tokens/sec
+```
+
+---
+
+# 10. Convergence and Numerical Stability
+
+Collect:
+
+```text
+train_loss
+validation_loss
+perplexity
+
+gradient_norm
+weight_norm
+
+learning_rate
+loss_scale
+
+NaN count
+Inf count
+
+gradient overflow
+gradient underflow
+```
+
+Example:
+
+```text
+Step       Loss
+
+1000       3.4
+2000       2.9
+3000       2.5
+4000       2.4
+4100       9.8
+4110       NaN
+```
+
+Then correlate:
+
+```text
+Step 4100
+    ↓
+Learning-rate update
+    ↓
+Gradient norm spike
+    ↓
+Loss explosion
+    ↓
+NaN
+```
+
+Likely diagnosis:
+
+```text
+training instability
+bad LR schedule
+mixed-precision overflow
+checkpoint restore issue
+```
+
+---
+
+# 11. Distributed Training Metrics
+
+Large pretraining jobs may involve hundreds or thousands of GPUs.
+
+Collect per-rank metrics:
+
+```text
+rank_step_time
+rank_forward_time
+rank_backward_time
+
+rank_comm_time
+rank_dataloader_time
+```
+
+Derived metrics:
+
+```text
+min_step_time
+max_step_time
+
+p50
+p95
+p99
+```
+
+Straggler ratio:
+
+```text
+straggler_ratio =
+slowest_rank_step_time
+----------------------
+median_rank_step_time
+```
+
+Example:
+
+```text
+Rank 0     1.90 sec
+Rank 1     1.91 sec
+Rank 2     1.89 sec
+...
+Rank 713   3.82 sec   ← straggler
+```
+
+Every synchronized step waits for Rank 713.
+
+The platform should expose:
+
+```text
+STRAGGLER DETECTED
+
+Job:        pretrain-4821
+Rank:       713
+Node:       gpu-node-89
+GPU:        5
+
+Step time:  3.82 sec
+Median:     1.91 sec
+```
+
+Then automatically correlate:
+
+```text
+GPU
+CPU
+Memory
+NVLink
+NIC
+Disk
+Temperature
+NCCL
+```
+
+---
+
+# 12. NCCL / NVLink / Network Metrics
+
+Distributed training is frequently communication-bound.
+
+Collect:
+
+```text
+NVLink TX bytes/sec
+NVLink RX bytes/sec
+NVLink utilization
+
+InfiniBand TX/RX
+RDMA throughput
+RDMA errors
+
+packet drops
+retransmits
+
+NCCL all-reduce latency
+NCCL all-gather latency
+NCCL reduce-scatter latency
+```
+
+Derived metric:
+
+```text
+communication_ratio =
+communication_time
+------------------
+step_time
+```
+
+Example:
+
+```text
+step_time       = 2.1 sec
+all_reduce_time = 0.7 sec
+
+communication_ratio ≈ 33%
+```
+
+If GPU utilization periodically drops while NCCL latency spikes:
+
+```text
+GPU compute healthy
+        +
+NCCL latency ↑
+        +
+NIC congestion
+        ↓
+Network bottleneck
+```
+
+---
+
+# 13. Data Pipeline Metrics
+
+A GPU may be healthy but starved for data.
+
+Collect:
+
+```text
+batch_load_latency
+data_decode_latency
+tokenization_latency
+
+prefetch_queue_depth
+dataloader_queue_depth
+
+cache_hit_rate
+
+storage_read_latency
+bytes_read/sec
+
+dataset_shard
+dataset_version
+```
+
+Visual correlation:
+
+```text
+GPU utilization
+
+████████_____████████_____████
+```
+
+```text
+Data-loader latency
+
+_____████_____████████_____███
+```
+
+Diagnosis:
+
+```text
+GPU idle
+   ↑
+DataLoader slow
+```
+
+Potential root causes:
+
+```text
+S3 / object storage latency
+slow dataset shard
+tokenization CPU bottleneck
+cache miss
+insufficient prefetch
+disk bottleneck
+```
+
+---
+
+# 14. Checkpoint Metrics
+
+Large-model checkpoints can be extremely expensive.
+
+Collect:
+
+```text
+checkpoint_duration
+checkpoint_size
+
+checkpoint_upload_latency
+checkpoint_write_throughput
+
+checkpoint_success
+checkpoint_failure
+
+last_checkpoint_step
+last_checkpoint_timestamp
+```
+
+Example:
+
+```text
+checkpoint size = 2.4 TB
+checkpoint time = 7 min
+checkpoint every = 15 min
+```
+
+This is a significant amount of time spent around checkpoint operations.
+
+Possible improvements:
+
+```text
+asynchronous checkpointing
+incremental checkpointing
+parallel writes
+local NVMe staging
+background object-storage upload
+reduce checkpoint frequency
+```
+
+---
+
+# 15. Pretraining Dashboard
+
+A useful researcher dashboard could show:
+
+```text
+TRAINING PROGRESS
+──────────────────────────────
+
+Step               412,829
+Tokens processed   2.83T
+
+Training loss      1.921
+Validation loss    2.014
+
+
+THROUGHPUT
+──────────────────────────────
+
+Tokens/sec         6.2M
+Tokens/sec/GPU     5,930
+
+MFU                47.2%
+
+
+STEP TIMING
+──────────────────────────────
+
+Forward            320 ms
+Backward           510 ms
+Optimizer          105 ms
+Communication      240 ms
+Data loading        45 ms
+
+
+GPU
+──────────────────────────────
+
+GPU util            96%
+HBM                  91%
+NVLink               72%
+
+Power               687 W
+Temperature          73°C
+```
+
+---
+
+# 16. Model Evaluation Architecture
+
+Training answers:
+
+```text
+Did optimization work?
+```
+
+Evaluation answers:
+
+```text
+Is the resulting model actually good?
+```
+
+Treat evaluation as a separate distributed platform.
+
+```text
+                         Training
+                            │
+                            ▼
+                    ┌─────────────────┐
+                    │ Model Registry  │
+                    │ model:v125     │
+                    └────────┬────────┘
+                             │
+                       checkpoint ready
+                             │
+                             ▼
+                   ┌────────────────────┐
+                   │ Evaluation Service │
+                   └─────────┬──────────┘
+                             │
+          ┌──────────────────┼──────────────────┐
+          │                  │                  │
+          ▼                  ▼                  ▼
+   Academic Eval         Safety Eval        Product Eval
+      Worker                Worker              Worker
+          │                  │                  │
+     MMLU / Math         jailbreak         domain dataset
+     Coding              harmfulness       product metrics
+          │                  │                  │
+          └──────────────────┼──────────────────┘
+                             ▼
+                    ┌──────────────────┐
+                    │ Evaluation Store │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │ Quality Gates   │
+                    └───────┬─────────┘
+                            │
+                 ┌──────────┴──────────┐
+                 ▼                     ▼
+               PASS                   FAIL
+                 │                      │
+                 ▼                      ▼
+          Model Promotion        Block Deployment
+                 │
+                 ▼
+              Canary
+                 │
+                 ▼
+            Production
+```
+
+---
+
+# 17. EvaluationRun Data Model
+
+Evaluation should be a first-class entity.
+
+```ts
+type EvaluationRun = {
+  evaluationId: string;
+
+  modelId: string;
+  modelVersion: string;
+
+  checkpointId: string;
+
+  datasetId: string;
+  datasetVersion: string;
+  datasetHash: string;
+
+  benchmark: string;
+  benchmarkVersion: string;
+
+  evaluatorVersion: string;
+
+  metrics: Record<string, number>;
+
+  startedAt: string;
+  completedAt?: string;
+};
+```
+
+Do not store only:
+
+```text
+MMLU = 81%
+```
+
+Store enough metadata to reproduce it:
+
+```text
+model_version        = llama-x-142
+checkpoint           = 820000
+
+benchmark            = MMLU
+benchmark_version    = 2026-04
+dataset_hash         = abc123
+
+prompt_template      = v12
+evaluator            = evaluator-v7
+
+temperature          = 0
+max_tokens           = 2048
+
+score                = 81.23
+```
+
+---
+
+# 18. Model Evaluation Metrics
+
+## Classification / QA
+
+```text
+accuracy
+precision
+recall
+F1
+
+exact_match
+normalized_accuracy
+```
+
+## Language Modeling
+
+```text
+perplexity
+log probability
+cross entropy
+```
+
+## Generation
+
+```text
+BLEU
+ROUGE
+BERTScore
+```
+
+## Coding
+
+```text
+pass@1
+pass@5
+pass@k
+```
+
+## Reasoning
+
+```text
+math accuracy
+reasoning accuracy
+tool-use success rate
+instruction-following score
+```
+
+## Safety
+
+```text
+harmful response rate
+jailbreak success rate
+policy violation rate
+refusal correctness
+```
+
+---
+
+# 19. LLM-as-a-Judge
+
+Exact-match metrics are insufficient for open-ended generation.
+
+Architecture:
+
+```text
+Candidate Model
+      │
+      ▼
+Generated Response
+      │
+      ├───────────────────┐
+      │                   │
+      ▼                   ▼
+Reference            Judge Model
+                          │
+                          ▼
+                     Rubric Scores
+
+                 correctness = 4/5
+                 relevance   = 5/5
+                 coherence   = 5/5
+                 safety      = 5/5
+```
+
+Version the judge configuration:
+
+```text
+judge_model
+judge_model_version
+
+judge_prompt
+judge_prompt_version
+
+rubric_version
+
+temperature
+sampling configuration
+```
+
+Otherwise evaluation results cannot be compared reliably.
+
+---
+
+# 20. Scaling Model Evaluation
+
+Suppose:
+
+```text
+100 models
+× 50 benchmarks
+× 10,000 examples
+
+= 50,000,000 inference requests
+```
+
+Do not run evaluations synchronously.
+
+Use:
+
+```text
+Evaluation API
+      │
+      ▼
+Evaluation Scheduler
+      │
+      ▼
+Kafka / Queue
+ ┌────┼────┬────┐
+ ▼    ▼    ▼    ▼
+GPU  GPU  GPU  GPU
+Evaluation Workers
+      │
+      ▼
+Partial Results
+      │
+      ▼
+Aggregator
+      │
+      ▼
+Evaluation DB
+```
+
+Shard work by:
+
+```text
+evaluation_id + dataset_partition
+```
+
+Example:
+
+```text
+MMLU
+
+partition-0 → examples 0-999
+partition-1 → examples 1000-1999
+partition-2 → examples 2000-2999
+...
+```
+
+Advantages:
+
+```text
+horizontal scaling
+retry individual shards
+GPU scheduling
+partial progress
+fault isolation
+```
+
+---
+
+# 21. Quality Gates
+
+Candidate models should be compared against the production baseline.
+
+Example:
+
+```text
+              V41       V42
+
+MMLU          81.2      83.1     ↑
+GSM8K         88.7      90.2     ↑
+HumanEval     74.1      77.5     ↑
+
+Safety        97.2      96.1     ↓
+Latency       48 ms     53 ms    ↓
+```
+
+Example policy:
+
+```ts
+if (
+  safetyRegression > 0.5 ||
+  qualityRegression > 1.0 ||
+  latencyRegression > allowedLatencyRegression
+) {
+  blockPromotion();
+}
+```
+
+Flow:
+
+```text
+Training
+   ↓
+Checkpoint
+   ↓
+Evaluation
+   ↓
+Quality Gate
+   ↓
+Model Registry
+   ↓
+Canary
+   ↓
+Production
+```
+
+---
+
+# 22. The Correlation Model
+
+This is the most important Staff-level design decision.
+
+Do not create:
+
+```text
+GPU dashboard
+
+Training dashboard
+
+Evaluation dashboard
+```
+
+with no relationship between them.
+
+Build lineage:
+
+```text
+Experiment
+   │
+   ▼
+Training Run
+   │
+   ├── dataset:v42
+   ├── code:git:a94df2
+   ├── config:v19
+   │
+   ▼
+Checkpoint:820000
+   │
+   ▼
+Model:v142
+   │
+   ▼
+Evaluation:e3491
+   │
+   ├── MMLU 83.1
+   ├── GSM8K 90.2
+   └── Safety 99.1
+```
+
+And infrastructure lineage:
+
+```text
+Training Run
+   │
+   ├── Cluster
+   │      │
+   │      └── Node
+   │           │
+   │           └── GPU
+   │
+   ├── Training Metrics
+   ├── Distributed Metrics
+   ├── Logs
+   ├── Traces
+   ├── Dataset
+   └── Checkpoint
+```
+
+---
+
+# 23. Run-to-Run Comparison
+
+Researcher asks:
+
+```text
+Why did V142 regress compared with V141?
+```
+
+Platform shows:
+
+```text
+                  V141          V142
+
+dataset           v41           v42
+learning rate     1.5e-4        2.0e-4  ← changed
+
+MFU               48%           47%
+
+validation loss   1.94          2.08    ← regression
+
+MMLU              83.4          80.1    ← regression
+```
+
+Likely conclusion:
+
+```text
+Infrastructure appears healthy.
+
+Training configuration changed.
+
+Validation regression is correlated
+with learning-rate change.
+```
+
+This is far more useful than inspecting individual Grafana graphs manually.
+
+---
+
+# 24. Researcher Failure Page
+
+Example:
+
+```text
+TRAINING RUN #384829
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STATUS
+FAILED
+
+Failure:
+NaN loss detected at step 482,910
+
+
+MODEL
+────────────────────────────────────
+
+Llama-X-70B
+
+GPUs:
+1024
+
+
+TRAINING
+────────────────────────────────────
+
+Loss
+
+1.81 → 1.79 → 7.2 → NaN
+
+Gradient norm
+
+0.81 → 0.84 → 47.2 ↑
+
+Learning rate
+
+1.4e-4 → 2.8e-4 ↑
+
+
+INFRASTRUCTURE
+────────────────────────────────────
+
+GPU Util           96%
+MFU                47%
+
+GPU errors         none
+NCCL errors        none
+OOM                none
+
+
+LIKELY CAUSE
+────────────────────────────────────
+
+Training instability.
+
+Learning rate changed
+at step 482,900.
+
+
+RELATED EVENTS
+────────────────────────────────────
+
+482,900   scheduler LR change
+482,906   gradient spike
+482,910   NaN loss
+
+
+RECOMMENDATION
+────────────────────────────────────
+
+Inspect:
+
+LR scheduler
+checkpoint restore state
+mixed precision configuration
+```
+
+---
+
+# 25. Failure Scenario #1 — Training Instability
+
+Symptoms:
+
+```text
+GPU util = normal
+NCCL = normal
+
+gradient norm ↑
+loss ↑
+NaN
+```
+
+Debug path:
+
+```text
+Model failure
+     ↓
+Training timeline
+     ↓
+Gradient spike
+     ↓
+LR configuration change
+```
+
+Likely owner:
+
+```text
+training code / configuration
+```
+
+---
+
+# 26. Failure Scenario #2 — GPU Straggler
+
+Symptoms:
+
+```text
+Median step = 1.9 sec
+
+Rank 713 = 3.8 sec
+```
+
+Correlate:
+
+```text
+Rank 713
+   ↓
+Node 89
+   ↓
+GPU 5
+   ↓
+temperature ↑
+   ↓
+GPU clock ↓
+   ↓
+thermal throttle
+```
+
+Likely owner:
+
+```text
+infrastructure / hardware
+```
+
+---
+
+# 27. Failure Scenario #3 — Data Starvation
+
+Symptoms:
+
+```text
+GPU utilization periodically ↓
+
+NCCL normal
+
+Data loader latency ↑
+```
+
+Correlate:
+
+```text
+step slowdown
+    ↓
+rank data wait
+    ↓
+dataset shard
+    ↓
+storage latency
+```
+
+Likely owner:
+
+```text
+data pipeline / storage
+```
+
+---
+
+# 28. Metrics Storage Architecture
+
+One of the strongest Staff-level discussions is **cardinality**.
+
+Do not put every possible dimension into Prometheus.
+
+Bad example:
+
+```text
+metric{
+  run_id,
+  rank_id,
+  gpu_id,
+  step,
+  dataset_shard,
+  model_id,
+  prompt_id
+}
+```
+
+At large scale, this creates massive cardinality.
+
+Use a tiered design.
+
+```text
+                    TELEMETRY
+                        │
+             ┌──────────┴──────────┐
+             │                     │
+             ▼                     ▼
+      Hot Operational       High-Cardinality
+          Metrics              Analytics
+
+      Prometheus/Mimir        ClickHouse
+                             / Druid / Pinot
+             │                     │
+             ▼                     ▼
+      seconds/minutes        detailed events
+      dashboards             rank-level data
+      alerts                 evaluation rows
+```
+
+---
+
+# 29. What Goes Into the Hot TSDB
+
+Good candidates:
+
+```text
+GPU utilization
+GPU memory
+GPU temperature
+
+node CPU
+node memory
+
+job step time
+job throughput
+
+job loss
+job MFU
+
+NCCL aggregate latency
+
+queue depth
+```
+
+Keep labels relatively bounded:
+
+```text
+cluster_id
+node_id
+gpu_id
+job_id
+model_id
+```
+
+---
+
+# 30. What Goes Into High-Cardinality Analytics
+
+Examples:
+
+```text
+rank-level timing events
+
+training step events
+
+dataset shard statistics
+
+evaluation examples
+
+prompt-level scores
+
+error records
+
+trace spans
+
+run comparisons
+```
+
+Example record:
+
+```json
+{
+  "run_id": "r918",
+  "step": 482910,
+  "rank": 713,
+  "node": "node-89",
+  "gpu": 5,
+  "step_ms": 3820,
+  "nccl_ms": 280,
+  "gpu_util": 42,
+  "temperature": 91
+}
+```
+
+This belongs in an analytical/event store, not necessarily as Prometheus labels.
+
+---
+
+# 31. Raw Data / Object Storage
+
+Store large artifacts in object storage:
+
+```text
+checkpoints
+profiler traces
+CUDA traces
+NCCL traces
+TensorBoard event files
+
+evaluation datasets
+evaluation output blobs
+
+training logs
+failure dumps
+```
+
+Store metadata pointers in a database.
+
+Example:
+
+```text
+run_id
+artifact_type
+object_uri
+checksum
+created_at
+```
+
+---
+
+# 32. Retention Strategy
+
+Not every metric deserves the same retention.
+
+Example:
+
+```text
+Raw GPU telemetry
+1–7 days
+
+1-minute aggregates
+30 days
+
+Hourly aggregates
+1 year
+
+Run summaries
+multi-year
+
+Evaluation results
+multi-year
+
+Checkpoints
+policy dependent
+```
+
+This keeps storage manageable.
+
+---
+
+# 33. Sampling
+
+For massive clusters:
+
+```text
+10,000 GPUs
+× 100 metrics
+× 1 sample/sec
+
+= 1,000,000 samples/sec
+```
+
+Do not necessarily retain every raw sample forever.
+
+Possible approach:
+
+```text
+real-time:
+1 sec
+
+after 24h:
+10 sec aggregate
+
+after 30d:
+1 min aggregate
+```
+
+Keep full-fidelity metrics around failure windows.
+
+---
+
+# 34. Failure Window Preservation
+
+When an alert fires:
+
+```text
+XID error
+NaN loss
+OOM
+straggler detected
+NCCL timeout
+```
+
+Preserve:
+
+```text
+T - 10 minutes
+through
+T + 10 minutes
+```
+
+at full resolution.
+
+This gives researchers detailed forensic information without retaining all raw metrics forever.
+
+---
+
+# 35. Alert Architecture
+
+```text
+Metrics
+   │
+   ▼
+Streaming Rules
+   │
+   ├── GPU Health Rules
+   ├── Training Rules
+   ├── NCCL Rules
+   ├── Data Rules
+   └── Evaluation Rules
+          │
+          ▼
+     Alert Manager
+          │
+          ├── Researcher
+          ├── Infra On-call
+          ├── ML Platform
+          └── Automated Remediation
+```
+
+---
+
+# 36. Example Alerts
+
+## GPU
+
+```text
+XID error detected
+
+uncorrected ECC > 0
+
+GPU temperature > threshold
+
+GPU clock unexpectedly low
+```
+
+## Training
+
+```text
+loss = NaN
+
+gradient_norm > threshold
+
+MFU drops > 20%
+
+tokens/sec drops > 25%
+```
+
+## Distributed
+
+```text
+rank p99 step time > 2 × median
+
+NCCL latency spike
+
+communication_ratio > threshold
+```
+
+## Data
+
+```text
+dataloader wait > threshold
+
+prefetch queue empty
+
+storage latency p99 ↑
+```
+
+## Evaluation
+
+```text
+candidate safety regression
+
+benchmark regression
+
+latency regression
+```
+
+---
+
+# 37. Automated Root-Cause Correlation
+
+Instead of only alerting:
+
+```text
+Training throughput down 30%
+```
+
+the system should correlate signals.
+
+Example:
+
+```text
+Step latency ↑
+      │
+      ├── GPU util ↓
+      ├── Data wait ↑
+      ├── NCCL normal
+      └── GPU health normal
+```
+
+Output:
+
+```text
+Probable cause:
+Data input bottleneck.
+```
+
+Another example:
+
+```text
+Step latency ↑
+      │
+      ├── GPU util ↓
+      ├── NCCL p99 ↑
+      ├── RDMA retransmit ↑
+      └── Data loader normal
+```
+
+Output:
+
+```text
+Probable cause:
+Network / collective communication issue.
+```
+
+---
+
+# 38. Observability Entity Model
+
+Useful core entities:
+
+```text
+Experiment
+TrainingRun
+TrainingStep
+
+Cluster
+Node
+GPU
+Rank
+
+Dataset
+DatasetVersion
+
+Checkpoint
+
+Model
+ModelVersion
+
+EvaluationRun
+Benchmark
+QualityGate
+
+Alert
+Incident
+Artifact
+```
+
+Relationships:
+
+```text
+Experiment
+   │
+   └── TrainingRun
+          │
+          ├── DatasetVersion
+          ├── GPU Allocation
+          ├── TrainingSteps
+          ├── Checkpoints
+          └── ModelVersion
+                  │
+                  └── EvaluationRun
+                         │
+                         └── QualityGate
+```
+
+---
+
+# 39. API Examples
+
+## Training Run
+
+```http
+GET /v1/runs/{runId}
+```
+
+Response:
+
+```json
+{
+  "runId": "r918",
+  "modelId": "llama-x",
+  "status": "RUNNING",
+  "step": 482100,
+  "tokensProcessed": 2800000000000,
+  "metrics": {
+    "loss": 1.91,
+    "mfu": 0.47,
+    "tokensPerSecond": 6200000
+  }
+}
+```
+
+---
+
+# 40. Rank Debugging
+
+```http
+GET /v1/runs/{runId}/ranks?sort=step_time&order=desc
+```
+
+Response:
+
+```json
+[
+  {
+    "rank": 713,
+    "node": "node-89",
+    "gpu": 5,
+    "stepTimeMs": 3820
+  }
+]
+```
+
+---
+
+# 41. Correlated Timeline
+
+```http
+GET /v1/runs/{runId}/timeline?fromStep=482850&toStep=482950
+```
+
+Could return:
+
+```text
+482,900   LR scheduler changed
+
+482,906   gradient norm 47.2
+
+482,908   loss 7.2
+
+482,910   loss NaN
+
+482,910   training aborted
+```
+
+---
+
+# 42. Run Comparison
+
+```http
+GET /v1/runs/compare?left=r917&right=r918
+```
+
+Return:
+
+```text
+config difference
+dataset difference
+throughput difference
+loss difference
+evaluation difference
+```
+
+This is extremely useful for researchers.
+
+---
+
+# 43. Evaluation API
+
+Create evaluation:
+
+```http
+POST /v1/evaluations
+```
+
+```json
+{
+  "modelVersion": "v142",
+  "checkpointId": "checkpoint-820000",
+  "benchmarkSuite": "preproduction-v12"
+}
+```
+
+Return:
+
+```json
+{
+  "evaluationId": "e3491",
+  "status": "QUEUED"
+}
+```
+
+---
+
+# 44. Evaluation Scheduler
+
+The scheduler should consider:
+
+```text
+GPU requirement
+model size
+
+benchmark priority
+
+deadline
+estimated duration
+
+available GPU pool
+model locality
+
+checkpoint locality
+```
+
+Potential scheduling policy:
+
+```text
+P0 safety certification
+
+P1 release candidate
+
+P2 researcher evaluation
+
+P3 exploratory evaluation
+```
+
+---
+
+# 45. Multi-Tenant Concerns
+
+Large GPU platforms support many teams.
+
+Need:
+
+```text
+tenant_id
+team_id
+project_id
+```
+
+Enforce:
+
+```text
+RBAC
+resource quotas
+
+GPU quotas
+evaluation quotas
+
+dataset ACLs
+model ACLs
+
+artifact access
+audit logging
+```
+
+Do not expose sensitive model/dataset metadata across teams.
+
+---
+
+# 46. Reliability
+
+Telemetry should never break training.
+
+Principle:
+
+> Observability must be best-effort and isolated from the hot training path.
+
+Bad:
+
+```text
+Training loop
+    ↓
+sync HTTP metrics request
+    ↓
+metrics backend slow
+    ↓
+training stalls
+```
+
+Better:
+
+```text
+Training loop
+    ↓
+local non-blocking metrics buffer
+    ↓
+background exporter
+    ↓
+collector
+```
+
+If telemetry fails:
+
+```text
+training continues
+```
+
+---
+
+# 47. Backpressure
+
+Telemetry ingestion can spike during:
+
+```text
+large job startup
+mass failure
+checkpoint
+evaluation fanout
+```
+
+Use:
+
+```text
+local buffering
+
+Kafka
+
+bounded queues
+
+sampling
+
+drop low-priority telemetry
+```
+
+Priority:
+
+```text
+P0 failure events
+P1 run health
+P2 detailed metrics
+P3 debug traces
+```
+
+Do not drop critical failure signals first.
+
+---
+
+# 48. Cost Controls
+
+Major cost drivers:
+
+```text
+high-frequency metrics
+high-cardinality dimensions
+
+trace retention
+
+checkpoint retention
+
+evaluation inference
+
+LLM-as-a-Judge
+```
+
+Controls:
+
+```text
+tiered retention
+
+sampling
+
+pre-aggregation
+
+query limits
+
+benchmark caching
+
+evaluation result reuse
+
+checkpoint lifecycle policies
+```
+
+---
+
+# 49. Evaluation Caching
+
+Evaluations are expensive.
+
+Cache result using:
+
+```text
+model checkpoint hash
++
+dataset hash
++
+evaluator version
++
+prompt version
++
+decoding config
+```
+
+Example:
+
+```text
+eval_cache_key =
+SHA256(
+  checkpoint_hash
+  + dataset_hash
+  + evaluator_version
+  + prompt_version
+  + decoding_config
+)
+```
+
+If nothing changed:
+
+```text
+reuse evaluation
+```
+
+---
+
+# 50. Staff-Level Deep Dive — Cardinality
+
+Interview question:
+
+> Why not put everything into Prometheus?
+
+Answer:
+
+Prometheus is excellent for operational time-series metrics, but large training platforms create dimensions like:
+
+```text
+10K GPUs
+× thousands of runs
+× thousands of ranks
+× millions of steps
+```
+
+Putting:
+
+```text
+step
+rank
+dataset_shard
+prompt_id
+```
+
+into labels creates explosive cardinality.
+
+So separate:
+
+```text
+operational telemetry
+        ↓
+Prometheus / Mimir
+
+high-cardinality debugging
+        ↓
+ClickHouse / event store
+```
+
+This keeps alerting fast while retaining detailed debugging data.
+
+---
+
+# 51. Staff-Level Deep Dive — Why run_id Matters
+
+Without a shared identifier:
+
+```text
+GPU metric
+training metric
+log
+checkpoint
+evaluation
+```
+
+are independent data sets.
+
+With:
+
+```text
+run_id
+```
+
+we can answer:
+
+```text
+Which model?
+
+Which checkpoint?
+
+Which training step?
+
+Which rank?
+
+Which GPU?
+
+Which dataset?
+
+Which evaluation result?
+```
+
+The identifier becomes the backbone of the observability product.
+
+---
+
+# 52. Staff-Level Deep Dive — Model Quality Regression
+
+Researcher:
+
+```text
+Model v142 lost 3% MMLU.
+```
+
+System:
+
+```text
+Model v142
+    ↓
+Evaluation e3491
+    ↓
+Checkpoint 820000
+    ↓
+Training run r918
+    ↓
+Config diff vs r917
+    ↓
+Learning rate changed
+```
+
+If infrastructure metrics are normal:
+
+```text
+likely training/config issue
+```
+
+If infrastructure metrics changed:
+
+```text
+possible systems issue
+```
+
+This reduces debugging time dramatically.
+
+---
+
+# 53. Staff-Level Deep Dive — Straggler Detection
+
+Large synchronous training behaves approximately like:
+
+```text
+step time =
+max(rank step time)
+```
+
+not:
+
+```text
+average(rank step time)
+```
+
+Therefore one unhealthy rank can slow the entire job.
+
+Detect:
+
+```text
+median rank = 1.9 sec
+rank 713    = 3.8 sec
+```
+
+Then correlate:
+
+```text
+rank
+ ↓
+GPU
+ ↓
+node
+ ↓
+NIC
+ ↓
+hardware / network telemetry
+```
+
+This is a critical distributed-training observability feature.
+
+---
+
+# 54. Staff-Level Deep Dive — Evaluation Reproducibility
+
+A score is meaningless without provenance.
+
+Bad:
+
+```text
+MMLU = 83.1
+```
+
+Good:
+
+```text
+model checkpoint hash
+dataset hash
+
+benchmark version
+prompt version
+
+evaluator version
+judge model version
+
+temperature
+sampling parameters
+
+code commit
+```
+
+Now:
+
+```text
+V141 vs V142
+```
+
+is a valid comparison.
+
+---
+
+# 55. Staff-Level Deep Dive — Promotion Safety
+
+Do not automatically promote based on one aggregate quality score.
+
+Use multidimensional gates:
+
+```text
+quality
+safety
+latency
+cost
+reliability
+```
+
+Example:
+
+```text
+Quality     +2.0%
+Safety      -1.1%
+Latency     +10%
+
+Decision:
+FAIL
+```
+
+Safety can be a hard gate even when quality improves.
+
+---
+
+# 56. Staff-Level Deep Dive — Evaluation Architecture
+
+Why separate evaluation from training?
+
+Because evaluation has different:
+
+```text
+workload shape
+
+GPU scheduling requirements
+
+retry semantics
+
+datasets
+
+security rules
+
+scaling characteristics
+
+SLAs
+```
+
+Training is long-running and stateful.
+
+Evaluation is:
+
+```text
+massively parallel
+batch-oriented
+retriable
+shardable
+```
+
+So it should have its own scheduler and worker pool.
+
+---
+
+# 57. Interview Tradeoffs
+
+## Prometheus vs ClickHouse
+
+Use Prometheus/Mimir for:
+
+```text
+alerts
+dashboards
+recent operational metrics
+```
+
+Use ClickHouse-like analytics for:
+
+```text
+rank-level events
+training step events
+evaluation rows
+high-cardinality queries
+```
+
+---
+
+## Metrics vs Logs
+
+Metrics:
+
+```text
+cheap
+aggregatable
+alertable
+```
+
+Logs:
+
+```text
+rich debugging context
+exceptions
+stack traces
+```
+
+Use both.
+
+---
+
+## Metrics vs Traces
+
+Metrics answer:
+
+```text
+Is something wrong?
+```
+
+Traces answer:
+
+```text
+Where is time being spent?
+```
+
+For example:
+
+```text
+step
+ ├── dataloader
+ ├── forward
+ ├── backward
+ ├── NCCL
+ └── optimizer
+```
+
+---
+
+# 58. Key Derived Metrics
+
+Memorize these.
+
+## Communication Ratio
+
+```text
+communication_ratio =
+communication_time / step_time
+```
+
+## Straggler Ratio
+
+```text
+straggler_ratio =
+max_rank_step_time / median_rank_step_time
+```
+
+## Data Wait Ratio
+
+```text
+data_wait_ratio =
+data_wait_time / step_time
+```
+
+## Checkpoint Overhead
+
+```text
+checkpoint_overhead =
+checkpoint_time / training_window
+```
+
+## GPU Memory Headroom
+
+```text
+memory_headroom =
+1 - used_memory / total_memory
+```
+
+---
+
+# 59. Debugging Decision Tree
+
+```text
+TRAINING SLOW
+     │
+     ▼
+GPU utilization low?
+     │
+ ┌───┴────┐
+ │        │
+YES       NO
+ │        │
+ ▼        ▼
+Data?    MFU low?
+NCCL?     │
+CPU?      ▼
+       Kernel /
+       parallelism /
+       communication
+```
+
+More detailed:
+
+```text
+Training throughput ↓
+        │
+        ▼
+GPU Util ↓?
+   │
+   ├── Data wait ↑ → data pipeline
+   │
+   ├── NCCL ↑      → network
+   │
+   └── CPU wait ↑  → host bottleneck
+        │
+        ▼
+GPU Util normal?
+   │
+   ├── MFU ↓       → inefficient compute
+   └── clock ↓     → hardware throttle
+```
+
+---
+
+# 60. Model Failure Decision Tree
+
+```text
+MODEL QUALITY ↓
+      │
+      ▼
+Validation loss changed?
+      │
+ ┌────┴────┐
+ │         │
+YES        NO
+ │         │
+ ▼         ▼
+Training   Evaluation
+issue      mismatch?
+ │         │
+ ▼         ▼
+LR         Dataset version
+gradient   prompt version
+dataset    evaluator version
+```
+
+---
+
+# 61. Strong Staff-Level Answer
+
+If asked:
+
+> What metrics would you collect for a GPU training platform?
+
+Say:
+
+> I would organize observability into six layers: model quality, training behavior, distributed communication, GPU health, node health, and data-pipeline health. I would correlate all six through a common run ID so a researcher can move from a model-quality regression to the exact training step, rank, node, GPU, or dataset shard responsible.
+
+Then explain:
+
+```text
+MODEL QUALITY
+accuracy
+perplexity
+evaluation
+safety
+
+      ↓
+
+TRAINING
+loss
+gradient norm
+learning rate
+MFU
+tokens/sec
+step time
+
+      ↓
+
+DISTRIBUTED
+rank latency
+NCCL
+NVLink
+stragglers
+
+      ↓
+
+GPU
+utilization
+HBM
+temperature
+power
+clock
+ECC/XID
+
+      ↓
+
+NODE
+CPU
+memory
+disk
+network
+
+      ↓
+
+DATA
+dataloader latency
+storage throughput
+queue depth
+dataset version
+```
+
+---
+
+# 62. Strong Model Evaluation Answer
+
+If asked:
+
+> How would you design model evaluation?
+
+Say:
+
+> I would make evaluation an asynchronous distributed system separate from training. A checkpoint registered in the model registry creates an evaluation job. The scheduler shards benchmark datasets across GPU workers, aggregates results, stores reproducible evaluation metadata, compares the candidate against the current production baseline, and applies quality and safety gates before promotion.
+
+Then draw:
+
+```text
+Model Registry
+      ↓
+Evaluation Scheduler
+      ↓
+Queue
+      ↓
+GPU Workers
+      ↓
+Aggregator
+      ↓
+Evaluation Store
+      ↓
+Quality Gate
+      ↓
+Canary
+      ↓
+Production
+```
+
+---
+
+# 63. Strong Staff-Level Closing Statement
+
+> The platform should not be a collection of GPU dashboards. It should be a correlated run graph that lets researchers move from a model-quality regression to the exact training step, rank, node, GPU, data shard, or configuration change responsible. Evaluation should use the same lineage and provide reproducible quality gates before a checkpoint can be promoted.
+
+---
+
+# 64. 90-Second Interview Version
+
+```text
+I would structure the platform around a common training run ID.
+
+At the infrastructure layer, I collect GPU utilization, HBM, power,
+temperature, clocks, ECC/XID, NVLink, node CPU, memory, storage and
+network telemetry.
+
+At the training layer, I collect loss, validation loss, learning rate,
+gradient norm, MFU, tokens per second and detailed step timing.
+
+For distributed jobs, I collect rank-level step time and NCCL collective
+latencies so I can detect stragglers. One slow rank can hold up an entire
+synchronous training step.
+
+I also collect data-loader latency and checkpoint metrics because GPU
+under-utilization is often caused by storage or data-pipeline issues,
+not the GPU itself.
+
+I would split storage by cardinality: Prometheus/Mimir for hot
+operational metrics and alerting, and ClickHouse or an event store for
+rank-level, step-level, and evaluation data.
+
+Finally, checkpoints flow into a distributed evaluation service. It
+runs benchmark, safety, domain and LLM-as-a-Judge evaluations, stores
+full provenance, compares against production baselines and applies
+quality gates before promotion.
+
+The Staff-level goal is not another dashboard. It is a correlated run
+graph that lets a researcher move from a model regression all the way
+down to the exact step, rank, GPU or dataset shard responsible.
+```
+
+---
+
+# 65. Whiteboard Flow to Draw During Interview
+
+If time is limited, draw only this:
+
+```text
+                       TRAINING JOB
+                           │
+          ┌────────────────┼────────────────┐
+          ▼                ▼                ▼
+       Training           GPU           NCCL/Data
+       Metrics          Telemetry        Metrics
+          │                │                │
+          └────────────────┼────────────────┘
+                           ▼
+                    Telemetry Pipeline
+                           │
+               ┌───────────┴────────────┐
+               ▼                        ▼
+          Prometheus                ClickHouse
+          hot metrics             detailed events
+               │                        │
+               └───────────┬────────────┘
+                           ▼
+                     Correlation Layer
+                           │
+                           ▼
+                    Researcher Portal
+
+                           │
+                           ▼
+                       Checkpoint
+                           │
+                           ▼
+                    Model Registry
+                           │
+                           ▼
+                 Evaluation Scheduler
+                           │
+                           ▼
+                      GPU Workers
+                           │
+                           ▼
+                    Evaluation Store
+                           │
+                           ▼
+                     Quality Gate
+                           │
+                           ▼
+                      Production
+```
+
+Then explain:
+
+```text
+run_id connects everything.
+```

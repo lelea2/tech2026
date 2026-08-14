@@ -124,10 +124,6 @@
       "hash": "418ff47387e7a6f3b32595b65eabbaacc9e67f99b7bebea0ae302e9841b7ef1a",
       "docRelative": "google-calendar.png"
     },
-    "system-designs/gpu-telemetry-metrics.png": {
-      "hash": "1d449ab21a0ca876c32b7eb37d2cc67be48bfd7c652f9692055f8007b2d6a190",
-      "docRelative": "gpu-telemetry-metrics.png"
-    },
     "system-designs/i18n.png": {
       "hash": "fd6d2e9fd5a69d3c6947665db4ad8c5ba879e38af192f7896612c2b95d8c2583",
       "docRelative": "i18n.png"
@@ -167,6 +163,10 @@
     "system-designs/miscellaneous/spv.png": {
       "hash": "177f823568ee4950eae55eac4852aeb7f2097fcf1cc80cc70aea028f954add92",
       "docRelative": "miscellaneous/spv.png"
+    },
+    "system-designs/ml-designs/gpu-telemetry-metrics.png": {
+      "hash": "1d449ab21a0ca876c32b7eb37d2cc67be48bfd7c652f9692055f8007b2d6a190",
+      "docRelative": "ml-designs/gpu-telemetry-metrics.png"
     },
     "system-designs/multimodal-file-ingestion.png": {
       "hash": "f09a4178656b7fcd39c80d3dbca33476d19a7a27b6b897b096dd41d5e173c8c9",
@@ -241,7 +241,7 @@
       "docRelative": "rate-limiter.png"
     },
     "system-designs/recommendation.png": {
-      "hash": "aacb443d125c734b85e02b54123b725a4e8543aacd5c527bac23fc74aeff0e0e",
+      "hash": "0649efa10e6a12f0c5972837e3a0f713aa222d0864bb953df771fbf0f785ec0d",
       "docRelative": "recommendation.png"
     },
     "system-designs/ride-hailing.png": {
@@ -368,10 +368,6 @@
       "hash": "8b7228fa984e56358456d7e53fc2484433e81761db105f0c6f007e708e30c7a9",
       "docRelative": "github-actions-system-design.mdx"
     },
-    "system-designs/gpu-telemetry-metrics.mdx": {
-      "hash": "64b8994d40edad4c262229b4833ad28bcbdf4694f3f6ef70b3a3bb5aea30e7b9",
-      "docRelative": "gpu-telemetry-metrics.mdx"
-    },
     "system-designs/i18n-design.mdx": {
       "hash": "19b247dbf720c63bcbab360fe12e3cfd6742d76ed9036c5d27665e1734787aef",
       "docRelative": "i18n-design.mdx"
@@ -423,6 +419,14 @@
     "system-designs/miscellaneous/spv-webhook.mdx": {
       "hash": "17a1572bdb3472ca955508d357323ca5ce99855ef6feb3cab82c954edd4cd558",
       "docRelative": "miscellaneous/spv-webhook.mdx"
+    },
+    "system-designs/ml-designs/gpu-telemetry-metrics.mdx": {
+      "hash": "e364ebfe7f7109dfc0f5c293e343e98c5de100eed2f1fb83a71f5612ab196bf5",
+      "docRelative": "ml-designs/gpu-telemetry-metrics.mdx"
+    },
+    "system-designs/ml-designs/gpu_training_observability.mdx": {
+      "hash": "add3927f3ba9ce4e7072e983dbd38deac8e7ebd101c90d25ac61d58fd8828dfa",
+      "docRelative": "ml-designs/gpu_training_observability.mdx"
     },
     "system-designs/multimodal-file-ingestion-retrieval.mdx": {
       "hash": "eff03e929e4631eb3a26fc263ad8080e3660914b272256afee3a4b22dc944c34",
@@ -551,6 +555,10 @@
     "__nav__:miscellaneous": {
       "hash": "0e522a80bd9235d06fdebf48bc08b235f6b6fe5e0b8434ea31ba59e9a1df4b03",
       "docRelative": "miscellaneous/_index.mdx"
+    },
+    "__nav__:ml-designs": {
+      "hash": "614f61c156adfaf1d47c065ecc92dfb7cc61d4887ac3e1a3ba1d61de61f44897",
+      "docRelative": "ml-designs/_index.mdx"
     },
     "__nav__:patterns": {
       "hash": "479506a05ee78fc2702866bf1430e74acae25f04b8f403b01340769ab6d1a630",
