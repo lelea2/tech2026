@@ -1,0 +1,1310 @@
+---
+title: 'ZooKeeper'
+description: 'When and why to use ZooKeeper for coordination, leader election, membership, locks, shard ownership, failover, and configuration.'
+---
+
+# ZooKeeper in System Design
+
+## 1. Core Mental Model
+
+ZooKeeper is primarily a **distributed coordination system**.
+
+Use it to answer questions like:
+
+```text
+Who is the leader?
+Which nodes are alive?
+Who owns this shard?
+What is the current cluster configuration?
+Can only one worker perform this action?
+```
+
+Think:
+
+```text
+Distributed System
+      │
+      ▼
+ Coordination Problem
+      │
+      ▼
+   ZooKeeper
+```
+
+The most important interview rule:
+
+> Use ZooKeeper for **coordination state**, not business state.
+
+---
+
+# 2. What ZooKeeper Is Good At
+
+Common use cases:
+
+```text
+Leader election
+Cluster membership
+Service discovery
+Distributed locks
+Shard ownership
+Configuration management
+Failover coordination
+Scheduler coordination
+Cluster metadata
+```
+
+A compact mnemonic:
+
+```text
+ZooKeeper =
+
+L  Leader Election
+M  Membership
+L  Locks
+C  Configuration
+S  Shard Ownership
+F  Failover
+```
+
+---
+
+# 3. Leader Election
+
+One of the most classic ZooKeeper use cases.
+
+Example:
+
+```text
+              ZooKeeper
+                  │
+        ┌─────────┼─────────┐
+        ▼         ▼         ▼
+ Scheduler A  Scheduler B  Scheduler C
+   LEADER       standby      standby
+      │
+      ▼
+ Runs scheduled work
+```
+
+Why this helps:
+
+```text
+Only one scheduler should actively assign jobs.
+```
+
+If Scheduler A dies:
+
+```text
+Scheduler A crashes
+        ↓
+ZooKeeper session expires
+        ↓
+ephemeral node disappears
+        ↓
+Scheduler B wins election
+        ↓
+Scheduler B becomes leader
+```
+
+Typical scenarios:
+
+```text
+job scheduler
+database coordinator
+GPU cluster scheduler
+metadata service
+distributed controller
+```
+
+---
+
+# 4. Cluster Membership
+
+ZooKeeper can track which workers are currently alive.
+
+Example:
+
+```text
+/workers/A
+/workers/B
+/workers/C
+```
+
+Workers register with ephemeral nodes.
+
+If Worker B disconnects:
+
+```text
+Worker B dies
+    ↓
+ZooKeeper session expires
+    ↓
+/workers/B disappears
+    ↓
+other services know B is gone
+```
+
+Useful for:
+
+```text
+worker pools
+distributed schedulers
+storage nodes
+stream-processing workers
+cluster controllers
+```
+
+---
+
+# 5. Service Discovery
+
+A service may register itself:
+
+```text
+/services/payment/instance-1
+/services/payment/instance-2
+/services/payment/instance-3
+```
+
+Consumers can discover active instances.
+
+Conceptually:
+
+```text
+Payment Service Instances
+       │
+       ▼
+    ZooKeeper
+       │
+       ▼
+Active Membership
+       │
+       ▼
+   API Clients
+```
+
+Modern alternatives may include:
+
+```text
+Consul
+etcd
+Kubernetes Service Discovery
+cloud-native service registries
+```
+
+So in an interview, say:
+
+> ZooKeeper can do service discovery, but I would first use the platform-native service discovery mechanism if one already exists.
+
+---
+
+# 6. Distributed Locking
+
+Use ZooKeeper when multiple processes must coordinate access to a critical section.
+
+Example:
+
+```text
+Worker A
+Worker B
+Worker C
+    │
+    ▼
+ ZooKeeper Lock
+    │
+    ▼
+Only one worker proceeds
+```
+
+Example scenario:
+
+```text
+Only one worker may perform database migration.
+```
+
+Or:
+
+```text
+Only one scheduler may rebalance partitions.
+```
+
+Do not use distributed locks unless necessary.
+
+Prefer:
+
+```text
+idempotency
+optimistic concurrency
+database transactions
+```
+
+when those are simpler.
+
+---
+
+# 7. Shard Ownership
+
+ZooKeeper is useful for assigning partitions or shards to workers.
+
+Example:
+
+```text
+Partitions
+
+P0  P1  P2  P3  P4  P5
+│   │   │   │   │   │
+└── Worker A
+        └── Worker B
+                └── Worker C
+```
+
+ZooKeeper could store:
+
+```text
+/partitions/0/owner = worker-A
+/partitions/1/owner = worker-A
+/partitions/2/owner = worker-B
+/partitions/3/owner = worker-B
+/partitions/4/owner = worker-C
+/partitions/5/owner = worker-C
+```
+
+If Worker B disappears:
+
+```text
+Worker B dies
+    ↓
+membership entry disappears
+    ↓
+coordinator detects failure
+    ↓
+P2 and P3 reassigned
+```
+
+This is useful in:
+
+```text
+stream processing
+distributed queues
+storage systems
+search clusters
+worker pools
+```
+
+---
+
+# 8. Configuration Management
+
+ZooKeeper can hold small, strongly consistent configuration values.
+
+Example:
+
+```text
+/config/rate-limit = 1000
+/config/active-region = us-west
+/config/feature-x = enabled
+```
+
+Workers watch for changes:
+
+```text
+Config changed
+     ↓
+ZooKeeper watch fires
+     ↓
+workers refresh config
+```
+
+Good for:
+
+```text
+cluster-level config
+routing config
+leader metadata
+feature coordination
+```
+
+Not good for:
+
+```text
+large config files
+large blobs
+high-write application data
+```
+
+---
+
+# 9. Failover Coordination
+
+Example:
+
+```text
+Primary Database
+      │
+      ▼
+ ZooKeeper
+      │
+      ▼
+Standby Database
+```
+
+If primary fails:
+
+```text
+Primary heartbeat disappears
+        ↓
+ZooKeeper detects failure
+        ↓
+Standby promoted
+```
+
+ZooKeeper can help coordinate:
+
+```text
+who is active
+who is standby
+which replica should become leader
+```
+
+---
+
+# 10. Scheduler Coordination
+
+Suppose you have multiple scheduler replicas:
+
+```text
+Scheduler A
+Scheduler B
+Scheduler C
+```
+
+You want high availability but only one active scheduler.
+
+ZooKeeper provides:
+
+```text
+leader election
+liveness tracking
+failover
+```
+
+Architecture:
+
+```text
+        ZooKeeper
+            │
+       Leader Lease
+            │
+      ┌─────┼─────┐
+      ▼     ▼     ▼
+      A     B     C
+    leader standby standby
+```
+
+---
+
+# 11. Notification System Example
+
+ZooKeeper can coordinate notification workers, but it should not carry the notification messages themselves.
+
+Architecture:
+
+```text
+Notification API
+      │
+      ▼
+    Kafka
+      │
+      ▼
+Notification Workers
+      │
+      ▼
+Email / SMS / Push
+```
+
+ZooKeeper could help with:
+
+```text
+worker membership
+leader election
+shard ownership
+```
+
+But Kafka handles:
+
+```text
+actual notification events
+```
+
+Example:
+
+```text
+Kafka
+  │
+  ├── partition 0 → Worker A
+  ├── partition 1 → Worker A
+  ├── partition 2 → Worker B
+  └── partition 3 → Worker C
+
+ZooKeeper
+  │
+  └── tracks worker ownership / coordination
+```
+
+---
+
+# 12. GPU Cluster Example
+
+ZooKeeper can be used in the GPU cluster control plane.
+
+Example:
+
+```text
+Training Scheduler Replicas
+           │
+           ▼
+       ZooKeeper
+           │
+           ├── leader election
+           ├── membership
+           └── distributed locks
+           │
+           ▼
+        GPU Nodes
+```
+
+Example:
+
+```text
+Scheduler A = leader
+Scheduler B = standby
+Scheduler C = standby
+```
+
+If A dies:
+
+```text
+A session expires
+      ↓
+leader node disappears
+      ↓
+B becomes leader
+      ↓
+B resumes GPU scheduling
+```
+
+Potential coordination state:
+
+```text
+/scheduler/leader
+/gpu-workers/node-1
+/gpu-workers/node-2
+/gpu-workers/node-3
+```
+
+---
+
+# 13. Distributed Queue / Stream Processing Example
+
+ZooKeeper can coordinate worker ownership.
+
+Example:
+
+```text
+Partitions
+    │
+    ▼
+ ZooKeeper
+    │
+    ▼
+Worker Assignment
+```
+
+But use:
+
+```text
+Kafka
+Pulsar
+SQS
+```
+
+for actual messaging.
+
+Rule:
+
+```text
+ZooKeeper = coordination
+Kafka = event transport
+```
+
+---
+
+# 14. What NOT to Store in ZooKeeper
+
+Do not use ZooKeeper as your main database for:
+
+```text
+user profiles
+orders
+notifications
+chat messages
+large documents
+large blobs
+analytics events
+payment records
+```
+
+Why:
+
+```text
+not designed for large data
+not designed for high-volume business writes
+coordination metadata should remain small
+```
+
+---
+
+# 15. ZooKeeper vs Database
+
+Use a database for:
+
+```text
+business data
+transactions
+persistent records
+large datasets
+```
+
+Use ZooKeeper for:
+
+```text
+coordination
+leader election
+cluster metadata
+membership
+locks
+```
+
+Example:
+
+```text
+Postgres
+
+users
+orders
+payments
+```
+
+```text
+ZooKeeper
+
+current scheduler leader
+active workers
+partition ownership
+```
+
+---
+
+# 16. ZooKeeper vs Redis
+
+Redis can support:
+
+```text
+caching
+distributed locks
+counters
+queues
+fast ephemeral state
+```
+
+ZooKeeper is stronger for:
+
+```text
+cluster coordination
+membership
+watches
+leader election
+hierarchical metadata
+```
+
+Interview framing:
+
+```text
+Redis:
+fast data structure server
+
+ZooKeeper:
+distributed coordination service
+```
+
+---
+
+# 17. ZooKeeper vs etcd
+
+Both can handle:
+
+```text
+configuration
+coordination
+leader election
+service discovery
+```
+
+etcd is commonly used in modern cloud-native systems.
+
+Example:
+
+```text
+Kubernetes
+    │
+    ▼
+   etcd
+```
+
+ZooKeeper is historically common in:
+
+```text
+Hadoop
+HBase
+Kafka
+Solr
+older distributed systems
+```
+
+Modern design interview answer:
+
+> If the platform already uses Kubernetes or etcd, I would generally avoid adding ZooKeeper unless there is a specific requirement or existing ecosystem dependency.
+
+---
+
+# 18. ZooKeeper vs Raft-Based Control Plane
+
+Many modern systems embed their own consensus layer.
+
+Instead of:
+
+```text
+Application
+    ↓
+ZooKeeper
+```
+
+they may use:
+
+```text
+Application
+    ↓
+Embedded Raft
+```
+
+Examples of things to ask:
+
+```text
+Does this system already have a control plane?
+
+Does the database already elect leaders?
+
+Does Kubernetes already provide membership?
+
+Does the message system already manage partition assignment?
+```
+
+Do not introduce ZooKeeper unnecessarily.
+
+---
+
+# 19. Ephemeral Nodes
+
+Ephemeral nodes are one of ZooKeeper's most useful concepts.
+
+A client creates:
+
+```text
+/workers/worker-A
+```
+
+as ephemeral.
+
+As long as the session is alive:
+
+```text
+node exists
+```
+
+If client dies:
+
+```text
+session expires
+    ↓
+node automatically disappears
+```
+
+Useful for:
+
+```text
+membership
+leader election
+liveness
+service registration
+```
+
+---
+
+# 20. Watches
+
+Clients can watch ZooKeeper nodes.
+
+Example:
+
+```text
+Worker watches:
+
+/config/routing
+```
+
+When it changes:
+
+```text
+/config/routing updated
+        ↓
+watch event
+        ↓
+worker refreshes routing
+```
+
+Useful for:
+
+```text
+dynamic configuration
+membership changes
+leader changes
+shard reassignment
+```
+
+---
+
+# 21. Leader Election Pattern
+
+Conceptually:
+
+```text
+Clients create sequential nodes:
+
+/election/node-0001
+/election/node-0002
+/election/node-0003
+```
+
+The smallest sequence becomes leader.
+
+```text
+node-0001 = leader
+```
+
+If it disappears:
+
+```text
+node-0002 becomes leader
+```
+
+This avoids multiple active leaders.
+
+---
+
+# 22. Distributed Lock Pattern
+
+Clients create sequential ephemeral nodes:
+
+```text
+/lock/node-0001
+/lock/node-0002
+/lock/node-0003
+```
+
+Smallest number owns the lock.
+
+Others wait.
+
+If owner crashes:
+
+```text
+ephemeral node disappears
+```
+
+next client proceeds.
+
+---
+
+# 23. Common System Design Scenarios
+
+Use ZooKeeper when designing:
+
+```text
+Distributed Job Scheduler
+GPU Cluster Scheduler
+Distributed Database
+Search Cluster
+Stream Processing Platform
+Distributed Cache Control Plane
+Distributed File System
+Notification Worker Coordination
+Large Worker Pool
+Leader-Based Metadata Service
+```
+
+---
+
+# 24. Scenario: Job Scheduler
+
+Requirement:
+
+```text
+multiple scheduler replicas
+only one should execute scheduled jobs
+```
+
+Architecture:
+
+```text
+Schedulers
+    │
+    ▼
+ZooKeeper Leader Election
+    │
+    ▼
+Leader executes jobs
+```
+
+If leader fails:
+
+```text
+standby promoted
+```
+
+---
+
+# 25. Scenario: Distributed Storage
+
+ZooKeeper may store metadata like:
+
+```text
+which storage nodes are alive
+which node owns a shard
+which node is primary
+```
+
+Data itself stays in:
+
+```text
+storage nodes
+```
+
+ZooKeeper stores only coordination metadata.
+
+---
+
+# 26. Scenario: Search Cluster
+
+Could track:
+
+```text
+active search nodes
+shard ownership
+leader node
+configuration
+```
+
+Example:
+
+```text
+Shard 0 → Node A
+Shard 1 → Node B
+Shard 2 → Node C
+```
+
+If Node B fails:
+
+```text
+Shard 1 reassigned
+```
+
+---
+
+# 27. Scenario: Multi-Region System
+
+ZooKeeper might coordinate:
+
+```text
+active region
+standby region
+leader controller
+```
+
+However for global systems, consider:
+
+```text
+latency
+quorum location
+network partition behavior
+```
+
+Do not stretch ZooKeeper blindly across distant regions.
+
+---
+
+# 28. Staff-Level Tradeoff: Availability vs Consistency
+
+Coordination generally requires strong consistency.
+
+You do not want:
+
+```text
+Scheduler A believes it is leader
+
+AND
+
+Scheduler B believes it is leader
+```
+
+That creates split brain.
+
+So coordination systems prioritize:
+
+```text
+consistent leadership
+quorum-based decisions
+```
+
+over always accepting writes during partitions.
+
+---
+
+# 29. Staff-Level Tradeoff: Session Expiration
+
+Failure detection is not instantaneous.
+
+Example:
+
+```text
+worker network pause
+      ↓
+ZooKeeper does not immediately know
+      ↓
+session timeout expires
+      ↓
+worker considered dead
+```
+
+Tradeoff:
+
+```text
+short timeout
+
+fast failover
+but more false positives
+```
+
+vs.
+
+```text
+long timeout
+
+fewer false positives
+but slower failover
+```
+
+---
+
+# 30. Staff-Level Tradeoff: Split Brain
+
+Leader election alone is not always enough.
+
+Imagine:
+
+```text
+Old leader temporarily disconnected
+
+New leader elected
+```
+
+Old leader could still attempt writes.
+
+Mitigation:
+
+```text
+fencing token
+generation number
+epoch
+```
+
+Example:
+
+```text
+Leader A epoch = 7
+
+Leader B epoch = 8
+```
+
+Downstream services accept only the newest epoch.
+
+This is an excellent Staff-level point.
+
+---
+
+# 31. Fencing Tokens
+
+Example:
+
+```text
+Scheduler acquires leadership.
+
+ZooKeeper returns epoch = 42.
+```
+
+Scheduler includes:
+
+```text
+epoch=42
+```
+
+with writes.
+
+Next leader:
+
+```text
+epoch=43
+```
+
+Storage rejects:
+
+```text
+epoch < currentEpoch
+```
+
+This protects against stale leaders.
+
+---
+
+# 32. Staff-Level Tradeoff: Metadata Size
+
+ZooKeeper should contain small metadata.
+
+Good:
+
+```text
+leader = scheduler-3
+partition-owner = worker-7
+config-version = 42
+```
+
+Bad:
+
+```text
+2 GB model checkpoint
+large JSON document
+millions of user messages
+```
+
+---
+
+# 33. Staff-Level Tradeoff: Watches
+
+Watches are useful but should not become your business event system.
+
+Bad:
+
+```text
+millions of user notifications
+through ZooKeeper watches
+```
+
+Good:
+
+```text
+cluster configuration changed
+worker joined
+leader changed
+```
+
+Use Kafka/PubSub for high-volume application events.
+
+---
+
+# 34. Decision Framework
+
+Ask:
+
+```text
+Do I need strong coordination?
+```
+
+If no:
+
+```text
+Do not use ZooKeeper.
+```
+
+If yes, ask:
+
+```text
+Leader election?
+Membership?
+Locks?
+Shard ownership?
+Configuration?
+Failover?
+```
+
+Then ask:
+
+```text
+Does my platform already solve this?
+```
+
+Examples:
+
+```text
+Kubernetes
+etcd
+Kafka controller
+database built-in consensus
+cloud service registry
+```
+
+If yes:
+
+```text
+use the existing control plane
+```
+
+instead of adding ZooKeeper.
+
+---
+
+# 35. Interview Decision Tree
+
+```text
+Need shared distributed state?
+        │
+        ▼
+Is it business data?
+   │             │
+  YES            NO
+   │             │
+   ▼             ▼
+Database      Is it coordination?
+                  │
+             ┌────┴────┐
+             │         │
+            YES        NO
+             │         │
+             ▼         ▼
+         ZooKeeper   Redis /
+         etcd /      Kafka /
+         Raft        DB
+```
+
+---
+
+# 36. Strong Interview Answer
+
+If asked:
+
+> When would you use ZooKeeper?
+
+Say:
+
+> I would use ZooKeeper for small, strongly consistent coordination metadata such as leader election, cluster membership, distributed locks, shard ownership, configuration, and failover. I would not use it for business data or high-volume event traffic. In a modern architecture, I would first check whether Kubernetes, etcd, Kafka, the database, or another existing control plane already provides the coordination primitive before introducing ZooKeeper.
+
+---
+
+# 37. 30-Second Version
+
+```text
+ZooKeeper is for distributed coordination.
+
+Typical uses are:
+
+leader election
+membership
+distributed locking
+shard ownership
+configuration
+failover
+
+I keep actual business data in databases
+and events in Kafka.
+
+In modern systems I also ask whether
+Kubernetes, etcd, or an embedded Raft
+control plane already solves the problem.
+```
+
+---
+
+# 38. 60-Second Staff-Level Version
+
+```text
+I think of ZooKeeper as a strongly consistent
+coordination control plane.
+
+If I have multiple scheduler replicas, for example,
+they can use ZooKeeper for leader election so only one
+actively assigns work. Workers can register ephemeral
+nodes for membership, and shard ownership can be stored
+as small metadata.
+
+If a worker or leader dies, its session expires,
+its ephemeral node disappears, and the cluster can
+rebalance or elect a new leader.
+
+I would not put application traffic or business data
+in ZooKeeper; Kafka carries events and a database stores
+persistent business state.
+
+At Staff level, I would also think about session timeout,
+split brain, and fencing tokens, and I would first check
+whether Kubernetes, etcd, Kafka, or the underlying
+platform already provides an equivalent control plane.
+```
+
+---
+
+# 39. Whiteboard Diagram
+
+Use this in an interview:
+
+```text
+                    ZooKeeper
+                        │
+          ┌─────────────┼─────────────┐
+          │             │             │
+          ▼             ▼             ▼
+   Leader Election   Membership   Shard Ownership
+          │             │             │
+          ▼             ▼             ▼
+     Scheduler      Worker Pool     Partitions
+          │
+          ▼
+      Work Queue
+          │
+          ▼
+        Kafka
+
+Business data → Database
+
+Large blobs → Object Storage
+```
+
+Then say:
+
+```text
+ZooKeeper coordinates the system.
+It does not carry the system's main data.
+```
+
+---
+
+# 40. Final Rule to Memorize
+
+> ZooKeeper is the **control plane for coordination**, not the **data plane for application traffic**.
