@@ -8,3 +8,186 @@ tags:
 ---
 
 ![High level architecture and request flow](./job-scheduler.png)
+
+## Staff-engineer framing
+
+The key question is not only how to enqueue and execute jobs. A production scheduler must define what happens when a job is running, a worker dies, an operator pauses it, or a downstream dependency fails.
+
+Clarify these requirements before choosing implementation details:
+
+- **At-least-once or exactly-once effects:** Most schedulers provide at-least-once execution. Job handlers must therefore be idempotent or use deduplication keys.
+- **Execution model:** One-shot jobs, recurring jobs, DAGs, long-running workflows, or all of them.
+- **Control plane vs. data plane:** Scheduling and operator commands should remain available even when workers are overloaded.
+- **Recovery objective:** How quickly should a failed worker's jobs be reassigned, and how much progress can be lost?
+- **Safety:** Which jobs may be stopped, retried, or resumed, and which require compensation or manual approval?
+
+## Job state machine
+
+Persist job state durably rather than relying on worker memory:
+
+```text
+           enqueue
+             |
+           PENDING
+         /      |      \
+     claim       pause     cancel
+      |           |          |
+    RUNNING     PAUSED    CANCELLED
+     / |  \
+ success  retryable error  stop
+  |          |              |
+SUCCEEDED   RETRY_WAIT    STOPPING
+           |              |
+          retry         STOPPED
+```
+
+Useful states include `PENDING`, `RUNNING`, `PAUSED`, `RETRY_WAIT`, `STOPPING`, `STOPPED`, `SUCCEEDED`, `FAILED`, and `CANCELLED`. Every transition should be conditional on the current version so two workers cannot both claim or control the same job.
+
+## In-flight jobs
+
+An in-flight job is a job that has been claimed by a worker but has not reached a terminal state. Treat this as a lease, not ownership forever.
+
+### Claiming and heartbeats
+
+When a worker claims a job, the scheduler atomically writes:
+
+- `status = RUNNING`
+- `worker_id`
+- `lease_id`
+- `lease_expires_at`
+- `attempt`
+- `started_at`
+
+The worker renews the lease with heartbeats. If the lease expires, the recovery service moves the job back to `PENDING` or `RETRY_WAIT` and another worker may claim it.
+
+Use a fencing token or monotonically increasing `lease_id`. A stale worker must not be able to commit results after its lease has expired and the job has been reassigned.
+
+### Progress and checkpoints
+
+For long-running jobs, persist progress at safe boundaries:
+
+```text
+job_id       = export-123
+checkpoint   = page-4200
+processed    = 4,200,000 records
+checkpoint_version = 18
+updated_at   = ...
+```
+
+Checkpoint only after the associated side effect is durable. Otherwise a resumed job can skip work or duplicate work. The handler should make each checkpointed unit idempotent with a stable operation key such as `job_id + item_id`.
+
+### What happens when a worker dies?
+
+1. Heartbeats stop.
+2. The lease expires after a bounded timeout.
+3. Recovery marks the attempt as interrupted.
+4. The job is retried from its latest valid checkpoint, or restarted from the beginning.
+5. The retry policy decides whether to use another queue, worker pool, or dead-letter state.
+
+Do not assume a process kill rolls back external effects. For payments, emails, data writes, or API calls, use idempotency keys, an outbox, transactional status records, or compensating actions.
+
+## Pause, stop, and cancel semantics
+
+These commands are different and should be exposed separately in the API and UI.
+
+### Pause
+
+Pause prevents new work from starting but allows the current safe unit to finish. A paused job remains resumable and retains its checkpoint.
+
+Recommended behavior:
+
+1. Set `pause_requested = true` in the control plane.
+2. Workers observe the flag between units or at heartbeat time.
+3. The worker stops claiming additional work and transitions the job to `PAUSED`.
+4. The scheduler stops dispatching the job until an explicit resume.
+
+Pause is cooperative. It cannot safely interrupt arbitrary code at any instruction boundary.
+
+### Stop
+
+Stop requests graceful termination. The worker finishes the current transactional unit, writes a checkpoint, releases resources, and transitions to `STOPPED`.
+
+For jobs that do not respond within a configured grace period:
+
+- mark the request as `STOPPING`;
+- emit an escalation event;
+- terminate the worker or container as a last resort;
+- retry only if the job contract says the side effects are safe to repeat.
+
+### Cancel
+
+Cancel prevents a pending job from running. For a running job, cancellation should normally behave like a stop request followed by a terminal `CANCELLED` state. If partial side effects cannot be undone, show that explicitly and run a compensating workflow instead of claiming rollback.
+
+## Resume behavior
+
+Resume should be a state transition, not simply a new enqueue operation.
+
+```text
+PAUSED  --resume--> PENDING
+STOPPED --resume--> PENDING
+RETRY_WAIT --retry--> PENDING
+```
+
+On resume:
+
+- validate that the checkpoint schema is still compatible with the current job version;
+- validate that required inputs and dependencies still exist;
+- create a new attempt while preserving the prior attempt history;
+- retain the same logical `job_id` but issue a new `attempt_id` and lease;
+- start from the latest committed checkpoint;
+- prevent two resumes with an atomic compare-and-set transition.
+
+If the job is not safely resumable, make the UI offer **restart from beginning** rather than pretending that resume is supported. For DAGs, resume only failed nodes and their descendants when dependencies are unchanged; otherwise recompute the affected subgraph.
+
+## Error handling and alerting
+
+Classify errors before deciding whether to retry:
+
+| Error type                         | Action                                                           |
+| ---------------------------------- | ---------------------------------------------------------------- |
+| Transient dependency timeout       | Retry with exponential backoff and jitter.                       |
+| Rate limit or overload             | Honor `Retry-After`, reduce concurrency, and alert if sustained. |
+| Invalid input or schema            | Fail fast; do not retry indefinitely.                            |
+| Non-idempotent side-effect failure | Place in a review queue and require reconciliation.              |
+| Worker crash or lease expiry       | Recover from checkpoint and increment attempt.                   |
+| Repeated failure                   | Move to dead-letter/manual-review state.                         |
+| Policy or authorization failure    | Stop and alert the owner/security channel.                       |
+
+Every attempt should emit structured events containing `job_id`, `attempt_id`, `workflow_id`, `task_name`, `worker_id`, error class, retry count, checkpoint, and trace ID. Never use only free-form log messages for operational decisions.
+
+Alert on symptoms and causes:
+
+- Job failure rate or repeated failures above threshold.
+- Dead-letter queue growth.
+- Lease-expiry and worker-crash rate.
+- Queue age and schedule lateness.
+- Checkpoint/freshness lag for long-running jobs.
+- Retry storms or exhausted retry budgets.
+- Error-budget burn for critical workflows.
+- A job stuck in `RUNNING`, `STOPPING`, or `PAUSED` beyond its SLA.
+
+Route alerts by ownership: page the on-call engineer for customer-impacting failures, notify the job owner for workflow errors, and create a ticket for non-urgent trends. Include a runbook link, recent attempt IDs, logs/traces, the last checkpoint, and a safe action such as retry, pause, or rollback.
+
+## Observability and auditability
+
+Keep an append-only job-event history separate from the current job projection. This supports debugging and answers questions such as who paused a job, which worker executed a side effect, and why a retry occurred.
+
+Track:
+
+- Queue depth, queue age, dispatch latency, and schedule skew.
+- Worker utilization, concurrency, lease renewals, and heartbeat latency.
+- Duration and success rate by job type and attempt number.
+- Pause, stop, cancel, resume, and forced-termination counts.
+- Checkpoint frequency, recovery time, duplicate-effect rate, and dead-letter volume.
+
+Use correlation IDs across scheduler, worker, database, queue, and downstream services. Control-plane actions should be authenticated, authorized, audited, and protected against accidental bulk operations.
+
+## Staff-level trade-offs to discuss
+
+- **Exactly-once vs. at-least-once:** Prefer at-least-once delivery plus idempotent handlers because distributed exactly-once execution is costly and often misleading across external systems.
+- **Hard kill vs. graceful stop:** Graceful stop protects consistency but delays recovery; hard kill improves recovery time but requires robust checkpointing and reconciliation.
+- **Frequent checkpoints vs. throughput:** More checkpoints reduce replay work but add storage and coordination overhead. Checkpoint at business-safe boundaries.
+- **Central scheduler vs. partitioned schedulers:** A central control plane simplifies operations; partitioning improves scale and fault isolation but complicates global ordering.
+- **Automatic retry vs. human review:** Retry transient failures automatically, but stop retry storms and route ambiguous side-effect failures to reconciliation.
+
+The strongest design makes job execution reversible where possible, observable at every state transition, and explicit about what “resume” means for each job type.

@@ -236,6 +236,10 @@
       "hash": "4985cbb2a4a23c97944195f33bd84dcddf792ee9a7d9a57a530ad5a0090cc0d6",
       "docRelative": "price-tracking-service.png"
     },
+    "system-designs/quota-management.png": {
+      "hash": "999cbd028d72b1110be38f987139e6f98f1881fbe44a43df3050bac255ce1ee8",
+      "docRelative": "quota-management.png"
+    },
     "system-designs/rate-limiter.png": {
       "hash": "cbc9857f856770f79e74b98e7b38ddc52eada83f69b2b8cc91f44340fd050530",
       "docRelative": "rate-limiter.png"
@@ -373,7 +377,7 @@
       "docRelative": "i18n-design.mdx"
     },
     "system-designs/job-scheduler.mdx": {
-      "hash": "c2c20a8c58d7145293135b4c31ab75b293ed4ba8386abaf22a7894fff9463a0c",
+      "hash": "71653f45f7d31516ced7e2c0b02ae8e8527a85e515ccc5b6776f2b7de9d4f006",
       "docRelative": "job-scheduler.mdx"
     },
     "system-designs/key-technologies/database.mdx": {
@@ -503,6 +507,10 @@
     "system-designs/price-tracking-service.mdx": {
       "hash": "17ce07043eca67547c0438d269b814db50105537db835d9759d61ff031c0d0ef",
       "docRelative": "price-tracking-service.mdx"
+    },
+    "system-designs/quota-management.mdx": {
+      "hash": "cc4c624e493e50233dce1eddb35aec06afc94acf14a588a3631d6ffb85510d26",
+      "docRelative": "quota-management.mdx"
     },
     "system-designs/rate-limit.mdx": {
       "hash": "a62a344d5c71f09dade78a20324ea1052d2ae53ae9670a39c5b9fe124a1c1355",
