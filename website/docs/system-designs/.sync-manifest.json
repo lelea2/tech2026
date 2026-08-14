@@ -97,7 +97,7 @@
       "docRelative": "distributed-cache.png"
     },
     "system-designs/dropbox.png": {
-      "hash": "7f05c54311c5622788ca9680b97f0ed747bbd0641c228f785a22565aba20a930",
+      "hash": "b1027920d7e416df4bb19f2c6744eeb1b07f1d32a2869fcf3d77439c218c0f17",
       "docRelative": "dropbox.png"
     },
     "system-designs/excalidraw/figma.png": {
@@ -211,6 +211,10 @@
     "system-designs/patterns/long-running-task.png": {
       "hash": "bd6de504af531b6d00c45cc24dcfab74a84dec5583505ed43426224077bca090",
       "docRelative": "patterns/long-running-task.png"
+    },
+    "system-designs/patterns/metrics-monitoring.png": {
+      "hash": "4d752a8fea5a603af68529b6b4fd2b035fad70a4d7f660d24ab75f5c63082bf7",
+      "docRelative": "patterns/metrics-monitoring.png"
     },
     "system-designs/patterns/realtime-updates.png": {
       "hash": "40ce64fb9c130132d4a978bb4ea6f7105d0c69e1b6a9d740148859b8f9258eaf",
