@@ -129,7 +129,7 @@
       "docRelative": "i18n.png"
     },
     "system-designs/job-scheduler.png": {
-      "hash": "459fdca03bc7ead4b576a15e1fbaefb0a3aec3490a828ff527636fc618dea467",
+      "hash": "9233017b5ea20cb07ce064d5ceaf500bdb96584b01c6baef2001207f326d8ed4",
       "docRelative": "job-scheduler.png"
     },
     "system-designs/key-technologies/promixity-search.png": {
@@ -501,7 +501,7 @@
       "docRelative": "patterns/scale-db-read-write.mdx"
     },
     "system-designs/payment-system.mdx": {
-      "hash": "e137fd2d0e9e8e54e0709923ff00644b8fbcd0d18cfa17ce556ae4517a605f8f",
+      "hash": "110bae956514dbedc40993f228ca9b88b68e8721920111e02d64f1625eedad61",
       "docRelative": "payment-system.mdx"
     },
     "system-designs/price-tracking-service.mdx": {

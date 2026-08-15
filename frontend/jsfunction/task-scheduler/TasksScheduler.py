@@ -56,3 +56,28 @@ class TaskScheduler:
 
             # Don't block scheduler
             asyncio.create_task(task_fn())
+
+
+# Test example:
+# async def test_scheduler():
+#     scheduler = TaskScheduler()
+#     executed_tasks = []
+#
+#     async def first_task():
+#         executed_tasks.append("first")
+#
+#     async def second_task():
+#         executed_tasks.append("second")
+#
+#     scheduler.schedule_task(0.02, second_task)
+#     scheduler.schedule_task(0.01, first_task)
+#
+#     scheduler_runner = asyncio.create_task(scheduler.run())
+#     await asyncio.sleep(0.03)
+#
+#     assert executed_tasks == ["first", "second"]
+#
+#     scheduler_runner.cancel()
+#
+#
+# asyncio.run(test_scheduler())
