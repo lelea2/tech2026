@@ -276,6 +276,10 @@
       "hash": "ff2a93835d9d3d490bc8e3992b26992db8029d423620143a728d601e52ed7e34",
       "docRelative": "token-api-scale.png"
     },
+    "system-designs/topk.png": {
+      "hash": "cc5ed934e778690f54dc61aecd50933f8f03f28aa1eb08aa78bea5d311517d29",
+      "docRelative": "topk.png"
+    },
     "system-designs/uber.png": {
       "hash": "cd7acb614cac5698d4f3a8abac986eb8def2a309ec6339dc104b2f46c2fe11a1",
       "docRelative": "uber.png"
@@ -457,7 +461,7 @@
       "docRelative": "news-aggregator.mdx"
     },
     "system-designs/notifications.mdx": {
-      "hash": "53a7958b8ff2757abc85a315bc2af22a6e28b592f22c52d4960c6b104337f783",
+      "hash": "245317961c69deb30423f01a15e6b7c582178d369eef7fb84b49ba2c700a8b8e",
       "docRelative": "notifications.mdx"
     },
     "system-designs/online-auction.mdx": {
@@ -543,6 +547,10 @@
     "system-designs/token-api-scale.mdx": {
       "hash": "7d6b308356839c9bca7abe2989b2db555f4fc420f978c0f78d8552c714ef0a7e",
       "docRelative": "token-api-scale.mdx"
+    },
+    "system-designs/topk.mdx": {
+      "hash": "e99e421bbdfb64e942991cd013f6ec072a23ee45e7b04435a883a36562e382e4",
+      "docRelative": "topk.mdx"
     },
     "system-designs/uber.mdx": {
       "hash": "f06103d7cefd942912141bbcda5c46bb76a7a45ebf4642cbf2432331f8d47c46",
