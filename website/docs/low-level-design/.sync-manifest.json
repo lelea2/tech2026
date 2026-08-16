@@ -4,6 +4,10 @@
       "hash": "f8af4c28ac7f7e6b4a1665f790c709fe7403200b5b8cf015416652cc7969ad19",
       "docRelative": "concurrency.png"
     },
+    "low-level-design/durable-key-value-store.png": {
+      "hash": "8b69595de54764bb0345c5f3e0cf8b7f5cec8e6be0eab03904c52f3c2daa47df",
+      "docRelative": "durable-key-value-store.png"
+    },
     "low-level-design/elevator.png": {
       "hash": "71e57c835e72881aa9391cdf136a5b4db1db520205e772fd24631b7699829872",
       "docRelative": "elevator.png"
@@ -15,6 +19,10 @@
     "low-level-design/design-patterns.mdx": {
       "hash": "4cb45ebcff32a6936c6b95adf4c7fff403c2da2132ffea05f0cfef617717005c",
       "docRelative": "design-patterns.mdx"
+    },
+    "low-level-design/durable-key-value-store.mdx": {
+      "hash": "7f8440ed1895053722568fad7bf2187dafbacbe56c0160c3bc474991003b6505",
+      "docRelative": "durable-key-value-store.mdx"
     },
     "low-level-design/elevator.mdx": {
       "hash": "39509561f3e31c51310fbfad8e2c971bd4c6a8ad191c95d34e05eb9044d2b347",
