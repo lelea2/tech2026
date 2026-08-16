@@ -256,6 +256,10 @@
       "hash": "b0ddcee377e7b82750f0819bbf74ba6ac34583a5d1b1c994dde48f377e3d6cca",
       "docRelative": "ride-hailing.png"
     },
+    "system-designs/robinhood.png": {
+      "hash": "a82bcefd95b6d47138983f58621a17131ff402fd7c060170d3b70e2d73d7603e",
+      "docRelative": "robinhood.png"
+    },
     "system-designs/teleoperation_management_system.svg": {
       "hash": "36445ae99ba91aa71c056771b832f39fbb32a87e4d04a72c1b3e9d6d90ca5ef4",
       "docRelative": "teleoperation_management_system.svg"
@@ -535,6 +539,10 @@
     "system-designs/ride_hailing.mdx": {
       "hash": "fd0c91c71e4db2ee07b437acef4df6dbf6a07656bb3adee3a21beb1496961331",
       "docRelative": "ride_hailing.mdx"
+    },
+    "system-designs/robinhood.mdx": {
+      "hash": "2aca2034a667fb647f65ff1afb9a0822ceed128a66c0a0141706e55c875411bc",
+      "docRelative": "robinhood.mdx"
     },
     "system-designs/teleoperations.mdx": {
       "hash": "b456b1322ab342a6fb28bbfae5f1524b6b0f96d100af6a37ae39685881e4f379",
