@@ -188,6 +188,10 @@
       "hash": "dbc251b15f94a785ed3f2e1c166f9e22d6b3200e069c6c37f274016b9b8b1bd0",
       "docRelative": "news-aggregator.png"
     },
+    "system-designs/notfications.png": {
+      "hash": "eae7604c4b3d28268b10e2ec68f37d9fcb9fcd94d5aa95dc1ddc9e4e749944e0",
+      "docRelative": "notfications.png"
+    },
     "system-designs/online-auction.png": {
       "hash": "9a199dce7165f179793e86359c059226f1f0c2ff7cd96ad78daece23880b6996",
       "docRelative": "online-auction.png"
@@ -451,6 +455,10 @@
     "system-designs/news-aggregator.mdx": {
       "hash": "515e3f1dc9be787119e71ad9d198b22745b761b7d265a5aa7aac9d2903d4a8de",
       "docRelative": "news-aggregator.mdx"
+    },
+    "system-designs/notifications.mdx": {
+      "hash": "f397f8dd005fce0fc95a6d807745d47533f9050f70991babecce0f7fec3894c7",
+      "docRelative": "notifications.mdx"
     },
     "system-designs/online-auction.mdx": {
       "hash": "a16210c4d6e1758aee2fd32a98a7d5fd2c65bc01f43ea842f03daf8cf4e84475",
