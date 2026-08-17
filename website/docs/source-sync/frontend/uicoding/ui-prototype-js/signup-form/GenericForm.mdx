@@ -5,40 +5,6 @@ title: GenericForm
 # GenericForm
 
 ~~~javascript
-/**
- * Interview question:
- * Design a reusable form system that can power many forms without duplicating
- * state management, validation, submit handling, and field rendering logic.
- *
- * What this example demonstrates:
- * - UserForm owns the business rules for this specific form.
- * - GenericForm should own reusable mechanics like values, errors, touched
- *   state, submit state, reset behavior, and calling validate/onSubmit.
- * - FormField should adapt common field types through props instead of making
- *   every form reimplement input, select, checkbox, radio, and file handling.
- *
- * Interview answer:
- * Split the problem into a generic form container and small field components.
- * The container controls data flow; the fields only describe how each value is
- * edited. This keeps new forms declarative and makes validation/submission
- * consistent across the product.
- */
-
-/**
- * ============================================================
- * FormField
- * ============================================================
- *
- * Supports:
- * - native input
- * - textarea
- * - select
- * - checkbox
- * - radio
- * - file
- * - custom component
- */
-
 export function FormField({
   name,
   label,

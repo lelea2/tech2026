@@ -32,7 +32,9 @@ export default function InfiniteScrollList() {
       }, 500);
     });
 
-    if (sentinelRef.current) observer.observe(sentinelRef.current);
+    if (sentinelRef.current) {
+      observer.observe(sentinelRef.current);
+    }
     return () => observer.disconnect();
   }, [loading, page]);
 

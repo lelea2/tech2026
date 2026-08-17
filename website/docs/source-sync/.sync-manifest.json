@@ -1245,7 +1245,7 @@
       "docRelative": "frontend/react-interview/InfiniteScrollList/InfiniteScrollList.css.mdx"
     },
     "frontend/react-interview/InfiniteScrollList/InfiniteScrollList.jsx": {
-      "hash": "9ccf92c85e8e6d9261dfe161058e9d2b3db5afe86b9a41713c4c8aa6e76c8d1d",
+      "hash": "5fa0a94eb7fda8cb1aab5a8e683407abf645bfcf6f454c1c64a77f304633ffd4",
       "docRelative": "frontend/react-interview/InfiniteScrollList/InfiniteScrollList.jsx.mdx"
     },
     "frontend/react-interview/MapListingSync/MapListingSync.css": {
@@ -1561,7 +1561,7 @@
       "docRelative": "frontend/uicoding/ui-prototype-js/mortgage-calculator/MortgageCalculator.mdx"
     },
     "frontend/uicoding/ui-prototype-js/nested-checkbox/NestedCheckbox.js": {
-      "hash": "74ec9f4574f9a40628689c66293ace66a90de1718ba742b51ea30c15df863072",
+      "hash": "ae87e53dc395d153694b71f0b089978d271f85eac4d9a889310c1b0a111f1ba7",
       "docRelative": "frontend/uicoding/ui-prototype-js/nested-checkbox/NestedCheckbox.mdx"
     },
     "frontend/uicoding/ui-prototype-js/nested-checkbox/NestedCheckbox.module.css": {
@@ -1609,12 +1609,16 @@
       "docRelative": "frontend/uicoding/ui-prototype-js/roll-dice/RollDice.mdx"
     },
     "frontend/uicoding/ui-prototype-js/signup-form/GenericForm.js": {
-      "hash": "6d632927cc9441a6e9c16f6fa87f2cb5b2e0c35f0120d4b449af29e80cc4e81a",
+      "hash": "c5a2f35f541f06bf6de81f61b28664cf0be92d73d81c808b439f668528cf09c0",
       "docRelative": "frontend/uicoding/ui-prototype-js/signup-form/GenericForm.mdx"
     },
     "frontend/uicoding/ui-prototype-js/signup-form/SignupForm.js": {
       "hash": "c4aa2ef8da6275e70163909b0973b6f7f14617d273aafd4eedc9a139f390057d",
       "docRelative": "frontend/uicoding/ui-prototype-js/signup-form/SignupForm.mdx"
+    },
+    "frontend/uicoding/ui-prototype-js/signup-form/SimpleGenericForm.js": {
+      "hash": "34f3d575ed10cb5bcae6848baf3b586f9c3b8c8f86dae0c49f820b5f7991e8bb",
+      "docRelative": "frontend/uicoding/ui-prototype-js/signup-form/SimpleGenericForm.mdx"
     },
     "frontend/uicoding/ui-prototype-js/snake-game/SnakeGame.js": {
       "hash": "4f315a21a612d89874ebc860577900439fef2ca9024431317a44d39f7277c2b3",
@@ -2601,7 +2605,7 @@
       "docRelative": "frontend/uicoding/ui-prototype-js/roll-dice/_index.mdx"
     },
     "__nav__:frontend/uicoding/ui-prototype-js/signup-form": {
-      "hash": "ee9b0aa273262452abdf8bcb4315b1cf61501559bc4179426427b6ca32f45e37",
+      "hash": "e4d5d9965d20aef7bd107541d7fcb41267972be4a79eef496584ebc3b16e4aba",
       "docRelative": "frontend/uicoding/ui-prototype-js/signup-form/_index.mdx"
     },
     "__nav__:frontend/uicoding/ui-prototype-js/snake-game": {

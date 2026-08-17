@@ -41,41 +41,7 @@ const fileData = [
   },
   { id: 11, name: "Toys" },
 ];
-
-/**
- * Interview Discussion:
- *
- * We have two requirements:
- *
- * 1. Downward propagation
- *    If a parent is checked/unchecked,
- *    all descendants should inherit that value.
- *
- * 2. Upward propagation
- *    When a child changes,
- *    all ancestors must recalculate their state:
- *
- *      all checked      => checked
- *      none checked     => unchecked
- *      partial checked  => indeterminate
- *
- * A recursive tree traversal is the cleanest solution.
- */
-
-/**
- * Recursively updates the current node and ALL descendants.
- *
- * Example:
- *
- * Electronics (checked)
- *   Mobile Phones
- *      iPhone
- *      Android
- *
- * Checking Electronics should check every node below it.
- *
- * Time Complexity: O(size of subtree)
- */
+// Time Complexity: O(N)
 function setDescendantsChecked(item, checked) {
   return {
     ...item,
@@ -85,17 +51,6 @@ function setDescendantsChecked(item, checked) {
     ),
   };
 }
-
-/**
- * Determines parent's state from DIRECT children.
- *
- * Rules:
- *
- * [true, true] => true
- * [false, false] => false
- * [true, false] => indeterminate
- * [true, indeterminate] => indeterminate
- */
 function getParentState(children) {
   const states = children.map((child) => child.checked ?? false);
 
@@ -107,66 +62,20 @@ function getParentState(children) {
 
   return "indeterminate";
 }
-
-/**
- * Main recursive update function.
- *
- * Traverses tree looking for target node.
- *
- * Once found:
- *  - update target
- *  - update all descendants
- *
- * While recursion unwinds:
- *  - recompute every ancestor state
- *
- * Example:
- *
- * User checks:
- *   iPhone
- *
- * Recursion bubbles upward:
- *
- * iPhone => checked
- * Mobile Phones => indeterminate
- * Electronics => indeterminate
- *
- * Time Complexity: O(N)
- * N = total nodes in tree
- */
 function updateTree(items, targetId, checked) {
   return items.map((item) => {
-    /**
-     * Found clicked node.
-     *
-     * Apply value to entire subtree.
-     */
     if (item.id === targetId) {
       return setDescendantsChecked(item, checked);
     }
 
-    /**
-     * Leaf node.
-     *
-     * Nothing to search below.
-     */
     if (!item.children) {
       return item;
     }
-
-    /**
-     * Continue DFS search.
-     */
     const updatedChildren = updateTree(
       item.children,
       targetId,
       checked
     );
-
-    /**
-     * After child updates complete,
-     * recompute current parent state.
-     */
     return {
       ...item,
       children: updatedChildren,
@@ -175,16 +84,6 @@ function updateTree(items, targetId, checked) {
   });
 }
 
-/**
- * Recursive component.
- *
- * Every node renders itself,
- * then recursively renders children.
- *
- * Interview Tip:
- * Nested data structures are almost always
- * a good use case for recursive components.
- */
 function CheckboxNode({ item, onChange }) {
   const checkboxRef = useRef(null);
 
@@ -192,16 +91,6 @@ function CheckboxNode({ item, onChange }) {
   const isIndeterminate =
     item.checked === "indeterminate";
 
-  /**
-   * Important Interview Point:
-   *
-   * HTML does NOT support:
-   *
-   * <input indeterminate />
-   *
-   * indeterminate is a DOM property,
-   * so we must set it imperatively.
-   */
   useEffect(() => {
     if (checkboxRef.current) {
       checkboxRef.current.indeterminate =
@@ -240,16 +129,6 @@ function CheckboxNode({ item, onChange }) {
 }
 
 export default function NestedCheckbox() {
-  /**
-   * Store entire tree in state.
-   *
-   * Alternative:
-   * normalize tree into a Map for
-   * O(1) node lookup on huge trees.
-   *
-   * For interview scale,
-   * recursive tree structure is simpler.
-   */
   const [items, setItems] = useState(fileData);
 
   const handleChange = (id, checked) => {
