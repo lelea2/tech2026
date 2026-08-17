@@ -164,9 +164,17 @@
       "hash": "177f823568ee4950eae55eac4852aeb7f2097fcf1cc80cc70aea028f954add92",
       "docRelative": "miscellaneous/spv.png"
     },
+    "system-designs/ml-designs/bot-detection.png": {
+      "hash": "fc86c0cb4d05cc1f149d55ec06e9ce62770dd9090fbf61b9c98802e37e604027",
+      "docRelative": "ml-designs/bot-detection.png"
+    },
     "system-designs/ml-designs/gpu-telemetry-metrics.png": {
       "hash": "1d449ab21a0ca876c32b7eb37d2cc67be48bfd7c652f9692055f8007b2d6a190",
       "docRelative": "ml-designs/gpu-telemetry-metrics.png"
+    },
+    "system-designs/ml-designs/harmful-content.png": {
+      "hash": "711d81d8bc1f3e193520f69892abb42e0bc9c788fd6e3741219c67174d733d01",
+      "docRelative": "ml-designs/harmful-content.png"
     },
     "system-designs/multimodal-file-ingestion.png": {
       "hash": "f09a4178656b7fcd39c80d3dbca33476d19a7a27b6b897b096dd41d5e173c8c9",
@@ -440,6 +448,10 @@
       "hash": "17a1572bdb3472ca955508d357323ca5ce99855ef6feb3cab82c954edd4cd558",
       "docRelative": "miscellaneous/spv-webhook.mdx"
     },
+    "system-designs/ml-designs/bot-detection.mdx": {
+      "hash": "db23d57e326dd90921e3b2872d63ce95b19287ae829118be0051d08ed7d84052",
+      "docRelative": "ml-designs/bot-detection.mdx"
+    },
     "system-designs/ml-designs/gpu-telemetry-metrics.mdx": {
       "hash": "e364ebfe7f7109dfc0f5c293e343e98c5de100eed2f1fb83a71f5612ab196bf5",
       "docRelative": "ml-designs/gpu-telemetry-metrics.mdx"
@@ -447,6 +459,10 @@
     "system-designs/ml-designs/gpu_training_observability.mdx": {
       "hash": "add3927f3ba9ce4e7072e983dbd38deac8e7ebd101c90d25ac61d58fd8828dfa",
       "docRelative": "ml-designs/gpu_training_observability.mdx"
+    },
+    "system-designs/ml-designs/harmful-content.mdx": {
+      "hash": "d505f75cccf80e4f71adfc131849b97204f4b4ca5454e340144eac55f048c7cf",
+      "docRelative": "ml-designs/harmful-content.mdx"
     },
     "system-designs/multimodal-file-ingestion-retrieval.mdx": {
       "hash": "eff03e929e4631eb3a26fc263ad8080e3660914b272256afee3a4b22dc944c34",
@@ -593,7 +609,7 @@
       "docRelative": "miscellaneous/_index.mdx"
     },
     "__nav__:ml-designs": {
-      "hash": "614f61c156adfaf1d47c065ecc92dfb7cc61d4887ac3e1a3ba1d61de61f44897",
+      "hash": "e00f1601940f3a7f2a92a4496e9735882de35100d2175483cccd483763deea00",
       "docRelative": "ml-designs/_index.mdx"
     },
     "__nav__:patterns": {
