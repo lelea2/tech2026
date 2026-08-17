@@ -120,10 +120,6 @@
       "hash": "e27d28337a0e2d251c2e9b3d5b662de74f969ab27d505fe8177b6d810702f94b",
       "docRelative": "github-actions-system-architecture.svg"
     },
-    "system-designs/google-calendar.png": {
-      "hash": "418ff47387e7a6f3b32595b65eabbaacc9e67f99b7bebea0ae302e9841b7ef1a",
-      "docRelative": "google-calendar.png"
-    },
     "system-designs/i18n.png": {
       "hash": "fd6d2e9fd5a69d3c6947665db4ad8c5ba879e38af192f7896612c2b95d8c2583",
       "docRelative": "i18n.png"
