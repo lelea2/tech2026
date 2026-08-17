@@ -620,6 +620,10 @@
       "hash": "1c2ab6259f8bf70a097ecf8a3c30ca62bc7c50db15aa750e3377d3821a2104c0",
       "docRelative": "frontend/jsfunction/hooks/useQuery.mdx"
     },
+    "frontend/jsfunction/hooks/useRetryFetch.js": {
+      "hash": "0922d4e36a953a44ad6e41399879e726505bf888c17ab42c3ce0740b6c20c4d3",
+      "docRelative": "frontend/jsfunction/hooks/useRetryFetch.mdx"
+    },
     "frontend/jsfunction/hooks/useSearchQuery.js": {
       "hash": "288a25d947b61ba04ff0c7281f4ebbd55894b0ed11318df655b82294a048a846",
       "docRelative": "frontend/jsfunction/hooks/useSearchQuery.mdx"
@@ -2321,7 +2325,7 @@
       "docRelative": "frontend/jsfunction/getElementBy/_index.mdx"
     },
     "__nav__:frontend/jsfunction/hooks": {
-      "hash": "c9358b25ac84bea38ae3fd8685cfc3e4b5f405b852d156d846efcf9ed1586713",
+      "hash": "beaf8fbfd43a126d1331c8ac8f2b5ad16e33101fa3350ba6421e63e56b953320",
       "docRelative": "frontend/jsfunction/hooks/_index.mdx"
     },
     "__nav__:frontend/jsfunction/htmlModifier": {

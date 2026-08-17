@@ -1,0 +1,48 @@
+import { useCallback, useState } from "react";
+
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+export function useRetryFetch<T>(
+  fetchFn: () => Promise<T>,
+  maxRetries = 3,
+  delay = 1000
+) {
+  const [data, setData] = useState<T | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const run = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    const fetchWithRetry = async (attempt = 0): Promise<T> => {
+      try {
+        return await fetchFn();
+      } catch (err) {
+        if (attempt >= maxRetries) throw err;
+
+        await sleep(delay);
+
+        return fetchWithRetry(attempt + 1);
+      }
+    };
+
+    try {
+      const result = await fetchWithRetry();
+
+      setData(result);
+      return result;
+    } catch (err) {
+      const error =
+        err instanceof Error ? err : new Error("Request failed");
+
+      setError(error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchFn, maxRetries, delay]);
+
+  return { data, error, loading, run };
+}
