@@ -1908,6 +1908,10 @@
       "hash": "fa1523d9fb3d29e4f51a0eff6e25cc1729a02ac43431b14158c016272910b64c",
       "docRelative": "algorithm/dfs/countIslandOnGrid.mdx"
     },
+    "algorithm/dfs/floodFill.js": {
+      "hash": "a3b03bd912e559d291b1167a6f2fbfcd50cc989c99fec2e30999f55c0b0bc223",
+      "docRelative": "algorithm/dfs/floodFill.mdx"
+    },
     "algorithm/dfs/maximizeAmountAfterTwoDays.js": {
       "hash": "599797a7cd4282da4f3834fc26dcc1177fc393734d59608b933b31b471c9a170",
       "docRelative": "algorithm/dfs/maximizeAmountAfterTwoDays.mdx"
@@ -2213,7 +2217,7 @@
       "docRelative": "algorithm/bit/_index.mdx"
     },
     "__nav__:algorithm/dfs": {
-      "hash": "ebc5b979bb2c6c4534fc62c43675507efa6ae7ded2b7fdf8e280cc1436b38e9a",
+      "hash": "d4943dc1460f6402d497395befe447931dc9f0fabdacdf42f639b104133e6952",
       "docRelative": "algorithm/dfs/_index.mdx"
     },
     "__nav__:algorithm/graph": {
