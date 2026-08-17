@@ -1,0 +1,37 @@
+import { useEffect, useRef } from "react";
+
+// If useState here, that means we double fire since callback being re-rendered
+// Use useRef instead to make sure callback is not double-fire
+export function useInterval(
+  callback: () => void,
+  delay: number | null
+) {
+  const callbackRef = useRef(callback);
+
+  // Keep the latest callback without recreating the interval.
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+
+  useEffect(() => {
+    if (delay === null) return;
+
+    const id = window.setInterval(() => {
+      callbackRef.current();
+    }, delay);
+
+    // prevent leakage
+    return () => window.clearInterval(id);
+  }, [delay]);
+}
+
+// Example
+// function Counter() {
+//   const [count, setCount] = useState(0);
+
+//   useInterval(() => {
+//     setCount(c => c + 1);
+//   }, 1000);
+
+//   return <div>{count}</div>;
+// }

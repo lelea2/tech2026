@@ -628,6 +628,10 @@
       "hash": "b5f2f5fa872beb6013024b4895b9a13cda7e2a5da8b40b8bee279952594253ef",
       "docRelative": "frontend/jsfunction/hooks/useSet.mdx"
     },
+    "frontend/jsfunction/hooks/useSetInterval.js": {
+      "hash": "906e9a91d5a72c79475e2ab5854e2eb8fb6d6c405e925aade504984963270dce",
+      "docRelative": "frontend/jsfunction/hooks/useSetInterval.mdx"
+    },
     "frontend/jsfunction/hooks/useStateWithReset.js": {
       "hash": "b9fdd555006381a364d1461d9e0e23fe2fd0aa0a9d2950b5808e83830b6f65c3",
       "docRelative": "frontend/jsfunction/hooks/useStateWithReset.mdx"
@@ -2317,7 +2321,7 @@
       "docRelative": "frontend/jsfunction/getElementBy/_index.mdx"
     },
     "__nav__:frontend/jsfunction/hooks": {
-      "hash": "9a046e3b5519e3d146b4c16c2b0d99ada6385b561a3ce1930f825d7155430879",
+      "hash": "c9358b25ac84bea38ae3fd8685cfc3e4b5f405b852d156d846efcf9ed1586713",
       "docRelative": "frontend/jsfunction/hooks/_index.mdx"
     },
     "__nav__:frontend/jsfunction/htmlModifier": {
