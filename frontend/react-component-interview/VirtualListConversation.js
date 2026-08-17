@@ -1,0 +1,168 @@
+import React, { useMemo, useRef, useState, useCallback } from "react";
+
+export default function VirtualizedConversationList({
+  items,
+  height = 600,
+  rowHeight = 72,
+  overscan = 5,
+  selectedId,
+  onSelect,
+}) {
+  const containerRef = useRef(null);
+  const [scrollTop, setScrollTop] = useState(0);
+
+  const totalHeight = items.length * rowHeight;
+
+  const visibleRange = useMemo(() => {
+    const startIndex = Math.max(
+      0,
+      Math.floor(scrollTop / rowHeight) - overscan
+    );
+
+    const visibleCount = Math.ceil(height / rowHeight);
+
+    const endIndex = Math.min(
+      items.length - 1,
+      startIndex + visibleCount + overscan * 2
+    );
+
+    return { startIndex, endIndex };
+  }, [scrollTop, rowHeight, height, overscan, items.length]);
+
+  const visibleItems = useMemo(() => {
+    return items.slice(visibleRange.startIndex, visibleRange.endIndex + 1);
+  }, [items, visibleRange]);
+
+  const handleScroll = useCallback((event) => {
+    setScrollTop(event.currentTarget.scrollTop);
+  }, []);
+
+  if (items.length === 0) {
+    return (
+      <div
+        style={{
+          height,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#64748b",
+          border: "1px solid #e2e8f0",
+          borderRadius: 8,
+        }}
+      >
+        No conversations yet
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      onScroll={handleScroll}
+      role="listbox"
+      aria-label="Conversation list"
+      style={{
+        height,
+        overflowY: "auto",
+        border: "1px solid #e2e8f0",
+        borderRadius: 8,
+        position: "relative",
+        background: "white",
+      }}
+    >
+      <div
+        style={{
+          height: totalHeight,
+          position: "relative",
+        }}
+      >
+        {visibleItems.map((item, visibleIndex) => {
+          const actualIndex = visibleRange.startIndex + visibleIndex;
+          const top = actualIndex * rowHeight;
+          const isSelected = item.id === selectedId;
+
+          return (
+            <ConversationRow
+              key={item.id}
+              item={item}
+              top={top}
+              height={rowHeight}
+              selected={isSelected}
+              onSelect={onSelect}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ConversationRow({ item, top, height, selected, onSelect }) {
+  return (
+    <button
+      role="option"
+      aria-selected={selected}
+      onClick={() => onSelect(item)}
+      style={{
+        position: "absolute",
+        top,
+        left: 0,
+        right: 0,
+        height,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "stretch",
+        justifyContent: "center",
+        padding: "8px 12px",
+        border: "none",
+        borderBottom: "1px solid #f1f5f9",
+        background: selected ? "#e0f2fe" : "white",
+        cursor: "pointer",
+        textAlign: "left",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 8,
+          marginBottom: 4,
+        }}
+      >
+        <strong
+          style={{
+            fontSize: 14,
+            color: "#0f172a",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {item.title}
+        </strong>
+
+        <span
+          style={{
+            fontSize: 12,
+            color: "#64748b",
+            flexShrink: 0,
+          }}
+        >
+          {item.updatedAt}
+        </span>
+      </div>
+
+      <div
+        style={{
+          fontSize: 13,
+          color: "#475569",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {item.lastMessage}
+      </div>
+    </button>
+  );
+}

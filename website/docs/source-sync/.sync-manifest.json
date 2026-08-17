@@ -1136,6 +1136,10 @@
       "hash": "9b0f73554476e26ddca8ef161402c7bd44ab5583a4c2d4cfc60fff050b0cab8e",
       "docRelative": "frontend/react-component-interview/VirtualList.mdx"
     },
+    "frontend/react-component-interview/VirtualListConversation.js": {
+      "hash": "ebbd6921db5b48dda073468c6eb05900f52eb5981dd0fd8010562a16726a369c",
+      "docRelative": "frontend/react-component-interview/VirtualListConversation.mdx"
+    },
     "frontend/react-component-interview/hooks/useAsync.js": {
       "hash": "e8820613f4a99f109d7126f57b56b85ff7af1c5fd1e93adff723840f10bf8336",
       "docRelative": "frontend/react-component-interview/hooks/useAsync.mdx"
@@ -2377,7 +2381,7 @@
       "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
     },
     "__nav__:frontend/react-component-interview": {
-      "hash": "3dc8d20edcceb3ec3277b3a5018d5dbc87a96a7273481776633ea9222b3d2270",
+      "hash": "d6aae3f2ad40318b290031da83cf6270bdcd027edd10df3bf681c7f5fe5aa5a0",
       "docRelative": "frontend/react-component-interview/_index.mdx"
     },
     "__nav__:frontend/react-component-interview/hooks": {
