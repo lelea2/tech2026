@@ -2012,6 +2012,14 @@
       "hash": "534a99755859d20db8c3271cf0d1b069408de8d64123186325accbc59419480e",
       "docRelative": "algorithm/stack/isBalanceBracket.mdx"
     },
+    "algorithm/stack/isValidParenthesis.js": {
+      "hash": "dc6a029e27587e367c5815a4245e9f78f68d03ed342a3cea3cc8c157ebe0d9e1",
+      "docRelative": "algorithm/stack/isValidParenthesis.mdx"
+    },
+    "algorithm/stack/longestParenthesis.js": {
+      "hash": "703c845bd791ec9b42aaef6de16deae79c46e03f70285422763d329f8029d420",
+      "docRelative": "algorithm/stack/longestParenthesis.mdx"
+    },
     "algorithm/tree/BinaryTree.js": {
       "hash": "40d5127a13aa754b0f5a904f73bd240376b72661a37606b5ec65091ba3fcff3f",
       "docRelative": "algorithm/tree/BinaryTree.mdx"
@@ -2221,7 +2229,7 @@
       "docRelative": "algorithm/recursive/_index.mdx"
     },
     "__nav__:algorithm/stack": {
-      "hash": "e3caa644ca5cb3eb73573701d079af50f69800dc4cae55ab426968ad1ed37de2",
+      "hash": "e062408cc2a3c827348fabafb42b0bae34a676c3f61b9b02b75174e8dc86831d",
       "docRelative": "algorithm/stack/_index.mdx"
     },
     "__nav__:algorithm/tree": {
