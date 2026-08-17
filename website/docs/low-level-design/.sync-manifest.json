@@ -1,5 +1,9 @@
 {
   "files": {
+    "low-level-design/chess-board.png": {
+      "hash": "ccf497a69d6c411ed81a1eed5ba5df86b5d9d5944eb706ea3e198fb0dead9b9c",
+      "docRelative": "chess-board.png"
+    },
     "low-level-design/concurrency.png": {
       "hash": "f8af4c28ac7f7e6b4a1665f790c709fe7403200b5b8cf015416652cc7969ad19",
       "docRelative": "concurrency.png"
@@ -11,6 +15,10 @@
     "low-level-design/elevator.png": {
       "hash": "71e57c835e72881aa9391cdf136a5b4db1db520205e772fd24631b7699829872",
       "docRelative": "elevator.png"
+    },
+    "low-level-design/chess-board.mdx": {
+      "hash": "3f4f8e0d827cfe790590830c3b139aed4de9739e0faf9c88b15586a70414e8f0",
+      "docRelative": "chess-board.mdx"
     },
     "low-level-design/concurrency.mdx": {
       "hash": "c6aeb9a02c851f13c9ecac42c53f171ff0fe5039f4614f0f17b156cb1c4facc6",
