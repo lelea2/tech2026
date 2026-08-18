@@ -80,6 +80,10 @@
       "hash": "7b5aa30ebd7422aa3b2e9af01d6c8038a0ce6e15d2aee0470426e87297977c77",
       "docRelative": "strength-vs-weakness.mdx"
     },
+    "behavorial/tlm.mdx": {
+      "hash": "1ed4f506a5259a08b96430f3aa86a4468a060d84b2bf455ae9d66c4511ab96b0",
+      "docRelative": "tlm.mdx"
+    },
     "behavorial/tradeoff-behavioral.mdx": {
       "hash": "b3de7641108f76b6fd9323ad043aa30cf09a715e134bc02b6427876e98534cb2",
       "docRelative": "tradeoff-behavioral.mdx"
