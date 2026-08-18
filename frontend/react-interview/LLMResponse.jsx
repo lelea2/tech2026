@@ -1,0 +1,357 @@
+/**
+ * LLM / Agent
+    |
+    | SSE
+    |
+    +---- text_delta ------> buffer in ref
+    |                           |
+    |                           v
+    |                 requestAnimationFrame
+    |                           |
+    |                           v
+    |                     React setState
+    |
+    +---- image_progress --> progress UI
+    |
+    +---- image_complete --> CDN URL --> <img>
+    |
+    +---- component ------> validate schema
+                                |
+                                v
+                        component registry
+                                |
+                                v
+                          trusted React UI
+ */
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+type StreamEvent =
+  | { type: "text_delta"; requestId: string; delta: string }
+  | { type: "image_progress"; requestId: string; progress: number }
+  | { type: "image_complete"; requestId: string; url: string }
+  | {
+      type: "component";
+      requestId: string;
+      component: "weather_card" | "stock_card";
+      props: Record<string, unknown>;
+    }
+  | { type: "done"; requestId: string }
+  | { type: "error"; requestId: string; message: string };
+
+type Message =
+  | {
+      id: string;
+      kind: "text";
+      text: string;
+      streaming: boolean;
+    }
+  | {
+      id: string;
+      kind: "image";
+      url?: string;
+      progress?: number;
+    }
+  | {
+      id: string;
+      kind: "component";
+      component: string;
+      props: Record<string, unknown>;
+    };
+
+/**
+ * Buffers high-frequency text deltas and flushes
+ * at most once per animation frame.
+ */
+function useRafBuffer(
+  onFlush: (chunk: string) => void,
+) {
+  const bufferRef = useRef("");
+  const rafRef = useRef<number | null>(null);
+  const callbackRef = useRef(onFlush);
+
+  callbackRef.current = onFlush;
+
+  const flush = useCallback(() => {
+    rafRef.current = null;
+
+    const chunk = bufferRef.current;
+    bufferRef.current = "";
+
+    if (chunk) {
+      callbackRef.current(chunk);
+    }
+  }, []);
+
+  const push = useCallback(
+    (delta: string) => {
+      bufferRef.current += delta;
+
+      if (rafRef.current === null) {
+        rafRef.current = requestAnimationFrame(flush);
+      }
+    },
+    [flush],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, []);
+
+  return { push, flush };
+}
+
+export default function AIResponse() {
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  const textMessageIdRef = useRef<string | null>(null);
+
+  const { push: pushText, flush: flushText } =
+    useRafBuffer((chunk) => {
+      const id = textMessageIdRef.current;
+
+      if (!id) return;
+
+      setMessages((current) =>
+        current.map((message) =>
+          message.id === id && message.kind === "text"
+            ? {
+                ...message,
+                text: message.text + chunk,
+              }
+            : message,
+        ),
+      );
+    });
+
+  useEffect(() => {
+    const source = new EventSource("/api/ai/stream");
+
+    source.addEventListener("text_delta", (event) => {
+      const data = JSON.parse(event.data) as Extract<
+        StreamEvent,
+        { type: "text_delta" }
+      >;
+
+      const id = `text-${data.requestId}`;
+
+      if (!textMessageIdRef.current) {
+        textMessageIdRef.current = id;
+
+        setMessages((current) => [
+          ...current,
+          {
+            id,
+            kind: "text",
+            text: "",
+            streaming: true,
+          },
+        ]);
+      }
+
+      pushText(data.delta);
+    });
+
+    source.addEventListener("image_progress", (event) => {
+      const data = JSON.parse(event.data);
+
+      const id = `image-${data.requestId}`;
+
+      setMessages((current) => {
+        const exists = current.some(
+          (message) => message.id === id,
+        );
+
+        if (!exists) {
+          return [
+            ...current,
+            {
+              id,
+              kind: "image",
+              progress: data.progress,
+            },
+          ];
+        }
+
+        return current.map((message) =>
+          message.id === id && message.kind === "image"
+            ? {
+                ...message,
+                progress: data.progress,
+              }
+            : message,
+        );
+      });
+    });
+
+    source.addEventListener("image_complete", (event) => {
+      const data = JSON.parse(event.data);
+
+      const id = `image-${data.requestId}`;
+
+      setMessages((current) => {
+        const exists = current.some(
+          (message) => message.id === id,
+        );
+
+        if (!exists) {
+          return [
+            ...current,
+            {
+              id,
+              kind: "image",
+              url: data.url,
+              progress: 1,
+            },
+          ];
+        }
+
+        return current.map((message) =>
+          message.id === id && message.kind === "image"
+            ? {
+                ...message,
+                url: data.url,
+                progress: 1,
+              }
+            : message,
+        );
+      });
+    });
+
+    source.addEventListener("component", (event) => {
+      const data = JSON.parse(event.data);
+
+      setMessages((current) => [
+        ...current,
+        {
+          id: `component-${data.requestId}`,
+          kind: "component",
+          component: data.component,
+          props: data.props,
+        },
+      ]);
+    });
+
+    source.addEventListener("done", () => {
+      flushText();
+
+      const id = textMessageIdRef.current;
+
+      if (id) {
+        setMessages((current) =>
+          current.map((message) =>
+            message.id === id && message.kind === "text"
+              ? {
+                  ...message,
+                  streaming: false,
+                }
+              : message,
+          ),
+        );
+      }
+
+      source.close();
+    });
+
+    source.onerror = () => {
+      console.error("SSE connection failed");
+    };
+
+    return () => {
+      source.close();
+    };
+  }, [pushText, flushText]);
+
+  return (
+    <div>
+      {messages.map((message) => (
+        <MessageRenderer
+          key={message.id}
+          message={message}
+        />
+      ))}
+    </div>
+  );
+}
+
+function MessageRenderer({
+  message,
+}: {
+  message: Message;
+}) {
+  switch (message.kind) {
+    case "text":
+      return (
+        <p>
+          {message.text}
+          {message.streaming && <span>▍</span>}
+        </p>
+      );
+
+    case "image":
+      return message.url ? (
+        <img
+          src={message.url}
+          alt=""
+          loading="lazy"
+        />
+      ) : (
+        <div>
+          Generating image...
+          {Math.round((message.progress ?? 0) * 100)}%
+        </div>
+      );
+
+    case "component":
+      return (
+        <DynamicComponent
+          type={message.component}
+          props={message.props}
+        />
+      );
+  }
+}
+
+/**
+ * Never render arbitrary JSX/code from an LLM.
+ * Map a validated component name to trusted React code.
+ */
+const componentRegistry = {
+  weather_card: WeatherCard,
+  stock_card: StockCard,
+} satisfies Record<string, React.ComponentType<any>>;
+
+function DynamicComponent({
+  type,
+  props,
+}: {
+  type: string;
+  props: Record<string, unknown>;
+}) {
+  const Component =
+    componentRegistry[
+      type as keyof typeof componentRegistry
+    ];
+
+  if (!Component) {
+    return <div>Unsupported component</div>;
+  }
+
+  return <Component {...props} />;
+}
+
+function WeatherCard(props: any) {
+  return <div>Weather: {JSON.stringify(props)}</div>;
+}
+
+function StockCard(props: any) {
+  return <div>Stock: {JSON.stringify(props)}</div>;
+}

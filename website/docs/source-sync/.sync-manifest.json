@@ -620,6 +620,10 @@
       "hash": "1c2ab6259f8bf70a097ecf8a3c30ca62bc7c50db15aa750e3377d3821a2104c0",
       "docRelative": "frontend/jsfunction/hooks/useQuery.mdx"
     },
+    "frontend/jsfunction/hooks/useRAFTextBuffer.js": {
+      "hash": "60c28ccc1db641d89d08959a393324361ea0d570e8d4ad5a1e40aa93316acffa",
+      "docRelative": "frontend/jsfunction/hooks/useRAFTextBuffer.mdx"
+    },
     "frontend/jsfunction/hooks/useRetryFetch.js": {
       "hash": "0922d4e36a953a44ad6e41399879e726505bf888c17ab42c3ce0740b6c20c4d3",
       "docRelative": "frontend/jsfunction/hooks/useRetryFetch.mdx"
@@ -1124,6 +1128,10 @@
       "hash": "f0a8619c2f217f15f3d8bea91ffb17cb2a05e357320224ac36dc511c99e47978",
       "docRelative": "frontend/react-component-interview/SimpleChatReducer.mdx"
     },
+    "frontend/react-component-interview/StockView.jsx": {
+      "hash": "1f2452f97ec8d2a1f62d342e2554d40d1692f0e2438bde3aa7c1bab62e2d0372",
+      "docRelative": "frontend/react-component-interview/StockView.mdx"
+    },
     "frontend/react-component-interview/TransferList.jsx": {
       "hash": "85a1b569d468c6aebd1abf325c93c1e8d1ac0ed7db046963909617096fe21162",
       "docRelative": "frontend/react-component-interview/TransferList.mdx"
@@ -1247,6 +1255,10 @@
     "frontend/react-interview/InfiniteScrollList/InfiniteScrollList.jsx": {
       "hash": "5fa0a94eb7fda8cb1aab5a8e683407abf645bfcf6f454c1c64a77f304633ffd4",
       "docRelative": "frontend/react-interview/InfiniteScrollList/InfiniteScrollList.jsx.mdx"
+    },
+    "frontend/react-interview/LLMResponse.jsx": {
+      "hash": "e70b47837878a9153adf7450ebd92de040c17db8d719933c9c9ff6b82ef5ecbe",
+      "docRelative": "frontend/react-interview/LLMResponse.mdx"
     },
     "frontend/react-interview/MapListingSync/MapListingSync.css": {
       "hash": "1b24b474228408a3ddfe1b224c64fa1d87283151ff5da54621fff8a210f41288",
@@ -2337,7 +2349,7 @@
       "docRelative": "frontend/jsfunction/getElementBy/_index.mdx"
     },
     "__nav__:frontend/jsfunction/hooks": {
-      "hash": "beaf8fbfd43a126d1331c8ac8f2b5ad16e33101fa3350ba6421e63e56b953320",
+      "hash": "3f71c52aaa7d45e624d13ae4d8f42a0c9ee85d68fbcff6381d74ebf2bdee11a7",
       "docRelative": "frontend/jsfunction/hooks/_index.mdx"
     },
     "__nav__:frontend/jsfunction/htmlModifier": {
@@ -2409,7 +2421,7 @@
       "docRelative": "frontend/jsfunction/undoRedoManager/_index.mdx"
     },
     "__nav__:frontend/react-component-interview": {
-      "hash": "d6aae3f2ad40318b290031da83cf6270bdcd027edd10df3bf681c7f5fe5aa5a0",
+      "hash": "edbd3ff8d9dca43c5649ddd971d5769bd924ae619df5b39dfe1ec10a371fd49b",
       "docRelative": "frontend/react-component-interview/_index.mdx"
     },
     "__nav__:frontend/react-component-interview/hooks": {
@@ -2417,7 +2429,7 @@
       "docRelative": "frontend/react-component-interview/hooks/_index.mdx"
     },
     "__nav__:frontend/react-interview": {
-      "hash": "c6f448779a84a81eeeec4aaf65432cf5c9b0787e2d464daf59de44a3f0567614",
+      "hash": "67f52687fe3c673eabf2d35190446f8b4bbf7f08c16490e55bbec96823c222d7",
       "docRelative": "frontend/react-interview/_index.mdx"
     },
     "__nav__:frontend/react-interview/Accordion": {

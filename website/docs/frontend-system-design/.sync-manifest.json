@@ -100,6 +100,10 @@
       "hash": "9157ca3c0e5159528a83f6f83e63b2a92580856db28efa80241f81336bf95647",
       "docRelative": "XSS-vs-CORS.mdx"
     },
+    "frontend-system-design/asset-optimize-stencil.mdx": {
+      "hash": "7fa80d548bf89c81855b98a1851c72a68017f2c79a9514567d00a31ebc82d08f",
+      "docRelative": "asset-optimize-stencil.mdx"
+    },
     "frontend-system-design/autocomplete.mdx": {
       "hash": "886fedf4755486b440d1d56cead08a807cb7bd0160905feb919b28095b3ef0e4",
       "docRelative": "autocomplete.mdx"
