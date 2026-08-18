@@ -48,6 +48,10 @@
       "hash": "5f7d52ded9e724121f726355a02a21194b7607ffead8fd7fa186ee1ee18a9254",
       "docRelative": "google-docs.png"
     },
+    "frontend-system-design/llm-text-vs-image.png": {
+      "hash": "0693039bf87cc611ce24eb26b151b6e47802cd325ca3a327c466dc2fa17aa377",
+      "docRelative": "llm-text-vs-image.png"
+    },
     "frontend-system-design/newsfeed.png": {
       "hash": "7c32bed9378a970683aa76380ad349cac4434cec781db46acf6504823a8b8857",
       "docRelative": "newsfeed.png"
@@ -147,6 +151,10 @@
     "frontend-system-design/large-scale-node-link-visualization-design.mdx": {
       "hash": "9613e930bb9621373a1cfaacce2f54d29c559fbdef7840f5111ecb6ef57fe933",
       "docRelative": "large-scale-node-link-visualization-design.mdx"
+    },
+    "frontend-system-design/llm-text-vs-image.mdx": {
+      "hash": "02c2efe7f5015769b324c9956c05344711e232ab8d2ec2eacffb9428ab054025",
+      "docRelative": "llm-text-vs-image.mdx"
     },
     "frontend-system-design/masonry-layout-system-design.mdx": {
       "hash": "f1db19746175d3345d853c6e53b08d80b6b9aeec1938d418e2250827878ff87f",
