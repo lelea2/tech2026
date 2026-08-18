@@ -1,0 +1,934 @@
+---
+title: JavaScript Fundamentals
+description: Closures, Event Loop, Promise Chaining, Scope & Hoisting, Pure Functions, Immutability, and Functional Patterns
+---
+
+# JavaScript Fundamentals — Interview Notes
+
+Use this as a fast interview review sheet.
+
+---
+
+# 1. Closures
+
+## Definition
+
+A **closure** happens when a function remembers variables from the scope where it was created, even after that outer function has finished executing.
+
+```js
+function createCounter() {
+  let count = 0;
+
+  return function increment() {
+    count++;
+    return count;
+  };
+}
+
+const counter = createCounter();
+
+console.log(counter()); // 1
+console.log(counter()); // 2
+console.log(counter()); // 3
+```
+
+`increment()` keeps access to `count`.
+
+## Common use cases
+
+### Private state
+
+```js
+function createBankAccount(initialBalance) {
+  let balance = initialBalance;
+
+  return {
+    deposit(amount) {
+      balance += amount;
+    },
+
+    getBalance() {
+      return balance;
+    },
+  };
+}
+
+const account = createBankAccount(100);
+
+account.deposit(50);
+
+console.log(account.getBalance()); // 150
+```
+
+## Classic closure interview bug
+
+```js
+for (var i = 0; i < 3; i++) {
+  setTimeout(() => {
+    console.log(i);
+  }, 100);
+}
+```
+
+Output:
+
+```text
+3
+3
+3
+```
+
+Fix:
+
+```js
+for (let i = 0; i < 3; i++) {
+  setTimeout(() => {
+    console.log(i);
+  }, 100);
+}
+```
+
+Output:
+
+```text
+0
+1
+2
+```
+
+## Interview answer
+
+> A closure is a function bundled with references to its lexical environment. It allows the function to access variables from its creation scope even when executed somewhere else later.
+
+---
+
+# 2. JavaScript Event Loop
+
+JavaScript executes synchronous code on a single call stack.
+
+```text
+Call Stack
+    |
+    v
+Browser / Node APIs
+    |
+    +----------------+
+    |                |
+    v                v
+Microtask Queue   Task Queue
+Promise           setTimeout
+queueMicrotask    events
+MutationObserver  setInterval
+    |                |
+    +-------+--------+
+            |
+            v
+        Event Loop
+```
+
+Important ordering:
+
+```text
+1. Run synchronous code
+2. Drain ALL microtasks
+3. Run next task/macrotask
+4. Drain microtasks again
+5. Repeat
+```
+
+## Interview example
+
+```js
+console.log('A');
+
+setTimeout(() => {
+  console.log('B');
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log('C');
+});
+
+console.log('D');
+```
+
+Output:
+
+```text
+A
+D
+C
+B
+```
+
+## More difficult example
+
+```js
+console.log(1);
+
+setTimeout(() => {
+  console.log(2);
+}, 0);
+
+Promise.resolve()
+  .then(() => {
+    console.log(3);
+  })
+  .then(() => {
+    console.log(4);
+  });
+
+console.log(5);
+```
+
+Output:
+
+```text
+1
+5
+3
+4
+2
+```
+
+---
+
+# 3. Promise Chaining
+
+A `.then()` returns a **new Promise**.
+
+```js
+fetchUser()
+  .then((user) => {
+    return fetchOrders(user.id);
+  })
+  .then((orders) => {
+    return calculateTotal(orders);
+  })
+  .then((total) => {
+    console.log(total);
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+```
+
+## Returning a regular value
+
+```js
+Promise.resolve(10)
+  .then((value) => {
+    return value * 2;
+  })
+  .then((value) => {
+    console.log(value);
+  });
+```
+
+Output:
+
+```text
+20
+```
+
+## Returning another Promise
+
+```js
+Promise.resolve(10)
+  .then((value) => {
+    return Promise.resolve(value * 2);
+  })
+  .then((value) => {
+    console.log(value);
+  });
+```
+
+## Common interview mistake
+
+Bad:
+
+```js
+fetchUser()
+  .then((user) => {
+    fetchOrders(user.id);
+  })
+  .then((orders) => {
+    console.log(orders);
+  });
+```
+
+Correct:
+
+```js
+fetchUser()
+  .then((user) => {
+    return fetchOrders(user.id);
+  })
+  .then((orders) => {
+    console.log(orders);
+  });
+```
+
+Or:
+
+```js
+fetchUser()
+  .then((user) => fetchOrders(user.id))
+  .then((orders) => console.log(orders));
+```
+
+## Error propagation
+
+```js
+doStep1()
+  .then(doStep2)
+  .then(doStep3)
+  .catch((error) => {
+    console.error(error);
+  });
+```
+
+---
+
+# 4. Scope and Hoisting
+
+JavaScript uses **lexical scope**.
+
+## Global scope
+
+```js
+const appName = 'ChatApp';
+```
+
+## Function scope
+
+```js
+function test() {
+  var x = 10;
+}
+
+console.log(x); // ReferenceError
+```
+
+## Block scope
+
+```js
+if (true) {
+  let x = 10;
+  const y = 20;
+}
+
+console.log(x); // ReferenceError
+console.log(y); // ReferenceError
+```
+
+## Hoisting with `var`
+
+```js
+console.log(x);
+
+var x = 10;
+```
+
+Output:
+
+```text
+undefined
+```
+
+Conceptually:
+
+```js
+var x;
+
+console.log(x);
+
+x = 10;
+```
+
+## `let` and `const`
+
+```js
+console.log(x);
+
+let x = 10;
+```
+
+Throws a `ReferenceError` because `x` is in the **Temporal Dead Zone** until initialization.
+
+## Function declaration
+
+```js
+sayHello();
+
+function sayHello() {
+  console.log('hello');
+}
+```
+
+Works because function declarations are hoisted.
+
+## Function expression
+
+```js
+sayHello();
+
+const sayHello = function () {
+  console.log('hello');
+};
+```
+
+Throws because `sayHello` is in the TDZ.
+
+## Quick comparison
+
+```text
+var
+- function scoped
+- hoisted
+- initialized undefined
+
+let
+- block scoped
+- hoisted
+- TDZ
+
+const
+- block scoped
+- hoisted
+- TDZ
+- cannot reassign binding
+
+function declaration
+- fully hoisted
+```
+
+---
+
+# 5. Pure Functions vs Side Effects
+
+A **pure function**:
+
+```text
+Same input -> same output
+```
+
+and does not modify external state.
+
+```js
+function add(a, b) {
+  return a + b;
+}
+```
+
+## Impure function
+
+```js
+let total = 0;
+
+function addToTotal(value) {
+  total += value;
+}
+```
+
+This modifies external state.
+
+## Common side effects
+
+```text
+Network request
+Database write
+DOM mutation
+console.log
+localStorage
+Changing global variables
+Changing function arguments
+Reading current time
+Generating random values
+```
+
+Example:
+
+```js
+function saveUser(user) {
+  localStorage.setItem('user', JSON.stringify(user));
+}
+```
+
+## Why pure functions are useful
+
+Pure functions are easier to:
+
+```text
+Test
+Cache
+Compose
+Debug
+Parallelize
+Reason about
+```
+
+## React connection
+
+Bad:
+
+```js
+function User({ user }) {
+  user.name = user.name.toUpperCase();
+
+  return <div>{user.name}</div>;
+}
+```
+
+Better:
+
+```js
+function User({ user }) {
+  const name = user.name.toUpperCase();
+
+  return <div>{name}</div>;
+}
+```
+
+---
+
+# 6. Immutability
+
+Immutability means creating new data instead of modifying existing data.
+
+Bad:
+
+```js
+const user = {
+  name: 'Khanh',
+  age: 30,
+};
+
+user.age = 31;
+```
+
+Better:
+
+```js
+const updatedUser = {
+  ...user,
+  age: 31,
+};
+```
+
+## Arrays
+
+Bad:
+
+```js
+const items = [1, 2, 3];
+
+items.push(4);
+```
+
+Better:
+
+```js
+const updatedItems = [...items, 4];
+```
+
+## Updating an item
+
+```js
+const updatedUsers = users.map((user) =>
+  user.id === targetId
+    ? {
+        ...user,
+        active: true,
+      }
+    : user
+);
+```
+
+## Removing an item
+
+```js
+const updatedUsers = users.filter((user) => user.id !== targetId);
+```
+
+## Why React cares about immutability
+
+React often relies on reference comparison:
+
+```js
+oldState === newState;
+```
+
+Bad:
+
+```js
+state.user.name = 'Bob';
+
+setState(state);
+```
+
+Better:
+
+```js
+setState({
+  ...state,
+  user: {
+    ...state.user,
+    name: 'Bob',
+  },
+});
+```
+
+## Shallow copy gotcha
+
+Spread syntax performs a shallow copy.
+
+```js
+const user = {
+  name: 'Khanh',
+  address: {
+    city: 'San Jose',
+  },
+};
+
+const nextUser = {
+  ...user,
+};
+```
+
+`user.address` and `nextUser.address` still reference the same nested object.
+
+Correct nested update:
+
+```js
+const nextUser = {
+  ...user,
+  address: {
+    ...user.address,
+    city: 'Seattle',
+  },
+};
+```
+
+---
+
+# 7. Functional Programming Patterns
+
+Common JavaScript functional concepts:
+
+```text
+Pure functions
+Immutability
+Higher-order functions
+Function composition
+map
+filter
+reduce
+Closures
+Currying
+Declarative programming
+```
+
+## Higher-order functions
+
+A higher-order function accepts a function, returns a function, or both.
+
+```js
+function calculate(a, b, operation) {
+  return operation(a, b);
+}
+
+const add = (a, b) => a + b;
+
+calculate(2, 3, add); // 5
+```
+
+## `map`
+
+```js
+const numbers = [1, 2, 3];
+
+const doubled = numbers.map((number) => number * 2);
+
+// [2, 4, 6]
+```
+
+## `filter`
+
+```js
+const numbers = [1, 2, 3, 4];
+
+const even = numbers.filter((number) => number % 2 === 0);
+
+// [2, 4]
+```
+
+## `reduce`
+
+```js
+const numbers = [1, 2, 3, 4];
+
+const total = numbers.reduce((sum, number) => sum + number, 0);
+
+// 10
+```
+
+## Real interview example
+
+```js
+const users = [
+  { name: 'A', active: true, score: 10 },
+  { name: 'B', active: false, score: 20 },
+  { name: 'C', active: true, score: 30 },
+];
+
+const total = users
+  .filter((user) => user.active)
+  .map((user) => user.score)
+  .reduce((sum, score) => sum + score, 0);
+
+console.log(total); // 40
+```
+
+## Function composition
+
+```js
+const trim = (value) => value.trim();
+const lower = (value) => value.toLowerCase();
+
+const normalize = (value) => {
+  return lower(trim(value));
+};
+
+normalize('  HELLO  '); // "hello"
+```
+
+## Currying
+
+```js
+const add = (a) => (b) => a + b;
+
+const add10 = add(10);
+
+add10(5); // 15
+add10(20); // 30
+```
+
+## Imperative vs declarative
+
+Imperative:
+
+```js
+const result = [];
+
+for (let i = 0; i < users.length; i++) {
+  if (users[i].active) {
+    result.push(users[i].name.toUpperCase());
+  }
+}
+```
+
+Declarative:
+
+```js
+const result = users.filter((user) => user.active).map((user) => user.name.toUpperCase());
+```
+
+---
+
+# Interview Gotchas
+
+## Gotcha 1 — Event Loop
+
+```js
+console.log('start');
+
+Promise.resolve().then(() => {
+  console.log('promise');
+});
+
+setTimeout(() => {
+  console.log('timeout');
+}, 0);
+
+console.log('end');
+```
+
+Output:
+
+```text
+start
+end
+promise
+timeout
+```
+
+## Gotcha 2 — Hoisting
+
+```js
+var x = 10;
+
+function test() {
+  console.log(x);
+
+  var x = 20;
+}
+
+test();
+```
+
+Output:
+
+```text
+undefined
+```
+
+## Gotcha 3 — Lexical Scope
+
+```js
+let x = 1;
+
+function outer() {
+  let x = 2;
+
+  return function inner() {
+    console.log(x);
+  };
+}
+
+const fn = outer();
+
+fn();
+```
+
+Output:
+
+```text
+2
+```
+
+## Gotcha 4 — Promise chaining
+
+```js
+Promise.resolve(1)
+  .then((x) => x + 1)
+  .then((x) => {
+    console.log(x);
+
+    return x * 2;
+  })
+  .then(console.log);
+```
+
+Output:
+
+```text
+2
+4
+```
+
+## Gotcha 5 — React state mutation
+
+Bad:
+
+```js
+const state = {
+  users: [],
+};
+
+state.users.push(newUser);
+
+setState(state);
+```
+
+Better:
+
+```js
+setState({
+  ...state,
+  users: [...state.users, newUser],
+});
+```
+
+---
+
+# 60-Second Review
+
+```text
+CLOSURE
+Function remembers lexical environment.
+
+EVENT LOOP
+sync -> microtasks -> next task.
+
+PROMISE CHAINING
+.then() returns a new Promise.
+Always return async work from .then().
+
+SCOPE
+JavaScript uses lexical scope.
+
+HOISTING
+var -> undefined
+let/const -> TDZ
+function declaration -> callable early
+
+PURE FUNCTION
+same input -> same output
+no side effects
+
+IMMUTABILITY
+create new values instead of mutating old ones
+
+FUNCTIONAL PATTERNS
+map = transform
+filter = select
+reduce = aggregate
+higher-order = takes/returns functions
+composition = combine small functions
+currying = function returning partially configured function
+```
+
+---
+
+# Senior / Staff Interview Framing
+
+Connect the fundamentals to production engineering:
+
+```text
+Closures
+-> hooks, callbacks, stale closures, event handlers
+
+Event loop
+-> UI responsiveness, long tasks, microtask starvation
+
+Promises
+-> concurrency, error handling, cancellation
+
+Scope
+-> module boundaries and state ownership
+
+Pure functions
+-> testable business logic and reducers
+
+Immutability
+-> React rendering, memoization, state management
+
+Functional patterns
+-> reusable transformations and predictable pipelines
+```
+
+A strong answer moves from:
+
+```text
+language concept
+      |
+      v
+small example
+      |
+      v
+common bug
+      |
+      v
+production implication
+```

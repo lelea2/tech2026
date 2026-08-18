@@ -17,7 +17,7 @@
       "docRelative": "camera-motion.png"
     },
     "frontend-system-design/chatapp.png": {
-      "hash": "ab44cc76d535e72f96d36fdc8520eceb1d186983b53b0a4993cdf18bb61299a2",
+      "hash": "e2b5283af14872780d1d942de0352fe7c6b7e9bd53b926950afb083aa5b52656",
       "docRelative": "chatapp.png"
     },
     "frontend-system-design/chatgpt.png": {
@@ -112,9 +112,9 @@
       "hash": "6fbeb992cc0b9633847f12120c7632efedb2f4ff07f8c564510e5e04c4dad492",
       "docRelative": "chatapp.mdx"
     },
-    "frontend-system-design/chatgpt-frontend-system-design-staff.mdx": {
-      "hash": "c93c69c7fe5fce995ba023f8b3f30718e45a4acef3f342eabb0b1f2ac043adc6",
-      "docRelative": "chatgpt-frontend-system-design-staff.mdx"
+    "frontend-system-design/chatgpt.mdx": {
+      "hash": "4cd4b7d61d84e0f1c7cbb7733845105fd656be606a44fbbfbabbfff80cf1c57e",
+      "docRelative": "chatgpt.mdx"
     },
     "frontend-system-design/claude-ai-spreadsheet-agent-interview-guide.mdx": {
       "hash": "1cfafe5dda3ea44b53f27b187487900d4bf83e6ae6a0e34d6a8615b6a31e1f5f",
@@ -139,6 +139,10 @@
     "frontend-system-design/google-docs-design.mdx": {
       "hash": "04208f76240f659921d307997b21ade9aa4565510d7f6151c219fc826c424db2",
       "docRelative": "google-docs-design.mdx"
+    },
+    "frontend-system-design/javascript-fundamentals-interview-notes.mdx": {
+      "hash": "77064a0cfbced470bee70164f99acd4752b2d0a02e40083949884a3805adfba4",
+      "docRelative": "javascript-fundamentals-interview-notes.mdx"
     },
     "frontend-system-design/large-scale-node-link-visualization-design.mdx": {
       "hash": "9613e930bb9621373a1cfaacce2f54d29c559fbdef7840f5111ecb6ef57fe933",

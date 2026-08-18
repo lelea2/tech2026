@@ -54,7 +54,7 @@ export function RemoteModuleHost({
         if (!isMountedRef.current || isObsolete) {
           return;
         }
-        console.log('>>> remoteMoule', remoteModule);
+        console.log('>>> remoteModule', remoteModule);
         setState({
           status: 'success',
           RemoteComponent: remoteModule.default,
