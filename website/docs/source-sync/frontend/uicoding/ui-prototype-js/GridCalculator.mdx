@@ -1,0 +1,86 @@
+---
+title: GridCalculator
+---
+
+# GridCalculator
+
+~~~javascript
+import React, {useState} from 'react'
+import './App.css'
+
+
+// Create react app, =SUM(A1, B2, C3) -> 6
+// const match = formula.match(/^=SUM\(([^)]+)\)$/i);
+
+function setUpValue(formula, hashTable) {
+  const number = Number(formula);
+  if (!isNaN(number)) {
+    return number;
+  }
+  const match = formula.match(/^=SUM\(([^)]+)\)$/i);
+  const data = match[1] ?? '';
+  const inputs = data.split(',') ?? [];
+  let result = 0;
+  for (const item of inputs) {
+    result += hashTable[item.trim()] ?? 0;
+  }
+  return result;
+}
+
+function App() {
+  const cols = ['A', 'B', 'C'];
+  const rows = [1, 2, 3];
+
+  const [hashValue, setHashValue] = useState({});
+  const [isEditing, setIsEditing] = useState({});
+  const [rawValue, setRawValue] = useState();
+
+  // grid array
+  const newArr = rows.map(
+    item => cols.map(char => `${char}${item}`)
+  ).flat();
+
+  const handleOnChange = (value) => {
+    setRawValue(value);
+  };
+
+  const handleOnFocus = (key) => {
+    setIsEditing({
+      ...isEditing,
+      [key]: true,
+    });
+  };
+
+  const handleOnBlur = (key, value) => {
+    setIsEditing({
+      ...isEditing,
+      [key]: false
+    });
+    const result = setUpValue(value, hashValue);
+    const newHashValue = {
+       ...hashValue,
+      [key]: result,
+    };
+    setHashValue(newHashValue);
+  };
+
+  return (
+    <div className="grid">
+      {newArr.map(key => (
+        <div key={key} className="cell">
+          <input
+            placeholder={key}
+            value={isEditing[key] ? rawValue : hashValue[key]}
+            onFocus={(e) => handleOnFocus(key)}
+            onChange={(e) => handleOnChange(e.target.value)}
+            onBlur={(e) => handleOnBlur(key, e.target.value)}
+          />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export default App
+
+~~~

@@ -1360,6 +1360,10 @@
       "hash": "74d55569a078c6c1015f33e19288a85583030ba068e54243c4614f00ac60cc89",
       "docRelative": "frontend/uicoding/main.mdx"
     },
+    "frontend/uicoding/ui-prototype-js/GridCalculator.js": {
+      "hash": "14efd62be2a4a1dca1e19079ad82830f5febc94fb9afd40edfd397e0b11ab3c1",
+      "docRelative": "frontend/uicoding/ui-prototype-js/GridCalculator.mdx"
+    },
     "frontend/uicoding/ui-prototype-js/accordion/Accordion.js": {
       "hash": "81c5706e675c04722df3f4253511df3e273e3c24579a9c0d0bdafadb9eac2185",
       "docRelative": "frontend/uicoding/ui-prototype-js/accordion/Accordion.mdx"
@@ -2501,7 +2505,7 @@
       "docRelative": "frontend/uicoding/_index.mdx"
     },
     "__nav__:frontend/uicoding/ui-prototype-js": {
-      "hash": "de508628c7f9a96451cdc04823858502caba5d46238c357010c6b4d4bf527db9",
+      "hash": "d48ca8446208a1c76d421c5d8cb1edec4472e4435e39286c4e949648aba8d5ed",
       "docRelative": "frontend/uicoding/ui-prototype-js/_index.mdx"
     },
     "__nav__:frontend/uicoding/ui-prototype-js/accordion": {
