@@ -1571,7 +1571,81 @@ Correct answer:
 
 ---
 
-# 33. Follow-up: “What if the user zooms to 800%?”
+# 33. Follow-up: “Why isn’t WASM just magic? How does it actually help?”
+
+WASM is a compilation target for near-native CPU execution. It is not a memory-reduction technology and it does not parallelize anything by itself.
+
+## What WASM actually gives you
+
+- **Predictable performance** — no JIT warm-up variance, no GC pauses in the middle of a pixel loop
+- **SIMD** (`v128`) — process 4–8 pixel channels per instruction instead of one at a time
+- **Reuse of existing native kernels** — a Rust/C++ blur, resize, or color-space conversion routine instead of a JS reimplementation
+- **Linear memory you control directly** — no intermediate JS object graph, no per-pixel boxing
+
+## Example: a tile-sized Gaussian blur
+
+Rust compiled to WASM, operating directly on a shared memory arena:
+
+```rust
+#[no_mangle]
+pub extern "C" fn gaussian_blur_tile(ptr: *mut u8, width: u32, height: u32, radius: u32) {
+    let len = (width * height * 4) as usize;
+    let pixels = unsafe { std::slice::from_raw_parts_mut(ptr, len) };
+
+    // operates in place on linear memory — no allocation per call
+    blur_in_place(pixels, width, height, radius);
+}
+```
+
+JS/worker glue, written to avoid copying on every call:
+
+```ts
+// Allocate the arena ONCE per tile size, reuse it across calls.
+const tileBytes = TILE_SIZE * TILE_SIZE * 4;
+const ptr = wasmExports.alloc(tileBytes);
+const arena = new Uint8Array(wasmExports.memory.buffer, ptr, tileBytes);
+
+function blurTile(tilePixels: Uint8ClampedArray, radius: number) {
+  arena.set(tilePixels); // one copy in
+  wasmExports.gaussian_blur_tile(ptr, TILE_SIZE, TILE_SIZE, radius);
+  return arena; // read the result view directly, no copy out
+}
+```
+
+## Why it is not magic
+
+- **The JS ↔ WASM boundary still copies.** Every `arena.set(tilePixels)` and every `.slice()` on the way out is a real memory copy. Allocating a fresh arena per call, or copying the whole document instead of a tile, erases the speed gain.
+- **WASM linear memory is still a bounded `ArrayBuffer`.** Loading the entire 12k × 12k document into WASM memory hits the exact same multi-gigabyte problem it hits in JS — WASM does not make a 550 MiB buffer smaller.
+- **No automatic parallelism.** A single WASM module call runs on one thread. Multi-core execution still requires Web Workers (and `SharedArrayBuffer` + COOP/COEP headers for zero-copy sharing across them).
+- **It only speeds up compute, not I/O.** Decoding, GPU upload, canvas compositing, and layout are unaffected by WASM.
+- **Sloppy glue code cancels the benefit.** If every call allocates new typed arrays, or the module is instantiated per operation instead of once, the overhead can dominate the actual pixel math.
+
+## How it actually contributes, correctly wired
+
+```text
+Tile Manager
+   |
+   | transferable ArrayBuffer, one tile
+   v
+Worker thread
+   |
+   | write into a persistent WASM memory arena (allocated once, reused)
+   v
+WASM gaussian_blur_tile()  <- SIMD, in-place, no GC
+   |
+   | result already in the same arena
+   v
+Read result view from wasm.memory.buffer directly
+   |
+   v
+Transfer back to main thread / upload to GPU
+```
+
+> **Rule of thumb:** WASM makes the CPU-bound math fast and predictable. It does not shrink your data, does not parallelize by itself, and does not fix an architecture that keeps allocating full-document buffers. Tile first — then let WASM process each tile efficiently.
+
+---
+
+# 34. Follow-up: “What if the user zooms to 800%?”
 
 At very high zoom, the viewport intersects only a tiny document region.
 
@@ -1596,7 +1670,7 @@ zoomed in  -> full-res, very few tiles
 
 ---
 
-# 34. Follow-up: “How do you avoid seams between tiles?”
+# 35. Follow-up: “How do you avoid seams between tiles?”
 
 For normal drawing/compositing, coordinates must align exactly.
 
@@ -1620,7 +1694,7 @@ This gives the same result as whole-image processing without requiring the whole
 
 ---
 
-# 35. Follow-up: “How would you prioritize tile jobs?”
+# 36. Follow-up: “How would you prioritize tile jobs?”
 
 Use viewport-aware scheduling.
 
@@ -1646,7 +1720,7 @@ This prevents the system from wasting CPU and memory rendering areas the user no
 
 ---
 
-# 36. Follow-up: “How do you handle cancellation?”
+# 37. Follow-up: “How do you handle cancellation?”
 
 Operations should carry a generation/revision ID.
 
@@ -1682,7 +1756,7 @@ Also cancel queued low-priority work whenever possible.
 
 ---
 
-# 37. Staff-level answer: separate authoritative state from caches
+# 38. Staff-level answer: separate authoritative state from caches
 
 This distinction is important.
 
@@ -1712,7 +1786,7 @@ This gives the system predictable correctness even when the browser is constrain
 
 ---
 
-# 38. Staff-level answer: design for peak memory, not average memory
+# 39. Staff-level answer: design for peak memory, not average memory
 
 Suppose normal editing uses:
 
@@ -1749,7 +1823,7 @@ Or process the operation in bounded tile batches.
 
 ---
 
-# 39. Staff-level answer: avoid accidental copies
+# 40. Staff-level answer: avoid accidental copies
 
 Watch JavaScript APIs carefully.
 
@@ -1774,7 +1848,7 @@ Every unexplained copy of a 550 MiB buffer is a production incident waiting to h
 
 ---
 
-# 40. Short interview answer — 60 seconds
+# 41. Short interview answer — 60 seconds
 
 > A 12,000 × 12,000 image contains 144 million pixels. In 8-bit RGBA, one decoded surface is roughly 550 MiB. Photoshop Web probably has more than one copy: a canvas backing store, layer/composite buffers, GPU textures, temporary filter outputs, and undo state. A few full-size copies can push the browser into multi-gigabyte peak memory, and one giant texture can also hit GPU or VRAM constraints. DPR can accidentally make it four times worse in pixel count.
 >
@@ -1782,7 +1856,7 @@ Every unexplained copy of a 550 MiB buffer is a production incident waiting to h
 
 ---
 
-# 41. Whiteboard summary
+# 42. Whiteboard summary
 
 ```text
 WHY IT CRASHES
@@ -1845,6 +1919,6 @@ PLUS
 
 ---
 
-# 42. The sentence I would end with
+# 43. The sentence I would end with
 
 > **For a professional web image editor, large-document support is fundamentally a virtualization problem: bound memory and rendering work to the visible/active working set instead of scaling resource consumption with total document pixels.**
