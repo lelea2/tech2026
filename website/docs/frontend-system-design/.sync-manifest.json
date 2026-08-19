@@ -152,6 +152,10 @@
       "hash": "88b5e9f4afc328114bd009dad704b7b51721587bc09f1f5afc1c37abc690796c",
       "docRelative": "core/react-vs-web-component.mdx"
     },
+    "frontend-system-design/core/undo-redo.mdx": {
+      "hash": "e20593782e54e6a23abe0746ef3828eb7ea72b00150d6f3b73e05355d834957c",
+      "docRelative": "core/undo-redo.mdx"
+    },
     "frontend-system-design/core/websocket-vs.SSE-vs.polling.mdx": {
       "hash": "fa42f706184db6d7c12bf946dd32b079c1332e785fef3fc01da9ac584bcfce06",
       "docRelative": "core/websocket-vs.SSE-vs.polling.mdx"
@@ -213,7 +217,7 @@
       "docRelative": "video-netflix.mdx"
     },
     "__nav__:core": {
-      "hash": "d9d89907c4e8272cf3c7d4861ee4ee733161658975bfff8dcd21fd74549493ca",
+      "hash": "f6cc2920ab574a81b43ec7fca46a9e2372232071ec3e32fe808153764c4a5910",
       "docRelative": "core/_index.mdx"
     }
   }

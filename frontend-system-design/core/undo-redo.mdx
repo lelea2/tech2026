@@ -1,0 +1,2239 @@
+---
+title: 'Implement Undo/Redo for Photoshop Operations'
+description: 'Staff-level interview guide covering JavaScript implementation, large raster history, grouped commands, redo invalidation, async AI operations, and collaborative undo.'
+---
+
+# Implement Undo/Redo for Photoshop Operations
+
+## Coding Answer First — JavaScript
+
+A clean interview implementation uses two stacks:
+
+- `undoStack`: commands that have already executed.
+- `redoStack`: commands that were undone and may be replayed.
+- Executing a **new** command clears `redoStack`, because the user has created a new history branch.
+
+```js
+class HistoryManager {
+  constructor() {
+    this.undoStack = [];
+    this.redoStack = [];
+  }
+
+  async execute(command) {
+    await command.execute();
+
+    this.undoStack.push(command);
+
+    // A new edit after undo creates a new branch.
+    // Old redo history is no longer valid.
+    this.redoStack = [];
+  }
+
+  async undo() {
+    const command = this.undoStack[this.undoStack.length - 1];
+
+    if (!command) {
+      return;
+    }
+
+    // Only move history after undo succeeds.
+    await command.undo();
+
+    this.undoStack.pop();
+    this.redoStack.push(command);
+  }
+
+  async redo() {
+    const command = this.redoStack[this.redoStack.length - 1];
+
+    if (!command) {
+      return;
+    }
+
+    if (command.redo) {
+      await command.redo();
+    } else {
+      await command.execute();
+    }
+
+    this.redoStack.pop();
+    this.undoStack.push(command);
+  }
+}
+```
+
+Each Photoshop operation implements a command.
+
+```js
+class MoveLayerCommand {
+  constructor(layer, from, to) {
+    this.layer = layer;
+    this.from = from;
+    this.to = to;
+  }
+
+  async execute() {
+    this.layer.x = this.to.x;
+    this.layer.y = this.to.y;
+  }
+
+  async undo() {
+    this.layer.x = this.from.x;
+    this.layer.y = this.from.y;
+  }
+
+  async redo() {
+    await this.execute();
+  }
+}
+```
+
+Usage:
+
+```js
+const history = new HistoryManager();
+
+const layer = {
+  x: 0,
+  y: 0,
+};
+
+await history.execute(new MoveLayerCommand(layer, { x: 0, y: 0 }, { x: 100, y: 50 }));
+
+console.log(layer);
+// { x: 100, y: 50 }
+
+await history.undo();
+
+console.log(layer);
+// { x: 0, y: 0 }
+
+await history.redo();
+
+console.log(layer);
+// { x: 100, y: 50 }
+```
+
+### Complexity
+
+For normal metadata commands:
+
+```text
+execute: O(1)
+undo:    O(1)
+redo:    O(1)
+```
+
+The stacks themselves are simple.
+
+The real Photoshop interview problem is:
+
+> What does a command store when the operation modifies hundreds of megabytes of pixels, spans many low-level events, runs asynchronously, or conflicts with edits from another collaborator?
+
+---
+
+# 1. Core Design
+
+I would use a hybrid of:
+
+```text
+Command log
++
+incremental pixel deltas
++
+periodic checkpoints
+```
+
+Not:
+
+```text
+full-document snapshot after every operation
+```
+
+Conceptually:
+
+```text
+User Gesture
+     |
+     v
+Command Factory
+     |
+     v
+History Manager
+     |
+     +---- undo stack
+     |
+     +---- redo stack
+     |
+     +---- grouping / transactions
+     |
+     +---- memory budget
+     |
+     v
+Document Model
+     |
+     +---- Layer metadata
+     |
+     +---- Raster tile store
+     |
+     +---- AI asset store
+     |
+     v
+Renderer
+Canvas / WebGL / GPU
+```
+
+A command can expose approximately this contract:
+
+```js
+class Command {
+  async execute() {}
+
+  async undo() {}
+
+  async redo() {
+    await this.execute();
+  }
+}
+```
+
+A production version would also carry metadata:
+
+```js
+const historyEntry = {
+  id: crypto.randomUUID(),
+
+  authorId: 'user-123',
+
+  type: 'brush',
+
+  state: 'pending',
+
+  parentRevision: 101,
+
+  committedRevision: null,
+
+  estimatedBytes: 0,
+
+  async execute() {},
+
+  async undo() {},
+
+  async redo() {},
+};
+```
+
+Useful states:
+
+```text
+PENDING
+RUNNING
+COMMITTED
+UNDONE
+FAILED
+CANCELED
+```
+
+---
+
+# 2. Follow-Up: What About a 100 MB Brush Stroke?
+
+This is where a naive undo implementation breaks.
+
+Suppose the canvas is:
+
+```text
+8000 x 8000 pixels
+4 bytes / pixel
+```
+
+That is roughly:
+
+```text
+8000 * 8000 * 4
+≈ 256 MB
+```
+
+If we snapshot the whole raster before every brush stroke:
+
+```text
+100 strokes * 256 MB
+≈ 25 GB
+```
+
+That is not acceptable.
+
+## Better Approach: Dirty Regions + Tiles
+
+Raster editors naturally partition image data into tiles.
+
+```text
+Canvas
+
++---------+---------+---------+
+| Tile A  | Tile B  | Tile C  |
++---------+---------+---------+
+| Tile D  | Tile E  | Tile F  |
++---------+---------+---------+
+| Tile G  | Tile H  | Tile I  |
++---------+---------+---------+
+```
+
+A brush stroke usually modifies only a subset.
+
+```text
++---------+---------+---------+
+|         |   XXX   |         |
++---------+---------+---------+
+|         | XXXXXXX |   XX    |
++---------+---------+---------+
+```
+
+Instead of storing the entire document, store only the pixels that are about to change.
+
+```js
+class BrushStrokeCommand {
+  constructor(canvas, stroke) {
+    this.canvas = canvas;
+    this.stroke = stroke;
+    this.patches = [];
+  }
+
+  async execute() {
+    const affectedTiles = this.canvas.getAffectedTiles(this.stroke);
+
+    for (const tile of affectedTiles) {
+      const dirtyRect = tile.getDirtyRegion(this.stroke);
+
+      this.patches.push({
+        tileId: tile.id,
+        rect: dirtyRect,
+
+        // Copy only the previous pixels
+        // inside the dirty region.
+        before: tile.copyPixels(dirtyRect),
+      });
+
+      tile.renderStroke(this.stroke, dirtyRect);
+    }
+  }
+
+  async undo() {
+    for (const patch of this.patches) {
+      const tile = this.canvas.getTile(patch.tileId);
+
+      tile.restorePixels(patch.rect, patch.before);
+    }
+  }
+}
+```
+
+## Storage Optimization
+
+A production implementation can combine:
+
+```text
+dirty rectangle capture
+        |
+        v
+tile-level history
+        |
+        v
+delta encoding
+        |
+        v
+compression
+        |
+        v
+RAM
+        |
+        v
+local SSD
+```
+
+For example:
+
+```js
+const patch = {
+  tileId: 'tile-42',
+
+  rect: {
+    x: 120,
+    y: 40,
+    width: 200,
+    height: 80,
+  },
+
+  beforePixels: compressedBytes,
+};
+```
+
+Instead of storing:
+
+```text
+256 MB document snapshot
+```
+
+we may store:
+
+```text
+600 KB changed pixels
+```
+
+for that stroke.
+
+---
+
+# 3. History Memory Budget
+
+Undo history must not be allowed to OOM the editor.
+
+```js
+const HISTORY_MEMORY_LIMIT = 512 * 1024 * 1024;
+```
+
+Use a tiered strategy:
+
+```text
+Recent commands
+      |
+      v
+RAM / GPU-visible memory
+      |
+      v
+Compressed RAM
+      |
+      v
+Local SSD
+      |
+      v
+Checkpoint + discard oldest history
+```
+
+A history entry may track:
+
+```js
+const entry = {
+  command,
+
+  estimatedBytes: 18_000_000,
+
+  storageTier: 'memory',
+};
+```
+
+When the limit is exceeded:
+
+```js
+function enforceHistoryBudget() {
+  while (historyBytes > HISTORY_MEMORY_LIMIT) {
+    spillOldestEntryToDisk();
+  }
+}
+```
+
+For an interview, the key point is:
+
+> Undo history is a bounded cache, not unlimited application state.
+
+---
+
+# 4. Grouped Commands
+
+The user thinks in terms of gestures, not low-level pointer events.
+
+Consider dragging a layer:
+
+```text
+pointerDown
+
+move +2 px
+move +3 px
+move +1 px
+move -1 px
+move +4 px
+
+pointerUp
+```
+
+The user expects:
+
+```text
+Cmd+Z
+```
+
+to undo the entire drag.
+
+They do not expect to press undo hundreds of times.
+
+## Composite Command
+
+```js
+class CompositeCommand {
+  constructor(commands = []) {
+    this.commands = commands;
+  }
+
+  async execute() {
+    for (const command of this.commands) {
+      await command.execute();
+    }
+  }
+
+  async undo() {
+    // Inverses run in reverse order.
+    for (let i = this.commands.length - 1; i >= 0; i--) {
+      await this.commands[i].undo();
+    }
+  }
+
+  async redo() {
+    await this.execute();
+  }
+}
+```
+
+Why reverse order?
+
+Suppose:
+
+```text
+1. resize
+2. rotate
+3. apply mask
+4. update bounds
+```
+
+Undo must be:
+
+```text
+4. undo bounds
+3. undo mask
+2. undo rotation
+1. undo resize
+```
+
+This is the standard transactional inverse rule.
+
+---
+
+# 5. Command Grouping API
+
+The history system can expose gesture-level transactions.
+
+```js
+history.beginGroup('Transform Layer');
+
+history.add(moveCommand);
+history.add(rotateCommand);
+history.add(scaleCommand);
+
+await history.commitGroup();
+```
+
+Conceptually:
+
+```text
+Transform Layer
+|
++-- Move
+|
++-- Rotate
+|
++-- Scale
+```
+
+The entire composite command becomes one history entry.
+
+---
+
+# 6. Command Coalescing
+
+Some operations should not even create multiple commands.
+
+Example:
+
+```text
+slider = 10
+slider = 11
+slider = 12
+slider = 13
+...
+slider = 75
+```
+
+Do not save 65 undo entries.
+
+Store:
+
+```text
+Brightness
+
+before = 10
+after  = 75
+```
+
+Likewise:
+
+```text
+Move Layer
+
+before = (100, 200)
+after  = (410, 250)
+```
+
+Rather than every pointer movement.
+
+Example:
+
+```js
+class MoveLayerCommand {
+  constructor(layer) {
+    this.layer = layer;
+
+    this.start = {
+      x: layer.x,
+      y: layer.y,
+    };
+
+    this.end = null;
+  }
+
+  update(x, y) {
+    this.layer.x = x;
+    this.layer.y = y;
+
+    this.end = { x, y };
+  }
+
+  async undo() {
+    this.layer.x = this.start.x;
+    this.layer.y = this.start.y;
+  }
+
+  async redo() {
+    this.layer.x = this.end.x;
+    this.layer.y = this.end.y;
+  }
+}
+```
+
+Commit to history only on `pointerup`.
+
+---
+
+# 7. Redo Invalidation
+
+Suppose history is:
+
+```text
+A -> B -> C
+```
+
+The user undoes C:
+
+```text
+A -> B
+
+redoStack:
+C
+```
+
+Now the user performs D.
+
+The document becomes:
+
+```text
+A -> B -> D
+```
+
+The old redo operation C is no longer valid.
+
+Conceptually:
+
+```text
+       C
+      /
+A -> B
+      \
+       D
+```
+
+Most editors expose linear history, so C is discarded.
+
+```js
+async execute(command) {
+  await command.execute();
+
+  this.undoStack.push(command);
+
+  // New branch.
+  this.redoStack = [];
+}
+```
+
+This is called **redo invalidation**.
+
+---
+
+# 8. Could We Preserve Branches?
+
+Yes.
+
+Internally history could be represented as a DAG.
+
+```text
+       C -> E
+      /
+A -> B
+      \
+       D -> F
+```
+
+That supports branching history.
+
+But it introduces complexity:
+
+```text
+UI
+memory management
+autosave
+serialization
+collaboration
+branch selection
+reconstruction
+```
+
+For Photoshop-style interaction, I would normally keep:
+
+```text
+user-visible history = linear
+```
+
+while still assigning stable revision IDs internally.
+
+---
+
+# 9. Async AI Operation
+
+Now imagine:
+
+```text
+Generative Fill:
+"add a boat"
+
+request time:
+12 seconds
+```
+
+A synchronous command model is insufficient.
+
+The operation needs lifecycle state.
+
+```text
+PENDING
+   |
+   v
+RUNNING
+   |
+   +------> FAILED
+   |
+   +------> CANCELED
+   |
+   v
+COMMITTED
+   |
+   v
+UNDONE
+```
+
+---
+
+# 10. AI Command Example
+
+```js
+class GenerativeFillCommand {
+  constructor({ aiClient, document, prompt, mask }) {
+    this.aiClient = aiClient;
+    this.document = document;
+
+    this.prompt = prompt;
+    this.mask = mask;
+
+    this.operationId = crypto.randomUUID();
+
+    this.abortController = new AbortController();
+
+    this.resultAsset = null;
+
+    this.state = 'pending';
+  }
+
+  async execute() {
+    this.state = 'running';
+
+    try {
+      const result = await this.aiClient.generate({
+        prompt: this.prompt,
+        mask: this.mask,
+        operationId: this.operationId,
+        signal: this.abortController.signal,
+      });
+
+      // The operation might have been
+      // undone while the server was working.
+      if (this.state === 'canceled') {
+        return;
+      }
+
+      this.resultAsset = result;
+
+      this.document.insertGeneratedLayer(result);
+
+      this.state = 'committed';
+    } catch (error) {
+      if (this.abortController.signal.aborted) {
+        this.state = 'canceled';
+        return;
+      }
+
+      this.state = 'failed';
+
+      throw error;
+    }
+  }
+
+  async undo() {
+    if (this.state === 'pending' || this.state === 'running') {
+      this.state = 'canceled';
+
+      // Best-effort physical cancellation.
+      this.abortController.abort();
+
+      return;
+    }
+
+    if (this.state === 'committed' && this.resultAsset) {
+      this.document.removeGeneratedLayer(this.resultAsset.id);
+
+      this.state = 'undone';
+    }
+  }
+
+  async redo() {
+    if (!this.resultAsset) {
+      throw new Error('Generated result unavailable');
+    }
+
+    // Reuse existing result rather than
+    // rerunning expensive inference.
+    this.document.insertGeneratedLayer(this.resultAsset);
+
+    this.state = 'committed';
+  }
+}
+```
+
+---
+
+# 11. Critical Async Race
+
+This is a strong interviewer follow-up.
+
+```text
+T0 user starts AI operation
+
+T1 operation is RUNNING
+
+T2 user presses Undo
+
+T3 frontend calls AbortController.abort()
+
+T4 backend GPU job cannot actually stop
+
+T5 result eventually comes back
+```
+
+If we blindly apply the result at T5, undo is broken.
+
+We need **logical cancellation**.
+
+```text
+request
+operationId = 42
+      |
+      v
+AI backend
+      |
+      v
+response
+operationId = 42
+      |
+      v
+Is operation 42 still active?
+      |
+  +---+---+
+  |       |
+ yes      no
+  |       |
+apply   ignore
+```
+
+Example:
+
+```js
+function shouldApplyResult(history, operationId) {
+  const operation = history.getOperation(operationId);
+
+  return operation && operation.state === 'running';
+}
+```
+
+Or using generation/version tokens:
+
+```js
+const generation = editor.currentGeneration;
+
+const result = await generateImage();
+
+if (generation !== editor.currentGeneration) {
+  return;
+}
+
+applyResult(result);
+```
+
+---
+
+# 12. Cancellation != Undo
+
+This distinction is important.
+
+**Cancellation** means:
+
+```text
+try to stop unnecessary work
+```
+
+**Undo** means:
+
+```text
+ensure the operation has no effect
+on the current document
+```
+
+The backend may not support physical cancellation.
+
+That is fine.
+
+Undo semantics can still be correct by invalidating the result.
+
+Interview phrase:
+
+> Cancellation is best-effort resource reclamation. Undo is a document-state guarantee.
+
+---
+
+# 13. AI Redo Should Usually Not Regenerate
+
+Suppose:
+
+```text
+Prompt:
+"add a sailboat"
+
+Model output:
+asset-123
+```
+
+The user undoes it.
+
+If they press Redo, we should normally restore:
+
+```text
+asset-123
+```
+
+not rerun the model.
+
+Why?
+
+```text
+AI inference can be:
+
+expensive
+slow
+nondeterministic
+rate-limited
+quota-controlled
+```
+
+Redo should mean:
+
+```text
+restore the previous result
+```
+
+not:
+
+```text
+produce a new interpretation
+```
+
+Store metadata like:
+
+```js
+const aiHistoryEntry = {
+  prompt: 'add a sailboat',
+
+  modelVersion: 'image-model-v7',
+
+  seed: 982734,
+
+  outputAssetId: 'asset-123',
+};
+```
+
+The output may live in:
+
+```text
+memory cache
+   |
+   v
+local disk
+   |
+   v
+blob/object store
+```
+
+---
+
+# 14. AI Result Lifetime
+
+Suppose undo history evicts the generated asset.
+
+Redo can have several policies:
+
+```text
+Option 1
+disable redo after asset eviction
+
+Option 2
+reload from durable object storage
+
+Option 3
+regenerate using model + seed
+
+Option 4
+create a new generation and clearly
+treat it as a new operation
+```
+
+For a professional creative editor, I prefer:
+
+```text
+durably retain the generated artifact
+for as long as the associated history
+entry remains available
+```
+
+---
+
+# 15. Async Command Transaction Boundary
+
+A useful architecture separates:
+
+```text
+compute
+```
+
+from:
+
+```text
+commit
+```
+
+For AI:
+
+```text
+Generate Result
+      |
+      v
+Temporary Asset
+      |
+      v
+Validate command still active
+      |
+      v
+Commit asset into document
+```
+
+This prevents late async work from directly mutating shared editor state.
+
+```js
+const result = await ai.generate(input);
+
+if (!history.isActive(operationId)) {
+  return;
+}
+
+history.commit(operationId, () => {
+  document.insert(result);
+});
+```
+
+---
+
+# 16. Collaborative Undo
+
+Collaboration changes the semantics.
+
+Suppose:
+
+```text
+Initial:
+Hello
+
+Alice inserts:
+" beautiful"
+
+Bob inserts:
+" world"
+
+Current:
+Hello beautiful world
+```
+
+Alice presses Undo.
+
+Wrong:
+
+```text
+Hello
+```
+
+That removes Bob's work.
+
+Correct:
+
+```text
+Hello world
+```
+
+The rule becomes:
+
+> Undo my operation, not the entire world's most recent state.
+
+---
+
+# 17. Why Snapshot Rewind Fails in Collaboration
+
+Consider raster editing:
+
+```text
+Revision 100
+    |
+    v
+Alice:
+brush stroke
+    |
+    v
+Revision 101
+    |
+    v
+Bob:
+brightness +20
+    |
+    v
+Revision 102
+```
+
+Alice presses Undo.
+
+A naive implementation restores revision 100.
+
+That accidentally removes Bob's brightness adjustment.
+
+Instead:
+
+```text
+Alice stroke
+     |
+     v
+Bob brightness
+     |
+     v
+inverse(Alice stroke)
+     |
+     v
+new shared revision
+```
+
+Undo itself becomes another collaborative operation.
+
+---
+
+# 18. Semantic Inverse Operations
+
+For simple structured operations:
+
+```text
+Alice:
+
+Move Layer X
++20 px
+```
+
+Alice's undo:
+
+```text
+Move Layer X
+-20 px
+```
+
+Bob might meanwhile do:
+
+```text
+Rename Layer X
+```
+
+Undoing Alice should preserve the rename.
+
+```text
+Layer:
+new name
+
+Position:
+original position
+```
+
+---
+
+# 19. Text Collaboration Example
+
+Alice:
+
+```text
+insert(" beautiful")
+```
+
+Bob:
+
+```text
+insert(" world")
+```
+
+Alice undo:
+
+```text
+inverse(
+  alice-operation-id
+)
+```
+
+A CRDT or OT system can resolve the inverse relative to the latest document state.
+
+Possible underlying approaches:
+
+```text
+CRDT
+
+OT
+
+server-sequenced operation log
+
+revisioned operation transforms
+```
+
+---
+
+# 20. Collaborative Raster Editing Is Harder
+
+Pixel operations are not always semantically invertible.
+
+Suppose Alice paints pixels:
+
+```text
+old:
+white
+
+Alice:
+red
+
+Bob:
+brightness operation
+```
+
+Simply restoring Alice's original white pixels may erase transformations that Bob performed later.
+
+One approach:
+
+```text
+checkpoint
+   |
+   v
+replay operation history
+   |
+   v
+skip the operation being undone
+   |
+   v
+recompute affected tiles
+```
+
+For example:
+
+```text
+Checkpoint revision 95
+
+96 Bob op
+97 Alice op
+98 Carol op
+99 Bob op
+100 Alice op to undo
+101 Bob op
+102 current
+```
+
+To remove operation 100:
+
+```text
+load checkpoint 95
+      |
+      v
+replay 96
+      |
+      v
+replay 97
+      |
+      v
+...
+      |
+      v
+skip 100
+      |
+      v
+replay 101
+      |
+      v
+produce revision 103
+```
+
+In practice, recomputation should be scoped to only the affected layer/tile region when possible.
+
+---
+
+# 21. Command Log + Checkpoints
+
+Commands only are attractive:
+
+```text
+small metadata
+semantic operations
+collaboration friendly
+```
+
+But there are problems:
+
+```text
+some commands are expensive to replay
+
+some inverse functions are complex
+
+replaying 50,000 operations is slow
+
+bugs in inverse operations are dangerous
+```
+
+Snapshots are attractive:
+
+```text
+easy restoration
+```
+
+But:
+
+```text
+huge memory use
+poor collaborative semantics
+```
+
+So use both.
+
+```text
+Snapshot revision 100
+
+101 Brush Stroke
+102 Move Layer
+103 Text Edit
+104 Brush Stroke
+
+Snapshot revision 105
+
+106 AI Generate
+107 Transform
+108 Mask
+```
+
+To reconstruct revision 103:
+
+```text
+load snapshot 100
+
+replay 101
+replay 102
+replay 103
+```
+
+This is similar to:
+
+```text
+event sourcing
++
+checkpointing
+```
+
+---
+
+# 22. Checkpoint Strategy
+
+Do not necessarily checkpoint every fixed number of operations.
+
+You can use multiple thresholds:
+
+```js
+function shouldCheckpoint(history) {
+  return (
+    history.commandsSinceCheckpoint > 1000 ||
+    history.bytesSinceCheckpoint > 200 * MB ||
+    history.replayCost > MAX_REPLAY_COST
+  );
+}
+```
+
+Checkpoint decisions can depend on:
+
+```text
+number of operations
+pixel delta volume
+estimated replay time
+document size
+available memory
+idle time
+autosave boundary
+```
+
+---
+
+# 23. Undo Failure
+
+Even undo itself can fail.
+
+Examples:
+
+```text
+disk-backed patch is corrupted
+
+generated asset no longer exists
+
+network-backed collaborative operation fails
+
+GPU context is lost
+
+document resource is unavailable
+```
+
+Do not move the history pointer before the undo transaction succeeds.
+
+Bad:
+
+```js
+async undo() {
+  const command =
+    this.undoStack.pop();
+
+  await command.undo();
+
+  this.redoStack.push(command);
+}
+```
+
+If `command.undo()` throws, history has already been mutated.
+
+Better:
+
+```js
+async undo() {
+  const command =
+    this.undoStack[
+      this.undoStack.length - 1
+    ];
+
+  if (!command) {
+    return;
+  }
+
+  try {
+    await command.undo();
+
+    this.undoStack.pop();
+    this.redoStack.push(command);
+  } catch (error) {
+    this.reportHistoryFailure(error);
+
+    // Leave history cursor unchanged.
+  }
+}
+```
+
+Likewise for redo.
+
+---
+
+# 24. History Manager With Safer Transactions
+
+```js
+class HistoryManager {
+  constructor({ maxMemoryBytes = 512 * 1024 * 1024 } = {}) {
+    this.undoStack = [];
+    this.redoStack = [];
+
+    this.maxMemoryBytes = maxMemoryBytes;
+
+    this.memoryBytes = 0;
+  }
+
+  async execute(command) {
+    await command.execute();
+
+    this.undoStack.push(command);
+
+    this.memoryBytes += command.estimatedBytes || 0;
+
+    // New branch.
+    this.redoStack = [];
+
+    await this.enforceBudget();
+  }
+
+  async undo() {
+    const command = this.undoStack.at(-1);
+
+    if (!command) {
+      return false;
+    }
+
+    try {
+      await command.undo();
+
+      this.undoStack.pop();
+      this.redoStack.push(command);
+
+      return true;
+    } catch (error) {
+      this.reportError('undo', command, error);
+
+      return false;
+    }
+  }
+
+  async redo() {
+    const command = this.redoStack.at(-1);
+
+    if (!command) {
+      return false;
+    }
+
+    try {
+      if (command.redo) {
+        await command.redo();
+      } else {
+        await command.execute();
+      }
+
+      this.redoStack.pop();
+      this.undoStack.push(command);
+
+      return true;
+    } catch (error) {
+      this.reportError('redo', command, error);
+
+      return false;
+    }
+  }
+
+  async enforceBudget() {
+    while (this.memoryBytes > this.maxMemoryBytes && this.undoStack.length > 0) {
+      const candidate = this.findOldestMemoryEntry();
+
+      if (!candidate) {
+        return;
+      }
+
+      const releasedBytes = await candidate.spillToDisk();
+
+      this.memoryBytes -= releasedBytes;
+    }
+  }
+
+  findOldestMemoryEntry() {
+    return this.undoStack.find((command) => command.storageTier === 'memory');
+  }
+
+  reportError(operation, command, error) {
+    console.error(`History ${operation} failed`, {
+      command,
+      error,
+    });
+  }
+}
+```
+
+---
+
+# 25. Production History Entry
+
+A richer representation:
+
+```js
+class HistoryEntry {
+  constructor({ id, authorId, type, parentRevision, execute, undo, redo }) {
+    this.id = id;
+
+    this.authorId = authorId;
+
+    this.type = type;
+
+    this.parentRevision = parentRevision;
+
+    this.committedRevision = null;
+
+    this.state = 'pending';
+
+    this.estimatedBytes = 0;
+
+    this.storageTier = 'memory';
+
+    this.execute = execute;
+    this.undo = undo;
+    this.redo = redo;
+  }
+}
+```
+
+Potential command types:
+
+```text
+brush
+erase
+transform
+text-edit
+layer-create
+layer-delete
+filter
+mask
+group
+ai-generate
+collaborative-inverse
+```
+
+---
+
+# 26. Full Architecture
+
+```text
+                        USER
+
+          Brush / Drag / Filter / AI
+                         |
+                         v
+              +----------------------+
+              | Gesture Controller   |
+              +----------+-----------+
+                         |
+                         v
+              +----------------------+
+              | Command Factory      |
+              +----------+-----------+
+                         |
+                         v
+              +----------------------+
+              | History Manager      |
+              |----------------------|
+              | undo stack           |
+              | redo stack           |
+              | grouping             |
+              | coalescing           |
+              | memory budget        |
+              | revision IDs         |
+              +---+----------+-------+
+                  |          |
+         +--------+          +---------+
+         |                             |
+         v                             v
++------------------+          +------------------+
+| Document Model   |          | History Storage  |
+|------------------|          |------------------|
+| layer tree       |          | RAM              |
+| vector objects   |          | compressed RAM   |
+| metadata         |          | SSD              |
++--------+---------+          | checkpoints      |
+         |                    +------------------+
+         |
+         +------------------+
+         |                  |
+         v                  v
++------------------+   +------------------+
+| Raster Tile      |   | AI Asset Store   |
+| Store            |   |------------------|
+|------------------|   | generated assets |
+| dirty regions    |   | metadata         |
+| pixel deltas     |   | model / seed     |
++--------+---------+   +------------------+
+         |
+         v
++--------------------------+
+| Renderer                 |
+| Canvas / WebGL / GPU     |
++--------------------------+
+```
+
+---
+
+# 27. Collaborative Architecture
+
+```text
++----------------+
+| Alice Client   |
+| local history  |
++-------+--------+
+        |
+        | operation
+        v
++--------------------------+
+| Collaboration Service    |
+|--------------------------|
+| operation sequencing     |
+| revision assignment      |
+| conflict resolution      |
+| OT / CRDT / rebase       |
+| durable operation log    |
++-----+---------------+----+
+      |               |
+      |               |
+      v               v
++-----------+    +-----------+
+| Bob       |    | Carol     |
+| Client    |    | Client    |
++-----------+    +-----------+
+```
+
+Undo becomes:
+
+```text
+Alice presses Undo
+        |
+        v
+Find Alice's latest
+undoable operation
+        |
+        v
+Create inverse operation
+        |
+        v
+Send inverse through normal
+collaboration pipeline
+        |
+        v
+Rebase / transform against
+later operations
+        |
+        v
+Commit new shared revision
+```
+
+---
+
+# 28. Important Invariants
+
+I would explicitly state these during an interview.
+
+## Invariant 1
+
+A history command should appear in `undoStack` only after the operation successfully commits.
+
+```text
+execute fails
+=>
+do not add history entry
+```
+
+## Invariant 2
+
+Undo moves the history cursor only after the inverse succeeds.
+
+## Invariant 3
+
+A new committed edit clears linear redo history.
+
+## Invariant 4
+
+Async results must verify that their operation is still valid before mutating the document.
+
+## Invariant 5
+
+Redo should reproduce the previous user-visible operation, not unexpectedly recompute a nondeterministic result.
+
+## Invariant 6
+
+Collaborative undo removes the user's logical operation rather than rewinding unrelated collaborators' state.
+
+---
+
+# 29. Edge Cases the Interviewer May Ask
+
+## Undo while pointer gesture is still active
+
+I would usually:
+
+```text
+cancel current gesture
+
+restore gesture start state
+
+do not commit incomplete gesture
+```
+
+or first finalize the gesture depending on product semantics.
+
+---
+
+## Undo a deleted layer
+
+Store enough state to restore it:
+
+```js
+const deleteLayerCommand = {
+  layerSnapshot,
+  previousParentId,
+  previousIndex,
+};
+```
+
+Undo:
+
+```text
+restore layer
+at same hierarchy location
+with stable layer ID
+```
+
+---
+
+## Undo a layer containing 500 MB
+
+Do not necessarily duplicate its pixels.
+
+Use reference counting / copy-on-write:
+
+```text
+Layer Delete
+    |
+    v
+remove document reference
+
+pixels remain in backing store
+while history references them
+```
+
+Only physically delete bytes when:
+
+```text
+document ref count == 0
+AND
+history ref count == 0
+```
+
+---
+
+## Undo after autosave
+
+Autosave and undo history are different concerns.
+
+```text
+autosave:
+durability
+
+undo:
+interactive history
+```
+
+Saving the document should not normally clear history.
+
+---
+
+## Undo after reload
+
+Depends on product requirements.
+
+Simple product:
+
+```text
+history is session-only
+```
+
+Advanced editor:
+
+```text
+persist operation log +
+checkpoints across sessions
+```
+
+---
+
+## Undo a filter
+
+For cheap deterministic filters:
+
+```text
+store parameters
++
+previous state
+```
+
+For expensive rasterized filters:
+
+```text
+store affected tile deltas
+```
+
+For nondestructive adjustment layers:
+
+```text
+undo only metadata
+```
+
+This is one reason nondestructive editing is valuable.
+
+---
+
+# 30. Why Nondestructive Editing Helps Undo
+
+Compare:
+
+```text
+Destructive brightness filter
+
+pixels:
+old -> modified
+```
+
+Undo needs pixel history.
+
+Versus:
+
+```text
+Adjustment Layer
+
+brightness = +20
+```
+
+Undo only needs:
+
+```text
+remove adjustment layer
+```
+
+or:
+
+```text
+restore previous parameter
+```
+
+This can reduce history storage dramatically.
+
+Staff-level observation:
+
+> The data model itself can make undo cheaper. Nondestructive document primitives reduce the number of operations that require raster snapshots.
+
+---
+
+# 31. GPU / Canvas Consideration
+
+If raster data exists on the GPU:
+
+```text
+WebGL texture
+WebGPU texture
+native GPU surface
+```
+
+Do not synchronously read the entire framebuffer on every stroke.
+
+GPU -> CPU readback can stall rendering.
+
+Prefer:
+
+```text
+tile-level backing buffers
+
+copy-on-write textures
+
+GPU-side copy operations
+
+asynchronous readback only when needed
+```
+
+Example conceptual flow:
+
+```text
+Brush input
+    |
+    v
+identify dirty tiles
+    |
+    +---- copy old tile / region
+    |
+    v
+GPU render stroke
+    |
+    v
+history patch references old tile
+```
+
+This avoids full-canvas `readPixels()` style stalls.
+
+---
+
+# 32. Performance Model
+
+For a brush stroke touching `k` tiles:
+
+```text
+Naive snapshot:
+
+O(document pixels)
+```
+
+Better:
+
+```text
+O(changed pixels)
+```
+
+If:
+
+```text
+N = total pixels
+D = dirty pixels
+```
+
+then usually:
+
+```text
+D << N
+```
+
+and history work becomes:
+
+```text
+O(D)
+```
+
+instead of:
+
+```text
+O(N)
+```
+
+This is the key scalability property.
+
+---
+
+# 33. Staff-Level Trade-Off Table
+
+| Problem               | Naive Design          | Better Design                             |
+| --------------------- | --------------------- | ----------------------------------------- |
+| Normal undo           | snapshot entire state | command/inverse                           |
+| 100 MB brush stroke   | full canvas snapshot  | dirty tile delta                          |
+| Pointer drag          | command per event     | gesture grouping/coalescing               |
+| Redo after new edit   | keep redo             | invalidate branch                         |
+| AI generation         | rerun model           | persist result asset                      |
+| Undo AI while running | hope abort works      | logical invalidation + best-effort cancel |
+| Collaboration         | rewind snapshot       | inverse user's operation                  |
+| Huge history          | keep forever in RAM   | memory budget + disk spill                |
+| Long replay           | replay from beginning | periodic checkpoints                      |
+| GPU raster            | framebuffer readback  | tile/COW/GPU copies                       |
+
+---
+
+# 34. Interview Answer — 2 Minutes
+
+> I would model Photoshop history primarily as a command log, but I would not rely on commands alone. Each user-visible edit becomes an undoable operation, while large raster edits store only dirty tile or region deltas rather than snapshotting the entire document.
+>
+> The basic implementation uses an undo stack and redo stack. Undo moves a successfully reverted command to the redo stack. Redo reapplies it. Any new edit after an undo clears the redo stack because the user has created a new history branch.
+>
+> High-frequency interactions such as drag events, brush samples, or slider updates should be grouped or coalesced so one user gesture produces one history entry.
+>
+> For a 100 MB brush stroke, I would not copy the whole image. I would identify affected tiles and dirty rectangles, save the previous pixels for only those regions, compress the deltas, and enforce a bounded history-memory budget. Older entries can spill to local disk, while periodic checkpoints bound replay cost.
+>
+> Async AI operations require explicit pending, running, committed, canceled, and failed states. If the user undoes while generation is running, I perform best-effort cancellation but also logically invalidate the operation ID so a late response cannot mutate the document. If generation completed, redo should restore the saved AI result instead of rerunning expensive and nondeterministic inference.
+>
+> Collaboration changes undo semantics. Undo should remove my logical operation, not rewind the entire shared document. I would send an inverse operation through the same collaboration pipeline and transform or rebase it against later edits. For raster operations that cannot be cleanly inverted, I can reconstruct only the affected tiles from a checkpoint while omitting the undone operation.
+
+---
+
+# 35. Interview Answer — 30 Seconds
+
+> I would use a command-based undo/redo system with two stacks, but Photoshop needs a hybrid history model. Small metadata edits can store semantic inverses; large raster operations store only dirty tile deltas. Gestures are grouped into one command, and new edits invalidate redo. Async AI commands get stable operation IDs so undo can logically cancel stale results, and redo restores the cached generated asset rather than rerunning inference. For collaboration, undo generates an inverse of my operation and rebases it against later remote edits instead of rewinding global state.
+
+---
+
+# 36. Keywords to Hit
+
+```text
+Command Pattern
+
+Undo Stack
+
+Redo Stack
+
+Redo Invalidation
+
+Composite Command
+
+Transactions
+
+Command Coalescing
+
+Dirty Rectangles
+
+Tile-Based Raster Storage
+
+Pixel Delta
+
+Compression
+
+Copy-on-Write
+
+Memory Budget
+
+SSD Spill
+
+Checkpointing
+
+Revision IDs
+
+Async State Machine
+
+AbortController
+
+Logical Cancellation
+
+Stale Result Protection
+
+AI Artifact Caching
+
+Deterministic Redo
+
+Operation Log
+
+Event Sourcing
+
+OT
+
+CRDT
+
+Inverse Operation
+
+Collaborative Undo
+
+Rebase
+
+Nondestructive Editing
+```
+
+---
+
+# 37. Interviewer Follow-Up Drill
+
+### Why not save the whole image for every operation?
+
+Because history cost becomes proportional to total document size rather than changed pixels.
+
+```text
+bad:
+O(total document)
+
+better:
+O(dirty region)
+```
+
+---
+
+### Why clear redo after a new edit?
+
+Because redo commands were created against the previous branch of history and may no longer be valid.
+
+---
+
+### Why group commands?
+
+Because history should match the user's mental model of one gesture, not implementation-level pointer events.
+
+---
+
+### Why does a Composite Command undo in reverse order?
+
+Because operation inverses must reverse the dependency order of the original transaction.
+
+---
+
+### How do you handle a huge brush stroke?
+
+Tile the raster, capture only dirty regions, compress deltas, enforce a memory budget, spill old history to disk, and checkpoint periodically.
+
+---
+
+### What happens if AI finishes after the user presses Undo?
+
+The result contains an operation/version ID. Before committing it, verify that the operation is still active. If not, ignore the stale result.
+
+---
+
+### Is AbortController enough?
+
+No.
+
+Abort is best effort. The server may already be processing the operation. You still need logical cancellation/version validation on the client.
+
+---
+
+### Should Redo rerun generative AI?
+
+Usually no.
+
+Redo should restore the original generated artifact so it is fast, deterministic from the user's perspective, and does not incur another inference cost.
+
+---
+
+### What changes with collaboration?
+
+Undo becomes a new inverse operation targeted at the user's own prior edit. It must be transformed or rebased against subsequent remote operations rather than rewinding global document state.
+
+---
+
+### Command log or snapshots?
+
+Both.
+
+```text
+semantic commands
++
+incremental pixel patches
++
+periodic checkpoints
+```
+
+That gives efficient history, fast reconstruction, and better collaborative semantics.
