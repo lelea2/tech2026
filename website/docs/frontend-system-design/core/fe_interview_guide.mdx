@@ -1,0 +1,2230 @@
+---
+title: 'FE Interview Guide'
+description: 'Focused interview preparation for Photoshop on the Web: browser performance, rendering, Web Components, AI/LLM integration, editor architecture, TypeScript, and senior-level ownership.'
+---
+
+## Role Signal
+
+This role is not a generic React frontend position.
+
+The strongest signals are:
+
+- Photoshop on the Web
+- large, performance-conscious, interactive web applications
+- modern browser technologies
+- Web Components
+- TypeScript
+- Generative AI and LLM integration
+- AI coding tools
+- large modular codebases
+- open-ended architectural decisions
+- engineering quality, craftsmanship, and polish
+- cross-functional collaboration with research, design, product, and engineering
+
+The interview is likely to focus on this intersection:
+
+```text
+Browser Internals
+      +
+Rendering / Editor Architecture
+      +
+Web Components
+      +
+AI / LLM Product Engineering
+      +
+TypeScript / JavaScript
+      +
+Senior-Level Technical Leadership
+```
+
+---
+
+# Priority Map
+
+| Priority | Area                                   |  Likelihood |
+| -------- | -------------------------------------- | ----------: |
+| Tier 1   | Browser rendering / performance        |   Very High |
+| Tier 1   | Large interactive editor architecture  |   Very High |
+| Tier 1   | TypeScript / JavaScript coding         |   Very High |
+| Tier 1   | Web Components                         |   Very High |
+| Tier 1   | AI / LLM integration                   |   Very High |
+| Tier 1   | AI coding workflow                     |        High |
+| Tier 2   | Canvas / WebGL / WebGPU                |        High |
+| Tier 2   | Web Workers / WASM                     |        High |
+| Tier 2   | React performance / state architecture |        High |
+| Tier 2   | Undo / redo / autosave                 |        High |
+| Tier 2   | Accessibility / design systems         | Medium-High |
+| Tier 3   | Traditional algorithms                 |      Medium |
+| Tier 3   | General backend / distributed systems  |      Medium |
+| Tier 3   | LeetCode Hard                          |       Lower |
+
+---
+
+# 1. Design Photoshop on the Web
+
+## Possible Prompt
+
+> Design the frontend architecture for a browser-based image editor similar to Photoshop.
+
+A good answer should separate UI responsibilities from document and rendering responsibilities.
+
+```text
+                         ┌─────────────────────────────┐
+                         │       Photoshop Web         │
+                         └──────────────┬──────────────┘
+                                        │
+             ┌──────────────────────────┼─────────────────────────┐
+             │                          │                         │
+      React / Web Components      Editor State             Rendering Engine
+             │                          │                         │
+     panels / toolbar / UI       document model              Canvas/WebGL
+     Spectrum components          selection                  WebGPU?
+                                  history                    WASM workers
+                                  viewport
+                                  layers
+             │                          │                         │
+             └──────────────────────────┼─────────────────────────┘
+                                        │
+                                Worker / WASM boundary
+                                        │
+                           image processing / filters
+                                        │
+                                GPU + local cache
+                                        │
+                            Cloud document services
+```
+
+## Key Principle
+
+> React owns application UI. The rendering engine owns pixels.
+
+Do not put every canvas object into React state and expect React to run the frame loop.
+
+## Likely Follow-Ups
+
+- How would you render 100,000 objects?
+- Canvas vs SVG vs WebGL vs WebGPU?
+- How do you keep React out of the 60 FPS path?
+- How do zoom and pan work?
+- How are layers represented?
+- How would selection state be managed?
+- How would undo / redo work?
+- How would you open a multi-GB document?
+- How would autosave work?
+- How would you progressively load a document?
+- What happens on WebGL context loss?
+- How do you respond to memory pressure?
+- How do you run expensive filters?
+- What performance metrics matter?
+
+---
+
+# 2. Diagnose a Canvas Editor Running at 20 FPS
+
+## Possible Prompt
+
+> Your Photoshop canvas editor runs at 20 FPS. Diagnose and fix it.
+
+Start with the browser pipeline.
+
+```text
+User input
+   ↓
+pointermove
+   ↓
+JavaScript
+   ↓
+style
+   ↓
+layout
+   ↓
+paint
+   ↓
+composite
+   ↓
+frame
+```
+
+## Step 1: Classify the Bottleneck
+
+### JavaScript
+
+Look for:
+
+- long tasks
+- excessive React renders
+- expensive geometry
+- repeated object allocation
+- garbage collection
+- synchronous image processing
+- serialization
+- huge state cloning
+
+### Layout
+
+Classic layout-thrashing pattern:
+
+```ts
+element.style.width = '100px';
+
+const width = element.getBoundingClientRect().width;
+
+element.style.height = `${width}px`;
+
+const height = element.getBoundingClientRect().height;
+```
+
+This creates:
+
+```text
+write
+ ↓
+read → forced synchronous layout
+ ↓
+write
+ ↓
+read → forced synchronous layout
+```
+
+`getBoundingClientRect()` is not inherently bad.
+
+The problem is reading layout after invalidating layout.
+
+Better pattern:
+
+```ts
+const rect = element.getBoundingClientRect();
+
+requestAnimationFrame(() => {
+  element.style.width = '100px';
+  element.style.height = `${rect.width}px`;
+});
+```
+
+General rule:
+
+```text
+batch DOM reads
+      ↓
+compute
+      ↓
+batch DOM writes
+```
+
+### Rendering
+
+Look for:
+
+- full-canvas redraws
+- redrawing offscreen objects
+- too many draw calls
+- repeated image decoding
+- unnecessary buffer allocation
+- unnecessary texture uploads
+- excessive alpha blending
+- huge overdraw
+
+Possible fixes:
+
+- dirty rectangles
+- viewport culling
+- tile-based rendering
+- level of detail
+- cache static layers
+- separate active overlay from static scene
+- batch GPU work
+- reuse buffers
+- use workers for preprocessing
+
+---
+
+# 3. requestAnimationFrame for High-Frequency Input
+
+For drawing, dragging, or pointer tracking:
+
+```ts
+let latestPointer: PointerEvent | null = null;
+let scheduled = false;
+
+canvas.addEventListener('pointermove', (event) => {
+  latestPointer = event;
+
+  if (scheduled) return;
+
+  scheduled = true;
+
+  requestAnimationFrame(() => {
+    scheduled = false;
+
+    if (latestPointer) {
+      renderPointer(latestPointer);
+    }
+  });
+});
+```
+
+## Why RAF Instead of Debounce?
+
+Debounce waits for inactivity.
+
+That is usually wrong for drawing.
+
+`requestAnimationFrame()` instead:
+
+- aligns with browser rendering
+- coalesces multiple input events
+- prevents unnecessary work between frames
+- preserves continuous interaction
+
+---
+
+# 4. Render 100,000 Objects
+
+## Possible Prompt
+
+> Design a canvas editor that supports 100,000 objects while maintaining smooth interaction.
+
+Do not answer with only:
+
+> Use `React.memo`.
+
+Think in terms of scene reduction.
+
+```text
+100,000 document objects
+        ↓
+spatial index
+        ↓
+viewport query
+        ↓
+~500 visible objects
+        ↓
+dirty-region analysis
+        ↓
+~30 changed objects
+        ↓
+GPU / Canvas rendering
+```
+
+## Architecture
+
+```text
+                 Document Model
+                       │
+             Spatial Index / Scene Tree
+                       │
+                       ▼
+                Viewport Query
+                       │
+                 Visible Nodes
+                       │
+             ┌─────────┴──────────┐
+             │                    │
+       Static Content        Active Overlay
+             │                    │
+          WebGL               Canvas / DOM
+             │                    │
+             └─────────┬──────────┘
+                       ▼
+                    Screen
+```
+
+## Techniques
+
+- quadtree / R-tree
+- viewport culling
+- dirty-region rendering
+- level of detail
+- tile caches
+- retained scene graph
+- stable IDs
+- batched draw calls
+- texture atlases
+- worker preprocessing
+- GPU compositing
+
+---
+
+# 5. Canvas vs SVG vs WebGL vs WebGPU
+
+| Technology | Best For                      | Main Trade-Off                           |
+| ---------- | ----------------------------- | ---------------------------------------- |
+| DOM        | controls, text, accessibility | poor for huge visual scenes              |
+| SVG        | moderate vector scenes        | DOM cost grows with object count         |
+| Canvas 2D  | custom raster drawing         | manual scene management                  |
+| WebGL      | GPU-accelerated rendering     | complexity, shaders, resource management |
+| WebGPU     | modern rendering + compute    | newer platform, fallback considerations  |
+| WASM       | CPU-intensive algorithms      | JS/WASM boundary and memory costs        |
+
+## Good Interview Principle
+
+> Choose the technology based on the rendering bottleneck, interaction requirements, browser support, and operational complexity.
+
+Do not say:
+
+> WebGPU is newer, so we should use WebGPU.
+
+A senior answer asks:
+
+- What is actually slow?
+- What percentage of users support the feature?
+- What is the fallback?
+- What is the migration cost?
+- What are the observability requirements?
+
+---
+
+# 6. Web Components vs React
+
+## Why Web Components?
+
+```text
+              Shared Web Component
+                      │
+          ┌───────────┼───────────┐
+          │           │           │
+        React        Vue       Vanilla JS
+```
+
+Benefits:
+
+- browser-native component model
+- framework independence
+- usable across large modular products
+- encapsulated implementation
+- long-lived API surface
+- independent of React version changes
+- portable design-system primitives
+
+Costs:
+
+- Shadow DOM styling
+- events across boundaries
+- testing
+- SSR and hydration
+- form participation
+- accessibility
+- debugging
+- version coexistence
+
+---
+
+# 7. Shadow DOM
+
+## What Does Shadow DOM Give You?
+
+Encapsulation for:
+
+```text
+markup
+styles
+internal component implementation
+```
+
+## Costs
+
+- styling overrides become harder
+- events may be retargeted
+- integration testing is more complex
+- accessibility requires care
+- browser devtools debugging is less straightforward
+- SSR / hydration can be trickier
+
+---
+
+# 8. Custom Events Across Shadow DOM
+
+Example:
+
+```ts
+this.dispatchEvent(
+  new CustomEvent('change', {
+    detail: { value },
+    bubbles: true,
+    composed: true,
+  })
+);
+```
+
+`composed: true` matters because the event needs to cross the Shadow DOM boundary.
+
+---
+
+# 9. Attributes vs Properties
+
+Declarative serializable value:
+
+```html
+<image-layer opacity="0.5"></image-layer>
+```
+
+Complex JavaScript value:
+
+```ts
+layer.imageData = imageBitmap;
+```
+
+Use:
+
+- attributes for primitive, serializable declarative state
+- properties for objects, functions, arrays, typed buffers, binary data
+
+---
+
+# 10. Can Multiple Versions of a Web Component Library Coexist?
+
+The Custom Elements Registry is global.
+
+```ts
+customElements.define('sp-button', Button);
+```
+
+Registering the same element name again is not allowed.
+
+This means dependency/version mismatch can become difficult in a large modular product.
+
+## Discussion Points
+
+- dedupe shared design-system packages
+- enforce compatible ranges
+- singleton dependency strategy
+- app shell controls component version
+- versioned element names only as a last resort
+- codemods for migrations
+- release policy
+- runtime diagnostics
+
+---
+
+# 11. Implement a Reusable Web Component
+
+## Possible Prompt
+
+> Build an `<image-slider>` custom element that exposes `value` and fires a change event.
+
+```ts
+class ImageSlider extends HTMLElement {
+  static observedAttributes = ['value'];
+
+  private input!: HTMLInputElement;
+
+  constructor() {
+    super();
+
+    const shadow = this.attachShadow({ mode: 'open' });
+
+    shadow.innerHTML = `
+      <input type="range" min="0" max="100" />
+    `;
+  }
+
+  connectedCallback() {
+    this.input = this.shadowRoot!.querySelector('input')!;
+
+    this.input.addEventListener('input', this.handleInput);
+
+    this.sync();
+  }
+
+  disconnectedCallback() {
+    this.input.removeEventListener('input', this.handleInput);
+  }
+
+  attributeChangedCallback() {
+    this.sync();
+  }
+
+  private handleInput = () => {
+    this.value = Number(this.input.value);
+
+    this.dispatchEvent(
+      new CustomEvent('change', {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  };
+
+  private sync() {
+    if (this.input) {
+      this.input.value = String(this.value);
+    }
+  }
+
+  get value() {
+    return Number(this.getAttribute('value') ?? 0);
+  }
+
+  set value(value: number) {
+    this.setAttribute('value', String(value));
+  }
+}
+
+customElements.define('image-slider', ImageSlider);
+```
+
+## Follow-Up: React Integration
+
+Expect questions about:
+
+- refs
+- custom event listeners
+- property assignment
+- wrapper components
+- controlled vs uncontrolled behavior
+
+---
+
+# 12. Design Generative Fill for Photoshop Web
+
+## Possible Prompt
+
+> Design Generative Fill for Photoshop on the Web.
+
+Do not model it as:
+
+```text
+Browser → LLM → Image
+```
+
+Use an asynchronous job system.
+
+```text
+User selects region
+        │
+        ▼
+prompt + mask + document context
+        │
+        ▼
+Generation API
+        │
+   moderation
+        │
+        ▼
+     Job Service
+        │
+        ▼
+       Queue
+        │
+        ▼
+    GPU Worker
+        │
+        ▼
+   Object Storage
+        │
+        ▼
+ signed / CDN asset
+        │
+        ▼
+      Browser
+```
+
+## Frontend State Machine
+
+```ts
+type GenerationState =
+  | { status: 'idle' }
+  | { status: 'submitting' }
+  | { status: 'queued'; jobId: string }
+  | { status: 'generating'; jobId: string }
+  | { status: 'success'; variants: ImageVariant[] }
+  | { status: 'error'; error: Error };
+```
+
+## Discuss
+
+- upload masks separately from JSON
+- signed object-storage URLs
+- asynchronous GPU execution
+- idempotency keys
+- cancellation
+- retries
+- moderation
+- progress
+- SSE / polling
+- output variants
+- generation history
+- content provenance
+- cost
+- quota enforcement
+
+## Photoshop-Specific Principle
+
+> Treat generated output as a non-destructive editor operation, ideally creating a new layer or command rather than destructively replacing pixels.
+
+That makes undo / redo natural.
+
+---
+
+# 13. Streaming AI Responses with SSE
+
+## Possible Prompt
+
+> Build the frontend streaming flow for an AI assistant embedded in Photoshop.
+
+```text
+POST /chat
+    │
+    ▼
+conversation service
+    │
+    ▼
+agent / LLM
+    │
+  SSE stream
+    │
+    ▼
+browser
+```
+
+Do not rerender React on every token.
+
+```ts
+let pending = '';
+let scheduled = false;
+
+function onToken(token: string) {
+  pending += token;
+
+  if (scheduled) return;
+
+  scheduled = true;
+
+  requestAnimationFrame(() => {
+    scheduled = false;
+
+    setText((prev) => prev + pending);
+    pending = '';
+  });
+}
+```
+
+## Core Topics
+
+- AbortController
+- disconnect
+- reconnect
+- retry
+- `Last-Event-ID`
+- duplicate event suppression
+- backpressure
+- buffering
+- partial assistant content
+- partial tool calls
+- state transitions
+- accessibility announcements
+
+## Backpressure Principle
+
+```text
+network production rate
+          ≠
+UI render consumption rate
+```
+
+Buffer network chunks and consume them at a bounded UI cadence.
+
+---
+
+# 14. Design an AI Agent That Can Modify Photoshop
+
+## Possible Prompt
+
+> The user says: "Remove the person, brighten the sky, and crop for Instagram." Design the system.
+
+```text
+User
+ │
+ ▼
+AI Assistant
+ │
+ ▼
+LLM / Planner
+ │
+ ├── inspect_document()
+ ├── select_object()
+ ├── generative_remove()
+ ├── adjust_brightness()
+ └── crop_document()
+ │
+ ▼
+Governed Tool Layer
+ │
+ ▼
+Photoshop Command System
+ │
+ ▼
+Document
+```
+
+## Most Important Boundary
+
+> The model proposes intent. Deterministic tools perform document mutations.
+
+Do not give the LLM arbitrary write access to application state.
+
+## Tool Context
+
+```ts
+type ToolContext = {
+  documentId: string;
+  userId: string;
+  permissions: Permission[];
+  requestId: string;
+};
+
+type CropArgs = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+```
+
+## Tool-Layer Responsibilities
+
+- schema validation
+- authorization
+- capability checks
+- deterministic execution
+- idempotency
+- retries
+- timeout handling
+- audit log
+- preview
+- confirmation
+- undo integration
+
+---
+
+# 15. LLM Boundary vs Tool Boundary
+
+This is an important senior-level AI discussion.
+
+```text
+                      LLM
+                       │
+               intent / planning
+                       │
+                       ▼
+               Governed Tool Layer
+                       │
+          ┌────────────┼─────────────┐
+          ▼            ▼             ▼
+     Document API   Asset API   Generation API
+```
+
+## LLM Responsibilities
+
+Good:
+
+- interpret user intent
+- plan steps
+- select tools
+- summarize results
+- reason about ambiguity
+
+Bad:
+
+- directly mutate document state
+- bypass authorization
+- invent arbitrary tool payloads
+- be the system of record
+
+## Tool Responsibilities
+
+- authorization
+- validation
+- deterministic mutations
+- retries
+- idempotency
+- auditability
+- state transitions
+- failure handling
+
+---
+
+# 16. Safe LLM Integration
+
+Prepare for:
+
+> How would you integrate an LLM safely into a creative product?
+
+Discuss:
+
+- prompt injection
+- tool allowlists
+- capability-scoped tokens
+- schema validation
+- tenant isolation
+- user isolation
+- document privacy
+- destructive-action confirmation
+- least privilege
+- context minimization
+- output validation
+- observability
+- redaction
+- auditing
+
+---
+
+# 17. AI Coding Tools
+
+The role strongly emphasizes AI-augmented engineering.
+
+Likely questions:
+
+- How are you using AI coding tools?
+- What work do you delegate to AI?
+- What do you never delegate?
+- Give an example where AI materially improved delivery.
+- How do you validate AI-generated code?
+- How would you improve AI adoption across a team?
+- What are the risks of AI-generated code?
+- How do you measure whether AI is really improving productivity?
+
+## Good Engineering Loop
+
+```text
+Problem decomposition
+        ↓
+explicit specification
+        ↓
+AI implementation / exploration
+        ↓
+human review
+        ↓
+type checker / unit tests
+        ↓
+integration / visual tests
+        ↓
+performance / security review
+        ↓
+merge
+```
+
+## Good AI Delegation Targets
+
+- scaffolding
+- tests
+- repetitive refactors
+- codemods
+- documentation
+- boilerplate
+- unfamiliar API exploration
+
+## Human Judgment Should Remain Strongest In
+
+- architecture
+- product behavior
+- security
+- privacy
+- performance
+- accessibility
+- correctness invariants
+- system boundaries
+
+---
+
+# 18. Web Workers + OffscreenCanvas
+
+## Possible Prompt
+
+> How would you run an expensive image filter without freezing the UI?
+
+Main thread:
+
+```ts
+const worker = new Worker(new URL('./filter.worker.ts', import.meta.url), { type: 'module' });
+
+const offscreen = canvas.transferControlToOffscreen();
+
+worker.postMessage(
+  {
+    canvas: offscreen,
+    imageBuffer,
+  },
+  [offscreen, imageBuffer]
+);
+```
+
+Worker:
+
+```ts
+self.onmessage = (event) => {
+  const { canvas, imageBuffer } = event.data;
+
+  const ctx = canvas.getContext('2d');
+
+  processImage(imageBuffer);
+
+  // Draw result.
+};
+```
+
+## Why Transfer Buffers?
+
+Potential problem:
+
+```text
+structured clone
+100 MB buffer
+    ↓
+large copy cost
+```
+
+Better:
+
+```text
+Transferable
+100 MB buffer
+    ↓
+ownership moves to worker
+```
+
+This avoids copying the entire buffer.
+
+---
+
+# 19. WebAssembly
+
+## Possible Prompt
+
+> When would you use WebAssembly instead of JavaScript for Photoshop Web?
+
+Good targets:
+
+- existing C / C++ image algorithms
+- codecs
+- pixel-processing loops
+- filters
+- geometry
+- color transforms
+- portable native libraries
+
+Important:
+
+> WASM is not automatically faster.
+
+Costs include:
+
+- JS ↔ WASM calls
+- copying
+- memory management
+- serialization
+- startup
+
+Good architecture:
+
+```text
+UI Thread
+   │
+   ▼
+Worker
+   │
+   ▼
+WASM
+   │
+   ▼
+Shared / Transferred Buffers
+```
+
+Bad architecture:
+
+```text
+React component
+     ↓
+WASM call per pixel
+```
+
+---
+
+# 20. Memory Management
+
+## Possible Prompt
+
+> A user opens a 12,000 × 12,000 image and the browser crashes. Why?
+
+RGBA memory:
+
+```text
+12,000 × 12,000 × 4
+= 576,000,000 bytes
+≈ 549 MiB
+```
+
+That is only one uncompressed copy.
+
+Real memory may include:
+
+```text
+original pixels
+working buffer
+GPU texture
+preview
+undo state
+temporary filter buffers
+decoded image
+tile cache
+```
+
+This can quickly reach multiple GB.
+
+## Mitigations
+
+- tiled image representation
+- lazy decoding
+- mipmaps
+- memory budgets
+- cache eviction
+- incremental filters
+- reusable buffers
+- transferred ArrayBuffers
+- release GPU resources
+- deltas instead of full undo snapshots
+- offscreen resource cleanup
+
+---
+
+# 21. Undo / Redo
+
+## Possible Prompt
+
+> Implement undo / redo for Photoshop operations.
+
+Command pattern:
+
+```ts
+interface Command {
+  execute(): void;
+  undo(): void;
+}
+
+class MoveLayerCommand implements Command {
+  constructor(
+    private layer: Layer,
+    private from: Point,
+    private to: Point
+  ) {}
+
+  execute() {
+    this.layer.position = this.to;
+  }
+
+  undo() {
+    this.layer.position = this.from;
+  }
+}
+```
+
+History:
+
+```text
+command
+   ↓
+execute()
+   ↓
+undoStack.push(command)
+
+undo:
+undoStack.pop()
+      ↓
+command.undo()
+      ↓
+redoStack.push(command)
+```
+
+## Follow-Ups
+
+### 100 MB brush stroke?
+
+Do not snapshot the whole document.
+
+Store:
+
+- compressed delta
+- changed tile IDs
+- stroke input
+- operation representation
+
+### Grouped commands?
+
+Use transaction / composite command.
+
+```ts
+class CompositeCommand implements Command {
+  constructor(private commands: Command[]) {}
+
+  execute() {
+    for (const command of this.commands) {
+      command.execute();
+    }
+  }
+
+  undo() {
+    for (const command of [...this.commands].reverse()) {
+      command.undo();
+    }
+  }
+}
+```
+
+### Redo invalidation?
+
+After undo, a new user operation clears the redo stack.
+
+### Async AI operation?
+
+Represent:
+
+```text
+pending command
+      ↓
+job runs
+      ↓
+result arrives
+      ↓
+commit deterministic mutation
+      ↓
+history entry
+```
+
+### Collaborative edits?
+
+Simple local stack assumptions break.
+
+You may need:
+
+- operation transforms
+- CRDTs
+- versioned commands
+- inverse operations applied against latest state
+
+---
+
+# 22. Progressive Loading for Huge Documents
+
+## Possible Prompt
+
+> A Photoshop document is hundreds of megabytes. How do you make opening it feel fast?
+
+Do not:
+
+```text
+download entire file
+       ↓
+decode everything
+       ↓
+construct everything
+       ↓
+render
+```
+
+Prefer:
+
+```text
+Open document
+    │
+    ├── metadata
+    ├── document structure
+    ├── thumbnail / preview
+    └── visible tiles
+            │
+            ▼
+        interactive
+            │
+            ▼
+      background fetch
+            │
+            ▼
+       remaining tiles
+```
+
+Use:
+
+- HTTP range requests
+- CDN
+- chunking
+- prioritization
+- progressive preview
+- cancellation
+- cache
+- IndexedDB where appropriate
+- background prefetch
+- visible-first loading
+
+---
+
+# 23. Browser Scheduling
+
+Know the use cases for:
+
+```text
+requestAnimationFrame
+requestIdleCallback
+queueMicrotask
+setTimeout
+scheduler.postTask
+Web Worker
+```
+
+## Example: 500 Layer Thumbnails
+
+Possible policy:
+
+```text
+visible thumbnails
+      ↓
+high priority
+
+interaction
+      ↓
+requestAnimationFrame
+
+CPU-heavy decoding
+      ↓
+worker
+
+background precomputation
+      ↓
+idle / background scheduling
+```
+
+## Microtask Starvation
+
+Dangerous:
+
+```ts
+function loop() {
+  queueMicrotask(loop);
+}
+
+loop();
+```
+
+The browser may never get enough opportunity to render.
+
+---
+
+# 24. React Performance
+
+Possible questions:
+
+- Why did this component rerender?
+- When does `React.memo()` not help?
+- `useMemo` vs `useCallback`?
+- stale closures?
+- automatic batching?
+- `useTransition`?
+- `useDeferredValue`?
+- how do you avoid rerendering panels while dragging?
+- when should state live outside React?
+
+## Important Editor Principle
+
+```text
+High-frequency render state
+           ≠
+React global application state
+```
+
+Separate:
+
+```text
+document engine
+viewport engine
+pointer interaction
+render loop
+```
+
+from slower UI state:
+
+```text
+toolbar
+side panel
+dialog
+menu
+settings
+```
+
+---
+
+# 25. State Architecture for a Large Editor
+
+## Possible Prompt
+
+> Would you put the Photoshop document in Redux?
+
+Good answer:
+
+> Not all of it.
+
+```text
+                    Application
+                        │
+          ┌─────────────┼──────────────┐
+          ▼             ▼              ▼
+       UI State     Server State   Document Engine
+       React          cache            model
+       panels         assets           layers
+       dialogs        jobs             history
+       menus                           rendering
+```
+
+## Discuss
+
+- normalized entities
+- subscriptions
+- selectors
+- transaction boundaries
+- command model
+- server state vs client state
+- transient pointer state
+- persistence
+- dirty state
+- document version
+
+---
+
+# 26. Autosave and Persistence
+
+## Possible Prompt
+
+> How would you autosave Photoshop documents?
+
+```text
+Local editor
+   │
+   ├── command log
+   ├── dirty tiles
+   └── metadata deltas
+          │
+          ▼
+   Autosave Coordinator
+          │
+          ▼
+   Object Storage + Metadata DB
+```
+
+Discuss:
+
+- debounced autosave
+- periodic checkpoints
+- incremental saves
+- version IDs
+- idempotency
+- retries
+- local crash recovery
+- optimistic concurrency
+- conflict detection
+
+Possible API:
+
+```http
+PUT /documents/:id
+If-Match: version-42
+```
+
+If the current server version is `43`, reject or initiate conflict handling.
+
+---
+
+# 27. Accessibility in a Canvas Editor
+
+## Possible Prompt
+
+> Canvas is not naturally accessible. How would you make Photoshop Web accessible?
+
+Do not try to pretend pixels alone are semantic.
+
+```text
+Visual Canvas
+     │
+     ├── keyboard interaction model
+     ├── semantic layer tree
+     ├── focus management
+     ├── property inspector
+     ├── ARIA announcements
+     └── accessible menus / controls
+```
+
+Discuss:
+
+- keyboard alternatives to drag
+- focus order
+- visible focus state
+- screen reader announcements
+- selection state
+- layer list semantics
+- high contrast
+- reduced motion
+- shortcuts
+- accessible dialogs
+- semantic controls outside the canvas
+
+---
+
+# 28. Cross-Browser Capability Strategy
+
+## Possible Prompt
+
+> Chrome supports a new API but Safari does not. What do you do?
+
+Use capability detection.
+
+```text
+capability detection
+       ↓
+progressive enhancement
+       ↓
+ fast path     fallback
+```
+
+Example:
+
+```ts
+if ('gpu' in navigator) {
+  // WebGPU path
+} else {
+  // WebGL / Canvas path
+}
+```
+
+Avoid user-agent checks unless absolutely necessary.
+
+Evaluate:
+
+- supported-user percentage
+- performance benefit
+- fallback quality
+- maintenance cost
+- failure telemetry
+
+---
+
+# 29. TypeScript Questions
+
+## Discriminated Union
+
+```ts
+type Job =
+  | { status: 'queued'; jobId: string }
+  | { status: 'running'; progress: number }
+  | { status: 'success'; url: string }
+  | { status: 'failed'; error: Error };
+```
+
+## Generic API
+
+```ts
+async function cachedFetch<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+  return fetcher();
+}
+```
+
+## Type Predicate
+
+```ts
+function isLayer(value: unknown): value is Layer {
+  return typeof value === 'object' && value !== null && 'id' in value;
+}
+```
+
+## Exhaustiveness
+
+```ts
+function assertNever(value: never): never {
+  throw new Error(`Unexpected value: ${value}`);
+}
+```
+
+Use discriminated unions heavily for asynchronous editor and AI state.
+
+---
+
+# 30. Coding Questions to Practice
+
+Most likely style:
+
+1. LRU cache
+2. debounce
+3. throttle
+4. async retry with exponential backoff
+5. AbortController
+6. undo / redo
+7. concurrency-limited work queue
+8. event emitter
+9. tree traversal
+10. flatten layer hierarchy
+11. merge intervals
+12. async request deduplication
+13. streaming SSE parser
+14. recursive API pagination
+15. custom `useInterval`
+16. resizable panel
+17. keyboard shortcut manager
+18. selection model
+19. Web Component
+20. generic TypeScript cache
+
+---
+
+# 31. Concurrency-Limited Task Queue
+
+## Possible Prompt
+
+> Generate thumbnails for 1,000 layers, but only process four simultaneously.
+
+```ts
+async function mapLimit<T, R>(
+  items: T[],
+  limit: number,
+  fn: (item: T) => Promise<R>
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let next = 0;
+
+  async function worker() {
+    while (true) {
+      const index = next++;
+
+      if (index >= items.length) {
+        return;
+      }
+
+      results[index] = await fn(items[index]);
+    }
+  }
+
+  await Promise.all(
+    Array.from(
+      {
+        length: Math.min(limit, items.length),
+      },
+      () => worker()
+    )
+  );
+
+  return results;
+}
+```
+
+## Follow-Ups
+
+- cancellation
+- retries
+- task priorities
+- preserving order
+- backpressure
+- memory pressure
+- dynamic concurrency
+
+---
+
+# 32. Design System Architecture
+
+Possible questions:
+
+- When should a component become shared?
+- Primitive vs product component?
+- Who owns accessibility?
+- How do design tokens propagate?
+- How do you avoid CSS leakage?
+- How do you evolve APIs?
+- How do you ship breaking accessibility fixes?
+- How do you handle multiple versions?
+- How do you measure adoption?
+- How do you prevent the design system from becoming a bottleneck?
+
+## Architecture
+
+```text
+Design Tokens
+     ↓
+Foundation Primitives
+     ↓
+Spectrum Web Components
+     ↓
+Framework Adapters
+     ↓
+Photoshop Product Components
+     ↓
+Feature UI
+```
+
+---
+
+# 33. Open-Ended Performance Question
+
+## Possible Prompt
+
+> PM says: "Make Photoshop feel much faster." What do you do?
+
+Do not immediately propose optimization techniques.
+
+Start with the user journey.
+
+```text
+open document
+tool activation
+brush latency
+zoom / pan
+AI generation
+save
+export
+```
+
+Then define metrics.
+
+Possible metrics:
+
+```text
+document-open-to-editable
+INP
+frame time
+dropped frames
+pointer-to-pixel latency
+memory
+crash rate
+AI time-to-first-feedback
+AI total generation time
+save latency
+export latency
+```
+
+Then:
+
+1. measure
+2. identify dominant user pain
+3. profile
+4. form hypothesis
+5. optimize
+6. run experiment
+7. verify no quality regressions
+
+---
+
+# 34. Behavioral — Ambiguity
+
+## Possible Prompt
+
+> Tell me about a project where requirements were unclear.
+
+Use this structure:
+
+```text
+Ambiguity
+   ↓
+What was known?
+   ↓
+What was risky?
+   ↓
+Prototype / instrumentation
+   ↓
+Cross-functional alignment
+   ↓
+Decision
+   ↓
+Measured outcome
+```
+
+A strong answer shows:
+
+- you did not wait for perfect requirements
+- you made assumptions explicit
+- you identified irreversible decisions
+- you used prototypes or data
+- you aligned stakeholders
+- you measured the result
+
+---
+
+# 35. Behavioral — Technical Influence
+
+Likely questions:
+
+- Tell me about a technical direction you drove without authority.
+- Tell me about an architectural disagreement.
+- Tell me about a conflict with design or product.
+- Tell me about a difficult code review.
+- Tell me about a time you changed your mind.
+- How do you raise the engineering quality bar?
+- Tell me about mentoring another engineer.
+
+Good model:
+
+```text
+make trade-offs explicit
+        ↓
+agree on decision criteria
+        ↓
+prototype / gather data
+        ↓
+make decision
+        ↓
+document rationale
+        ↓
+measure result
+```
+
+Avoid framing:
+
+> I convinced everyone that my design was right.
+
+Prefer:
+
+> I created a decision framework that let the team reason about the trade-offs together.
+
+---
+
+# 36. Behavioral — AI Adoption
+
+## Possible Prompt
+
+> How have you changed engineering practices using AI?
+
+Good structure:
+
+```text
+Problem
+   ↓
+Manual development bottleneck
+   ↓
+AI-assisted workflow
+   ↓
+Guardrails
+   ↓
+Team adoption
+   ↓
+Measured outcome
+```
+
+Potential dimensions:
+
+- cycle time
+- test coverage
+- review time
+- defect rate
+- documentation
+- onboarding
+- migration speed
+- codemod efficiency
+
+Important:
+
+Do not make productivity claims without a validation mechanism.
+
+---
+
+# 37. Staff/Senior-Level Framing
+
+Even if the title is Senior Web Developer, the job description expects broad ownership.
+
+For system-design answers, consistently cover:
+
+```text
+Requirements
+   ↓
+Constraints
+   ↓
+Core architecture
+   ↓
+State model
+   ↓
+Data flow
+   ↓
+Performance
+   ↓
+Failure modes
+   ↓
+Observability
+   ↓
+Accessibility
+   ↓
+Security
+   ↓
+Trade-offs
+```
+
+Do not only explain the happy path.
+
+---
+
+# 38. Top 12 Questions to Drill
+
+If preparation time is limited, rehearse these out loud.
+
+## 1. Design Photoshop on the Web
+
+Cover:
+
+- document engine
+- React / Web Components
+- rendering
+- workers
+- WASM
+- storage
+- undo
+- performance
+
+## 2. Your Canvas Editor Runs at 20 FPS
+
+Cover:
+
+- Performance panel
+- long tasks
+- layout thrashing
+- React rerenders
+- raster work
+- GPU
+- memory
+- dirty rendering
+
+## 3. Render 100,000 Objects
+
+Cover:
+
+- scene graph
+- spatial index
+- viewport culling
+- LOD
+- tiles
+- GPU batching
+
+## 4. Canvas vs SVG vs WebGL vs WebGPU
+
+Focus on constraints and migration strategy.
+
+## 5. Web Workers + WASM
+
+Cover:
+
+- worker boundary
+- transferable buffers
+- CPU-intensive filters
+- stale-result cancellation
+
+## 6. Web Components
+
+Cover:
+
+- Shadow DOM
+- lifecycle
+- properties
+- attributes
+- events
+- React integration
+- version coexistence
+
+## 7. Design Generative Fill
+
+Cover:
+
+- mask
+- prompt
+- async job
+- GPU queue
+- SSE
+- storage
+- variants
+- cancellation
+- undo
+
+## 8. AI Agent Modifying Photoshop
+
+Cover:
+
+- planner
+- tool calls
+- deterministic mutation
+- authorization
+- confirmation
+- audit
+- undo
+
+## 9. SSE LLM Streaming
+
+Cover:
+
+- retry
+- reconnect
+- `Last-Event-ID`
+- backpressure
+- RAF batching
+- AbortController
+
+## 10. Undo / Redo + Autosave
+
+Cover:
+
+- command pattern
+- delta storage
+- async operations
+- redo invalidation
+- persistence
+
+## 11. AI Coding Workflow
+
+Cover:
+
+- delegation
+- verification
+- code review
+- testing
+- security
+- team adoption
+
+## 12. Ambiguous Product Requirement
+
+Cover:
+
+- metrics
+- prototypes
+- assumptions
+- cross-functional decision making
+
+---
+
+# 39. One Architecture That Connects the Entire Role
+
+The following diagram connects almost every major signal in the job description.
+
+```text
+USER INPUT
+    │
+    ▼
+React / Web Components
+    │
+    ▼
+Editor State / Command System
+    │
+    ├─────────────┐
+    │             │
+    ▼             ▼
+Worker          AI Assistant
+    │             │
+    ▼             ▼
+WASM          LLM / Planner
+    │             │
+    ▼             ▼
+Canvas /      Governed Tools
+WebGL /           │
+WebGPU            ▼
+    │         Photoshop Commands
+    ▼             │
+60 FPS            ▼
+             Async Generation
+                  │
+                  ▼
+              SSE Progress
+                  │
+                  ▼
+            Generated Asset
+                  │
+                  ▼
+          Non-Destructive Layer
+                  │
+                  ▼
+             Undo / Redo
+```
+
+---
+
+# 40. Interview Answer Checklist
+
+For every frontend system-design problem, make sure you mention the following where relevant:
+
+- requirements
+- document/state model
+- rendering strategy
+- main-thread work
+- worker boundary
+- memory
+- caching
+- scheduling
+- cancellation
+- retries
+- stale work
+- browser support
+- accessibility
+- observability
+- testing
+- failure recovery
+
+For every AI system-design problem:
+
+- what the LLM owns
+- what tools own
+- tool schemas
+- validation
+- authorization
+- idempotency
+- async execution
+- cancellation
+- retries
+- progress
+- human confirmation
+- auditability
+- undo / rollback
+- privacy
+- moderation
+- cost controls
+
+---
+
+# 41. Strong Phrases to Use in the Interview
+
+These are useful because they communicate architecture clearly and concisely.
+
+### Rendering
+
+> React owns application UI; the rendering engine owns pixels.
+
+### Performance
+
+> I want to identify whether the frame budget is being lost in JavaScript, layout, rasterization, compositing, or GPU work before choosing an optimization.
+
+### 100K Objects
+
+> The key is not rendering 100,000 objects faster. The key is reducing the active working set to the objects that matter to the current frame.
+
+### Web Components
+
+> The value is a browser-level component contract that can survive framework boundaries and framework lifecycle changes.
+
+### WASM
+
+> WASM helps when computation dominates, but the JS/WASM boundary and memory movement still need to be designed carefully.
+
+### AI Agent
+
+> The model proposes intent; deterministic tools own state mutation.
+
+### AI Safety
+
+> Tool execution is a capability boundary, not simply another model output.
+
+### SSE
+
+> Network production rate and UI consumption rate are different, so I buffer the stream and render at a bounded cadence.
+
+### Undo / Redo
+
+> Undo history should store semantic operations or deltas, not full document snapshots.
+
+### New Browser Technology
+
+> I adopt new browser capabilities when they remove a measurable user-facing constraint, not simply because the API is newer.
+
+### Ambiguity
+
+> I try to identify which assumptions are cheap to reverse and which decisions create long-term architectural commitment.
+
+---
+
+# 42. Night-Before Preparation Order
+
+If there is only a few hours left:
+
+## Hour 1
+
+Practice:
+
+- Photoshop Web architecture
+- 100K object rendering
+- Canvas 20 FPS debugging
+
+## Hour 2
+
+Practice:
+
+- Web Components
+- Shadow DOM
+- React integration
+- Web Workers / WASM
+
+## Hour 3
+
+Practice:
+
+- Generative Fill
+- AI agent modifying document
+- LLM vs tool boundary
+- SSE
+
+## Hour 4
+
+Code:
+
+- undo / redo
+- concurrency limiter
+- LRU
+- AbortController
+- SSE buffer
+
+## Final Review
+
+Rehearse behavioral stories for:
+
+- ambiguity
+- influence
+- engineering quality
+- AI adoption
+- cross-functional disagreement
+- failure / learning
+
+---
+
+# Final Mental Model
+
+The strongest way to think about this Adobe role is:
+
+```text
+Professional creative application
+        +
+browser systems engineering
+        +
+portable component architecture
+        +
+high-performance rendering
+        +
+AI-assisted creative workflows
+        +
+engineering leadership
+```
+
+A strong candidate should be comfortable moving between:
+
+```text
+React component
+     ↓
+browser scheduling
+     ↓
+worker
+     ↓
+WASM
+     ↓
+GPU
+```
+
+and:
+
+```text
+user prompt
+    ↓
+LLM
+    ↓
+tool
+    ↓
+document command
+    ↓
+async AI job
+    ↓
+streamed progress
+    ↓
+undoable editor result
+```
+
+That combination is the core of the interview preparation.
