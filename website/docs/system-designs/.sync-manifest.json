@@ -112,6 +112,10 @@
       "hash": "9c847ecca391881c7bedd070836b39c2c90426532a898a1a88b509bf6687250f",
       "docRelative": "figma.png"
     },
+    "system-designs/geolocation-search.png": {
+      "hash": "ae6cedbc25d0f3652b4809113e8a2b1ab13e284b1dcdb47b546dfa75dd2d4218",
+      "docRelative": "geolocation-search.png"
+    },
     "system-designs/github-actions-fe-run-view.svg": {
       "hash": "c618adc3bc826faa21f968af2b0fe590d448640ad8eeeb6dc86548729b2d65f8",
       "docRelative": "github-actions-fe-run-view.svg"
@@ -383,6 +387,10 @@
     "system-designs/figma.mdx": {
       "hash": "f721d716d1d533135b572115dc83996c2e53b8bc068cf891dff97896b2991fe1",
       "docRelative": "figma.mdx"
+    },
+    "system-designs/geolocation-service.mdx": {
+      "hash": "2a958ff023b747590c3ef6d83a054855504621ab80d20ac53870a747dc01a259",
+      "docRelative": "geolocation-service.mdx"
     },
     "system-designs/github-actions-system-design.mdx": {
       "hash": "8b7228fa984e56358456d7e53fc2484433e81761db105f0c6f007e708e30c7a9",

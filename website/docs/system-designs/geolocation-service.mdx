@@ -1,0 +1,170 @@
+---
+title: 'Geolocation Search Service'
+---
+
+![High-level architecture](./geolocation-search.svg)
+
+# Geolocation Search Service
+
+Companion doc to `geolocation-search-service-architecture.excalidraw`. Component names below match the boxes on the diagram.
+
+## 0. Framing & clarifying questions to ask
+
+Ask these first, out loud, before drawing anything — a technical screen is partly evaluating whether you scope before you design:
+
+- **What exact goal?** "Places near me" style search (Yelp/Maps-like: restaurants, stores, points of interest) vs. "nearby entities" in a more generic/internal sense (e.g., nearby users, devices, assets). Assume the former (a public places/POI search) unless told otherwise — it's the richer, more standard version of this problem.
+- **Scale/latency/reliability/privacy?** Assume: read-heavy (search QPS orders of magnitude above write/update QPS), low-latency requirement (p95 sub-200ms for search since it's usually in a live UI), high availability expected (users notice outages immediately), data freshness of minutes is acceptable (a new restaurant doesn't need to appear in under a second), and light privacy sensitivity around the _user's_ live location (don't log/retain precise user coordinates longer than needed for the request).
+- **Existing infrastructure?** Per the prompt's constraint, don't assume company-specific systems — design as a standalone service with standard building blocks (a spatial index, a text/relevance index, a metadata store, a cache), and name concrete technology options (PostGIS, Elasticsearch geo queries, Redis GEO, S2/geohash) as _interchangeable choices_, not a hard dependency on any one vendor.
+- **What defines success here?** Correct recall (never silently drop a place that's actually within the radius), acceptable ranking quality (closest + most relevant first), and meeting the latency/availability targets above under realistic load, including uneven geographic density (Manhattan vs. rural).
+
+## 1. Functional requirements
+
+- Given a location (lat/lng) and a radius or bounding box, return relevant places/entities ranked by a combination of distance, text/category relevance, and popularity.
+- Support both "search near my current location" and "search near an arbitrary address/place."
+- Support free-text + category/filter search combined with the geo constraint (e.g., `"coffee" within 2km`).
+- Support pagination over results.
+- Keep entity data (name, hours, category, popularity) reasonably fresh as the real world changes (new places open, places close, attributes update).
+- (Stretch, shown on the diagram as a separate branch) typeahead/autocomplete while the user types a query.
+
+## 2. Architecture walkthrough
+
+Read top to bottom on the diagram:
+
+1. **Client** — sends lat/lng, radius or bounding box, optional query text/filters, and a pagination cursor.
+2. **API Gateway / Load Balancer** — authn, rate limiting, routes to the right internal service.
+3. **Geo Search Service** — the orchestrator. Converts the request into a set of candidate geo cells covering the search area, queries the cache, falls through to the index on a miss, and hands candidates to ranking.
+4. **Query/Tile Cache** — caches results keyed by `(geohash cell, radius bucket, filters)`. Nearby-search traffic is extremely skewed toward popular areas (downtown cores, landmarks), so a small cache absorbs a large fraction of read QPS — call this out, it's a cheap, high-leverage win.
+5. **Search Index (Geo + Text)** — the core data structure (see §3). One logical index that supports both spatial queries (within-radius) and text/category matching, sharded by geo cell so a query only has to fan out to the handful of shards covering the search area, not the whole dataset.
+6. **Ranking Service** — combines distance decay, text relevance, and popularity/rating into a final score; applies business rules (e.g., sponsored placement, down-ranking permanently-closed entities).
+7. **Entity/Places Data Store** — source of truth for full entity metadata (hours, attributes, popularity signals). The search index stores just enough to filter and rank (id, geohash, category, a cached popularity score); Ranking/Formatter hydrate full details from here, keeping the hot-path index small and fast.
+8. **Results Formatter** — does the exact-radius post-filter (see §3), builds the pagination cursor, dedupes, shapes the response.
+9. **Ingestion Pipeline** — consumes entity create/update/delete events (CDC from the Entity Store, or partner data feeds), geocodes addresses, computes geohash(es), and asynchronously updates the Search Index. Decoupling ingestion from the read path means a slow or bursty write doesn't affect search latency.
+10. **Autocomplete Service** — a separate, purpose-built prefix/trie index. Deliberately _not_ reusing the geo+text index — typeahead has different latency/precision requirements (must respond in tens of milliseconds per keystroke) and benefits from its own simpler structure.
+11. **Observability & Monitoring** — see §6.
+
+## 3. Geo-indexing deep dive (the crux of this problem)
+
+**Choosing a spatial structure.** Four standard options, and the trade-off that actually matters for this problem:
+
+| Approach                    | Idea                                                             | Good for                                                                                            | Watch out for                                                                                                   |
+| --------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Geohash                     | Encode lat/lng into a base32 string; shared prefix ≈ nearby area | Simple, easy to shard by prefix, works with any key-value store                                     | Cells are rectangular, not circular (radius mismatch); precision jumps are coarse; boundary problem (see below) |
+| S2 cells (Google S2)        | Hierarchical cells on a cube-sphere projection                   | Handles poles/antimeridian correctly, more uniform cell area globally, still hierarchical/shardable | More complex to implement/reason about than geohash                                                             |
+| Quad-tree                   | Recursive spatial subdivision, adaptive to data density          | Naturally denser index where entities are denser (cities)                                           | Harder to shard cleanly across machines than a flat prefix scheme                                               |
+| R-tree (e.g., PostGIS GiST) | Bounding-box tree over actual geometries                         | Off-the-shelf via PostGIS `ST_DWithin`/KNN, supports arbitrary polygons                             | Less natural to horizontally shard yourself; you're relying on the DB's internals                               |
+
+**Recommendation to state in the interview:** geohash or S2-cell prefix, sharded by prefix, is the pragmatic default for a from-scratch design — simple mental model, shards naturally, and the known weaknesses (below) have well-known fixes. If "use existing infrastructure" is in scope, PostGIS or Elasticsearch's built-in `geo_point` queries do this for you and are the right answer for a time-boxed round (see §7, follow-up 4).
+
+**The boundary problem (say this explicitly — it's the detail that separates a strong answer):** geohash/S2 cells are a grid; two points can be geographically close but sit on opposite sides of a cell boundary, ending up in different cells with completely different prefixes. Naively querying only the cell containing the search center will miss real matches. Fix: compute the search center's cell **plus its 8 neighbors** (a 3×3 block) at a precision where cell size is roughly the search radius, query all 9, then **post-filter with exact haversine distance** to drop anything outside the true circular radius (this also removes the false positives you get from a square cell being larger than the circle inscribed in it).
+
+**Choosing precision / handling density skew:** pick geohash precision so cell size ≈ requested radius (e.g., ~5 chars ≈ 4.9km, ~6 chars ≈ 1.2km×0.6km — the exact numbers are less important than showing you know precision trades off cell size). Uneven entity density (thousands of places per cell in Manhattan vs. near-zero in rural areas) creates hot shards if you shard naively by fixed-precision prefix — mitigate with adaptive precision (go deeper/finer in dense areas so each shard stays roughly balanced) or by further sub-sharding prefixes that exceed a size/QPS threshold.
+
+**Query algorithm, end to end:**
+
+1. Pick geohash precision ≈ requested radius.
+2. Compute the 3×3 neighbor block of cells around the search point.
+3. Fan out to the shards owning those cells in parallel (cheap because it's a handful of shards, not a full scan).
+4. Merge candidates, then post-filter with exact haversine distance against the true radius.
+5. If text/category filters are present, intersect with the text-index match (same index, since it's a combined geo+text index).
+6. Hand the surviving candidate set to Ranking.
+7. For very large radius requests, walk to a coarser precision first to bound fan-out cost, rather than querying hundreds of fine-grained cells.
+
+## 4. API design
+
+```json
+GET /v1/search
+{
+  "lat": "float, required",
+  "lng": "float, required",
+  "radius_m": "int, optional (default 5000, max 50000) — mutually exclusive with bbox",
+  "bbox": "optional [minLat,minLng,maxLat,maxLng]",
+  "query": "string, optional free-text",
+  "category": "string, optional",
+  "open_now": "bool, optional",
+  "cursor": "string, optional pagination token",
+  "limit": "int, default 20, max 50"
+}
+-> 200 {
+  "results": [{ "entity_id", "name", "category", "lat", "lng", "distance_m", "rating", "snippet" }],
+  "next_cursor": "string | null"
+}
+```
+
+```json
+GET /v1/autocomplete
+{ "prefix": "string, required", "lat": "float, optional (bias results)", "lng": "float, optional", "limit": "int, default 8" }
+-> 200 { "suggestions": [{ "text", "entity_id?" }] }
+```
+
+```json
+GET /v1/entities/{entity_id}
+-> 200 { "entity_id", "name", "category", "lat", "lng", "address", "hours", "rating", "attributes", "status" }
+```
+
+Ingestion is intentionally **not** a public write API on the search path — entity creation/updates flow in via the CDC/partner-feed pipeline in §2, keeping the read path free of write-consistency concerns.
+
+## 5. Consistency, freshness & reliability
+
+- **Freshness model:** eventual consistency between the Entity Store (source of truth) and the Search Index is fine — target index lag in the low minutes. The one exception worth naming: a "permanently closed" flag should propagate fast (higher-priority queue in the ingestion pipeline) since serving a closed business as open is a worse user experience than a slightly stale popularity score.
+- **Cache correctness:** short TTLs (seconds-to-low-minutes) on the tile cache bound staleness automatically; a targeted invalidation on high-impact updates (closure, major attribute change) avoids waiting out the TTL for the worst cases.
+- **Fallback chain:** cache miss → query index; ranking service degraded/slow → fall back to pure distance sort rather than blocking; entity-store hydration slow → return results with cached/last-known metadata rather than failing the whole request; one index shard down → return partial results from healthy shards and flag the response as incomplete rather than erroring the whole search (a search missing a few results from one neighborhood beats a blank page).
+- **Timeouts, sharded fan-out:** the geo search service should apply a per-shard timeout on the 3×3-cell fan-out and proceed with whatever shards answered in time — a single slow shard shouldn't stall the whole query.
+- **Retries:** search/read queries are idempotent and safe to retry with backoff; ingestion writes should be idempotent via entity ID + version so a re-delivered CDC event doesn't double-apply.
+
+## 6. Validation, testing & what to monitor
+
+**Correctness validation:**
+
+- Brute-force baseline: on a sample dataset, compare indexed-query results against a naive full-scan haversine filter; the indexed approach should have **zero false negatives** (recall = 100% — nothing genuinely inside the radius should be missed) after the 3×3-neighbor-cell + post-filter approach, and **zero false positives** (nothing outside the true radius should leak through the post-filter).
+- Ranking quality: offline precision@k/NDCG against human-labeled relevance judgments; online A/B testing on click-through / "get directions" rate for ranking changes.
+- Data quality: monitor duplicate-entity rate, geocoding failure/implausible-coordinate rate, and ingestion-to-searchable lag.
+
+**Load/failure validation:**
+
+- Load test at target QPS with a realistic, skewed geographic distribution (simulate a hotspot like a major downtown) to catch shard hot-spotting, not just uniform synthetic load.
+- Chaos test: kill an index shard/replica mid-traffic and confirm degraded partial results, not a full outage.
+
+**What to monitor in production:**
+
+- Latency p50/p95/p99 per endpoint (search, autocomplete), and specifically the fan-out tail (slowest-shard latency).
+- QPS and error rate per endpoint and per shard.
+- Cache hit rate for the tile cache.
+- Index staleness (time since last successful update per entity/shard).
+- Empty-result rate (a spike often means a geocoding or index bug, not "no places exist").
+- Shard skew — QPS and entity-count variance across shards, the leading indicator of a hot-spot before it becomes a latency problem.
+- Ranking CTR as an online relevance proxy.
+- Ingestion pipeline lag/backlog.
+
+## 7. Follow-up questions
+
+### How would your answer change at 10x scale?
+
+Reshard to finer-grained cells and more shards; consider deploying **regional index clusters** (partition by continent/region so most queries only ever touch geographically-local shards, cutting both fan-out cost and cross-region latency) with a thin global router. Push harder on caching — CDN/edge caching for popular tiles (e.g., "coffee near Times Square" is asked constantly and barely changes minute to minute). For ranking, move from computing scores fully per-request toward pre-computed/periodically-refreshed top-K lists for the hottest cells, falling back to full computation for the long tail. Scale the ingestion pipeline's partitioning by region to match. The overall shape doesn't change — the same components just get more aggressively partitioned and cached.
+
+### What would you monitor in production?
+
+Covered in §6 — the short version to say out loud: latency percentiles (overall and per-shard tail), error rate, cache hit rate, index staleness, empty-result rate, shard skew, ranking CTR, and ingestion lag. Shard skew and staleness are the two an interviewer is most likely to probe on, since they're specific to the geospatial nature of the problem rather than generic service metrics.
+
+### What edge case is easiest to miss?
+
+The **cell-boundary problem** described in §3 — naively querying only the cell containing the search point misses real, nearby matches sitting just across a boundary line. It's easy to design the happy path (query one cell, return results) and only discover this in testing. Related edge cases worth naming if there's time: the antimeridian/pole wraparound (lat/lng math and geohash behave oddly crossing ±180° longitude or near the poles); extreme density variance causing hot shards in cities and near-empty shards in rural areas; stale "permanently closed" entities surfacing as open; and pagination results shifting between pages if the underlying data or cache changes mid-pagination.
+
+### What would you simplify if this were a 60-minute implementation round?
+
+Use an off-the-shelf geospatial engine (PostGIS `ST_DWithin`/KNN, or Elasticsearch/OpenSearch `geo_point` queries) instead of hand-building geohash sharding and a custom index — get correctness for free and spend the limited time on the parts that show design judgment. Single region, no multi-region replication. Simple ranking: distance plus a static rating field, no learned/ML ranking service. Synchronous writes directly updating the index instead of an async CDC pipeline. Drop autocomplete and the tile cache, or reduce the cache to a trivial in-memory LRU. State explicitly that these are scope cuts for time, not because they're unimportant — that framing matters to the interviewer.
+
+## 8. Staff Engineer evaluation — what the interviewer is actually grading
+
+For a "technical screen" labeled Software Engineer, a Staff-level candidate is still being implicitly graded against a higher bar: not just "is the design correct" but "would I trust this person to own a system like this and align a team around it." The content above already contains the right instincts — this section is about which moments to narrate _out loud_ so the signal doesn't stay implicit.
+
+| Signal                                                         | What it looks like here                                                                                                                                                                                                                                | Where to say it out loud                                                          |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| Scopes ambiguity before designing                              | You open by asking what "geolocation search" actually means (places/POI vs. generic entities) and state assumptions rather than guessing silently                                                                                                      | §0 — treat this as graded, not throat-clearing                                    |
+| Justifies trade-offs with a real comparison, not a name-drop   | The geohash/S2/quad-tree/R-tree table isn't decoration — you have a specific reason (shardability) for the recommendation, and you know what you're giving up (cell-shape accuracy)                                                                    | §3 — say the trade-off, not just the winner                                       |
+| Identifies the one hard problem and goes deep there            | Most of this design is standard service architecture; the cell-boundary problem is the part that's specific to geospatial systems and separates candidates who've actually reasoned about the data structure from those who've memorized "use geohash" | §3 — spend disproportionate time here relative to, say, the API shape             |
+| Reasons about failure and degradation, not just the happy path | Partial results from healthy shards, fallback to distance-only ranking, stale-but-served metadata — each is a deliberate choice about what a _degraded_ system should do, not just what a healthy one does                                             | §5 — frame every fallback as "if X breaks, we choose to do Y instead of erroring" |
+| Names ownership/organizational boundaries                      | The Entity/Places Data Store is explicitly a separate system of record with its own owner, reached only through a CDC contract — you're not assuming you'd own that team's data model, you're designing the interface to it                            | §2, when introducing the Entity Store and Ingestion Pipeline                      |
+| Build vs. buy judgment, stated as a judgment                   | You explicitly name PostGIS/Elasticsearch as viable off-the-shelf choices and are honest about when a custom index is and isn't worth building — this is a leverage/cost call, not just listing technology                                             | §3 recommendation + follow-up #4                                                  |
+| Scales the answer to the question asked                        | The 60-minute-round follow-up isn't "everything but smaller" — you cut specific components (autocomplete, ML ranking, async ingestion) and say why those and not others                                                                                | Follow-up #4 — explicitly state your cutting _criteria_, not just the cut list    |
+| Validates with data, not assertion                             | Recall/precision against a brute-force baseline, shard skew, ranking CTR — every claim of correctness or quality has a way to check it                                                                                                                 | §6 — say "and I'd verify that by..." after any correctness claim                  |
+| Drives the conversation                                        | You open with a plan for how you'll spend the time (clarify → requirements → architecture → deep-dive on indexing → validation) instead of waiting to be walked through it section by section                                                          | First minute, explicitly                                                          |
