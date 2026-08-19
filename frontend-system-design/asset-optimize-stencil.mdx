@@ -39,7 +39,7 @@ The key architectural idea:
 
 ---
 
-# 1. Goals
+## 1. Goals
 
 The shared asset system should optimize for:
 
@@ -76,11 +76,11 @@ Asset Optimization Platform
 
 ---
 
-# 2. Discovery Questions
+## 2. Discovery Questions
 
 Before choosing the architecture, clarify the runtime and organizational constraints.
 
-## Shared component architecture
+### Shared component architecture
 
 | Category            | Question                                                  | Why it matters / what you're deciding                                                                                                                                                                                                                                    |
 | -------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -95,7 +95,7 @@ Before choosing the architecture, clarify the runtime and organizational constra
 | Migration & adoption | How do teams request and discover shared components?        | Prevents teams from rebuilding components independently. Think catalog/Storybook, ownership metadata, RFC process, Slack/support channels, contribution guidelines, and component maturity status.                                                                     |
 | Migration & adoption | Which adoption and performance metrics define success?      | Forces measurable outcomes rather than "we built a design system." Track adoption, duplicate-component reduction, bundle cost, render latency, accessibility defects, upgrade lag, and engineering time saved.                                                         |
 
-## Asset-specific questions
+### Asset-specific questions
 
 11. Where do assets originate?
 12. Is there an existing image CDN?
@@ -110,17 +110,17 @@ Before choosing the architecture, clarify the runtime and organizational constra
 
 ---
 
-# 3. Tier 1 — Baseline Optimization
+## 3. Tier 1 — Baseline Optimization
 
-## Goal
+### Goal
 
 **Make every asset cheaper without requiring product teams to think about optimization.**
 
 Tier 1 should be automatic and mandatory.
 
-## Techniques
+### Techniques
 
-### Images
+#### Images
 
 - compress source assets
 - prefer AVIF/WebP when supported
@@ -140,14 +140,14 @@ Tier 1 should be automatic and mandatory.
 />
 ```
 
-### SVG
+#### SVG
 
 - optimize with SVGO
 - remove unnecessary groups and metadata
 - deduplicate icons
 - avoid embedding large raster payloads in SVG
 
-### JavaScript and CSS
+#### JavaScript and CSS
 
 - tree shaking
 - minification
@@ -155,7 +155,7 @@ Tier 1 should be automatic and mandatory.
 - avoid importing the full icon library
 - avoid shipping component styles globally when unnecessary
 
-### Delivery
+#### Delivery
 
 ```text
 Browser
@@ -169,7 +169,7 @@ CDN
    +--> edge caching
 ```
 
-## Stencil principle
+### Stencil principle
 
 Tier 1 behavior belongs inside shared components whenever possible.
 
@@ -203,15 +203,15 @@ The consumer should not repeatedly reimplement these defaults.
 
 ---
 
-# 4. Tier 2 — Adaptive Optimization
+## 4. Tier 2 — Adaptive Optimization
 
-## Goal
+### Goal
 
 **Deliver only the asset variant that the current viewport and use case need.**
 
 Tier 2 moves from basic compression to context-aware delivery.
 
-## Responsive variants
+### Responsive variants
 
 ```html
 <img
@@ -225,7 +225,7 @@ Tier 2 moves from basic compression to context-aware delivery.
 />
 ```
 
-## Device-aware delivery
+### Device-aware delivery
 
 The platform may consider:
 
@@ -252,7 +252,7 @@ Asset Service
         +--> immutable CDN URL
 ```
 
-## Priority management
+### Priority management
 
 Critical image:
 
@@ -266,7 +266,7 @@ Non-critical image:
 <img src="/card.avif" fetchpriority="low" loading="lazy" alt="Related item" />
 ```
 
-## Avoid preload abuse
+### Avoid preload abuse
 
 ```text
 BAD
@@ -288,7 +288,7 @@ Page
  |- lazy-load cards
 ```
 
-## Stencil abstraction
+### Stencil abstraction
 
 ```tsx
 <ds-image asset-id="campaign-banner-123" intent="hero" aspect-ratio="16/9"></ds-image>
@@ -298,9 +298,9 @@ Consumers describe **intent**, not CDN implementation.
 
 ---
 
-# 5. Tier 3 — Platform Optimization
+## 5. Tier 3 — Platform Optimization
 
-## Goal
+### Goal
 
 **Make optimization centralized, measurable, enforceable, and scalable across products.**
 
@@ -332,7 +332,7 @@ Tier 3 is a platform capability rather than a component-only concern.
               Browser
 ```
 
-## Semantic intent
+### Semantic intent
 
 Prefer:
 
@@ -346,7 +346,7 @@ Avoid forcing consumers to construct transformation URLs:
 <img src="https://cdn.example.com/a.jpg?w=1276&q=74&format=avif" />
 ```
 
-## Intent policy
+### Intent policy
 
 ```ts
 const ASSET_POLICIES = {
@@ -374,7 +374,7 @@ The policy is centralized and can evolve without every application changing.
 
 ---
 
-# 6. Stencil Component Architecture
+## 6. Stencil Component Architecture
 
 Stencil provides framework-neutral Web Components.
 
@@ -405,7 +405,7 @@ Consumers can use the same component in:
 - vanilla JavaScript
 - server-rendered applications with the appropriate integration layer
 
-## Recommended layering
+### Recommended layering
 
 ```text
 Layer 1: Design tokens
@@ -419,9 +419,9 @@ Keep product-specific business logic out of the shared asset primitive.
 
 ---
 
-# 7. ds-image API
+## 7. ds-image API
 
-## Suggested API
+### Suggested API
 
 ```tsx
 <ds-image
@@ -433,7 +433,7 @@ Keep product-specific business logic out of the shared asset primitive.
 ></ds-image>
 ```
 
-## Props
+### Props
 
 ```ts
 export type ImageIntent =
@@ -473,7 +473,7 @@ export class DsImage {
 }
 ```
 
-## API design rule
+### API design rule
 
 Expose semantic intent:
 
@@ -491,7 +491,7 @@ Low-level controls can become platform lock-in and encourage inconsistent behavi
 
 ---
 
-# 8. ds-icon API
+## 8. ds-icon API
 
 Icons often become a hidden bundle-size problem.
 
@@ -501,7 +501,7 @@ Avoid shipping an entire icon package when only a few icons are used.
 <ds-icon name="search" size="medium"></ds-icon>
 ```
 
-## Recommended behavior
+### Recommended behavior
 
 ```text
 <ds-icon name="search">
@@ -515,7 +515,7 @@ Icon Registry
 inline SVG
 ```
 
-## Example
+### Example
 
 ```tsx
 @Component({
@@ -544,7 +544,7 @@ export class DsIcon {
 
 ---
 
-# 9. Asset Delivery Flow
+## 9. Asset Delivery Flow
 
 ```text
 1. Product renders component
@@ -583,9 +583,9 @@ export class DsIcon {
 
 ---
 
-# 10. Performance and Loading Strategy
+## 10. Performance and Loading Strategy
 
-## Critical assets
+### Critical assets
 
 Examples:
 
@@ -601,7 +601,7 @@ fetchpriority=high
 potential preload
 ```
 
-## Non-critical assets
+### Non-critical assets
 
 Examples:
 
@@ -617,7 +617,7 @@ fetchpriority=low
 intersection-based behavior only when needed
 ```
 
-## Avoid layout shift
+### Avoid layout shift
 
 Always provide intrinsic size when possible.
 
@@ -629,7 +629,7 @@ or use `aspect-ratio`.
 
 ---
 
-# 11. Caching Strategy
+## 11. Caching Strategy
 
 Use content-addressed or immutable variant URLs whenever possible.
 
@@ -656,7 +656,7 @@ version metadata
 hero-banner/v42/1280.avif
 ```
 
-## Cache layers
+### Cache layers
 
 ```text
 Browser Cache
@@ -675,11 +675,11 @@ Do not dynamically recompute the same transformation for every request.
 
 ---
 
-# 12. Accessibility
+## 12. Accessibility
 
 Asset optimization cannot break accessibility.
 
-## Images
+### Images
 
 Decorative image:
 
@@ -695,7 +695,7 @@ Meaningful image:
 
 Avoid using filenames as alt text.
 
-## Icons
+### Icons
 
 Decorative icon:
 
@@ -709,7 +709,7 @@ Meaningful icon:
 <ds-icon name="warning" label="Warning"></ds-icon>
 ```
 
-## Regression detection
+### Regression detection
 
 Recommended pipeline:
 
@@ -726,7 +726,7 @@ Pull Request
 
 ---
 
-# 13. Versioning and Multi-Library Concerns
+## 13. Versioning and Multi-Library Concerns
 
 This is especially important with Stencil because Custom Elements use a page-global registry.
 
@@ -745,9 +745,9 @@ Application
           registration conflict
 ```
 
-## Options
+### Options
 
-### Option A — One design-system runtime per page
+#### Option A — One design-system runtime per page
 
 Preferred when organizationally possible.
 
@@ -756,7 +756,7 @@ Host owns design-system version
 Microfrontends consume host contract
 ```
 
-### Option B — Versioned element names
+#### Option B — Versioned element names
 
 ```text
 <ds1-image>
@@ -765,13 +765,13 @@ Microfrontends consume host contract
 
 Works technically but increases long-term migration complexity.
 
-### Option C — Compatibility layer
+#### Option C — Compatibility layer
 
 Keep stable element names while allowing internal implementation changes.
 
 This requires strong backwards compatibility.
 
-## Recommendation
+### Recommendation
 
 For most shared-component platforms:
 
@@ -779,11 +779,11 @@ For most shared-component platforms:
 
 ---
 
-# 14. Observability and Success Metrics
+## 14. Observability and Success Metrics
 
 Tier 3 requires telemetry.
 
-## Asset metrics
+### Asset metrics
 
 Track:
 
@@ -813,7 +813,7 @@ CDN cache hit:
 82% -> 96%
 ```
 
-## Design-system adoption metrics
+### Design-system adoption metrics
 
 Track:
 
@@ -827,9 +827,9 @@ Track:
 
 ---
 
-# 15. Failure Modes
+## 15. Failure Modes
 
-## 1. Shipping original images to mobile
+### 1. Shipping original images to mobile
 
 ```text
 Original: 4000 x 3000
@@ -843,7 +843,7 @@ Fix with responsive variants.
 
 ---
 
-## 2. Every product constructs CDN URLs
+### 2. Every product constructs CDN URLs
 
 ```text
 Team A: quality=80
@@ -858,7 +858,7 @@ Fix with semantic shared APIs.
 
 ---
 
-## 3. Lazy-loading the LCP image
+### 3. Lazy-loading the LCP image
 
 ```text
 Hero
@@ -871,13 +871,13 @@ Critical assets should normally be eagerly discoverable.
 
 ---
 
-## 4. Preloading too many images
+### 4. Preloading too many images
 
 This causes bandwidth contention and can make the most important resource slower.
 
 ---
 
-## 5. Importing every icon
+### 5. Importing every icon
 
 ```ts
 import * as Icons from '@company/icons';
@@ -889,7 +889,7 @@ Prefer exact imports or build-time/generated registries.
 
 ---
 
-## 6. Exposing too many tuning knobs
+### 6. Exposing too many tuning knobs
 
 ```tsx
 <ds-image quality="72" width="1376" format="webp" preload="true" />
@@ -905,7 +905,7 @@ Prefer:
 
 ---
 
-# 16. Staff-Level Interview Summary
+## 16. Staff-Level Interview Summary
 
 A concise way to explain the architecture:
 
@@ -946,11 +946,11 @@ MAKE OPTIMIZATION A PLATFORM CAPABILITY
 - automatic enforcement
 ```
 
-## Staff-level architecture statement
+### Staff-level architecture statement
 
 > I would keep Tier 1 and much of Tier 2 inside shared Stencil primitives such as `ds-image` and `ds-icon`. Tier 3 belongs in the asset platform. Product developers should express semantic intent such as `hero`, `thumbnail`, or `avatar`; the platform should decide dimensions, compression quality, format, caching, and delivery strategy.
 
-## Key trade-off
+### Key trade-off
 
 Stencil provides strong framework interoperability, but it does not automatically solve:
 
@@ -965,7 +965,7 @@ Those must be designed as explicit platform capabilities.
 
 ---
 
-## Interview Checklist
+### Interview Checklist
 
 Before finishing the design discussion, cover:
 
