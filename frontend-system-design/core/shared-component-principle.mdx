@@ -1,0 +1,1442 @@
+---
+title: 'Shared component principle'
+description: 'Staff-level interview notes on shared component boundaries, accessibility ownership, API evolution, style isolation, design tokens, versioning, and breaking-change rollout.'
+---
+
+> I treat a design-system component as an API with a much longer lifetime than the implementation behind it.
+>
+> I share stable UI semantics such as buttons, menus, dialogs, and form controls, while keeping business-specific behavior in the product layer. The design system owns primitive accessibility, interaction behavior, tokens, browser consistency, and compatibility. Product teams own contextual accessibility and domain-specific workflow semantics.
+>
+> For styling, I expose controlled customization through semantic design tokens rather than arbitrary CSS. Web Components can also provide stronger encapsulation through Shadow DOM.
+>
+> API evolution should be backward-compatible whenever possible: introduce the replacement, deprecate the old API, provide linting and codemods, measure adoption, migrate representative applications, and only then remove the old behavior in a major release.
+>
+> Versioning becomes especially important with Web Components because the custom-element registry makes multiple incompatible implementations of the same element name difficult to coexist in one runtime. I therefore prefer dependency alignment and compatibility adapters over arbitrary Spectrum versions on the same page.
+>
+> At Adobe scale, success is not only whether the new API is cleaner. It is whether hundreds of consumers can migrate safely.
+
+---
+
+# 1. When Should Something Become a Shared Component?
+
+Do **not** move something into a shared library simply because it appears twice.
+
+A component becomes a strong shared-component candidate when:
+
+1. It represents **repeated semantic behavior**, not merely duplicated markup.
+2. Its responsibility is stable enough to expose through a reasonably small API.
+3. Multiple products need roughly the same UX contract.
+4. Central ownership provides leverage through:
+   - accessibility
+   - design consistency
+   - bug fixes
+   - browser compatibility
+   - testing
+   - performance
+5. The component can evolve without constantly accumulating product-specific flags.
+
+## Good Candidate
+
+```tsx
+<Button variant="accent" size="medium" disabled={saving} onPress={save}>
+  Save
+</Button>
+```
+
+The concept of a button is stable and broadly reusable.
+
+## Weak Candidate
+
+```tsx
+<PhotoshopGenerativeFillToolbar
+  document={document}
+  selection={selection}
+  prompt={prompt}
+  credits={credits}
+/>
+```
+
+This may be reusable within Photoshop, but its semantics belong to the product domain.
+
+## Rule of Thumb
+
+> Share stable concepts, not coincidentally similar implementations.
+
+Prematurely centralizing an unstable abstraction can be more expensive than temporarily duplicating a small amount of code.
+
+---
+
+# 2. Primitive vs Product Component
+
+A useful architecture is to separate browser primitives, design-system primitives, application patterns, and domain/product components.
+
+```text
+Product Components
+────────────────────────────────
+GenerativeFillPanel
+PhotoshopLayersPanel
+ExportWorkflow
+
+Application / Pattern Components
+────────────────────────────────
+SearchField
+FilePicker
+ConfirmationDialog
+PropertyInspector
+
+Design-System Primitives
+────────────────────────────────
+Button
+TextField
+Checkbox
+Menu
+Popover
+Tooltip
+Tabs
+Dialog
+
+Browser Primitives
+────────────────────────────────
+button
+input
+dialog
+canvas
+```
+
+## Primitive Component
+
+A primitive represents a broadly reusable interaction or semantic concept.
+
+Examples:
+
+```tsx
+<Button />
+<TextField />
+<Menu />
+<Tabs />
+<Dialog />
+```
+
+The primitive should own things such as:
+
+- keyboard interaction
+- focus behavior
+- ARIA semantics
+- disabled states
+- interaction states
+- cross-browser behavior
+- design-token usage
+- standard accessibility behavior
+
+Its API should be intentionally constrained.
+
+## Product Component
+
+A product component expresses business or domain behavior.
+
+Examples:
+
+```tsx
+<GenerativeFillPrompt />
+<PhotoshopLayersPanel />
+<CreativeCloudAssetPicker />
+```
+
+It may understand:
+
+- Photoshop documents
+- layers
+- AI generation
+- credits
+- permissions
+- asset metadata
+- product-specific workflows
+
+## Anti-Pattern: Product Logic Leaking into a Primitive
+
+Avoid APIs like:
+
+```tsx
+<Button photoshopMode expressMode generativeAI showCreditWarning enableLayerTracking />
+```
+
+This suggests the shared primitive has absorbed product concerns.
+
+Prefer:
+
+```tsx
+function GenerateButton({ credits, onGenerate }) {
+  const disabled = credits === 0;
+
+  return (
+    <Button variant="accent" isDisabled={disabled} onPress={onGenerate}>
+      Generate
+    </Button>
+  );
+}
+```
+
+The distinction is:
+
+> The product owns policy. The primitive owns interaction semantics.
+
+---
+
+# 3. Who Owns Accessibility?
+
+A strong staff-level answer is:
+
+> Accessibility is a shared responsibility, but ownership exists at different architectural layers.
+
+## Design-System Ownership
+
+For a component such as `<Menu>`, the design-system team should own:
+
+- ARIA roles and relationships
+- keyboard navigation
+- arrow-key behavior
+- Escape behavior
+- focus management
+- screen-reader semantics
+- disabled semantics
+- high-contrast support
+- touch-target sizing
+- browser-specific interaction behavior
+
+A product team should not need to reimplement these rules.
+
+Example:
+
+```tsx
+<Menu>
+  <MenuItem>Edit</MenuItem>
+  <MenuItem>Delete</MenuItem>
+</Menu>
+```
+
+The product should not need to manually implement roving tabindex or menu keyboard behavior.
+
+## Product Ownership
+
+The product team still owns contextual accessibility.
+
+For example:
+
+```tsx
+<TextField label="Describe what you'd like to generate" />
+```
+
+The design system can guarantee that the label is programmatically associated with the input.
+
+It cannot determine whether the label text is correct for the workflow.
+
+The product team owns:
+
+- meaningful labels
+- workflow semantics
+- focus decisions across workflows
+- domain-specific error announcements
+- image alternative text
+- canvas accessibility
+- correct reading order at the page level
+
+## Ownership Model
+
+```text
+                    Accessibility Ownership
+
+Design System                              Product
+────────────────────────────────────────────────────────
+ARIA implementation                       Correct labels
+Keyboard mechanics                        Meaningful alt text
+Focus primitives                          Workflow semantics
+Contrast / tokens                         Canvas experience
+Browser compatibility                     Domain-specific errors
+Primitive accessibility tests             Product-level E2E tests
+
+                       ↓
+
+               Shared Responsibility
+```
+
+## Testing Strategy
+
+### Unit / Primitive Tests
+
+- ARIA attributes
+- keyboard behavior
+- focus behavior
+- axe or equivalent checks
+
+### Component Integration
+
+- focus transitions
+- dialog behavior
+- menu behavior
+- screen-reader state
+
+### Product E2E
+
+- complete keyboard workflows
+- toolbar → canvas → dialog interactions
+- asynchronous status announcements
+- product-specific accessibility scenarios
+
+---
+
+# 4. How Do You Evolve APIs Without Breaking Hundreds of Consumers?
+
+Treat the design-system API as a long-lived contract.
+
+Suppose the original API is:
+
+```tsx
+<Button quiet />
+```
+
+and the desired API is:
+
+```tsx
+<Button variant="quiet" />
+```
+
+Do not immediately remove `quiet`.
+
+## Step 1: Introduce the New API
+
+```tsx
+type ButtonProps = {
+  variant?: 'primary' | 'secondary' | 'quiet';
+
+  /** @deprecated Use variant="quiet" */
+  quiet?: boolean;
+};
+```
+
+## Step 2: Maintain Compatibility
+
+```tsx
+function Button({ variant, quiet, ...props }: ButtonProps) {
+  const resolvedVariant = variant ?? (quiet ? 'quiet' : 'secondary');
+
+  return <button data-variant={resolvedVariant} {...props} />;
+}
+```
+
+Both old and new consumers continue to work.
+
+## Step 3: Deprecate
+
+Provide:
+
+- TypeScript deprecation annotations
+- lint warnings
+- updated documentation
+- migration guides
+- telemetry or code-search reporting
+
+## Step 4: Provide a Codemod
+
+Before:
+
+```tsx
+<Button quiet>Cancel</Button>
+```
+
+After:
+
+```tsx
+<Button variant="quiet">Cancel</Button>
+```
+
+At Adobe scale, documentation alone is insufficient.
+
+> Migration tooling is part of the API design.
+
+## Migration Lifecycle
+
+```text
+Phase 1
+Old API works
+New API introduced
+
+        ↓
+
+Phase 2
+Old API deprecated
+Warnings + documentation
+
+        ↓
+
+Phase 3
+Codemod available
+Bulk migration begins
+
+        ↓
+
+Phase 4
+Remaining consumers measured
+
+        ↓
+
+Phase 5
+Old API removed in a major version
+```
+
+## Staff-Level Principle
+
+Semantic versioning tells consumers that something broke.
+
+It does **not** reduce the migration cost.
+
+For large organizations, optimize for:
+
+```text
+API quality
++
+migration cost
++
+compatibility
++
+observability
++
+adoption velocity
+```
+
+---
+
+# 5. How Do You Prevent Style Leakage?
+
+The answer differs between conventional React component libraries and Web Components.
+
+---
+
+## React / Conventional DOM
+
+Example:
+
+```tsx
+<div className="spectrum-Button">...</div>
+```
+
+The component still participates in the global document cascade.
+
+Useful controls include:
+
+- namespaced CSS classes
+- CSS Modules
+- CSS cascade layers
+- carefully controlled specificity
+- restricted global resets
+- design tokens
+- avoid global element selectors
+
+Prefer:
+
+```css
+.spectrum-Button {
+  padding-inline: var(--spectrum-button-padding-inline);
+}
+```
+
+Avoid:
+
+```css
+button {
+  padding: 10px;
+}
+```
+
+because a global selector can unintentionally affect unrelated components.
+
+---
+
+# 6. Shadow DOM and Web Components
+
+Web Components can provide stronger style encapsulation.
+
+```js
+class SpectrumButton extends HTMLElement {
+  constructor() {
+    super();
+
+    const root = this.attachShadow({ mode: 'open' });
+
+    root.innerHTML = `
+      <style>
+        button {
+          padding: var(--spectrum-button-padding);
+        }
+      </style>
+
+      <button>
+        <slot></slot>
+      </button>
+    `;
+  }
+}
+```
+
+Global application CSS such as:
+
+```css
+button {
+  background: red;
+}
+```
+
+does not automatically restyle the internal shadow-DOM button.
+
+## Shadow DOM Is Not Absolute Isolation
+
+Some things intentionally cross or interact with the boundary:
+
+- CSS custom properties
+- inherited CSS properties
+- slots
+- `::part()`
+- host styles
+- events, subject to retargeting semantics
+
+That is useful in a design system because we want to hide implementation details while still exposing a controlled styling contract.
+
+## Principle
+
+> Encapsulate implementation while intentionally exposing customization.
+
+---
+
+# 7. How Do Design Tokens Propagate?
+
+Avoid hardcoded styling:
+
+```css
+color: #1473e6;
+padding: 8px;
+border-radius: 4px;
+```
+
+Prefer tokens:
+
+```css
+.spectrum-Button {
+  color: var(--spectrum-button-label-color);
+  background: var(--spectrum-button-background-color);
+  border-radius: var(--spectrum-corner-radius-100);
+}
+```
+
+## Token Hierarchy
+
+```text
+Design Language
+
+      ↓
+
+Global / Raw Tokens
+────────────────────
+blue-900
+gray-100
+space-100
+
+      ↓
+
+Semantic Tokens
+────────────────────
+accent-background
+negative-background
+text-primary
+focus-ring
+
+      ↓
+
+Component Tokens
+────────────────────
+button-background
+button-label
+button-padding
+
+      ↓
+
+Component
+
+      ↓
+
+Product
+```
+
+## Prefer Semantic Tokens
+
+Avoid:
+
+```css
+background: var(--blue-900);
+```
+
+Prefer:
+
+```css
+background: var(--accent-background);
+```
+
+The component should care about semantic intent, not the raw color value.
+
+## Theme Example
+
+```text
+Light Theme
+
+accent-background
+       ↓
+blue-900
+
+
+Dark Theme
+
+accent-background
+       ↓
+blue-600
+```
+
+This allows the same component to support:
+
+- light mode
+- dark mode
+- high contrast
+- platform variations
+- brand variations
+- future visual refreshes
+
+without rewriting every component.
+
+---
+
+# 8. What Happens When Two Applications Need Different Versions?
+
+Suppose:
+
+```text
+Photoshop Web
+    Spectrum v1
+
+Adobe Express
+    Spectrum v2
+```
+
+If they are completely separate applications, this is usually manageable.
+
+The difficult case occurs when they coexist on the same page or runtime.
+
+```text
+Host Application
+
+ ├── Photoshop Module
+ │      Spectrum v1
+ │
+ └── Express Module
+        Spectrum v2
+```
+
+## Conventional React Libraries
+
+A bundler may technically include both:
+
+```text
+bundle
+├── Spectrum v1
+└── Spectrum v2
+```
+
+This may work, but introduces:
+
+- duplicate bundle cost
+- duplicated styles
+- possible shared-context assumptions
+- inconsistent UX
+- harder debugging
+
+## Web Components
+
+Web Components introduce a more fundamental problem.
+
+You cannot safely redefine the same custom-element tag name:
+
+```js
+customElements.define('sp-button', SpectrumButtonV1);
+
+customElements.define('sp-button', SpectrumButtonV2);
+```
+
+A custom-element name is registered against the page's custom-element registry.
+
+Therefore:
+
+```html
+<sp-button></sp-button>
+```
+
+cannot simultaneously mean two incompatible implementations in the same registry.
+
+This makes dependency consistency especially important for Web Component design systems.
+
+---
+
+# 9. Strategy for Multiple Versions
+
+## Preferred: Align Runtime Versions
+
+Use compatible dependency ranges and enforce them at build time.
+
+Example:
+
+```json
+{
+  "peerDependencies": {
+    "@spectrum-web-components/base": "^2.0.0"
+  }
+}
+```
+
+In a monorepo or federated environment, use controls such as:
+
+- pnpm constraints
+- Yarn constraints
+- dependency policy
+- lockfile validation
+- CI checks
+- peer-dependency validation
+
+Preferred runtime:
+
+```text
+Photoshop Module ─┐
+Express Module   ├── Spectrum 2.4
+Acrobat Module   ┘
+```
+
+Avoid:
+
+```text
+Photoshop → Spectrum 1.7
+Express   → Spectrum 2.2
+Acrobat   → Spectrum 3.0
+```
+
+inside the same page whenever possible.
+
+---
+
+## Second Choice: Compatibility Adapter
+
+If consumers cannot migrate simultaneously, introduce an adapter.
+
+```text
+Legacy Product API
+
+        ↓
+
+Compatibility Adapter
+
+        ↓
+
+Spectrum vNext
+```
+
+Example:
+
+```tsx
+function LegacyButton({ quiet, ...props }) {
+  return <Button variant={quiet ? 'quiet' : 'secondary'} {...props} />;
+}
+```
+
+This allows the runtime to standardize on one design-system implementation while product teams migrate independently.
+
+---
+
+## Last Resort: Versioned Custom-Element Names
+
+Technically, teams could use:
+
+```html
+<sp-v1-button></sp-v1-button> <sp-v2-button></sp-v2-button>
+```
+
+but this creates significant long-term cost:
+
+- version information leaks into markup
+- API duplication
+- documentation complexity
+- inconsistent user experience
+- expensive future migrations
+
+It should usually be considered a temporary escape hatch rather than the default architecture.
+
+---
+
+# 10. How Do You Roll Out Breaking Changes?
+
+Do not:
+
+```text
+Publish v3
+→ Tell every application to fix itself
+```
+
+Use a staged migration.
+
+```text
+                 Breaking Change Rollout
+
+New Implementation
+        │
+        ▼
+Backward-Compatible API
+        │
+        ▼
+Deprecation Notice
+        │
+        ├─────────────────┐
+        ▼                 ▼
+Documentation          Codemod
+        │                 │
+        └────────┬────────┘
+                 ▼
+          Migration Tooling
+                 │
+                 ▼
+          Canary Consumers
+                 │
+                 ▼
+             5% Adoption
+                 │
+                 ▼
+           25% → 50% → 90%
+                 │
+                 ▼
+         Remaining Consumers
+                 │
+                 ▼
+       Deprecated API Removed
+```
+
+## Canary Strategy
+
+Pick representative applications:
+
+```text
+Small Consumer
+     +
+Medium Consumer
+     +
+Large / Complex Consumer
+```
+
+For Adobe, a complex application such as Photoshop may uncover assumptions that smaller consumers never hit.
+
+## Monitor
+
+Track:
+
+- runtime errors
+- visual regressions
+- accessibility failures
+- bundle-size change
+- performance regressions
+- adoption percentage
+- rollback rate
+- product-team support requests
+- test failures
+- integration incompatibilities
+
+---
+
+# 11. Example Breaking-Change Scenario
+
+Imagine Spectrum wants to redesign its dialog API.
+
+Old:
+
+```tsx
+<Dialog title="Delete layer?" confirmText="Delete" cancelText="Cancel" onConfirm={deleteLayer} />
+```
+
+New:
+
+```tsx
+<Dialog>
+  <Heading>Delete layer?</Heading>
+
+  <ButtonGroup>
+    <Button onPress={close}>Cancel</Button>
+
+    <Button variant="negative" onPress={deleteLayer}>
+      Delete
+    </Button>
+  </ButtonGroup>
+</Dialog>
+```
+
+The new API may be more composable, but migrating 500 call sites manually would create enormous organizational cost.
+
+A better rollout might be:
+
+```tsx
+<LegacyDialog
+  title="Delete layer?"
+  confirmText="Delete"
+  cancelText="Cancel"
+  onConfirm={deleteLayer}
+/>
+```
+
+implemented internally using the new API.
+
+Then:
+
+1. new API is published
+2. old API becomes compatibility wrapper
+3. codemod converts common patterns
+4. complex edge cases migrate manually
+5. telemetry measures remaining usage
+6. old wrapper is removed only after adoption crosses an agreed threshold
+
+---
+
+# 12. Why SemVer Alone Is Not Enough
+
+An interviewer may ask:
+
+> We have 500 call sites. Why not just publish a major version?
+
+A strong response:
+
+> SemVer communicates compatibility. It does not solve migration.
+
+Consider:
+
+```text
+500 call sites
+×
+20 teams
+×
+different release schedules
+×
+different ownership
+×
+different test quality
+```
+
+A technically clean major release can still create substantial company-wide engineering cost.
+
+Therefore a shared-component platform should optimize for both:
+
+```text
+Correct API
+```
+
+and:
+
+```text
+Safe Organizational Migration
+```
+
+---
+
+# 13. Shared UI as a Platform
+
+The design system is not merely a package containing buttons.
+
+```text
+                     Shared UI Platform
+
+               ┌───────────────────┐
+               │        API        │
+               └─────────┬─────────┘
+                         │
+
+        ┌────────────────┼────────────────┐
+        ▼                ▼                ▼
+
+ Accessibility      Design Tokens      Behavior
+
+        │                │                │
+        └────────────────┼────────────────┘
+                         ▼
+
+                  Version Contract
+
+                         │
+                         ▼
+
+             Compatibility / Migration
+
+                         │
+
+            ┌────────────┼────────────┐
+            ▼            ▼            ▼
+
+        Photoshop      Express      Acrobat
+```
+
+It is a platform contract between the design-system organization and all product consumers.
+
+That contract includes:
+
+- API design
+- accessibility
+- visual consistency
+- design tokens
+- runtime behavior
+- browser compatibility
+- versioning
+- migration tooling
+- testing
+- documentation
+- release governance
+- telemetry
+
+---
+
+# 14. Staff-Level Trade-Offs
+
+## Shared Too Early
+
+Risks:
+
+- incorrect abstraction
+- endless feature flags
+- product semantics leak into primitives
+- API becomes difficult to remove
+- unrelated teams become coupled
+
+## Shared Too Late
+
+Risks:
+
+- duplicated accessibility implementations
+- inconsistent interaction behavior
+- visual fragmentation
+- duplicated bugs
+- larger maintenance cost
+
+The staff-level responsibility is not simply maximizing reuse.
+
+It is deciding where centralization creates enough leverage to justify the coupling.
+
+---
+
+# 15. Interview Deep-Dive Questions
+
+## Q: When should something become shared?
+
+Answer around:
+
+- semantic reuse
+- API stability
+- cross-product demand
+- centralized leverage
+- ownership
+- expected evolution
+
+Avoid saying:
+
+> If it is used twice, make it shared.
+
+---
+
+## Q: Primitive or product component?
+
+Ask:
+
+> Does this component represent a universal interaction concept or a domain workflow?
+
+If the answer includes concepts such as:
+
+- document permissions
+- AI credits
+- Photoshop layers
+- asset ownership
+
+it probably belongs above the primitive layer.
+
+---
+
+## Q: Who owns accessibility?
+
+Answer:
+
+> The design system owns primitive mechanics; the product owns contextual semantics. Both test their layer.
+
+---
+
+## Q: How do you avoid breaking hundreds of consumers?
+
+Mention:
+
+- additive evolution
+- deprecated compatibility APIs
+- codemods
+- telemetry
+- representative canaries
+- staged adoption
+- major-version removal only at the end
+
+---
+
+## Q: How do you prevent CSS leakage?
+
+For traditional React:
+
+- CSS Modules
+- class namespacing
+- cascade layers
+- tokenized styling
+- no broad global selectors
+
+For Web Components:
+
+- Shadow DOM
+- controlled CSS variables
+- `::part()` only when intentional
+- stable public styling surface
+
+---
+
+## Q: How do tokens propagate?
+
+Explain:
+
+```text
+Raw token
+   ↓
+Semantic token
+   ↓
+Component token
+   ↓
+Component
+   ↓
+Product
+```
+
+Use semantic tokens to isolate components from concrete visual values.
+
+---
+
+## Q: What if two apps require two design-system versions?
+
+Discuss separately:
+
+### Different pages
+
+Usually manageable.
+
+### Same React runtime
+
+Possible, but bundle and consistency costs increase.
+
+### Same Web Component runtime
+
+Potential collision because a given custom-element name cannot be independently redefined.
+
+Prefer:
+
+1. runtime version alignment
+2. compatibility adapters
+3. temporary versioned tags only as an escape hatch
+
+---
+
+## Q: How do you roll out breaking changes?
+
+Explain:
+
+```text
+Additive API
+→ Deprecation
+→ Tooling
+→ Canary
+→ Measure
+→ Gradual Migration
+→ Remove
+```
+
+Do not rely solely on:
+
+```text
+npm install latest
+```
+
+---
+
+# 16. API Design Principles for Shared Components
+
+Good design-system APIs are usually:
+
+## Small
+
+```tsx
+<Button variant="accent">Save</Button>
+```
+
+rather than:
+
+```tsx
+<Button text="Save" blue rounded hoverColor="#..." borderColor="#..." padding={8} photoshopMode />
+```
+
+## Semantic
+
+Prefer:
+
+```tsx
+<Button variant="negative">
+```
+
+over:
+
+```tsx
+<Button color="red">
+```
+
+## Composable
+
+Prefer:
+
+```tsx
+<Dialog>
+  <Heading />
+  <Content />
+  <ButtonGroup />
+</Dialog>
+```
+
+when consumers genuinely need composition.
+
+## Accessible by Default
+
+The easiest implementation path should also be the accessible path.
+
+## Difficult to Misuse
+
+A shared API should make invalid combinations hard or impossible.
+
+Example:
+
+```ts
+type ButtonProps =
+  | {
+      href: string;
+      onPress?: never;
+    }
+  | {
+      href?: never;
+      onPress: () => void;
+    };
+```
+
+when link and button semantics must remain distinct.
+
+---
+
+# 17. Versioning Philosophy
+
+A design-system release should distinguish between:
+
+## Implementation Change
+
+```text
+Internal DOM refactor
+CSS optimization
+render-performance improvement
+```
+
+No consumer API change.
+
+## Additive API Change
+
+```text
+new optional prop
+new token
+new component
+```
+
+Usually backward-compatible.
+
+## Behavioral Change
+
+Potentially more dangerous than an obvious API change.
+
+Example:
+
+```text
+Dialog now auto-focuses the first destructive action
+```
+
+Even if TypeScript still compiles, downstream behavior may change.
+
+## Breaking API Change
+
+```text
+prop removed
+event renamed
+DOM contract removed
+token removed
+```
+
+Requires migration strategy.
+
+---
+
+# 18. Testing a Shared Component System
+
+A mature shared-component platform should have several layers.
+
+## Primitive Unit Tests
+
+```text
+rendering
+events
+states
+ARIA
+keyboard interaction
+```
+
+## Visual Regression
+
+```text
+themes
+states
+breakpoints
+high contrast
+RTL
+```
+
+## Consumer Contract Tests
+
+Ensure representative downstream applications still work.
+
+## Cross-Browser
+
+Especially important for:
+
+- focus
+- pointer events
+- forms
+- Shadow DOM
+- selection behavior
+- custom elements
+
+## Performance
+
+Monitor:
+
+- JS bundle cost
+- CSS cost
+- initialization cost
+- layout
+- memory
+- render count
+- component startup
+
+---
+
+# 19. Ownership Model
+
+A useful ownership split:
+
+```text
+Spectrum Team
+────────────────────────────────
+Primitive APIs
+Tokens
+Accessibility mechanics
+Browser support
+Release process
+Migration tooling
+Documentation
+
+Product Infrastructure
+────────────────────────────────
+Application patterns
+Cross-product adapters
+Integration policies
+
+Product Team
+────────────────────────────────
+Business workflows
+Domain semantics
+Product-specific accessibility
+Product integration
+```
+
+This prevents every responsibility from collapsing into the central design-system team.
+
+---
+
+# 20. Signals That a Shared Component API Is Going Wrong
+
+Watch for props such as:
+
+```tsx
+isPhotoshop;
+isExpress;
+legacyMode;
+newMode;
+disableForMobile;
+useOldFocusBehavior;
+enableNewTokenSystem;
+specialCaseForAcrobat;
+```
+
+A few temporary flags may be necessary during migration.
+
+A growing list indicates that:
+
+- the abstraction boundary is wrong
+- product policy has entered the primitive
+- compatibility is being handled permanently instead of temporarily
+
+---
+
+# 21. Staff-Level Decision Framework
+
+Before moving something into Spectrum or another shared layer, ask:
+
+```text
+1. Is the semantic concept shared?
+
+2. Is the behavior sufficiently stable?
+
+3. Can we define a small API?
+
+4. Who owns the component long-term?
+
+5. Who owns accessibility?
+
+6. Which parts are customizable?
+
+7. Which tokens are public?
+
+8. What is the versioning contract?
+
+9. How do we migrate consumers?
+
+10. How do we measure adoption?
+
+11. How do we remove deprecated behavior?
+
+12. What happens when consumers cannot upgrade together?
+```
+
+If these questions do not have good answers, the component may not yet be ready for the global shared layer.
+
+---
+
+# 22. Closing Interview Summary
+
+A strong closing statement is:
+
+> For a system like Adobe Spectrum, I would think of reusable UI as infrastructure rather than a collection of components. The hardest problems are usually not rendering a button or dialog. They are defining the ownership boundary, making accessibility the default, controlling styling and tokens, creating stable APIs, supporting multiple application release cadences, and giving hundreds of consumers a safe migration path.
+>
+> The staff-level goal is to maximize reuse without creating excessive coupling. A successful component is not merely one that can be reused. It is one that can evolve for years without forcing every product team to coordinate every release.
