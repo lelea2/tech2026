@@ -1,0 +1,1850 @@
+---
+title: Why a 12,000 × 12,000 Image Can Crash the Browser
+description: Closures, Event Loop, Promise Chaining, Scope & Hoisting, Pure Functions, Immutability, and Functional Patterns
+---
+
+> **Interview framing:** A 12,000 × 12,000 image is not “144 MB.” That is only the pixel count if you assume one byte per pixel. In a real editor, the decoded bitmap, multiple layers, backing stores, GPU textures, undo history, temporary filter buffers, masks, and compositing surfaces can push memory into multiple gigabytes very quickly.
+
+---
+
+## Summary — Approach at a Glance
+
+**Diagnosis:** file size on disk is irrelevant. A 12,000 × 12,000 RGBA surface decodes to ~550 MiB, and a naive editor can hold several full-resolution copies at once — canvas backing store, GPU texture, filter buffers, undo snapshots — pushing peak memory into multiple gigabytes and potentially exceeding GPU texture/VRAM limits.
+
+**Fix:** stop treating the document as one monolithic bitmap. Virtualize it.
+
+```text
+1. Quantify          -> compute decoded working-set size, not file size
+2. Tile              -> split the document into 256/512px logical tiles
+3. Render viewport    -> draw only visible tiles into a viewport-sized canvas
+4. Use LOD/mipmaps    -> lower resolution when zoomed out
+5. Bound caches       -> LRU-evict RAM/GPU tile caches under a byte budget
+6. Delta undo         -> store changed tiles/commands, not full snapshots
+7. Offload work       -> Workers + WASM, transfer buffers instead of cloning
+8. Dirty regions      -> recompute/re-upload only what changed
+9. Design for peaks   -> admission control for transient multi-buffer operations
+10. Degrade gracefully -> cap DPR, cap concurrency, lower quality before crashing
+```
+
+**Result:** memory scales with the visible/active working set, not with total document pixels. Sections below walk through the diagnosis, each failure mode, and each fix in depth.
+
+---
+
+## 1. The first calculation I would do in the interview
+
+```text
+Width  = 12,000
+Height = 12,000
+Pixels = 144,000,000 pixels
+```
+
+For an 8-bit RGBA image:
+
+```text
+144,000,000 × 4 bytes
+= 576,000,000 bytes
+≈ 549 MiB
+≈ 576 MB decimal
+```
+
+So **one fully decoded RGBA surface is already about 550 MiB**.
+
+If Photoshop keeps several full-size surfaces around:
+
+```text
+Base decoded image         ~550 MiB
+Working/composite buffer   ~550 MiB
+GPU upload / texture       ~550 MiB
+Temporary filter buffer    ~550 MiB
+Undo snapshot              ~550 MiB
+------------------------------------
+                         ~2.7 GiB
+```
+
+That is before accounting for:
+
+- multiple layers
+- masks
+- mipmaps / previews
+- color conversion
+- WebAssembly memory
+- JavaScript heap
+- browser process overhead
+- texture alignment
+- double or triple buffering
+- temporary allocations during resize/filter/export
+
+The key point is:
+
+> **The compressed file size on disk is almost irrelevant to editing memory. The dangerous number is decoded working-set size.**
+
+---
+
+# 2. Why Photoshop Web crashes
+
+There usually is not one single cause. A large document can hit several limits at once.
+
+## Failure mode A — Huge decoded bitmap allocation
+
+A JPEG or PNG may only be 30–100 MB on disk, but decoding creates a raw bitmap.
+
+```js
+const bytes = width * height * 4;
+```
+
+For 12k × 12k:
+
+```js
+12_000 * 12_000 * 4; // 576,000,000 bytes
+```
+
+If the application creates another buffer for an operation:
+
+```js
+const src = new Uint8ClampedArray(width * height * 4);
+const dst = new Uint8ClampedArray(width * height * 4);
+```
+
+we just consumed roughly **1.1 GiB** for two pixel buffers.
+
+If we accidentally clone buffers through application state or worker messages, memory can spike even further.
+
+---
+
+## Failure mode B — Canvas backing-store explosion
+
+This looks innocent:
+
+```js
+canvas.width = 12_000;
+canvas.height = 12_000;
+```
+
+But the canvas needs a backing store.
+
+```text
+12,000 × 12,000 × 4 ≈ 550 MiB
+```
+
+If we have:
+
+- source canvas
+- editing canvas
+- overlay canvas
+- selection canvas
+- offscreen canvas
+
+then a seemingly simple canvas architecture can consume gigabytes.
+
+### High-DPI makes it worse
+
+A common bug is sizing the canvas based on `devicePixelRatio` without a cap:
+
+```js
+canvas.width = imageWidth * devicePixelRatio;
+canvas.height = imageHeight * devicePixelRatio;
+```
+
+At DPR = 2:
+
+```text
+24,000 × 24,000 × 4
+≈ 2.15 GiB for ONE RGBA surface
+```
+
+That can kill the tab almost immediately.
+
+### Important distinction
+
+The document may be 12k × 12k, but **the viewport canvas does not need to be 12k × 12k**.
+
+If the user sees only a 1500 × 1000 viewport, render roughly that viewport resolution plus a small overscan area.
+
+---
+
+## Failure mode C — GPU maximum texture size
+
+WebGL/WebGPU hardware has limits on maximum 2D texture dimensions.
+
+A 12k texture may work on some GPUs but fail or become fragile on others depending on:
+
+- `MAX_TEXTURE_SIZE`
+- available VRAM
+- driver behavior
+- browser process limits
+- other GPU consumers
+
+Never assume that because the CPU can allocate a bitmap, the GPU can upload it as one giant texture.
+
+Query capabilities instead of guessing:
+
+```js
+const gl = canvas.getContext('webgl2');
+const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+
+console.log(maxTextureSize);
+```
+
+Even when 12,000 is below the reported dimension limit, the texture can still create serious **VRAM pressure**.
+
+---
+
+## Failure mode D — Full-document compositing
+
+Suppose Photoshop Web recomputes every pixel whenever anything changes.
+
+```text
+144 million pixels/frame
+```
+
+At 60 FPS:
+
+```text
+144M × 60 = 8.64 billion pixel visits/sec
+```
+
+That is before blending multiple layers or applying effects.
+
+For an editor, repainting the entire 12k × 12k document because the user moved a 20 × 20 brush cursor is architecturally wrong.
+
+Symptoms include:
+
+- frame rate collapses
+- GPU process memory climbs
+- long raster/composite tasks
+- browser becomes unresponsive
+- eventual tab or GPU-process crash
+
+---
+
+## Failure mode E — Undo/redo stores full snapshots
+
+This is one of the most dangerous editor-specific bugs.
+
+Bad design:
+
+```js
+history.push(structuredClone(fullDocumentPixels));
+```
+
+If one snapshot is ~550 MiB, then only five history entries can require:
+
+```text
+~2.7 GiB
+```
+
+For layered documents it can be much worse.
+
+### Better model
+
+Store operations or changed regions:
+
+```ts
+type BrushCommand = {
+  layerId: string;
+  bounds: Rect;
+  beforeTileIds: string[];
+  afterTileIds: string[];
+};
+```
+
+A tiny stroke should not create a copy of a 144-million-pixel document.
+
+---
+
+## Failure mode F — Image operations allocate full-frame temporaries
+
+A blur implementation might do this:
+
+```js
+const input = ctx.getImageData(0, 0, width, height);
+const output = new ImageData(width, height);
+```
+
+Now we have two very large buffers, plus the canvas backing store.
+
+A multi-pass algorithm may allocate even more:
+
+```text
+source
+horizontal blur
+vertical blur
+mask
+composite output
+```
+
+A 550 MiB source can briefly create a **2–4 GiB transient working set**.
+
+Crashes frequently happen during these peaks rather than steady state.
+
+---
+
+## Failure mode G — `getImageData()` / CPU readback
+
+GPU → CPU readback is expensive.
+
+```js
+ctx.getImageData(0, 0, 12_000, 12_000);
+```
+
+can cause:
+
+1. GPU synchronization.
+2. A massive CPU-side allocation.
+3. Pipeline stalls.
+4. Potential duplicate storage of pixels.
+
+Doing this repeatedly during pointer movement is disastrous.
+
+Bad:
+
+```js
+onPointerMove(() => {
+  const pixels = ctx.getImageData(0, 0, width, height);
+});
+```
+
+---
+
+## Failure mode H — Main-thread decoding and filtering
+
+Even when memory does not immediately crash, the application may look dead because decoding or filtering monopolizes the main thread.
+
+```text
+Main thread
+  ├─ React/UI work
+  ├─ image decode
+  ├─ pixel processing
+  ├─ canvas upload
+  └─ event handling
+```
+
+A several-hundred-millisecond or multi-second task prevents:
+
+- pointer events
+- rendering
+- progress indicators
+- cancellation
+- browser responsiveness
+
+---
+
+## Failure mode I — Worker copies instead of transfers
+
+Workers help with CPU contention, but careless messaging can make memory worse.
+
+Potentially expensive:
+
+```js
+worker.postMessage({ pixels });
+```
+
+Depending on the object and transfer semantics, data can be cloned.
+
+Prefer transferable ownership when applicable:
+
+```js
+worker.postMessage({ buffer: pixels.buffer }, [pixels.buffer]);
+```
+
+Or avoid giant monolithic buffers entirely by processing tiles.
+
+---
+
+## Failure mode J — Memory fragmentation / transient peak
+
+Even if the theoretical total appears to fit, a browser may fail to obtain a sufficiently large contiguous allocation.
+
+Example:
+
+```text
+steady state = 1.8 GB
+filter starts
++ 550 MB temporary buffer
++ 550 MB result buffer
+--------------------------
+peak = ~2.9 GB
+```
+
+The crash occurs during the operation, even though idle memory looked acceptable.
+
+This is why the design should focus on **peak working set**, not just average memory.
+
+---
+
+# 3. The architecture I would propose
+
+The core idea is:
+
+> **Treat the document as a virtualized tiled image, not one giant browser bitmap.**
+
+```text
+                  12,000 × 12,000 document
+                            |
+                 Document / layer model
+                            |
+                  Tile manager / cache
+             256×256 or 512×512 logical tiles
+                 /          |          \
+                /           |           \
+        RAM hot tiles    Worker/WASM    Persistent/cache
+             |                              |
+             v                              v
+      Visible tile set                cold tile storage
+             |
+             v
+      WebGL / WebGPU renderer
+             |
+             v
+       viewport-sized canvas
+```
+
+The entire high-resolution document does **not** need to be simultaneously represented as one giant UI bitmap.
+
+---
+
+# 4. Fix 1 — Tile the document
+
+Instead of:
+
+```text
+1 × 12,000 × 12,000 bitmap
+```
+
+split the document into tiles.
+
+For 512 × 512 tiles:
+
+```text
+ceil(12000 / 512) = 24 tiles per dimension
+24 × 24 = 576 tiles
+```
+
+One RGBA tile costs:
+
+```text
+512 × 512 × 4
+= 1,048,576 bytes
+≈ 1 MiB
+```
+
+This is dramatically easier to manage.
+
+```ts
+interface TileKey {
+  layerId: string;
+  x: number;
+  y: number;
+  level: number;
+}
+
+interface Tile {
+  key: TileKey;
+  bitmap: ImageBitmap | GPUTexture;
+  dirty: boolean;
+  lastUsedAt: number;
+}
+```
+
+Benefits:
+
+- allocate only what is needed
+- evict cold tiles
+- update only dirty regions
+- parallelize work
+- cap GPU residency
+- avoid giant contiguous allocations
+- enable tile-level undo
+
+---
+
+# 5. Fix 2 — Render only visible tiles
+
+At 10% zoom, the entire 12k image might occupy only 1200 × 1200 screen pixels.
+
+Rendering a 12k backing surface is wasteful.
+
+Determine visible document coordinates:
+
+```ts
+const visibleRect = screenToDocument(viewportRect, camera);
+const visibleTiles = tileManager.getTilesIntersecting(visibleRect);
+```
+
+Then draw only those tiles:
+
+```ts
+for (const tile of visibleTiles) {
+  renderer.drawTile(tile, camera);
+}
+```
+
+Add a little overscan so panning remains smooth:
+
+```text
+visible viewport
++ one neighboring tile ring
+```
+
+Not:
+
+```text
+entire document
+```
+
+---
+
+# 6. Fix 3 — Use a mip pyramid / level of detail
+
+When the user views a 12k image at 10%, there is no reason to upload full-resolution pixels for the whole image.
+
+Generate resolution levels:
+
+```text
+Level 0    12,000 × 12,000
+Level 1     6,000 × 6,000
+Level 2     3,000 × 3,000
+Level 3     1,500 × 1,500
+Level 4       750 × 750
+```
+
+Choose the level based on zoom.
+
+```ts
+function chooseMipLevel(zoom) {
+  if (zoom >= 0.75) return 0;
+  if (zoom >= 0.375) return 1;
+  if (zoom >= 0.1875) return 2;
+  if (zoom >= 0.09375) return 3;
+  return 4;
+}
+```
+
+### Result
+
+At zoomed-out views:
+
+```text
+before: potentially 144M source pixels
+
+after: 1.5k × 1.5k level
+       = 2.25M pixels
+```
+
+That is around a **64× reduction in pixel count** relative to 12k × 12k.
+
+---
+
+# 7. Fix 4 — Keep the canvas viewport-sized
+
+Bad:
+
+```js
+canvas.width = document.width;
+canvas.height = document.height;
+```
+
+Better:
+
+```js
+function resizeCanvas(canvas, cssWidth, cssHeight) {
+  const maxDpr = 2;
+  const dpr = Math.min(window.devicePixelRatio, maxDpr);
+
+  canvas.width = Math.ceil(cssWidth * dpr);
+  canvas.height = Math.ceil(cssHeight * dpr);
+
+  canvas.style.width = `${cssWidth}px`;
+  canvas.style.height = `${cssHeight}px`;
+}
+```
+
+The camera transformation maps document coordinates into the viewport.
+
+```text
+Document: 12,000 × 12,000
+Canvas:    1,600 × 1,000 × DPR
+```
+
+Those are separate concepts.
+
+---
+
+# 8. Fix 5 — GPU texture atlas or bounded tile textures
+
+Do not upload the document as one huge GPU texture.
+
+Use tile textures:
+
+```text
+Tile 0,0 -> texture
+Tile 1,0 -> texture
+Tile 2,0 -> texture
+...
+```
+
+Maintain an LRU GPU cache:
+
+```ts
+class GpuTileCache {
+  constructor(private maxBytes: number) {}
+
+  ensureBudget(requiredBytes: number) {
+    while (this.bytesUsed + requiredBytes > this.maxBytes) {
+      this.evictLeastRecentlyUsedTile();
+    }
+  }
+}
+```
+
+### Cache layers
+
+```text
+GPU cache        visible + immediately adjacent tiles
+RAM cache        recently used decoded tiles
+persistent cache compressed/cold tiles if appropriate
+source storage   authoritative document data
+```
+
+---
+
+# 9. Fix 6 — Dirty-region rendering
+
+A brush stroke touching this rectangle:
+
+```text
+x=6000..6064
+y=4000..4064
+```
+
+should not invalidate the whole document.
+
+Track dirty tiles:
+
+```ts
+function markDirty(bounds: Rect) {
+  for (const tile of tileGrid.intersect(bounds)) {
+    tile.dirty = true;
+  }
+}
+```
+
+Then only recompute those tiles.
+
+```text
+brush event
+   |
+   v
+compute dirty bounds
+   |
+   v
+mark affected tiles
+   |
+   v
+worker recomputes changed tiles
+   |
+   v
+GPU uploads changed tiles
+   |
+   v
+requestAnimationFrame renders viewport
+```
+
+This is one of the biggest architectural improvements for a Photoshop-style editor.
+
+---
+
+# 10. Fix 7 — Command/delta-based undo instead of full snapshots
+
+Bad:
+
+```ts
+history.push(fullCanvasPixels);
+```
+
+Better:
+
+```ts
+interface EditCommand {
+  apply(): Promise<void>;
+  undo(): Promise<void>;
+  affectedTiles: TileKey[];
+}
+```
+
+For a brush stroke, preserve only the changed tile data.
+
+```text
+Stroke changes 3 tiles
+
+undo payload ≈ 3 MiB
+
+instead of
+
+full image snapshot ≈ 550 MiB
+```
+
+For very large edits, spill history to disk-like browser storage rather than forcing everything to remain resident.
+
+Possible tiers:
+
+```text
+Recent undo       RAM
+Older undo        IndexedDB / OPFS
+Cold history      compressed / persisted representation
+```
+
+---
+
+# 11. Fix 8 — Use Web Workers + WASM for image processing
+
+The main thread should coordinate UI, not process 144 million pixels.
+
+```text
+Main thread
+  |
+  | edit command
+  v
+Worker pool
+  |
+  | tile jobs
+  v
+WASM image kernels
+  |
+  | changed tiles
+  v
+renderer / tile cache
+```
+
+Example:
+
+```ts
+worker.postMessage({
+  type: 'apply-filter',
+  tileIds,
+  filter: {
+    type: 'gaussian-blur',
+    radius: 12,
+  },
+});
+```
+
+The worker can process multiple tiles while the main thread remains responsive.
+
+### Why WASM?
+
+For pixel-heavy loops:
+
+- predictable performance
+- SIMD opportunities
+- reusable C/C++/Rust image kernels
+- easier memory control than large JS object graphs
+
+But remember:
+
+> Workers solve main-thread responsiveness. They do **not** automatically solve memory pressure.
+
+Tile the data first.
+
+---
+
+# 12. Fix 9 — Stream/decode progressively
+
+Do not wait for the entire full-resolution document to become available before showing something.
+
+Preferred UX:
+
+```text
+Open document
+    |
+    v
+read metadata / dimensions
+    |
+    v
+show low-resolution preview
+    |
+    v
+build visible tiles first
+    |
+    v
+background decode neighboring tiles
+    |
+    v
+full-resolution tiles arrive on demand
+```
+
+The user gets an interactive document quickly while the system avoids a huge decode spike.
+
+With suitable APIs and formats, `ImageBitmap` can help move decoded images efficiently:
+
+```js
+const bitmap = await createImageBitmap(blob);
+```
+
+But avoid treating a single full 12k bitmap as the final architecture.
+
+---
+
+# 13. Fix 10 — Put an explicit memory budget in the architecture
+
+A robust editor should not allocate opportunistically until the browser kills the tab.
+
+Define budgets:
+
+```ts
+const budgets = {
+  decodedTileBytes: 512 * MB,
+  gpuTextureBytes: 512 * MB,
+  undoBytes: 1024 * MB,
+};
+```
+
+Then evict or spill proactively.
+
+```ts
+if (gpuCache.bytes > budget.gpu) {
+  gpuCache.evictLRU();
+}
+
+if (history.bytes > budget.undoRam) {
+  history.spillOldEntries();
+}
+```
+
+The precise values should adapt to device capability rather than being one universal constant.
+
+---
+
+# 14. Capability detection and graceful degradation
+
+Before selecting rendering strategy, inspect capabilities.
+
+```js
+const gl = canvas.getContext('webgl2');
+
+const capabilities = {
+  maxTextureSize: gl?.getParameter(gl.MAX_TEXTURE_SIZE),
+  deviceMemory: navigator.deviceMemory,
+  hardwareConcurrency: navigator.hardwareConcurrency,
+};
+```
+
+Then choose conservative defaults.
+
+```text
+High-end desktop
+  -> larger GPU tile cache
+  -> more worker concurrency
+
+Low-memory laptop/tablet
+  -> smaller cache
+  -> earlier eviction
+  -> lower preview resolution
+  -> fewer concurrent tile operations
+```
+
+The product should degrade quality/performance gracefully rather than crash.
+
+---
+
+# 15. Avoid giant React state
+
+Another frontend-specific mistake is putting pixel buffers into React state.
+
+Bad:
+
+```tsx
+const [pixels, setPixels] = useState<Uint8ClampedArray>();
+```
+
+Then every edit can trigger state propagation and retention of large objects.
+
+Keep document/rendering state outside normal React reconciliation.
+
+```text
+React
+  -> menus
+  -> panels
+  -> toolbar
+  -> document metadata
+
+Editor engine
+  -> tiles
+  -> GPU resources
+  -> undo
+  -> workers
+  -> image buffers
+```
+
+React receives lightweight derived state:
+
+```ts
+{
+  zoom: 0.42,
+  activeLayerId: 'layer-42',
+  selectionBounds: {...},
+  isRendering: false
+}
+```
+
+not hundreds of megabytes of pixel data.
+
+---
+
+# 16. Backpressure matters for image processing too
+
+Suppose pointer movement produces brush jobs faster than workers/GPU can consume them.
+
+Bad:
+
+```text
+pointer events: 300 jobs/sec
+worker capacity: 80 jobs/sec
+queue grows forever
+memory grows forever
+browser crashes
+```
+
+Use coalescing and bounded queues.
+
+```ts
+class BrushQueue {
+  private pending: BrushSegment[] = [];
+  private readonly maxPending = 32;
+
+  push(segment: BrushSegment) {
+    if (this.pending.length >= this.maxPending) {
+      this.coalesceOldSegments();
+    }
+
+    this.pending.push(segment);
+  }
+}
+```
+
+Render visual feedback at display cadence:
+
+```js
+requestAnimationFrame(render);
+```
+
+Do not necessarily run a full expensive operation for every raw pointer event.
+
+---
+
+# 17. What I would inspect when diagnosing the crash
+
+## Chrome DevTools — Performance
+
+Look for:
+
+- long main-thread tasks
+- repeated canvas rasterization
+- forced layouts mixed with drawing
+- excessive `getImageData`
+- repeated image decode
+- large upload/composite periods
+- frame rate collapse
+
+## Chrome DevTools — Memory
+
+Look for:
+
+- detached pixel buffers
+- retained `ImageData`
+- history retaining old buffers
+- ArrayBuffer growth
+- worker memory
+- memory after document close
+
+Question to ask:
+
+> Does memory return after the large document is closed?
+
+If not, we may also have a leak.
+
+## GPU inspection
+
+Look for:
+
+- giant textures
+- duplicate textures per layer
+- texture churn
+- repeated CPU ↔ GPU copies
+- context loss
+
+Handle context loss gracefully:
+
+```js
+canvas.addEventListener('webglcontextlost', (event) => {
+  event.preventDefault();
+  renderer.pause();
+});
+
+canvas.addEventListener('webglcontextrestored', () => {
+  renderer.rebuildVisibleTileResources();
+});
+```
+
+---
+
+# 18. A concrete corrected architecture
+
+```text
++----------------------------------------------------------+
+| React UI                                                 |
+| toolbar | layers | history | properties | status         |
++-----------------------------+----------------------------+
+                              |
+                              | commands / lightweight state
+                              v
++----------------------------------------------------------+
+| Document Engine                                          |
+|                                                          |
+|  layer graph       undo manager       dirty-region map   |
+|      |                  |                    |            |
+|      +------------------+--------------------+            |
+|                         |                                 |
+|                    Tile Manager                           |
+|              256/512px logical tiles                     |
++-------------------------+--------------------------------+
+                          |
+            +-------------+-------------+
+            |                           |
+            v                           v
++----------------------+      +---------------------------+
+| Worker + WASM Pool   |      | Tile Cache                |
+| filters              |      | RAM LRU                   |
+| brush                 |      | persistent cold storage  |
+| transform             |      +---------------------------+
++----------+-----------+
+           |
+           | dirty tile outputs
+           v
++----------------------------------------------------------+
+| WebGL / WebGPU Renderer                                  |
+| visible mip tiles only                                   |
+| bounded GPU LRU                                          |
++-------------------------+--------------------------------+
+                          |
+                          v
+                 viewport-sized canvas
+```
+
+---
+
+# 19. Example tile visibility calculation
+
+```ts
+const TILE_SIZE = 512;
+
+function visibleTileRange(rect: Rect) {
+  return {
+    minX: Math.floor(rect.left / TILE_SIZE),
+    maxX: Math.floor((rect.right - 1) / TILE_SIZE),
+    minY: Math.floor(rect.top / TILE_SIZE),
+    maxY: Math.floor((rect.bottom - 1) / TILE_SIZE),
+  };
+}
+```
+
+Then load only those tiles plus overscan.
+
+```ts
+function getNeededTiles(viewport: Rect, overscanTiles = 1) {
+  const range = visibleTileRange(viewport);
+
+  const result: TileKey[] = [];
+
+  for (let y = range.minY - overscanTiles; y <= range.maxY + overscanTiles; y++) {
+    for (let x = range.minX - overscanTiles; x <= range.maxX + overscanTiles; x++) {
+      result.push({ layerId: 'active', x, y, level: 0 });
+    }
+  }
+
+  return result;
+}
+```
+
+---
+
+# 20. Example LRU tile cache
+
+```ts
+type CacheEntry<T> = {
+  value: T;
+  bytes: number;
+  lastUsed: number;
+};
+
+class TileCache<T> {
+  private map = new Map<string, CacheEntry<T>>();
+  private usedBytes = 0;
+
+  constructor(private maxBytes: number) {}
+
+  get(key: string): T | undefined {
+    const entry = this.map.get(key);
+    if (!entry) return undefined;
+
+    entry.lastUsed = performance.now();
+    return entry.value;
+  }
+
+  put(key: string, value: T, bytes: number) {
+    this.evictUntilFits(bytes);
+
+    this.map.set(key, {
+      value,
+      bytes,
+      lastUsed: performance.now(),
+    });
+
+    this.usedBytes += bytes;
+  }
+
+  private evictUntilFits(incomingBytes: number) {
+    while (this.usedBytes + incomingBytes > this.maxBytes) {
+      let oldestKey: string | undefined;
+      let oldestTime = Infinity;
+
+      for (const [key, entry] of this.map) {
+        if (entry.lastUsed < oldestTime) {
+          oldestKey = key;
+          oldestTime = entry.lastUsed;
+        }
+      }
+
+      if (!oldestKey) break;
+
+      const entry = this.map.get(oldestKey)!;
+      this.release(entry.value);
+      this.map.delete(oldestKey);
+      this.usedBytes -= entry.bytes;
+    }
+  }
+
+  private release(value: T) {
+    if (value instanceof ImageBitmap) {
+      value.close();
+    }
+  }
+}
+```
+
+A production implementation would use a more efficient linked-list LRU, but this demonstrates the memory-budget principle clearly in an interview.
+
+---
+
+# 21. Filters need halo regions
+
+Tile processing creates one subtle problem: filters such as blur need neighboring pixels.
+
+For a blur radius of 20 pixels, processing exactly one 512 × 512 tile creates seams at tile boundaries.
+
+Request a halo:
+
+```text
+          neighboring source pixels
+       <-------------------------->
+
+      +----------------------------+
+      |          halo              |
+      |   +--------------------+   |
+      |   |                    |   |
+      |   |    target tile     |   |
+      |   |                    |   |
+      |   +--------------------+   |
+      |          halo              |
+      +----------------------------+
+```
+
+```ts
+const sourceRect = expand(tileRect, filter.radius);
+```
+
+Compute with the halo, then write only the target tile region.
+
+This preserves correctness without processing the entire document.
+
+---
+
+# 22. Operations that affect the whole image
+
+An interviewer may ask:
+
+> “Tiling works for a brush stroke, but what about rotate, resize, or Gaussian blur over the entire image?”
+
+Answer:
+
+Tiling still helps. The operation becomes a **scheduled tile graph**.
+
+```text
+Global operation requested
+       |
+       v
+Create operation revision
+       |
+       v
+Generate tile jobs
+       |
+       +--> visible tiles = high priority
+       |
+       +--> nearby tiles = medium priority
+       |
+       +--> offscreen tiles = background
+       v
+Commit result progressively
+```
+
+The UX can show the visible result first while continuing background work, provided document semantics remain correct.
+
+For transformations, use lazy/non-destructive representations where possible:
+
+```ts
+interface TransformNode {
+  matrix: DOMMatrix;
+  sourceLayerId: string;
+}
+```
+
+Do not eagerly rewrite all 144 million pixels merely because the user rotated a layer if the renderer can represent the transformation non-destructively.
+
+---
+
+# 23. Prefer non-destructive editing
+
+A Photoshop-like engine should avoid baking everything immediately.
+
+Instead of:
+
+```text
+apply transform
+-> rewrite entire bitmap
+```
+
+represent operations:
+
+```text
+Layer
+  |
+  +-- Transform
+  |
+  +-- Mask
+  |
+  +-- Adjustment
+  |
+  +-- Effects
+```
+
+Render the graph into visible tiles.
+
+Benefits:
+
+- lower immediate memory churn
+- cheap undo
+- better quality
+- easier progressive rendering
+
+Eventually the system can rasterize/cache hot regions when beneficial.
+
+---
+
+# 24. Open-document flow I would use
+
+```text
+1. Read metadata first
+   width, height, bit depth, color space, layer count
+
+2. Estimate risk
+   decoded size
+   expected tile cache
+   probable working set
+
+3. Select capability profile
+   GPU limits
+   memory hints
+   worker concurrency
+
+4. Load preview / low mip
+
+5. Create document tile index
+
+6. Decode visible tiles first
+
+7. Render viewport
+
+8. Prefetch neighboring tiles
+
+9. Decode cold tiles lazily
+```
+
+Pseudo-code:
+
+```ts
+async function openDocument(file: File) {
+  const meta = await decoder.readMetadata(file);
+
+  const profile = chooseCapabilityProfile({
+    width: meta.width,
+    height: meta.height,
+    deviceMemory: navigator.deviceMemory,
+  });
+
+  const document = await createVirtualDocument(meta, profile);
+
+  const preview = await decoder.decodePreview(file, profile.previewSize);
+  renderer.showPreview(preview);
+
+  const visible = camera.getVisibleDocumentRect();
+  const tiles = document.tilesForRect(visible);
+
+  await tileScheduler.scheduleVisibleFirst(tiles);
+}
+```
+
+---
+
+# 25. Memory-pressure strategy
+
+When memory pressure grows:
+
+```text
+1. cancel speculative prefetch
+2. reduce worker concurrency
+3. drop offscreen GPU tiles
+4. drop decoded cold RAM tiles
+5. persist old undo chunks
+6. reduce preview/mip cache
+7. preserve authoritative document state
+```
+
+The important invariant is:
+
+> **Evict recomputable caches before losing authoritative user edits.**
+
+---
+
+# 26. Failure containment
+
+Even with good architecture, decoding or GPU allocation can fail.
+
+The editor should degrade safely.
+
+```ts
+try {
+  await renderer.allocateTile(tile);
+} catch (error) {
+  gpuCache.trimAggressively();
+  renderer.reduceResolution();
+  telemetry.record('gpu_allocation_failure', error);
+}
+```
+
+The system can present a lower-resolution preview or temporarily reduce quality instead of crashing the entire application.
+
+---
+
+# 27. Observability I would add
+
+For a product like Photoshop Web, collect document-size buckets and resource metrics.
+
+```text
+Document metrics
+- width / height
+- megapixels
+- layer count
+- bit depth
+- file format
+
+Memory metrics
+- decoded tile cache bytes
+- GPU cache bytes
+- undo bytes
+- WASM heap size
+- worker count
+
+Performance
+- document open latency
+- time to first preview
+- time to interactive
+- tile decode latency
+- render FPS
+- dropped frames
+- worker queue depth
+
+Reliability
+- OOM-like failures
+- WebGL context loss
+- decode failures
+- abandoned opens
+- crash rate by megapixel bucket
+```
+
+Useful product segmentation:
+
+```text
+0–25 MP
+25–50 MP
+50–100 MP
+100–200 MP
+200+ MP
+```
+
+A 12,000 × 12,000 image is **144 MP**, so failures may become obvious in the 100–200 MP cohort.
+
+---
+
+# 28. Interview diagnosis sequence
+
+If the interviewer says:
+
+> “Photoshop Web crashes when users open 12,000 × 12,000 images. What do you do?”
+
+I would answer in this order.
+
+## Step 1 — quantify
+
+```text
+144M pixels
+× 4 bytes RGBA
+≈ 550 MiB per full raw surface
+```
+
+Then explain that multiple copies can create multi-GB peak memory.
+
+## Step 2 — identify where copies exist
+
+Ask:
+
+- Is the document represented as one canvas?
+- Do we duplicate it for compositing?
+- Are workers cloning buffers?
+- Is undo storing snapshots?
+- Are filters allocating full-frame outputs?
+- Are we uploading one giant GPU texture?
+- Are we multiplying dimensions by DPR?
+
+## Step 3 — profile
+
+Measure:
+
+```text
+JS heap
+ArrayBuffers
+WASM heap
+GPU textures
+canvas backing stores
+worker memory
+undo history
+peak allocations
+```
+
+## Step 4 — immediate mitigations
+
+- cap DPR
+- avoid duplicate full-image buffers
+- remove full-document `getImageData`
+- transfer rather than clone buffers
+- bound undo memory
+- reduce eager prefetch
+- enforce texture/cache budgets
+
+## Step 5 — architectural fix
+
+Move to:
+
+```text
+tiled document
++ viewport rendering
++ mipmaps
++ worker/WASM processing
++ dirty-region updates
++ bounded CPU/GPU LRU caches
++ delta/tile undo
+```
+
+---
+
+# 29. What not to say in an interview
+
+Weak answer:
+
+> “The image is too large, so I would resize it.”
+
+Why weak:
+
+- destroys fidelity
+- does not explain the crash
+- ignores browser/GPU constraints
+- does not support professional editing requirements
+
+Better answer:
+
+> “I would first quantify the decoded working set. A 12k × 12k RGBA surface alone is roughly 550 MiB, and an editor can easily hold several such surfaces for canvas backing, GPU textures, filters, layers, and undo. I would profile the peak allocations, then move the rendering architecture away from monolithic surfaces toward tiled, level-of-detail rendering with bounded CPU/GPU caches and tile-level undo.”
+
+---
+
+# 30. Follow-up: “What if there are 20 layers?”
+
+Suppose all 20 layers were dense full-resolution RGBA surfaces:
+
+```text
+550 MiB × 20
+≈ 11 GiB
+```
+
+Obviously we cannot keep every layer as an uncompressed full-size resident bitmap.
+
+Use:
+
+```text
+sparse tiles
+compressed backing storage
+visible tile residency
+lazy decode
+layer-specific dirty tiles
+composite cache
+```
+
+Transparent/empty regions should not allocate physical tile storage unnecessarily.
+
+```ts
+interface LayerTile {
+  state: 'empty' | 'compressed' | 'decoded' | 'gpu-resident';
+}
+```
+
+---
+
+# 31. Follow-up: “Would WebGPU fix this?”
+
+Not by itself.
+
+WebGPU can improve:
+
+- compute kernels
+- GPU scheduling/control
+- buffer management
+- modern rendering pipelines
+
+But this is still wrong:
+
+```text
+WebGPU
++ giant monolithic 12k surfaces
++ unlimited history
++ no cache budget
+```
+
+The primary architectural solution remains:
+
+```text
+tiling
++ bounded residency
++ LOD
++ incremental processing
+```
+
+WebGPU is an implementation accelerator, not a replacement for memory architecture.
+
+---
+
+# 32. Follow-up: “Why not just use Web Workers?”
+
+Because workers solve **where CPU work runs**, not how much memory the application requires.
+
+Bad architecture in a worker:
+
+```text
+main thread: 550 MB
+worker #1:   550 MB
+worker #2:   550 MB
+worker #3:   550 MB
+```
+
+can crash faster than doing it on the main thread.
+
+Correct answer:
+
+> Use workers after designing bounded, tiled data flow. Pass tile-sized transferable buffers, not entire-document copies.
+
+---
+
+# 33. Follow-up: “What if the user zooms to 800%?”
+
+At very high zoom, the viewport intersects only a tiny document region.
+
+This is actually favorable for tiled rendering.
+
+```text
+800% zoom
+viewport may need only
+2 × 3 high-resolution tiles
+```
+
+Load Level 0/full-resolution tiles for the visible region and evict distant ones.
+
+At low zoom, use lower mip levels.
+
+Thus the renderer dynamically trades:
+
+```text
+zoomed out -> lower-res, many logical regions
+zoomed in  -> full-res, very few tiles
+```
+
+---
+
+# 34. Follow-up: “How do you avoid seams between tiles?”
+
+For normal drawing/compositing, coordinates must align exactly.
+
+For neighborhood operations such as:
+
+- blur
+- sharpen
+- convolution
+- shadows
+- morphology
+
+include a halo/overlap determined by kernel radius.
+
+```text
+filter radius = R
+source tile read region = tile bounds expanded by R
+write region = original tile bounds
+```
+
+This gives the same result as whole-image processing without requiring the whole image in memory.
+
+---
+
+# 35. Follow-up: “How would you prioritize tile jobs?”
+
+Use viewport-aware scheduling.
+
+```text
+Priority 0: tiles currently visible
+Priority 1: tiles in pointer/brush interaction
+Priority 2: neighboring/overscan tiles
+Priority 3: background document work
+Priority 4: speculative prefetch
+```
+
+Pseudo-code:
+
+```ts
+scheduler.enqueue(job, {
+  priority: intersects(job.bounds, viewport) ? Priority.Visible : Priority.Background,
+});
+```
+
+If the user pans, reprioritize/cancel stale jobs.
+
+This prevents the system from wasting CPU and memory rendering areas the user no longer sees.
+
+---
+
+# 36. Follow-up: “How do you handle cancellation?”
+
+Operations should carry a generation/revision ID.
+
+```ts
+let generation = 0;
+
+async function applyPreview(params) {
+  const myGeneration = ++generation;
+
+  const tiles = await workerPool.compute(params);
+
+  if (myGeneration !== generation) {
+    release(tiles);
+    return;
+  }
+
+  commit(tiles);
+}
+```
+
+When a slider changes rapidly:
+
+```text
+blur=5
+blur=10
+blur=15
+blur=20
+```
+
+we should not commit stale `blur=5` results after `blur=20` becomes current.
+
+Also cancel queued low-priority work whenever possible.
+
+---
+
+# 37. Staff-level answer: separate authoritative state from caches
+
+This distinction is important.
+
+```text
+Authoritative
+- layer graph
+- editing commands
+- source tile contents
+- document metadata
+
+Recomputable caches
+- GPU textures
+- composite tiles
+- mip levels
+- previews
+- decoded cold tiles
+```
+
+Under memory pressure:
+
+```text
+Evict caches first.
+Never silently discard authoritative edits.
+```
+
+This gives the system predictable correctness even when the browser is constrained.
+
+---
+
+# 38. Staff-level answer: design for peak memory, not average memory
+
+Suppose normal editing uses:
+
+```text
+1.2 GiB
+```
+
+A filter may briefly require:
+
+```text
++ 500 MiB source
++ 500 MiB destination
++ 300 MiB worker intermediates
+```
+
+Peak:
+
+```text
+~2.5 GiB
+```
+
+A system that only monitors steady-state usage will still crash.
+
+Therefore scheduling needs admission control:
+
+```ts
+if (!memoryBudget.canStart(operation.estimatedPeakBytes)) {
+  await cache.trim();
+  operation.reduceConcurrency();
+}
+```
+
+Or process the operation in bounded tile batches.
+
+---
+
+# 39. Staff-level answer: avoid accidental copies
+
+Watch JavaScript APIs carefully.
+
+Potentially dangerous patterns:
+
+```js
+const copy = pixels.slice();
+const copy2 = structuredClone(pixels);
+const next = [...hugeArray];
+```
+
+For binary image data prefer:
+
+```text
+ownership transfer
+shared buffers when carefully synchronized
+tile-sized buffers
+GPU-resident operations where readback is unnecessary
+```
+
+Every unexplained copy of a 550 MiB buffer is a production incident waiting to happen.
+
+---
+
+# 40. Short interview answer — 60 seconds
+
+> A 12,000 × 12,000 image contains 144 million pixels. In 8-bit RGBA, one decoded surface is roughly 550 MiB. Photoshop Web probably has more than one copy: a canvas backing store, layer/composite buffers, GPU textures, temporary filter outputs, and undo state. A few full-size copies can push the browser into multi-gigabyte peak memory, and one giant texture can also hit GPU or VRAM constraints. DPR can accidentally make it four times worse in pixel count.
+>
+> I would first profile CPU, ArrayBuffer/WASM, canvas and GPU memory and identify duplicate full-document allocations. The architectural fix is to stop treating the image as one monolithic bitmap. I would tile it into 256 or 512 pixel chunks, render only visible tiles into a viewport-sized canvas, use mip levels for zoomed-out views, process tiles in Workers/WASM, keep bounded CPU/GPU LRU caches, update only dirty tiles, and store tile deltas or commands for undo instead of full snapshots. Then memory becomes proportional to the active viewport and working set rather than the entire document times the number of processing stages.
+
+---
+
+# 41. Whiteboard summary
+
+```text
+WHY IT CRASHES
+==============
+12k × 12k = 144M pixels
+RGBA       = ~550 MiB / full surface
+
+× canvas backing store
+× source buffer
+× destination buffer
+× GPU texture
+× layer composites
+× undo
+× temporary filters
+
+=> multi-GB peak memory
+=> GC / allocation failures
+=> GPU texture / VRAM pressure
+=> main-thread stalls
+=> tab or GPU process crash
+
+
+FIX
+===
+                Large Document
+                     |
+                     v
+              Virtual Tile Grid
+             256 / 512 px tiles
+                     |
+       +-------------+-------------+
+       |                           |
+       v                           v
+ Visible tile scheduler       Worker + WASM
+       |                           |
+       +-------------+-------------+
+                     |
+                     v
+              bounded RAM LRU
+                     |
+                     v
+              bounded GPU LRU
+                     |
+                     v
+          WebGL/WebGPU Renderer
+                     |
+                     v
+           viewport-sized canvas
+
+PLUS
+- mipmaps / LOD
+- dirty-region rendering
+- delta/tile undo
+- cancellation
+- backpressure
+- memory admission control
+- progressive loading
+- capability detection
+```
+
+---
+
+# 42. The sentence I would end with
+
+> **For a professional web image editor, large-document support is fundamentally a virtualization problem: bound memory and rendering work to the visible/active working set instead of scaling resource consumption with total document pixels.**

@@ -44,6 +44,10 @@
       "hash": "2c37c162b2abbc878aa7d6d29d601de73f232b0500d50ab43136f716b6304229",
       "docRelative": "figma.png"
     },
+    "frontend-system-design/generative-fill-design.png": {
+      "hash": "b601d6d594be0137a645da2195d9277a35831c2dfa3d35cff8e394ac9bb72e15",
+      "docRelative": "generative-fill-design.png"
+    },
     "frontend-system-design/google-calendar.png": {
       "hash": "418ff47387e7a6f3b32595b65eabbaacc9e67f99b7bebea0ae302e9841b7ef1a",
       "docRelative": "google-calendar.png"
@@ -136,6 +140,10 @@
       "hash": "099150bbc021347eac79b56868bdc7e89e93f7d553f1467faae36b3b45954a4e",
       "docRelative": "core/fe_interview_guide.mdx"
     },
+    "frontend-system-design/core/image_crash.mdx": {
+      "hash": "8c68ab7db6ee68a61ea6de34864d4160dccea8a8cac4fae41ca76eacd30c803b",
+      "docRelative": "core/image_crash.mdx"
+    },
     "frontend-system-design/core/javascript-fundamentals-interview-notes.mdx": {
       "hash": "6c5125bbc4b5a0339b495ebe619c6aed7158671a6067b3dd4db27eaaa3fd342a",
       "docRelative": "core/javascript-fundamentals-interview-notes.mdx"
@@ -175,6 +183,10 @@
     "frontend-system-design/figma.mdx": {
       "hash": "d9ec426dcbf94524449f3d4507c7b36a5213ea9a228033460cdf42dcb3a08bb6",
       "docRelative": "figma.mdx"
+    },
+    "frontend-system-design/generative-fill-design.mdx": {
+      "hash": "9296e71e2395f34a0abadc014d50c832ba6fc5619c1c9a1ca3cdd83855d5dbc1",
+      "docRelative": "generative-fill-design.mdx"
     },
     "frontend-system-design/google-docs-design.mdx": {
       "hash": "04208f76240f659921d307997b21ade9aa4565510d7f6151c219fc826c424db2",
@@ -221,7 +233,7 @@
       "docRelative": "video-netflix.mdx"
     },
     "__nav__:core": {
-      "hash": "6f3b9c4cd32b03de4b6ec39639bbc4fb2bc28506564cd6cb8ad2b7b3b0d9ff1b",
+      "hash": "796fa12aae35ce71a6017340d10f774990004f88afef5ad0ab1313c0ba238774",
       "docRelative": "core/_index.mdx"
     }
   }
