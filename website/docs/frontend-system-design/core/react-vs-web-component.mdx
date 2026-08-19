@@ -1,0 +1,1456 @@
+---
+title: react-vs-web-components
+---
+
+## 1. 60-second interview answer
+
+Separate the **component contract** from the **application framework**.
+
+- Use **Web Components** when the component must survive framework changes, be consumed by React/Angular/Vue/plain HTML, and provide a long-lived browser-native API surface.
+- Use **React components** when the component is tightly coupled to application state, React composition, routing, server components, hooks, or React-specific performance patterns.
+- For Spectrum-like primitives, I would favor **Web Components underneath with generated/thin React wrappers on top**.
+
+This is close to how Spectrum Web Components integrates with React today: Adobe documents `@swc-react/*` wrappers that bridge Spectrum custom elements into React through `@lit/react`, including React event/ref ergonomics.
+
+The major caveat is that custom elements use a **page-global registry by tag name**. Two incompatible implementations both trying to define `<sp-button>` cannot simply coexist in the default registry. Version policy and dependency deduplication therefore become part of the design-system architecture, not just package-management hygiene.
+
+---
+
+# 2. React vs Web Components
+
+| Dimension         | React Component                        | Web Component                                                 |
+| ----------------- | -------------------------------------- | ------------------------------------------------------------- |
+| Runtime model     | Framework component                    | Browser platform primitive                                    |
+| Portability       | React only                             | React, Vue, Angular, vanilla, other hosts                     |
+| Encapsulation     | Convention/CSS tooling                 | Custom Element + optional Shadow DOM                          |
+| State model       | React state/hooks/context              | JS class/reactive library/internal state                      |
+| Rendering         | React reconciler                       | Browser DOM; often Lit or direct DOM                          |
+| Events            | React event model                      | DOM events / `CustomEvent`                                    |
+| Styling           | CSS Modules, CSS-in-JS, Tailwind, etc. | host styles, custom properties, `::part`, slots               |
+| SSR               | Excellent React/Next ecosystem         | Possible, but more integration work                           |
+| Testing           | Mature React tooling                   | Shadow DOM/custom-element-aware tooling needed                |
+| Version isolation | package/bundle dependent               | **custom-element tag registration is page-global by default** |
+| Best fit          | Product/application components         | Cross-framework design-system primitives                      |
+
+## Interview decision rule
+
+```text
+Is this UI primitive expected to be reused across frameworks/products
+for many years?
+        |
+        +-- YES --> Web Component is a strong candidate
+        |            + React wrapper for React consumers
+        |
+        +-- NO --> Is it deeply tied to React state/router/hooks/RSC?
+                     |
+                     +-- YES --> React component
+                     +-- NO --> Either; optimize for team ecosystem
+```
+
+---
+
+# 3. Why Web Components are attractive at Adobe scale
+
+## 3.1 Browser-native component model
+
+A custom element is registered with the browser:
+
+```ts
+class SpectrumButton extends HTMLElement {
+  connectedCallback() {
+    // lifecycle controlled by browser
+  }
+}
+
+customElements.define('sp-button', SpectrumButton);
+```
+
+The browser understands `<sp-button>` independent of React.
+
+```html
+<sp-button variant="accent">Export</sp-button>
+```
+
+The same element can be consumed from React:
+
+```tsx
+export function Toolbar() {
+  return <sp-button variant="accent">Export</sp-button>;
+}
+```
+
+or Vue:
+
+```html
+<sp-button variant="accent">Export</sp-button>
+```
+
+This matters for a company with many products, shells, extension environments, legacy stacks, and teams moving between frameworks.
+
+## 3.2 Framework independence
+
+A React-only design system implicitly couples its public surface to React.
+
+```text
+Product A -------- React 18
+Product B -------- React 19
+Legacy shell ----- Angular
+Plugin ----------- Vanilla JS
+Embedded surface - another framework
+```
+
+With framework-neutral primitives:
+
+```text
+               +--------------------+
+               | Spectrum Component |
+               |   Web Component    |
+               +---------+----------+
+                         |
+       +-----------------+------------------+
+       |                 |                  |
+     React              Vue               HTML
+     wrapper           adapter             direct
+```
+
+The design-system contract can outlive any individual framework lifecycle.
+
+## 3.3 Encapsulated implementation
+
+A useful public API can remain small:
+
+```html
+<sp-action-button emphasized disabled> Save </sp-action-button>
+```
+
+Consumers should depend on:
+
+```text
+attributes / properties
+slots
+DOM events
+CSS custom properties / parts
+accessibility semantics
+```
+
+They should **not** depend on the component's internal DOM structure.
+
+That creates a durable migration boundary.
+
+---
+
+# 4. Web Components are NOT the same thing as Shadow DOM
+
+This is an important interview distinction.
+
+**Web Components** is an umbrella of browser technologies:
+
+1. Custom Elements
+2. Shadow DOM
+3. `<template>` and `<slot>`
+
+A custom element may use Shadow DOM, but it does not have to.
+
+## Light-DOM custom element
+
+```ts
+class UserBadge extends HTMLElement {
+  connectedCallback() {
+    this.innerHTML = `
+      <span class="badge">
+        <slot></slot>
+      </span>
+    `;
+  }
+}
+
+customElements.define('user-badge', UserBadge);
+```
+
+The resulting DOM is directly exposed to the page.
+
+```text
+user-badge
+  └─ span.badge
+```
+
+External CSS can reach it:
+
+```css
+user-badge .badge {
+  background: red;
+}
+```
+
+## Shadow-DOM custom element
+
+```ts
+class UserBadge extends HTMLElement {
+  constructor() {
+    super();
+
+    const shadow = this.attachShadow({ mode: 'open' });
+
+    shadow.innerHTML = `
+      <style>
+        :host {
+          display: inline-flex;
+        }
+
+        .badge {
+          border-radius: 999px;
+          padding: 4px 8px;
+        }
+      </style>
+
+      <span class="badge">
+        <slot></slot>
+      </span>
+    `;
+  }
+}
+
+customElements.define('user-badge', UserBadge);
+```
+
+Conceptually:
+
+```text
+Document DOM
+
+<user-badge>
+   #shadow-root
+      <style>
+      <span class="badge">
+         <slot>
+```
+
+External selectors normally cannot reach `.badge` inside the shadow tree.
+
+```css
+/* Doesn't pierce the shadow root */
+user-badge .badge {
+  background: red;
+}
+```
+
+### Interview phrase
+
+> A Web Component defines the browser-level component boundary; Shadow DOM is an optional encapsulation mechanism inside that boundary.
+
+---
+
+# 5. Shadow DOM: why use it?
+
+Without Shadow DOM, a design system can suffer accidental CSS coupling:
+
+```css
+/* Product team */
+button {
+  border: none;
+}
+
+/* Design system implementation */
+button {
+  border: 1px solid gray;
+}
+```
+
+At organization scale, global selectors become dangerous.
+
+Shadow DOM changes the boundary:
+
+```text
+Application CSS
+     |
+     X  cannot freely style internals
+     |
+<sp-button>
+   #shadow-root
+      <button>
+```
+
+### Benefits
+
+- CSS isolation
+- DOM implementation isolation
+- fewer global selector collisions
+- internal refactors without breaking consumers
+- safer embedding inside heterogeneous apps
+
+### But encapsulation creates costs
+
+The same boundary that protects the component also makes some use cases harder:
+
+- consumers cannot arbitrarily style internals
+- test selectors need shadow-aware APIs
+- event targets may be retargeted
+- browser DevTools display an additional DOM boundary
+- accessibility relationships must be designed carefully
+
+---
+
+# 6. Styling customization: the biggest API design trade-off
+
+With React components that render normal DOM, consumers commonly do this:
+
+```tsx
+<Button className="checkoutButton" />
+```
+
+```css
+.checkoutButton svg {
+  width: 18px;
+}
+```
+
+This is flexible but creates hidden coupling to implementation details.
+
+With Shadow DOM, you need intentional styling APIs.
+
+## Option A — CSS custom properties
+
+```css
+sp-button {
+  --button-background: var(--brand-accent);
+}
+```
+
+Inside:
+
+```css
+button {
+  background: var(--button-background, blue);
+}
+```
+
+Good for **design tokens**.
+
+## Option B — `::part`
+
+Inside the component:
+
+```html
+<button part="button">
+  <slot></slot>
+</button>
+```
+
+Consumer:
+
+```css
+sp-button::part(button) {
+  border-radius: 12px;
+}
+```
+
+Good for explicitly supported structural customization.
+
+## Option C — slots
+
+```html
+<sp-button>
+  <sp-icon slot="icon"></sp-icon>
+  Export
+</sp-button>
+```
+
+Good for content/composition.
+
+## Staff-level design principle
+
+Do **not** expose every internal node through `::part`.
+
+Otherwise:
+
+```text
+Shadow DOM encapsulation
+        ↓
+Expose every internal element
+        ↓
+Consumers depend on implementation
+        ↓
+You recreated global DOM coupling
+```
+
+Treat styling hooks as **public APIs with compatibility obligations**.
+
+---
+
+# 7. Events and event retargeting
+
+Suppose the internal DOM is:
+
+```text
+<sp-picker>
+  #shadow-root
+     <button>
+```
+
+A click originates from the internal button.
+
+Outside the shadow tree, event retargeting can make the host appear as the target:
+
+```ts
+host.addEventListener('click', (event) => {
+  console.log(event.target); // often <sp-picker>, not internal <button>
+});
+```
+
+This is good encapsulation because consumers should not depend on internal nodes.
+
+For semantic component actions, dispatch a component-level event:
+
+```ts
+this.dispatchEvent(
+  new CustomEvent('change', {
+    detail: { value: this.value },
+    bubbles: true,
+    composed: true,
+  })
+);
+```
+
+Two properties are important:
+
+```text
+bubbles: true
+    event moves upward
+
+composed: true
+    event can cross the shadow boundary
+```
+
+### Bad API
+
+```ts
+// Consumer must know implementation detail
+shadowRoot
+  .querySelector('button')
+  ?.addEventListener('click', ...);
+```
+
+### Better API
+
+```html
+<sp-picker></sp-picker>
+```
+
+```ts
+picker.addEventListener('change', handleChange);
+```
+
+### React integration issue
+
+DOM custom events and React's component/event conventions do not always map perfectly. This is one reason Adobe provides React wrappers around SWC. Adobe documents that the wrappers bridge SWC into React and support React-style event/ref behavior, with some specific limitations. citeturn105472view1
+
+---
+
+# 8. React wrapper around a Web Component
+
+A strong enterprise pattern is:
+
+```text
+                Stable core
+             Web Component
+                  |
+        +---------+---------+
+        |                   |
+   React wrapper        Vue adapter
+        |
+ React application
+```
+
+Example simplified wrapper:
+
+```tsx
+import React, { useEffect, useRef } from 'react';
+
+export function SpectrumPicker({ value, onChange, children }) {
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+
+    const handleChange = (event: Event) => {
+      const customEvent = event as CustomEvent<{ value: string }>;
+      onChange?.(customEvent.detail.value);
+    };
+
+    node.addEventListener('change', handleChange);
+
+    return () => {
+      node.removeEventListener('change', handleChange);
+    };
+  }, [onChange]);
+
+  return (
+    <sp-picker ref={ref} value={value}>
+      {children}
+    </sp-picker>
+  );
+}
+```
+
+The wrapper handles:
+
+```text
+DOM events         -> React callbacks
+properties         -> React props
+DOM refs           -> forwardRef
+custom element API -> TypeScript API
+```
+
+Adobe's documented `@swc-react/*` wrappers use this general bridge pattern, generated from Spectrum Web Components metadata and `@lit/react`. citeturn105472view1
+
+---
+
+# 9. Critical Adobe deep dive: can multiple versions coexist?
+
+## Short answer
+
+**Not safely under the same custom-element name in the page's default `CustomElementRegistry`.**
+
+The custom element registry maps a tag name to one definition:
+
+```text
+window.customElements
+
+"sp-button" -> ButtonClass
+"sp-picker" -> PickerClass
+```
+
+Once this happens:
+
+```ts
+customElements.define('sp-button', ButtonV1);
+```
+
+this is invalid:
+
+```ts
+customElements.define('sp-button', ButtonV2);
+```
+
+The browser throws because the name is already registered.
+
+Adobe's Spectrum documentation explicitly describes this registry-conflict scenario. It notes that duplicate definitions can arise from non-deduped dependency trees or incompatible/outdated dependency versions, and recommends aligning Spectrum package versions and deduplicating the tree. citeturn669250view0
+
+## Why this is more subtle than the thrown error
+
+A common workaround is:
+
+```ts
+if (!customElements.get('sp-button')) {
+  customElements.define('sp-button', SpectrumButton);
+}
+```
+
+That avoids the exception.
+
+It does **not** guarantee compatibility.
+
+Imagine:
+
+```text
+Application A expects
+@swc/button v1
+
+Application B expects
+@swc/button v2
+```
+
+Both render:
+
+```html
+<sp-button></sp-button>
+```
+
+If v1 registers first:
+
+```text
+sp-button -> implementation v1
+```
+
+then Application B may silently receive v1 behavior.
+
+This can be worse than a hard failure because it becomes a runtime semantic mismatch.
+
+```text
+Expected property in v2
+          ↓
+Tag resolves to v1
+          ↓
+No registration error
+          ↓
+Unexpected behavior
+          ↓
+Difficult debugging
+```
+
+Adobe's React-wrapper troubleshooting documentation similarly calls out the `"sp-xxx has already been used with this registry"` error as typically indicating two versions of the same SWC component, and recommends resolving the dependency conflict. citeturn105472view1
+
+---
+
+# 10. Why npm can install two versions but Custom Elements cannot use both names
+
+Node package resolution can support:
+
+```text
+node_modules/
+
+package-a/
+  node_modules/
+    @spectrum/button@1
+
+package-b/
+  node_modules/
+    @spectrum/button@2
+```
+
+JavaScript modules have different file/module identities.
+
+But both packages may execute:
+
+```ts
+customElements.define('sp-button', SpectrumButton);
+```
+
+The browser registry is keyed by **tag name**, not package path.
+
+```text
+Module graph
+
+button-v1.js ----+
+                 +--> customElements.define("sp-button")
+button-v2.js ----+
+```
+
+Therefore:
+
+> JS modules can coexist by module identity; custom-element definitions collide by registry name.
+
+That is an excellent interview point.
+
+---
+
+# 11. How I would prevent Spectrum version conflicts
+
+Treat this as an architecture/governance problem.
+
+## 11.1 Align design-system versions
+
+Adobe's Spectrum docs recommend keeping Spectrum Web Component packages on the same version. citeturn669250view0
+
+```json
+{
+  "dependencies": {
+    "@spectrum-web-components/button": "1.8.0",
+    "@spectrum-web-components/picker": "1.8.0",
+    "@spectrum-web-components/theme": "1.8.0"
+  }
+}
+```
+
+Avoid:
+
+```json
+{
+  "dependencies": {
+    "@spectrum-web-components/button": "1.8.0",
+    "@spectrum-web-components/picker": "1.4.0",
+    "@spectrum-web-components/theme": "1.1.0"
+  }
+}
+```
+
+## 11.2 Deduplicate dependency trees
+
+```bash
+npm ls @spectrum-web-components/button
+npm dedupe
+```
+
+or use package-manager resolutions/overrides carefully.
+
+Spectrum's registry-conflict guidance explicitly recommends deduplication and warns that forcing incompatible resolutions can produce undefined or breaking behavior. citeturn669250view0
+
+## 11.3 Make the host own the design-system runtime
+
+For microfrontends:
+
+```text
+Application shell
+    |
+    +-- owns Spectrum version
+    |
+    +-- MFE A
+    +-- MFE B
+    +-- MFE C
+```
+
+Instead of:
+
+```text
+MFE A bundles Spectrum v1
+MFE B bundles Spectrum v2
+MFE C bundles Spectrum v3
+```
+
+This gives one deliberate compatibility boundary.
+
+## 11.4 Peer dependency for shared libraries
+
+A shared product library should often avoid bundling its own second design-system runtime:
+
+```json
+{
+  "peerDependencies": {
+    "@spectrum-web-components/button": "^1.8.0"
+  }
+}
+```
+
+Host application:
+
+```json
+{
+  "dependencies": {
+    "@spectrum-web-components/button": "1.8.2"
+  }
+}
+```
+
+## 11.5 CI policy
+
+Add a dependency-tree check:
+
+```bash
+npm ls @spectrum-web-components/button \
+       @spectrum-web-components/base \
+       @spectrum-web-components/theme
+```
+
+Fail the build if multiple incompatible versions exist.
+
+At large scale, I would automate this through:
+
+```text
+Renovate / Dependabot
+       ↓
+version policy
+       ↓
+CI dependency validation
+       ↓
+visual + accessibility regression tests
+       ↓
+controlled rollout
+```
+
+---
+
+# 12. Scoped CustomElementRegistry: does it solve the problem?
+
+The platform has been evolving toward **scoped custom-element registries**, whose goal is to allow definitions to be scoped instead of relying only on one page-global registry.
+
+Conceptually:
+
+```text
+Registry A
+  sp-button -> V1
+
+Registry B
+  sp-button -> V2
+```
+
+But this should not become the default excuse to ship arbitrary versions everywhere.
+
+Adobe's Spectrum documentation notes that scoped registries could alleviate name collisions, but also calls out remaining costs: duplicate component code increases page size, globally coordinating components may still require one deduplicated implementation, and prior polyfill experimentation had unacceptable performance for a large library. citeturn669250view0
+
+### Staff answer
+
+> I would view scoped registries as an isolation tool for exceptional embedding/plugin cases, not as a replacement for coherent dependency governance.
+
+---
+
+# 13. Accessibility considerations
+
+Web Components can provide strong accessibility because the design-system team can centralize semantics.
+
+Example:
+
+```html
+<sp-button> Delete </sp-button>
+```
+
+Internal implementation:
+
+```html
+<button type="button">
+  <slot></slot>
+</button>
+```
+
+Every consuming application inherits the semantic native control.
+
+That is a major design-system benefit.
+
+But there are pitfalls.
+
+## 13.1 Prefer native controls internally
+
+Bad:
+
+```html
+<div role="button" tabindex="0">Save</div>
+```
+
+Now you own:
+
+```text
+keyboard semantics
+focus behavior
+disabled behavior
+activation behavior
+ARIA correctness
+```
+
+Prefer:
+
+```html
+<button>Save</button>
+```
+
+## 13.2 Form participation
+
+Custom controls are not automatically equivalent to native `<input>` elements.
+
+Modern browser APIs such as `ElementInternals` / `attachInternals()` can help custom elements participate in forms and expose accessibility semantics, but this needs deliberate implementation. citeturn513861search7turn513861search12
+
+## 13.3 IDs and cross-boundary relationships
+
+Accessibility relationships such as:
+
+```text
+aria-labelledby
+aria-describedby
+```
+
+can become more complex across encapsulation boundaries.
+
+The component API should therefore expose explicit label/help-text mechanisms rather than expecting callers to reach into internal markup.
+
+---
+
+# 14. SSR and hydration
+
+React has a very mature SSR ecosystem:
+
+```text
+React tree
+   ↓
+server rendering
+   ↓
+HTML
+   ↓
+hydration
+   ↓
+interactive React tree
+```
+
+Web Components historically require additional thought.
+
+Naive server output:
+
+```html
+<sp-card></sp-card>
+```
+
+Before the JS definition loads, the browser only knows this as an unknown/custom tag.
+
+After:
+
+```ts
+customElements.define('sp-card', SpectrumCard);
+```
+
+it upgrades the existing element.
+
+Potential UX issue:
+
+```text
+HTML arrives
+   ↓
+un-upgraded component
+   ↓
+JS loads
+   ↓
+custom element upgrades
+   ↓
+shadow tree renders
+```
+
+This can produce delayed content or layout changes if not planned.
+
+Modern techniques include declarative Shadow DOM and library-specific server rendering/hydration, but compared with native React framework paths there is still more integration surface to validate.
+
+Adobe's current Spectrum React docs include separate Next.js wrapper guidance and document specific integration limitations, showing why SSR/framework adapters remain important. citeturn105472view1
+
+### Interview decision
+
+For something SEO/content-heavy where SSR is critical:
+
+```text
+React / Next rendering may be the stronger default.
+```
+
+For application-shell controls such as:
+
+```text
+button
+picker
+slider
+tabs
+tooltip
+menu
+```
+
+framework-neutral Web Components can still be very attractive.
+
+---
+
+# 15. Testing complexity
+
+React testing:
+
+```tsx
+render(<Button>Save</Button>);
+expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled();
+```
+
+With Shadow DOM the internal structure may not be directly traversed by every testing utility.
+
+Bad approach:
+
+```ts
+const shadow = component.shadowRoot;
+const internalButton = shadow!.querySelector('.spectrum-Button');
+```
+
+This over-couples tests to implementation.
+
+Better tests focus on public behavior:
+
+```ts
+const button = document.querySelector('sp-button')!;
+button.click();
+expect(handleClick).toHaveBeenCalled();
+```
+
+and accessibility behavior:
+
+```text
+keyboard activation
+focus management
+ARIA semantics
+public event contract
+slot behavior
+visual regression
+```
+
+For the design-system package itself, internal shadow tests are appropriate.
+
+For product consumers, test through the public contract whenever possible.
+
+---
+
+# 16. Debugging complexity
+
+React provides powerful component-centric tooling:
+
+```text
+React DevTools
+component hierarchy
+props
+state
+profiler
+```
+
+With Web Components + Shadow DOM, debugging may require moving between:
+
+```text
+application framework tree
+        ↓
+custom-element host
+        ↓
+shadow root
+        ↓
+Lit/internal renderer
+        ↓
+DOM event propagation
+```
+
+Example failure:
+
+```text
+React onChange does not fire
+```
+
+Possible causes:
+
+```text
+React wrapper mismatch
+CustomEvent name mismatch
+bubbles=false
+composed=false
+wrong component version
+old custom element registered first
+```
+
+This is why wrapper libraries, runtime diagnostics, dependency policy, and good public contracts matter so much.
+
+---
+
+# 17. Direct DOM manipulation vs Shadow DOM
+
+## Plain DOM manipulation
+
+```ts
+class CounterElement extends HTMLElement {
+  connectedCallback() {
+    this.innerHTML = `
+      <button>-</button>
+      <span>0</span>
+      <button>+</button>
+    `;
+
+    const buttons = this.querySelectorAll('button');
+
+    buttons[1].addEventListener('click', () => {
+      const span = this.querySelector('span')!;
+      span.textContent = String(Number(span.textContent) + 1);
+    });
+  }
+}
+```
+
+All DOM remains in the page tree.
+
+## Shadow DOM manipulation
+
+```ts
+class CounterElement extends HTMLElement {
+  private count = 0;
+
+  constructor() {
+    super();
+
+    const root = this.attachShadow({ mode: 'open' });
+
+    root.innerHTML = `
+      <button id="minus">-</button>
+      <span id="value">0</span>
+      <button id="plus">+</button>
+    `;
+
+    root.getElementById('plus')!.addEventListener('click', () => {
+      this.count++;
+      this.render();
+    });
+  }
+
+  render() {
+    this.shadowRoot!.getElementById('value')!.textContent = String(this.count);
+  }
+}
+
+customElements.define('x-counter', CounterElement);
+```
+
+### Which category is this?
+
+```text
+Custom Element
+      |
+      +-- Light DOM implementation
+      |
+      +-- Shadow DOM implementation
+```
+
+Both are Web Components if built using custom-element APIs.
+
+Shadow DOM is not a separate alternative to Web Components—it is one tool used to implement them.
+
+---
+
+# 18. React reconciliation vs Web Component rendering
+
+React:
+
+```tsx
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return <button onClick={() => setCount((c) => c + 1)}>{count}</button>;
+}
+```
+
+Conceptually:
+
+```text
+setState
+   ↓
+React render
+   ↓
+reconciliation
+   ↓
+DOM mutations
+```
+
+Direct custom element:
+
+```text
+DOM event
+   ↓
+internal state
+   ↓
+manual DOM mutation
+```
+
+Lit-based Web Component:
+
+```text
+property update
+   ↓
+Lit render
+   ↓
+template diff
+   ↓
+Shadow DOM mutations
+```
+
+So avoid saying:
+
+> Web Components directly manipulate the DOM while React uses virtual DOM.
+
+That is too simplistic.
+
+A Spectrum Web Component may use **Lit as its rendering layer**, while the browser-standard component boundary remains Custom Elements/Shadow DOM.
+
+---
+
+# 19. Performance discussion
+
+Do not claim Web Components are automatically faster than React.
+
+Performance depends on:
+
+```text
+component count
+render frequency
+DOM complexity
+bundle size
+framework/runtime overhead
+layout/paint behavior
+subscription architecture
+```
+
+Potential Web Component advantages:
+
+- no React dependency required for non-React consumers
+- localized updates
+- framework-independent lazy loading
+- reusable runtime across products if deduplicated
+
+Potential costs:
+
+- duplicate libraries across microfrontends
+- Lit/runtime duplicated accidentally
+- many shadow roots
+- upgrade timing
+- extra wrapper layer in React apps
+
+The staff-level answer is:
+
+> Pick Web Components for architectural portability and encapsulation, not because of a blanket performance claim. Then measure actual loading, interaction, and rendering costs.
+
+---
+
+# 20. Where I would NOT use a Web Component
+
+Not every component should become a design-system Web Component.
+
+Suppose:
+
+```tsx
+<PhotoshopLayerPanel
+  document={document}
+  selection={selection}
+  collaboration={collaboration}
+  undoManager={undoManager}
+/>
+```
+
+This is deeply tied to product application state.
+
+Making it a framework-neutral custom element may require turning rich object/context interactions into awkward attributes/properties/events.
+
+I would likely keep this in React.
+
+### Good Web Component candidates
+
+```text
+Button
+Checkbox
+Slider
+Picker
+Tooltip
+Tabs
+Menu
+Dialog primitives
+Textfield
+Color controls
+```
+
+### Better React/product candidates
+
+```text
+Photoshop layer inspector
+Express editor panel
+AI generation workflow
+collaborative timeline
+complex product-specific route/page
+feature deeply dependent on app context
+```
+
+---
+
+# 21. Architecture I would propose at Adobe
+
+```text
+                  Spectrum Design Language
+                           |
+                           v
+                 Design Tokens / CSS
+                           |
+                           v
+               Spectrum Web Components
+             Custom Elements + Shadow DOM
+                           |
+              +------------+------------+
+              |                         |
+              v                         v
+       @swc-react wrappers         other adapters
+              |
+              v
+       Adobe React products
+```
+
+Ownership boundaries:
+
+```text
+Spectrum team
+-----------
+semantic behavior
+accessibility
+keyboard model
+visual contract
+tokens
+custom-element APIs
+compatibility
+
+React integration
+-----------------
+props
+refs
+event bridge
+React typing
+Next/framework integration
+
+Product teams
+-------------
+workflow
+application state
+data fetching
+business logic
+product composition
+```
+
+This gives a durable foundation without forcing application-level code away from React.
+
+---
+
+# 22. Version-management architecture for modular Adobe products
+
+For a huge modular app or microfrontend system:
+
+```text
+                    Application Shell
+                          |
+                 Spectrum Runtime 1.x
+                          |
+          +---------------+---------------+
+          |               |               |
+       Editor MFE      Assets MFE       AI MFE
+          |               |               |
+        React           React           React
+```
+
+Each MFE declares compatibility:
+
+```json
+{
+  "peerDependencies": {
+    "@spectrum-web-components/base": "^1.8.0"
+  }
+}
+```
+
+At build/deploy time:
+
+```text
+Dependency policy
+      ↓
+Lockfile validation
+      ↓
+Deduplication
+      ↓
+Integration test shell + MFEs
+      ↓
+visual/a11y/perf testing
+```
+
+If a microfrontend requires a breaking Spectrum major version:
+
+```text
+Option 1: migrate shell/platform together
+Option 2: isolate surface in iframe
+Option 3: exceptional scoped-registry architecture if platform support permits
+Option 4: temporary fork/name spacing, with explicit migration debt
+```
+
+Do not silently allow incompatible `<sp-*>` definitions to race.
+
+---
+
+# 23. Strong interview follow-up answers
+
+## Q: Why not just build everything in React?
+
+Because the design system becomes coupled to React's lifecycle and ecosystem. At Adobe scale, framework independence has real value across products, extensions, migrations, and long-lived surfaces. I would keep product workflows in React but put portable UI primitives below that framework boundary.
+
+## Q: Why not build everything as Web Components?
+
+Because framework neutrality has a cost. Product-level components often benefit directly from React context, hooks, server/client conventions, routing, and state composition. Converting every product component into attributes/properties/events can create unnecessary abstraction.
+
+## Q: Does Shadow DOM guarantee no styling problems?
+
+No. It prevents accidental selector penetration, but now you need intentional customization APIs: CSS custom properties, slots, `::part`, and theme context. The trade-off moves from uncontrolled styling to governed styling.
+
+## Q: Can two versions of `<sp-button>` coexist?
+
+Not under the same tag name in the default page registry. The first definition owns that name and the second `customElements.define()` fails. A guard may hide the exception but can leave the wrong version active. I would dedupe and align versions rather than depend on registration order. Adobe Spectrum's own registry-conflict documentation recommends a deduplicated version-compatible tree. citeturn669250view0
+
+## Q: What about scoped registries?
+
+They are promising for isolated/plugin cases because they can scope definitions, but they do not remove bundle-size, orchestration, or compatibility costs. Adobe's Spectrum docs explicitly note those trade-offs. citeturn669250view0
+
+## Q: What is the biggest Web Component risk in a microfrontend architecture?
+
+I would say **global registry/version governance**. Microfrontends feel independently deployable, but their custom elements share a browser page. Independent bundles can therefore collide through tag names and shared global behavior unless the shell defines the compatibility contract.
+
+## Q: What would you monitor?
+
+```text
+bundle duplication by package/version
+custom-element registration errors
+JS exceptions after Spectrum upgrades
+Core Web Vitals / interaction latency
+accessibility regressions
+visual diffs
+component adoption and deprecated API usage
+```
+
+---
+
+# 24. Pros / cons summary
+
+## Web Components — benefits
+
+- browser-native component model
+- framework independence
+- useful across huge modular products
+- encapsulated implementation
+- portable design system
+- long-lived public API surface
+- independent from React lifecycle/version churn
+- centralized accessibility and behavior
+- direct use in HTML and non-React environments
+
+## Web Components — costs
+
+- styling customization must be intentionally designed
+- accessibility across component boundaries requires expertise
+- event retargeting and `composed` semantics add complexity
+- React event/ref integration often benefits from wrappers
+- Shadow DOM changes test/debug workflows
+- SSR and hydration require extra integration discipline
+- custom-element names are page-global by default
+- duplicate versions can create registry conflicts or semantic mismatch
+- shared runtimes need dependency governance
+
+## React — benefits
+
+- excellent developer ecosystem
+- ergonomic composition
+- hooks/context/state integration
+- mature SSR/hydration/framework support
+- excellent debugging/testing tooling
+- natural fit for product-specific workflows
+
+## React — costs
+
+- React-specific public API
+- framework migrations affect the component library
+- reuse outside React requires additional implementation
+- CSS/DOM encapsulation depends on conventions/tooling rather than a native shadow boundary
+
+---
+
+# 25. Final staff-level answer
+
+> For Adobe, I would avoid treating React and Web Components as competing religions. They solve different layers. A Spectrum-style design system benefits from Web Components because custom elements create a browser-native, framework-neutral contract that can survive years of framework evolution. Shadow DOM can encapsulate implementation and styling, while CSS variables, parts, slots, properties, and DOM events form the supported public API.
+>
+> React remains a strong application framework, so I would provide thin/generated React wrappers for props, refs, events, typing, and framework-specific SSR integration.
+>
+> The architectural cost I would call out immediately is versioning. Custom element names are global within the default registry. If two independently shipped bundles both attempt to define `sp-button`, they cannot simply use two implementations under the same tag. Adobe's Spectrum docs explicitly recommend aligning SWC versions and deduplicating dependency trees because mismatched dependencies create registry conflicts and potentially undefined behavior. That means dependency governance, migration strategy, and microfrontend ownership are first-class design-system concerns—not package-manager cleanup after the fact. citeturn669250view0turn105472view1
+
+---
+
+# 26. Interview memory shortcut
+
+```text
+React = application composition
+Web Component = platform component boundary
+Shadow DOM = encapsulation mechanism
+Lit = possible rendering implementation
+React wrapper = integration adapter
+CustomElementRegistry = major version-sharing constraint
+```
+
+And for Adobe:
+
+```text
+Spectrum primitive
+      ↓
+Web Component
+      ↓
+React wrapper
+      ↓
+Adobe product
+```
+
+The key staff-level trade-off:
+
+> **Framework independence increases platform durability, but it shifts complexity into API design, styling boundaries, SSR integration, event semantics, testing, and version governance.**

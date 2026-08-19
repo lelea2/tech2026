@@ -1,0 +1,1133 @@
+---
+title: 'Running Expensive Filters Without Freezing the UI'
+description: 'Frontend interview guide for debounce, React scheduling, Web Workers, virtualization, stale-result handling, and server-side filtering.'
+---
+
+# Running Expensive Filters Without Freezing the UI
+
+I separate input responsiveness, computation, and rendering. I debounce input to reduce unnecessary work. For moderate React updates I use useDeferredValue or startTransition so typing stays high priority. If the filtering itself is CPU-bound, I move it to a Web Worker because React concurrency can’t prevent synchronous JavaScript from blocking the main thread. I version worker requests so stale results don’t overwrite newer ones, and I virtualize the result list so filtering 100K items doesn’t turn into rendering 100K DOM nodes. Once the dataset becomes large enough, I push filtering to an indexed backend rather than shipping everything to the browser.
+
+A strong frontend answer is to treat expensive filtering as **three separate problems**:
+
+1. **Too much work is being triggered**
+2. **CPU work is blocking the main thread**
+3. **Too many results are being rendered**
+
+The strategy is:
+
+```text
+Reduce work
+   ↓
+Schedule non-urgent UI work
+   ↓
+Move CPU-heavy work off the main thread
+   ↓
+Avoid rendering everything
+   ↓
+Move filtering to the server when the dataset becomes too large
+```
+
+---
+
+## 1. Start by reducing unnecessary work
+
+If a user is typing into a search field, do not run an expensive filter on every keystroke.
+
+Use **debouncing**.
+
+```tsx
+const [query, setQuery] = useState('');
+const [debouncedQuery, setDebouncedQuery] = useState('');
+
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setDebouncedQuery(query);
+  }, 200);
+
+  return () => clearTimeout(timer);
+}, [query]);
+```
+
+Then run the expensive operation using `debouncedQuery`.
+
+```tsx
+const filteredItems = useMemo(() => {
+  const normalizedQuery = debouncedQuery.toLowerCase();
+
+  return items.filter((item) => item.name.toLowerCase().includes(normalizedQuery));
+}, [items, debouncedQuery]);
+```
+
+### What debounce solves
+
+Without debounce:
+
+```text
+User types:
+
+a
+ad
+ado
+adob
+adobe
+
+↓
+
+5 expensive filter operations
+```
+
+With debounce:
+
+```text
+a
+ad
+ado
+adob
+adobe
+     ↓
+wait 200ms
+     ↓
+1 filter operation
+```
+
+Debounce reduces the **frequency** of expensive work.
+
+It does **not** make an individual expensive filter faster.
+
+---
+
+# 2. Keep urgent interactions responsive with React scheduling
+
+Sometimes filtering is not extremely CPU-heavy, but rendering the new result set is expensive.
+
+React can prioritize typing over result rendering.
+
+Two useful APIs are:
+
+- `useDeferredValue`
+- `startTransition`
+
+---
+
+## Option A: `useDeferredValue`
+
+```tsx
+const [query, setQuery] = useState('');
+
+const deferredQuery = useDeferredValue(query);
+
+const filteredItems = useMemo(() => {
+  const normalizedQuery = deferredQuery.toLowerCase();
+
+  return items.filter((item) => item.name.toLowerCase().includes(normalizedQuery));
+}, [items, deferredQuery]);
+```
+
+The text input updates immediately.
+
+The expensive result rendering may lag slightly behind.
+
+```text
+User typing
+   │
+   ├── urgent → input value updates immediately
+   │
+   └── non-urgent → filtered result rendering catches up
+```
+
+---
+
+## Option B: `startTransition`
+
+```tsx
+const [query, setQuery] = useState('');
+const [filterQuery, setFilterQuery] = useState('');
+
+const [isPending, startTransition] = useTransition();
+
+function handleChange(value: string) {
+  setQuery(value);
+
+  startTransition(() => {
+    setFilterQuery(value);
+  });
+}
+```
+
+Then:
+
+```tsx
+const filteredItems = useMemo(() => {
+  return items.filter((item) => item.name.toLowerCase().includes(filterQuery.toLowerCase()));
+}, [items, filterQuery]);
+```
+
+You can expose pending state:
+
+```tsx
+{
+  isPending && <Spinner />;
+}
+```
+
+---
+
+# Important React Interview Distinction
+
+`startTransition` does **not** move CPU work to another thread.
+
+This is important.
+
+If this takes 500ms:
+
+```tsx
+items.filter(expensivePredicate);
+```
+
+the JavaScript still runs on the browser's main thread.
+
+React scheduling helps prioritize rendering work, but it cannot magically parallelize synchronous JavaScript.
+
+```text
+useTransition
+     ↓
+better scheduling
+
+NOT
+
+useTransition
+     ↓
+background CPU thread
+```
+
+If the calculation itself is expensive, use a **Web Worker**.
+
+---
+
+# 3. Move CPU-heavy filtering to a Web Worker
+
+Suppose filtering hundreds of thousands of records takes several hundred milliseconds.
+
+Running it on the main thread can block:
+
+- typing
+- scrolling
+- pointer events
+- animation
+- React rendering
+- accessibility updates
+
+The browser main thread is responsible for:
+
+```text
+JavaScript
+Style calculation
+Layout
+Paint
+User interaction
+React rendering
+```
+
+Long-running JavaScript blocks all of them.
+
+A Web Worker lets the computation run on another thread.
+
+---
+
+## Worker implementation
+
+```js
+// filter.worker.js
+
+self.onmessage = (event) => {
+  const { items, query, requestId } = event.data;
+
+  const normalizedQuery = query.toLowerCase();
+
+  const result = items.filter((item) => item.name.toLowerCase().includes(normalizedQuery));
+
+  self.postMessage({
+    requestId,
+    result,
+  });
+};
+```
+
+---
+
+## React integration
+
+```tsx
+const worker = useMemo(() => {
+  return new Worker(new URL('./filter.worker.js', import.meta.url));
+}, []);
+```
+
+Send work to the worker:
+
+```tsx
+useEffect(() => {
+  const requestId = crypto.randomUUID();
+
+  worker.postMessage({
+    requestId,
+    items,
+    query,
+  });
+
+  worker.onmessage = (event) => {
+    if (event.data.requestId === requestId) {
+      setFilteredItems(event.data.result);
+    }
+  };
+}, [items, query, worker]);
+```
+
+Now:
+
+```text
+Main Thread
+────────────────────────────
+
+Typing
+React
+Scroll
+Animation
+Paint
+
+        │
+        │ postMessage()
+        ▼
+
+Worker Thread
+────────────────────────────
+
+filter 500K records
+sort
+aggregate
+transform
+
+        │
+        │ postMessage()
+        ▼
+
+Main Thread
+
+render results
+```
+
+---
+
+# 4. Handle stale worker responses
+
+There is an important race condition.
+
+Imagine:
+
+```text
+Request 1: "a"
+Request 2: "ad"
+Request 3: "ado"
+```
+
+Because worker operations can complete at different times, an old request might finish after a newer request.
+
+For example:
+
+```text
+Request 3 finishes
+        ↓
+UI shows "ado"
+
+Request 1 finishes later
+        ↓
+UI incorrectly shows "a"
+```
+
+Use request versioning.
+
+```tsx
+const latestRequestId = useRef(0);
+
+function runFilter(query: string) {
+  const requestId = ++latestRequestId.current;
+
+  worker.postMessage({
+    requestId,
+    query,
+    items,
+  });
+}
+```
+
+Then ignore stale responses.
+
+```tsx
+worker.onmessage = (event) => {
+  const { requestId, result } = event.data;
+
+  if (requestId !== latestRequestId.current) {
+    return;
+  }
+
+  setFilteredItems(result);
+};
+```
+
+This is essentially:
+
+```text
+latest request wins
+```
+
+---
+
+# 5. Avoid transferring huge datasets repeatedly
+
+A subtle Web Worker problem is serialization.
+
+This can be expensive:
+
+```tsx
+worker.postMessage({
+  items: millionRows,
+  query,
+});
+```
+
+Every filter operation may require sending a huge dataset to the worker.
+
+Instead, initialize the worker once.
+
+```tsx
+worker.postMessage({
+  type: 'INIT',
+  items,
+});
+```
+
+Then subsequent requests only send the query.
+
+```tsx
+worker.postMessage({
+  type: 'FILTER',
+  query,
+  requestId,
+});
+```
+
+Worker:
+
+```js
+let items = [];
+
+self.onmessage = (event) => {
+  const message = event.data;
+
+  if (message.type === 'INIT') {
+    items = message.items;
+    return;
+  }
+
+  if (message.type === 'FILTER') {
+    const result = items.filter((item) =>
+      item.name.toLowerCase().includes(message.query.toLowerCase())
+    );
+
+    self.postMessage({
+      requestId: message.requestId,
+      result,
+    });
+  }
+};
+```
+
+Now:
+
+```text
+initial load
+
+Main thread
+     ↓
+500K items
+     ↓
+Worker
+
+Then each search only sends:
+
+{
+  query: "adobe",
+  requestId: 42
+}
+```
+
+---
+
+# 6. Do not render every filtered result
+
+Even if filtering happens off the main thread, rendering thousands of DOM nodes can still freeze the browser.
+
+Example:
+
+```text
+1,000,000 records
+       ↓
+filter worker
+       ↓
+80,000 matches
+       ↓
+React renders 80,000 components
+       ↓
+UI freezes
+```
+
+The filter is no longer the bottleneck.
+
+The DOM is.
+
+Use **virtualization**.
+
+Libraries include:
+
+```text
+react-window
+react-virtualized
+TanStack Virtual
+```
+
+Conceptually:
+
+```tsx
+<VirtualizedList items={filteredItems} itemHeight={40} />
+```
+
+Instead of:
+
+```text
+80,000 matching rows
+        ↓
+80,000 DOM nodes
+```
+
+you get:
+
+```text
+80,000 matching rows
+        ↓
+viewport
+        ↓
+~20-50 DOM nodes
+```
+
+---
+
+# 7. Combine Web Workers and virtualization
+
+For a large client-side dataset:
+
+```text
+                    ┌─────────────────┐
+User types ────────▶│ Search Input    │
+                    └────────┬────────┘
+                             │
+                          debounce
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │ Web Worker      │
+                    │                 │
+                    │ filter          │
+                    │ sort            │
+                    │ aggregate       │
+                    └────────┬────────┘
+                             │
+                         result IDs
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │ React State     │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │ Virtualized UI  │
+                    │ ~20 visible rows│
+                    └─────────────────┘
+```
+
+This is often a strong architecture for:
+
+- spreadsheets
+- dashboards
+- design tools
+- log viewers
+- analytics applications
+- offline-first applications
+- large local datasets
+
+---
+
+# 8. Return IDs instead of large objects
+
+A further optimization is to avoid returning thousands of large objects from the worker.
+
+Instead of:
+
+```js
+[
+  {
+    id: 1,
+    name: "...",
+    description: "...",
+    metadata: {...}
+  },
+  ...
+]
+```
+
+return:
+
+```js
+[1, 18, 44, 92, 150];
+```
+
+Then map those IDs to existing local objects.
+
+```tsx
+const visibleItems = resultIds.map((id) => itemsById[id]);
+```
+
+This reduces worker-to-main-thread serialization overhead.
+
+---
+
+# 9. Consider indexes for repeated filtering
+
+Repeatedly scanning:
+
+```js
+items.filter(...)
+```
+
+is:
+
+```text
+O(n)
+```
+
+for every query.
+
+If users repeatedly search the same large local dataset, consider an index.
+
+Examples:
+
+```text
+prefix index
+inverted index
+token index
+Map<string, Set<ID>>
+sorted index
+trie
+```
+
+Instead of:
+
+```text
+query
+ ↓
+scan 1,000,000 records
+```
+
+you can perform:
+
+```text
+query
+ ↓
+lookup index
+ ↓
+matching IDs
+```
+
+This is especially useful for:
+
+- autocomplete
+- faceted search
+- log filtering
+- local document search
+- spreadsheet filtering
+
+---
+
+# 10. Chunk work if Web Workers are unavailable
+
+Another technique is splitting work into small chunks.
+
+Bad:
+
+```js
+for (let i = 0; i < 1_000_000; i++) {
+  expensiveWork(items[i]);
+}
+```
+
+This could create a long task.
+
+Instead:
+
+```js
+function processChunk(startIndex) {
+  const CHUNK_SIZE = 1000;
+
+  const end = Math.min(startIndex + CHUNK_SIZE, items.length);
+
+  for (let i = startIndex; i < end; i++) {
+    expensiveWork(items[i]);
+  }
+
+  if (end < items.length) {
+    setTimeout(() => {
+      processChunk(end);
+    }, 0);
+  }
+}
+```
+
+Now the event loop gets opportunities to handle UI work between chunks.
+
+However:
+
+```text
+Web Worker
+```
+
+is usually better for truly CPU-heavy work.
+
+Chunking is useful when:
+
+- worker setup is undesirable
+- workload is moderately expensive
+- progressive processing is useful
+
+---
+
+# 11. Do not use `requestAnimationFrame` for heavy filtering
+
+A common interview trap is saying:
+
+```js
+requestAnimationFrame(() => {
+  expensiveFilter();
+});
+```
+
+`requestAnimationFrame` does **not** move computation off the main thread.
+
+It schedules JavaScript before the next paint.
+
+If that callback takes 300ms:
+
+```text
+requestAnimationFrame
+      ↓
+300ms filter
+      ↓
+paint delayed 300ms
+```
+
+So:
+
+```text
+requestAnimationFrame
+```
+
+is useful for coordinating:
+
+- DOM reads/writes
+- animations
+- visual updates
+
+It is not a replacement for Web Workers.
+
+---
+
+# 12. Abort or ignore outdated work
+
+For network filtering:
+
+```tsx
+const controller = new AbortController();
+
+fetch(url, {
+  signal: controller.signal,
+});
+
+controller.abort();
+```
+
+For Web Workers, you generally cannot cancel a specific synchronous operation unless you design the worker for cooperative cancellation.
+
+A common strategy is:
+
+```text
+request versioning
++
+ignore stale results
+```
+
+For long-running chunked worker jobs, the worker can periodically check a cancellation token.
+
+```js
+let cancelledRequestId = null;
+
+for (let i = 0; i < items.length; i++) {
+  if (requestId === cancelledRequestId) {
+    return;
+  }
+
+  // process
+}
+```
+
+---
+
+# 13. When should filtering move to the backend?
+
+At some point the browser should not own the dataset.
+
+Imagine:
+
+```text
+50 million records
+```
+
+Shipping all of that to the frontend just so the browser can run:
+
+```js
+records.filter(...)
+```
+
+is the wrong architecture.
+
+Use backend filtering.
+
+```text
+User
+ │
+ │ search "adobe"
+ ▼
+Debounce
+ │
+ ▼
+GET /api/search?q=adobe&cursor=...
+ │
+ ▼
+Search Service
+ │
+ ├── database index
+ ├── Elasticsearch
+ ├── OpenSearch
+ └── specialized query engine
+ │
+ ▼
+20-50 results
+ │
+ ▼
+Frontend
+```
+
+---
+
+# Client-Side vs Server-Side Decision
+
+| Dataset / workload          | Strategy                            |
+| --------------------------- | ----------------------------------- |
+| Hundreds of rows            | `useMemo`                           |
+| Thousands of rows           | debounce + memoization              |
+| Tens of thousands           | deferred rendering + virtualization |
+| Hundreds of thousands       | Web Worker + virtualization         |
+| Large local/offline dataset | Worker + local index                |
+| Millions+ / remotely stored | Server-side filtering               |
+| Search-heavy application    | Search index / backend query engine |
+
+These are guidelines rather than strict thresholds.
+
+Measure actual latency and device performance.
+
+---
+
+# Performance Budget
+
+Useful numbers to remember:
+
+```text
+60 FPS
+≈ 16.7ms per frame
+```
+
+If JavaScript blocks for:
+
+```text
+20ms
+50ms
+100ms
+500ms
+```
+
+the browser starts dropping frames and interactions feel increasingly sluggish.
+
+Chrome identifies tasks longer than roughly:
+
+```text
+50ms
+```
+
+as long tasks.
+
+A useful goal is:
+
+```text
+keep main-thread work small
+yield frequently
+move CPU-heavy work elsewhere
+```
+
+---
+
+# Debugging Expensive Filters
+
+Use Chrome DevTools Performance profiling.
+
+Look for:
+
+```text
+Long Tasks
+JavaScript execution
+React render time
+Layout
+Paint
+GC
+```
+
+Typical symptoms:
+
+```text
+typing lag
+scroll jank
+input delay
+dropped frames
+large React commits
+high scripting time
+garbage collection spikes
+```
+
+Ask:
+
+```text
+Is computation expensive?
+
+or
+
+Is rendering expensive?
+```
+
+This distinction determines the solution.
+
+---
+
+# Diagnostic Decision Tree
+
+```text
+UI freezes during filtering
+        │
+        ▼
+How often is filter running?
+        │
+        ├── too often
+        │      ↓
+        │   debounce
+        │
+        ▼
+Is React rendering expensive?
+        │
+        ├── yes
+        │      ↓
+        │ useDeferredValue
+        │ startTransition
+        │ virtualization
+        │
+        ▼
+Is JavaScript computation expensive?
+        │
+        ├── yes
+        │      ↓
+        │ Web Worker
+        │
+        ▼
+Is dataset huge?
+        │
+        ├── yes
+        │      ↓
+        │ server filtering
+        │ search index
+        │ pagination
+        │
+        ▼
+Profile again
+```
+
+---
+
+# Common Interview Mistakes
+
+## Mistake 1: Only saying `useMemo`
+
+```tsx
+useMemo(() => expensiveFilter(items), [items]);
+```
+
+This avoids unnecessary recomputation.
+
+But when it runs, it still blocks the main thread.
+
+---
+
+## Mistake 2: Saying `useTransition` performs computation in the background
+
+It does not.
+
+React transitions change scheduling priority.
+
+They do not create another JavaScript thread.
+
+---
+
+## Mistake 3: Moving filtering to a worker but rendering 100K rows
+
+You fixed:
+
+```text
+CPU filtering
+```
+
+but still have:
+
+```text
+massive DOM rendering
+```
+
+Use virtualization.
+
+---
+
+## Mistake 4: Sending the full dataset to the worker on every keystroke
+
+This introduces serialization and copying overhead.
+
+Initialize the worker dataset once.
+
+Then send small filter commands.
+
+---
+
+## Mistake 5: Ignoring stale results
+
+Old computations can overwrite newer state.
+
+Use:
+
+```text
+requestId
+sequence number
+latest-request-wins
+```
+
+---
+
+## Mistake 6: Assuming client-side filtering always scales
+
+For sufficiently large remote datasets, use:
+
+```text
+server query
+database index
+search index
+pagination
+```
+
+---
+
+# Strong Interview Answer
+
+A concise staff-level answer:
+
+> I separate the problem into input responsiveness, computation, and rendering. First, I debounce the input so I don't perform expensive work on every keystroke. If the work is mainly a React rendering problem, I use `useDeferredValue` or `startTransition` so urgent updates such as typing remain responsive.
+>
+> If the filter itself is CPU-bound, React concurrency isn't enough because synchronous JavaScript still blocks the browser's main thread. I move that computation to a Web Worker and use request IDs so stale worker responses cannot overwrite newer results.
+>
+> I also avoid repeatedly transferring the entire dataset to the worker: I initialize the worker once and send only query changes. If the filter returns a large result set, I virtualize the UI so thousands of matches don't become thousands of DOM nodes.
+>
+> Finally, if the dataset is too large to reasonably live in the browser, I move filtering to an indexed backend or search service and return paginated results.
+
+---
+
+# 30-Second Version
+
+```text
+I solve expensive filtering at several layers.
+
+First, debounce so filtering doesn't run on every keystroke.
+
+For moderately expensive React updates, use useDeferredValue or
+startTransition to keep typing responsive.
+
+If the computation itself is expensive, move it to a Web Worker,
+because React concurrency does not move CPU work off the main thread.
+
+Version worker requests so stale results are ignored.
+
+Then virtualize the filtered result set so we don't render thousands
+of DOM nodes.
+
+For very large datasets, push filtering to an indexed backend instead
+of loading and scanning everything in the browser.
+```
+
+---
+
+# Mental Model
+
+Remember:
+
+```text
+Debounce
+    ↓
+reduces how often work runs
+
+useMemo
+    ↓
+avoids unnecessary recomputation
+
+useDeferredValue / startTransition
+    ↓
+changes React scheduling priority
+
+Web Worker
+    ↓
+moves CPU work off the main thread
+
+Virtualization
+    ↓
+reduces DOM/rendering cost
+
+Index
+    ↓
+reduces search complexity
+
+Server-side filtering
+    ↓
+reduces client data + computation
+```
+
+The key distinction to articulate in an interview is:
+
+> **Scheduling expensive work is not the same as removing expensive work from the main thread.**

@@ -1,0 +1,1958 @@
+---
+title: "Canvas Editor at 20 FPS — Staff Engineer Diagnosis & Fix"
+description: "Staff-level frontend system design and performance debugging playbook for diagnosing a slow Canvas editor."
+---
+
+# 2. Your Canvas Editor Runs at 20 FPS. Diagnose and Fix It.
+
+## Interview framing
+
+A Canvas editor running at **20 FPS** has roughly:
+
+```txt
+1000ms / 20 FPS = 50ms per frame
+```
+
+For a smooth 60 FPS experience, the browser has roughly:
+
+```txt
+1000ms / 60 FPS ≈ 16.7ms per frame
+```
+
+So the editor is spending about **3× the available frame budget**.
+
+As a Staff Engineer, I would not immediately start micro-optimizing drawing code.
+
+I would first answer:
+
+1. **Where is the 50ms going?**
+2. **Is the bottleneck CPU, GPU, layout, React, memory/GC, or data processing?**
+3. **Does cost scale with total scene size or only visible objects?**
+4. **Is the problem continuous rendering or interaction-specific?**
+5. **Can we reduce work rather than merely make the same work faster?**
+
+---
+
+# 1. Start With the Frame Budget
+
+A frame may include:
+
+```txt
+Input
+  ↓
+JavaScript
+  ↓
+Style calculation
+  ↓
+Layout
+  ↓
+Canvas draw calls
+  ↓
+Raster / GPU compositing
+  ↓
+Display
+```
+
+At 60 FPS:
+
+```txt
+┌──────────────────────── 16.7ms ────────────────────────┐
+│ JS │ layout │ draw │ raster │ composite │ browser work │
+└─────────────────────────────────────────────────────────┘
+```
+
+At 20 FPS:
+
+```txt
+┌────────────────────────── ~50ms ──────────────────────────┐
+│             Something is consuming ~30ms+ too much        │
+└────────────────────────────────────────────────────────────┘
+```
+
+My first goal is to identify **which stage dominates**.
+
+---
+
+# 2. First Diagnostic: Chrome Performance Panel
+
+Record a trace while reproducing a specific slow interaction:
+
+```txt
+1. Open Chrome DevTools
+2. Performance
+3. Enable screenshots + memory if useful
+4. Record
+5. Pan / zoom / drag / resize for ~5 seconds
+6. Stop
+7. Inspect long frames
+```
+
+I look for:
+
+| Symptom | Likely Cause |
+|---|---|
+| Long yellow blocks | Expensive JavaScript |
+| Purple layout/style | Forced synchronous layout / DOM work |
+| Heavy Paint | Too much rasterization |
+| Long GPU tasks | Large textures / compositing / fill rate |
+| Sawtooth memory | Allocation pressure / garbage collection |
+| React commits every frame | React state driving hot interaction loop |
+| `getBoundingClientRect` interleaved with writes | Layout thrashing |
+| Thousands of repeated draw calls | No culling / batching |
+| Full-canvas clear + redraw | Missing dirty-region strategy |
+
+---
+
+# 3. Measure the Actual Frame Loop
+
+I want instrumentation around the hot path.
+
+```ts
+let last = performance.now();
+
+function frame(now: number) {
+  const frameDuration = now - last;
+  last = now;
+
+  if (frameDuration > 16.7) {
+    console.log("slow frame", frameDuration);
+  }
+
+  renderScene();
+
+  requestAnimationFrame(frame);
+}
+
+requestAnimationFrame(frame);
+```
+
+For more detail:
+
+```ts
+function measure<T>(name: string, fn: () => T): T {
+  const start = performance.now();
+
+  try {
+    return fn();
+  } finally {
+    const duration = performance.now() - start;
+
+    if (duration > 2) {
+      console.log(`${name}: ${duration.toFixed(2)}ms`);
+    }
+  }
+}
+
+function renderScene() {
+  measure("visibility", computeVisibleObjects);
+  measure("geometry", updateGeometry);
+  measure("canvas", drawCanvas);
+  measure("overlay", updateDOMOverlay);
+}
+```
+
+The point is to decompose:
+
+```txt
+50ms/frame
+
+Possible example:
+
+10ms → scene traversal
+18ms → path generation
+12ms → canvas drawing
+6ms  → layout
+4ms  → GC / misc
+```
+
+Now optimization becomes targeted.
+
+---
+
+# 4. Check Whether We Render Everything
+
+The first architectural question:
+
+> Are we rendering 100,000 objects because 100,000 exist, or because 2,000 are visible?
+
+A Canvas editor should usually render based on the viewport.
+
+Bad:
+
+```ts
+for (const object of allObjects) {
+  draw(object);
+}
+```
+
+Better:
+
+```ts
+const visibleObjects = spatialIndex.query(viewport);
+
+for (const object of visibleObjects) {
+  draw(object);
+}
+```
+
+Architecture:
+
+```txt
+Scene: 100K objects
+        │
+        ▼
+Spatial Index
+R-tree / quadtree / grid
+        │
+        ▼
+Viewport query
+        │
+        ▼
+~500 visible objects
+        │
+        ▼
+Canvas renderer
+```
+
+This often gives the largest improvement because complexity changes from approximately:
+
+```txt
+O(total scene size)
+```
+
+toward:
+
+```txt
+O(log N + visible objects)
+```
+
+---
+
+# 5. Use Spatial Indexing
+
+For large editors:
+
+```ts
+type Rect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+interface SceneObject {
+  id: string;
+  bounds: Rect;
+  draw(ctx: CanvasRenderingContext2D): void;
+}
+```
+
+Conceptually:
+
+```ts
+const visible = spatialIndex.search({
+  minX: viewport.left,
+  minY: viewport.top,
+  maxX: viewport.right,
+  maxY: viewport.bottom,
+});
+
+for (const item of visible) {
+  item.draw(ctx);
+}
+```
+
+Possible structures:
+
+| Structure | Good For |
+|---|---|
+| Uniform grid | Similar object sizes |
+| Quadtree | Spatially distributed 2D objects |
+| R-tree | Arbitrary rectangular bounds |
+| BVH | Complex geometry / graphics |
+
+I would choose based on scene characteristics rather than assuming one universal answer.
+
+---
+
+# 6. Stop Redrawing When Nothing Changed
+
+A common Canvas performance bug is:
+
+```ts
+function loop() {
+  redrawEntireCanvas();
+  requestAnimationFrame(loop);
+}
+
+loop();
+```
+
+This produces 60 redraw attempts per second even when the user is idle.
+
+Instead:
+
+```ts
+let dirty = true;
+
+function invalidate() {
+  if (dirty) return;
+
+  dirty = true;
+  requestAnimationFrame(render);
+}
+
+function render() {
+  dirty = false;
+
+  drawScene();
+}
+```
+
+Events trigger invalidation:
+
+```ts
+pointerMove → invalidate()
+zoom        → invalidate()
+objectEdit  → invalidate()
+selection   → invalidate()
+```
+
+Idle state:
+
+```txt
+0 canvas redraws
+```
+
+instead of:
+
+```txt
+60 redraws/sec
+```
+
+---
+
+# 7. Dirty Rectangle Rendering
+
+If only one object changes, avoid repainting the entire canvas.
+
+Example:
+
+```txt
+Canvas
+┌────────────────────────────────────┐
+│                                    │
+│             unchanged              │
+│                                    │
+│       ┌───────────────┐            │
+│       │ changed area  │            │
+│       └───────────────┘            │
+│                                    │
+└────────────────────────────────────┘
+```
+
+Concept:
+
+```ts
+function redrawDirtyRegion(region: Rect) {
+  ctx.clearRect(
+    region.x,
+    region.y,
+    region.width,
+    region.height
+  );
+
+  const objects = spatialIndex.query(region);
+
+  for (const object of objects) {
+    draw(object);
+  }
+}
+```
+
+Caveat:
+
+Dirty rectangles become more complex when objects:
+
+- overlap
+- have shadows
+- have filters
+- use blending
+- extend beyond their logical bounds
+
+So I would measure whether the complexity is worth it.
+
+---
+
+# 8. Separate Static and Dynamic Layers
+
+During dragging, most of the scene is unchanged.
+
+Use multiple Canvas layers:
+
+```txt
+┌────────────────────────────────────┐
+│ HTML controls / accessibility      │
+├────────────────────────────────────┤
+│ Canvas: selection / drag overlay   │
+├────────────────────────────────────┤
+│ Canvas: static scene               │
+├────────────────────────────────────┤
+│ Background grid                    │
+└────────────────────────────────────┘
+```
+
+During drag:
+
+```txt
+static canvas     → unchanged
+dynamic overlay   → redraw each frame
+```
+
+Instead of:
+
+```txt
+entire document → redraw every pointermove
+```
+
+Example:
+
+```ts
+function drawDragFrame() {
+  overlayCtx.clearRect(0, 0, width, height);
+
+  drawSelectionBox();
+  drawDraggedObject();
+  drawGuides();
+}
+```
+
+---
+
+# 9. Avoid React in the Per-Frame Rendering Path
+
+A major architectural mistake:
+
+```ts
+onPointerMove={(e) => {
+  setPosition({
+    x: e.clientX,
+    y: e.clientY,
+  });
+}}
+```
+
+If this drives large React tree renders at pointer frequency:
+
+```txt
+pointermove
+   ↓
+setState
+   ↓
+React render
+   ↓
+reconciliation
+   ↓
+commit
+   ↓
+canvas redraw
+```
+
+That can become expensive.
+
+For hot interaction state, I prefer:
+
+```ts
+const positionRef = useRef({ x: 0, y: 0 });
+
+function onPointerMove(e: PointerEvent) {
+  positionRef.current.x = e.clientX;
+  positionRef.current.y = e.clientY;
+
+  requestRender();
+}
+```
+
+React remains responsible for:
+
+```txt
+menus
+toolbars
+property panels
+documents
+selection metadata
+persistent state
+accessibility DOM
+```
+
+The renderer owns:
+
+```txt
+pointer position
+drag interpolation
+viewport transform
+temporary guides
+animation state
+```
+
+A useful rule:
+
+> React owns application state. The renderer owns frame state.
+
+---
+
+# 10. Batch Pointer Events With requestAnimationFrame
+
+Pointer events can arrive faster than the display refresh rate.
+
+Bad:
+
+```ts
+canvas.addEventListener("pointermove", (event) => {
+  updateSelection(event);
+  redrawScene();
+});
+```
+
+If pointermove fires 150 times/sec:
+
+```txt
+150 redraws/sec
+```
+
+while the screen can only show ~60.
+
+Better:
+
+```ts
+let latestEvent: PointerEvent | null = null;
+let scheduled = false;
+
+canvas.addEventListener("pointermove", (event) => {
+  latestEvent = event;
+
+  if (scheduled) return;
+
+  scheduled = true;
+
+  requestAnimationFrame(() => {
+    scheduled = false;
+
+    if (!latestEvent) return;
+
+    updateSelection(latestEvent);
+    render();
+  });
+});
+```
+
+This coalesces many input events into one visual update.
+
+---
+
+# 11. Avoid Layout Thrashing
+
+Canvas itself does not trigger DOM layout, but surrounding editor code often does.
+
+Bad:
+
+```ts
+element.style.width = "100px";
+
+const rect = element.getBoundingClientRect();
+
+element.style.height = "200px";
+
+const rect2 = element.getBoundingClientRect();
+```
+
+This pattern can force:
+
+```txt
+write
+ ↓
+layout
+ ↓
+read
+ ↓
+write
+ ↓
+layout
+ ↓
+read
+```
+
+Batch reads:
+
+```ts
+const rect = element.getBoundingClientRect();
+const toolbarRect = toolbar.getBoundingClientRect();
+```
+
+Then writes:
+
+```ts
+element.style.transform = "...";
+toolbar.style.transform = "...";
+```
+
+General rule:
+
+```txt
+READ → READ → READ
+WRITE → WRITE → WRITE
+```
+
+not:
+
+```txt
+READ → WRITE → READ → WRITE
+```
+
+---
+
+# 12. Cache Expensive Geometry
+
+If shapes require expensive geometry:
+
+```ts
+new Path2D(...)
+measureText(...)
+bezier calculations
+polygon tessellation
+text wrapping
+```
+
+do not recompute every frame unless the object changed.
+
+Bad:
+
+```ts
+function drawShape(shape) {
+  const path = computeComplexPath(shape);
+  ctx.stroke(path);
+}
+```
+
+Better:
+
+```ts
+interface CachedShape {
+  geometryVersion: number;
+  cachedPath?: Path2D;
+}
+
+function getPath(shape: CachedShape) {
+  if (!shape.cachedPath) {
+    shape.cachedPath = computeComplexPath(shape);
+  }
+
+  return shape.cachedPath;
+}
+```
+
+Invalidation:
+
+```txt
+shape property changes
+       ↓
+invalidate geometry cache
+       ↓
+recompute once
+```
+
+---
+
+# 13. Pre-Render Expensive Objects
+
+For complex reusable objects, render once to an offscreen surface.
+
+```ts
+const buffer = document.createElement("canvas");
+const bufferCtx = buffer.getContext("2d")!;
+
+drawComplexObject(bufferCtx);
+```
+
+Then:
+
+```ts
+ctx.drawImage(buffer, x, y);
+```
+
+This is useful for:
+
+- complex icons
+- repeated shapes
+- expensive vector groups
+- text blocks
+- static thumbnails
+
+Tradeoff:
+
+```txt
+CPU ↓
+memory ↑
+```
+
+So caches must be bounded.
+
+---
+
+# 14. OffscreenCanvas and Web Workers
+
+If heavy rendering or preprocessing blocks the main thread:
+
+```txt
+Main Thread
+  │
+  ├── input
+  ├── React
+  ├── layout
+  └── interaction
+
+Worker
+  │
+  ├── geometry
+  ├── scene calculations
+  └── OffscreenCanvas rendering
+```
+
+Example:
+
+```ts
+const offscreen = canvas.transferControlToOffscreen();
+
+worker.postMessage(
+  {
+    type: "INIT",
+    canvas: offscreen,
+  },
+  [offscreen]
+);
+```
+
+Worker:
+
+```ts
+self.onmessage = (event) => {
+  if (event.data.type === "INIT") {
+    const canvas = event.data.canvas;
+    const ctx = canvas.getContext("2d");
+
+    // render in worker
+  }
+};
+```
+
+But I would not jump to workers first.
+
+Why?
+
+Because workers do not solve:
+
+```txt
+drawing too many objects
+poor culling
+unnecessary redraws
+GPU fill-rate limits
+massive allocations
+```
+
+They mainly help when **CPU work on the main thread** is the problem.
+
+---
+
+# 15. Check Object Allocation and Garbage Collection
+
+A bad rendering loop:
+
+```ts
+function render() {
+  const visible = objects.filter(...);
+  const points = objects.map(...);
+  const transforms = objects.map(...);
+
+  ...
+}
+```
+
+This can allocate thousands of temporary arrays and objects every frame.
+
+At 60 FPS:
+
+```txt
+60 × thousands of allocations
+       ↓
+GC pressure
+       ↓
+frame pauses
+```
+
+Prefer:
+
+```ts
+reuse buffers
+reuse arrays
+reuse vectors
+avoid temporary objects
+```
+
+Example:
+
+```ts
+const visibleObjects: SceneObject[] = [];
+
+function collectVisible() {
+  visibleObjects.length = 0;
+
+  spatialIndex.queryInto(viewport, visibleObjects);
+}
+```
+
+Look for GC slices in DevTools.
+
+---
+
+# 16. Reduce Canvas State Changes
+
+This:
+
+```ts
+for (const object of objects) {
+  ctx.fillStyle = object.color;
+  ctx.globalAlpha = object.opacity;
+  ctx.lineWidth = object.lineWidth;
+
+  object.draw(ctx);
+}
+```
+
+may result in many state changes.
+
+Where possible, group by rendering state:
+
+```txt
+red objects
+  ↓
+blue objects
+  ↓
+green objects
+```
+
+instead of:
+
+```txt
+red
+blue
+red
+green
+blue
+red
+```
+
+Likewise minimize unnecessary:
+
+```ts
+ctx.save();
+ctx.restore();
+```
+
+in deeply nested loops.
+
+---
+
+# 17. High-DPI Canvas Can Multiply Work
+
+A 1000 × 1000 CSS-pixel canvas at devicePixelRatio = 2 becomes:
+
+```txt
+2000 × 2000
+= 4 million pixels
+```
+
+At DPR 3:
+
+```txt
+3000 × 3000
+= 9 million pixels
+```
+
+So check:
+
+```ts
+window.devicePixelRatio
+```
+
+A large fullscreen canvas on a Retina display can dramatically increase raster cost.
+
+Possible adaptive strategy:
+
+```ts
+const effectiveDpr =
+  interactionActive
+    ? Math.min(devicePixelRatio, 1.5)
+    : Math.min(devicePixelRatio, 2);
+```
+
+During interaction:
+
+```txt
+quality slightly ↓
+FPS ↑
+```
+
+After interaction:
+
+```txt
+rerender at full quality
+```
+
+This is a useful fallback for very large scenes.
+
+---
+
+# 18. Expensive Canvas Features
+
+Some operations are substantially more expensive:
+
+```txt
+shadowBlur
+filters
+large gradients
+globalCompositeOperation
+huge transparent layers
+large image scaling
+text rendering
+clipping paths
+complex paths
+```
+
+For example:
+
+```ts
+ctx.shadowBlur = 40;
+ctx.filter = "blur(12px)";
+```
+
+on many objects may be expensive.
+
+Possible fixes:
+
+```txt
+pre-render effects
+cache layers
+disable effects during drag
+reduce quality while interacting
+use GPU renderer if needed
+```
+
+---
+
+# 19. Large Images
+
+A design editor may contain large images:
+
+```txt
+8000 × 8000 image
+```
+
+Even if displayed as:
+
+```txt
+500 × 500
+```
+
+you may still incur unnecessary decode/upload/memory costs.
+
+Use resolution appropriate for current zoom:
+
+```txt
+zoomed out
+  ↓
+thumbnail
+
+medium zoom
+  ↓
+medium resolution
+
+zoomed in
+  ↓
+full resolution
+```
+
+Conceptually:
+
+```ts
+function chooseImageLevel(zoom: number) {
+  if (zoom < 0.25) return "thumbnail";
+  if (zoom < 1) return "medium";
+
+  return "full";
+}
+```
+
+This is similar to mipmapping / level-of-detail.
+
+---
+
+# 20. Level of Detail
+
+When zoomed far out, users cannot see fine detail anyway.
+
+At:
+
+```txt
+5% zoom
+```
+
+do not draw:
+
+```txt
+individual text glyphs
+tiny shadows
+small handles
+complex filters
+fine strokes
+```
+
+Use:
+
+```ts
+if (zoom < 0.1) {
+  drawBoundingBox(object);
+  return;
+}
+```
+
+Level-of-detail strategy:
+
+```txt
+Zoom < 10%
+  simple bounding boxes
+
+10–50%
+  basic shapes
+
+50–100%
+  normal rendering
+
+>100%
+  detailed rendering
+```
+
+---
+
+# 21. Canvas vs SVG vs WebGL
+
+I would challenge the rendering technology if the scene size justifies it.
+
+## Canvas 2D
+
+Good:
+
+```txt
+moderate object counts
+simple editor
+easy immediate-mode rendering
+text / shapes
+```
+
+Potential bottleneck:
+
+```txt
+CPU-driven draw calls
+```
+
+---
+
+## SVG
+
+Good:
+
+```txt
+smaller DOM-like vector scenes
+semantic elements
+easy hit testing
+accessibility integration
+```
+
+Bad for:
+
+```txt
+tens of thousands of elements
+```
+
+because DOM overhead grows significantly.
+
+---
+
+## WebGL / WebGPU
+
+Useful when:
+
+```txt
+100K+ visible primitives
+large image compositing
+GPU-friendly batching
+filters
+transform-heavy scenes
+```
+
+Architecture:
+
+```txt
+Scene Graph
+    ↓
+Render batches
+    ↓
+Vertex buffers
+    ↓
+WebGL/WebGPU
+    ↓
+GPU
+```
+
+I would not migrate to WebGL just because Canvas hits 20 FPS.
+
+First prove that:
+
+```txt
+Canvas draw/raster is the bottleneck
+```
+
+after:
+
+```txt
+culling
+caching
+batching
+LOD
+invalidations
+```
+
+have been addressed.
+
+---
+
+# 22. Separate View Transform From Geometry
+
+Panning should not recompute document geometry.
+
+Bad:
+
+```txt
+pan
+ ↓
+recalculate every object's coordinates
+ ↓
+redraw
+```
+
+Better:
+
+```ts
+ctx.setTransform(
+  zoom,
+  0,
+  0,
+  zoom,
+  panX,
+  panY
+);
+```
+
+Keep world coordinates stable.
+
+Architecture:
+
+```txt
+World coordinates
+       │
+       ▼
+Camera transform
+       │
+       ▼
+Screen coordinates
+```
+
+This reduces expensive mutation of scene data.
+
+---
+
+# 23. Hit Testing Can Also Be the Bottleneck
+
+Sometimes rendering looks slow, but pointer hit testing is actually consuming the frame.
+
+Bad:
+
+```ts
+for (const object of allObjects) {
+  if (pointInsideObject(pointer, object)) {
+    ...
+  }
+}
+```
+
+For 100K objects:
+
+```txt
+O(N) per pointermove
+```
+
+Use the same spatial index:
+
+```ts
+const candidates = spatialIndex.queryPoint(pointer);
+
+for (const candidate of candidates) {
+  preciseHitTest(candidate, pointer);
+}
+```
+
+Pipeline:
+
+```txt
+pointer
+   ↓
+broad-phase spatial query
+   ↓
+~5 candidates
+   ↓
+precise geometry test
+```
+
+This mirrors collision detection in game engines.
+
+---
+
+# 24. Text Measurement Can Be Surprisingly Expensive
+
+Editors often repeatedly call:
+
+```ts
+ctx.measureText(text);
+```
+
+for every frame.
+
+Instead:
+
+```ts
+const key = `${font}:${fontSize}:${text}`;
+
+const measurement = textMeasureCache.get(key);
+```
+
+Cache:
+
+```txt
+font + size + text
+       ↓
+width
+height
+baseline
+```
+
+Invalidate only when typography changes.
+
+---
+
+# 25. Progressive Quality During Interaction
+
+A useful Staff-level optimization is to distinguish:
+
+```txt
+interaction quality
+```
+
+from:
+
+```txt
+final quality
+```
+
+While dragging:
+
+```txt
+disable shadows
+use lower-resolution images
+simplify paths
+hide tiny details
+reduce DPR
+```
+
+On pointerup:
+
+```txt
+render full fidelity
+```
+
+Flow:
+
+```txt
+pointerdown
+    ↓
+FAST MODE
+    ↓
+drag at 60 FPS
+    ↓
+pointerup
+    ↓
+HIGH QUALITY RENDER
+```
+
+This prioritizes responsiveness over unnecessary fidelity during motion.
+
+---
+
+# 26. Example Optimized Rendering Architecture
+
+```txt
+                           ┌──────────────────────┐
+                           │      React UI        │
+                           │ toolbar / panels     │
+                           └──────────┬───────────┘
+                                      │
+                                      │ commands
+                                      ▼
+┌───────────────┐             ┌──────────────────────┐
+│ Pointer Input │────────────▶│ Interaction Manager  │
+└───────────────┘             └──────────┬───────────┘
+                                        │
+                                        │ invalidate
+                                        ▼
+                             ┌──────────────────────┐
+                             │ requestAnimationFrame│
+                             └──────────┬───────────┘
+                                        │
+                                        ▼
+                             ┌──────────────────────┐
+                             │ Viewport / Camera    │
+                             └──────────┬───────────┘
+                                        │
+                                        ▼
+                             ┌──────────────────────┐
+                             │ Spatial Index        │
+                             │ R-tree / quadtree    │
+                             └──────────┬───────────┘
+                                        │
+                              visible objects only
+                                        │
+                                        ▼
+                             ┌──────────────────────┐
+                             │ Render Scheduler     │
+                             └──────────┬───────────┘
+                                        │
+                 ┌──────────────────────┼──────────────────────┐
+                 ▼                      ▼                      ▼
+        ┌────────────────┐     ┌────────────────┐     ┌────────────────┐
+        │ Geometry Cache │     │ Image / LOD    │     │ Text Cache     │
+        └────────────────┘     └────────────────┘     └────────────────┘
+                 │                      │                      │
+                 └──────────────────────┼──────────────────────┘
+                                        ▼
+                             ┌──────────────────────┐
+                             │ Canvas / WebGL       │
+                             └──────────────────────┘
+```
+
+---
+
+# 27. Concrete Optimization Sequence
+
+I would optimize in this order.
+
+## Phase 1 — Measure
+
+```txt
+Chrome Performance
+React Profiler
+frame timings
+memory
+GPU/raster metrics
+```
+
+Determine:
+
+```txt
+CPU?
+GPU?
+layout?
+GC?
+React?
+render traversal?
+```
+
+---
+
+## Phase 2 — Eliminate unnecessary work
+
+Highest leverage:
+
+```txt
+viewport culling
+event-driven rendering
+rAF coalescing
+dirty regions
+layering
+LOD
+```
+
+---
+
+## Phase 3 — Cache expensive work
+
+```txt
+Path2D
+text measurement
+geometry
+images
+pre-rendered groups
+```
+
+---
+
+## Phase 4 — Remove main-thread pressure
+
+```txt
+geometry → worker
+image processing → worker
+OffscreenCanvas → worker
+```
+
+---
+
+## Phase 5 — Upgrade renderer
+
+Only if needed:
+
+```txt
+Canvas 2D
+   ↓
+WebGL / WebGPU
+```
+
+---
+
+# 28. Example Before and After
+
+Assume:
+
+```txt
+100K total objects
+2K visible objects
+```
+
+Before:
+
+```txt
+Scene traversal       12ms
+Geometry              10ms
+Canvas drawing        18ms
+React                  5ms
+Layout                 3ms
+GC                     2ms
+───────────────────────────
+Total                 50ms
+
+≈20 FPS
+```
+
+After:
+
+```txt
+Spatial query          1ms
+Cached geometry        2ms
+Canvas drawing         7ms
+React                  1ms
+Layout                 1ms
+GC                     1ms
+───────────────────────────
+Total                 13ms
+
+≈60 FPS
+```
+
+The key improvement is not:
+
+```txt
+"make drawRect 20% faster"
+```
+
+It is:
+
+```txt
+"stop drawing 98% of the scene."
+```
+
+---
+
+# 29. Performance Budgets
+
+I would establish explicit budgets.
+
+Example:
+
+```txt
+Interaction frame:
+
+Input processing        < 1ms
+Hit testing             < 2ms
+Scene update            < 2ms
+Visibility query        < 1ms
+Rendering               < 8ms
+Browser/GPU             < 3ms
+─────────────────────────────
+Total                  < 16ms
+```
+
+Also track percentiles:
+
+```txt
+P50 frame time
+P95 frame time
+P99 frame time
+long frames > 50ms
+```
+
+Average FPS alone can hide jank.
+
+Example:
+
+```txt
+58 FPS average
+```
+
+can still feel bad if:
+
+```txt
+every second → 120ms frame
+```
+
+---
+
+# 30. Production Observability
+
+I would add Real User Monitoring rather than rely solely on local profiling.
+
+Capture:
+
+```txt
+device class
+browser
+canvas dimensions
+devicePixelRatio
+scene object count
+visible object count
+zoom
+image count
+frame time
+long frames
+interaction latency
+```
+
+Example event:
+
+```ts
+{
+  event: "editor_frame_slow",
+  frameMs: 42,
+  totalObjects: 87342,
+  visibleObjects: 1642,
+  zoom: 0.7,
+  dpr: 2,
+  interaction: "drag",
+}
+```
+
+Now we can answer:
+
+```txt
+Does the issue only occur:
+- on Intel Macs?
+- at DPR 3?
+- with image-heavy documents?
+- above 20K visible objects?
+- while dragging?
+```
+
+---
+
+# 31. Important Metrics
+
+I would track:
+
+```txt
+FPS
+frame time P50/P95/P99
+input latency
+long-task count
+render duration
+visible-object count
+scene-object count
+GC time
+JS heap size
+image memory
+GPU texture memory if available
+React commit duration
+```
+
+Business-facing UX metrics:
+
+```txt
+time to interactive editor
+drag latency
+zoom latency
+selection latency
+document-open latency
+```
+
+---
+
+# 32. Staff-Level Interview Answer
+
+A concise interview answer:
+
+> I would first establish whether 20 FPS is caused by JavaScript, layout, Canvas rasterization, GPU work, or garbage collection using Chrome Performance rather than guessing.
+>
+> At 20 FPS we are spending about 50ms per frame against a 16.7ms target. I would decompose the frame into scene traversal, hit testing, geometry generation, Canvas draw time, React commits, layout, and GC.
+>
+> Architecturally, my first suspicion in a large editor is unnecessary work. I would check whether we're walking and rendering the entire scene instead of only visible objects. I would introduce viewport culling using an R-tree or quadtree, make rendering invalidation-driven rather than continuously repainting, batch pointer updates through requestAnimationFrame, separate static and dynamic Canvas layers, and cache expensive paths, text measurements, and images.
+>
+> I would also ensure React isn't in the per-frame interaction loop. React can own durable application state, while pointer position and transient drag state live in refs or the rendering engine.
+>
+> If the main thread remains CPU-bound, I would move geometry or rendering to a worker using OffscreenCanvas. If profiling shows Canvas 2D itself is the bottleneck after culling and batching, then I would evaluate WebGL or WebGPU.
+>
+> Finally, I would define a frame budget and ship telemetry for P95/P99 frame time, visible object count, scene size, DPR, and interaction type so we can prevent regressions.
+
+---
+
+# 33. Interviewer Follow-Up: "What If There Are 100K Objects?"
+
+I would say:
+
+```txt
+100K total objects should not imply 100K draw calls.
+```
+
+Use:
+
+```txt
+R-tree
+  ↓
+viewport query
+  ↓
+500–2000 visible
+  ↓
+render only visible
+```
+
+For very large scenes:
+
+```txt
+spatial index
+LOD
+cached geometry
+tile-based rendering
+WebGL batching
+```
+
+---
+
+# 34. Interviewer Follow-Up: "What If Panning Is Slow?"
+
+Check whether panning causes:
+
+```txt
+geometry recomputation
+React state updates
+full scene traversal
+image decoding
+layout work
+```
+
+Ideal pan:
+
+```txt
+pointer delta
+    ↓
+camera transform update
+    ↓
+visibility query
+    ↓
+redraw
+```
+
+No persistent scene geometry should need to change.
+
+---
+
+# 35. Interviewer Follow-Up: "What If Dragging One Object Is Slow?"
+
+Optimize the interaction:
+
+```txt
+static scene cached
+        +
+drag overlay
+```
+
+During drag:
+
+```txt
+draw only:
+- dragged object
+- guides
+- selection box
+```
+
+On drop:
+
+```txt
+update scene
+rebuild spatial index entry
+rerender affected region
+```
+
+---
+
+# 36. Interviewer Follow-Up: "What If Zooming Is Slow?"
+
+Possible causes:
+
+```txt
+high DPR raster
+full-resolution images
+text relayout
+all geometry recomputed
+LOD missing
+```
+
+Fix:
+
+```txt
+camera transform
+LOD
+image pyramids
+temporary lower render quality
+cached geometry
+```
+
+---
+
+# 37. Interviewer Follow-Up: "Would You Use WebGL?"
+
+My answer:
+
+> Possibly, but only after profiling. WebGL helps when the bottleneck is large numbers of GPU-friendly primitives, compositing, transforms, or effects. It does not fix poor scene traversal, bad hit testing, unnecessary redraws, excessive React renders, or layout thrashing. I would first reduce the amount of work, then change rendering technology if Canvas 2D remains the limiting factor.
+
+---
+
+# 38. Interviewer Follow-Up: "How Do You Prevent Regression?"
+
+Add performance tests.
+
+Example benchmark:
+
+```txt
+Load 100K-object document
+
+Requirements:
+
+pan P95       < 16ms/frame
+zoom P95      < 20ms/frame
+drag P95      < 16ms/frame
+selection     < 50ms
+heap growth   bounded
+```
+
+CI can compare:
+
+```txt
+baseline
+   ↓
+new build
+   ↓
+performance delta
+```
+
+Fail or alert when:
+
+```txt
+P95 frame time regression > 10%
+```
+
+---
+
+# 39. Deep-Dive: Canvas Jitter
+
+If users describe the problem as:
+
+```txt
+jitter
+jumpiness
+dragging behind cursor
+```
+
+I would investigate:
+
+```txt
+multiple event streams
+pointermove > frame rate
+layout reads in pointermove
+React state synchronization
+async stale updates
+GC pauses
+camera transform rounding
+different coordinate spaces
+```
+
+Correct pattern:
+
+```txt
+Pointer events
+      ↓
+save latest pointer
+      ↓
+requestAnimationFrame
+      ↓
+read latest pointer once
+      ↓
+update simulation
+      ↓
+render exactly once
+```
+
+---
+
+# 40. Deep-Dive: Stale Worker Results
+
+If geometry is moved to a worker:
+
+```txt
+request A
+request B
+request C
+```
+
+The worker might return:
+
+```txt
+B
+A
+C
+```
+
+Use sequence IDs:
+
+```ts
+let latestRequestId = 0;
+
+function computeGeometry(input: Input) {
+  const requestId = ++latestRequestId;
+
+  worker.postMessage({
+    requestId,
+    input,
+  });
+}
+
+worker.onmessage = (event) => {
+  const { requestId, result } = event.data;
+
+  if (requestId !== latestRequestId) {
+    return;
+  }
+
+  applyGeometry(result);
+};
+```
+
+For document-level operations, use:
+
+```txt
+sceneVersion
+objectVersion
+requestId
+```
+
+to reject stale work.
+
+---
+
+# 41. Staff-Level Trade-Offs
+
+Do not optimize everything simultaneously.
+
+| Optimization | Benefit | Cost |
+|---|---|---|
+| Spatial index | Huge for large scenes | Index maintenance |
+| Dirty regions | Fewer pixels drawn | Overlap complexity |
+| Layered canvas | Fast interaction | Memory + synchronization |
+| Geometry cache | Lower CPU | Cache invalidation |
+| OffscreenCanvas | Frees main thread | Messaging complexity |
+| WebGL | Massive batching | Engineering complexity |
+| LOD | Strong zoom performance | Rendering variants |
+| Lower DPR | Faster raster | Temporary visual quality |
+
+A Staff Engineer should explain not only:
+
+```txt
+what optimization exists
+```
+
+but:
+
+```txt
+when the complexity is justified
+```
+
+---
+
+# 42. Final Mental Model
+
+When a Canvas editor is slow, I walk through:
+
+```txt
+                    20 FPS
+                       │
+                       ▼
+                 Where is 50ms?
+                       │
+        ┌──────────────┼──────────────┐
+        ▼              ▼              ▼
+       CPU            GPU          Browser
+        │              │              │
+        ▼              ▼              ▼
+scene traversal    raster/fill     layout
+hit testing        textures        style
+geometry           effects         compositing
+React
+GC
+        │
+        ▼
+Reduce work first
+        │
+        ├── viewport culling
+        ├── invalidation rendering
+        ├── rAF batching
+        ├── layering
+        ├── caching
+        ├── LOD
+        │
+        ▼
+Move work
+        │
+        ├── Worker
+        └── OffscreenCanvas
+        │
+        ▼
+Upgrade renderer if needed
+        │
+        └── WebGL / WebGPU
+```
+
+The most important Staff-level principle:
+
+> **The fastest frame is the frame where you avoid doing work at all.**
