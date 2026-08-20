@@ -80,6 +80,10 @@
       "hash": "8988ef9fcaa24a21b3763564f1a43e0641e433a9fcd3cd09a09507d966974778",
       "docRelative": "cicd.png"
     },
+    "system-designs/dag-caching.png": {
+      "hash": "6d324777b24de00905f6202cbebb106bdcd8af410bab50cd9f40aee0f89a43c3",
+      "docRelative": "dag-caching.png"
+    },
     "system-designs/dau-mau.png": {
       "hash": "e22abf43a8103945dbb2f0250482750747a7caf88743d80f24d50554f971a29c",
       "docRelative": "dau-mau.png"
@@ -371,6 +375,10 @@
     "system-designs/cicd-workflow-design.mdx": {
       "hash": "c4335586269b22359f88d4f3dd775dff2d6fc98edfc45dba089babecaabfbcd4",
       "docRelative": "cicd-workflow-design.mdx"
+    },
+    "system-designs/dag-caching.mdx": {
+      "hash": "2fab8939cc73dba0c0f3473ba18628e3424c506fe94efd4bdf743ef560a25eb7",
+      "docRelative": "dag-caching.mdx"
     },
     "system-designs/dau_mau_metrics_system_design.mdx": {
       "hash": "32bf6e8a729866786cb13640c0ff3fa8c05087771daa57115cf6eca557dcdbd8",
