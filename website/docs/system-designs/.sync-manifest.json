@@ -69,7 +69,7 @@
       "docRelative": "automate-jira-ticket.png"
     },
     "system-designs/bitly.png": {
-      "hash": "c008aa0a7d33e3db180971c7486f9fe4d565dd0b00a846766a43ad4906b3eaad",
+      "hash": "1058f27868d6303641b0de754f670ed8094b535de756ed539d3360a403f0c1d1",
       "docRelative": "bitly.png"
     },
     "system-designs/chat-gpt.png": {
@@ -252,6 +252,10 @@
       "hash": "999cbd028d72b1110be38f987139e6f98f1881fbe44a43df3050bac255ce1ee8",
       "docRelative": "quota-management.png"
     },
+    "system-designs/rate-limit.png": {
+      "hash": "344c574653d3742936ed85d4cde3b8d08bd54c7a11d8efa8c1143c51c0e3b95b",
+      "docRelative": "rate-limit.png"
+    },
     "system-designs/rate-limiter.png": {
       "hash": "cbc9857f856770f79e74b98e7b38ddc52eada83f69b2b8cc91f44340fd050530",
       "docRelative": "rate-limiter.png"
@@ -389,7 +393,7 @@
       "docRelative": "figma.mdx"
     },
     "system-designs/geolocation-service.mdx": {
-      "hash": "2a958ff023b747590c3ef6d83a054855504621ab80d20ac53870a747dc01a259",
+      "hash": "3cd8650a85d60c9683cb0b8ccb60f5cf81974a698227f1311ae74becd1bab365",
       "docRelative": "geolocation-service.mdx"
     },
     "system-designs/github-actions-system-design.mdx": {
