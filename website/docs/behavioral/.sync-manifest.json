@@ -48,6 +48,10 @@
       "hash": "49766acdae4dd55cb20ca4ae7658575f768c9a2c55ae36dbca709fbd0f8d8916",
       "docRelative": "eng_manager/feature-drift-staff-interview-story.mdx"
     },
+    "behavorial/eng_manager/strength-vs-weakness.mdx": {
+      "hash": "46dde7aa4ab420b411be00a6a3c91f471be82b3afa3da42529a05d6c4191a5c6",
+      "docRelative": "eng_manager/strength-vs-weakness.mdx"
+    },
     "behavorial/eng_manager/tlm.mdx": {
       "hash": "ace9ca327dee723a2ae54ab7b322345a6f31002fff4711192e335dbd24898f0e",
       "docRelative": "eng_manager/tlm.mdx"
@@ -55,6 +59,10 @@
     "behavorial/eng_manager/tlm_engineering_manager_interview_playbook.mdx": {
       "hash": "df9bdac1e415a9cd29bdf4af61661217881f0cc2fdfe18f22da68b21eefcd3a1",
       "docRelative": "eng_manager/tlm_engineering_manager_interview_playbook.mdx"
+    },
+    "behavorial/eng_manager/tradeoff-behavioral.mdx": {
+      "hash": "3cdcfd628d02fa5b69607178a85269475a3444e9d9105b3aa1c53ecc3c17b0fd",
+      "docRelative": "eng_manager/tradeoff-behavioral.mdx"
     },
     "behavorial/model_foundry_agent_qna_system_design.mdx": {
       "hash": "09e748c2580e2ea998ef6e1ddd3befc8135ca8cdf06fd9277f0f386dee675021",
@@ -88,16 +96,8 @@
       "hash": "a31f582233d076b6dfac6accebde31e1866fbe9d812e77cec28a1d7239a78f17",
       "docRelative": "stencil_shared_component.mdx"
     },
-    "behavorial/strength-vs-weakness.mdx": {
-      "hash": "7b5aa30ebd7422aa3b2e9af01d6c8038a0ce6e15d2aee0470426e87297977c77",
-      "docRelative": "strength-vs-weakness.mdx"
-    },
-    "behavorial/tradeoff-behavioral.mdx": {
-      "hash": "b3de7641108f76b6fd9323ad043aa30cf09a715e134bc02b6427876e98534cb2",
-      "docRelative": "tradeoff-behavioral.mdx"
-    },
     "__nav__:eng_manager": {
-      "hash": "8e3461b362b2da6844a6344cf2539c167ab1b52cf25b8854ca26d669b613df56",
+      "hash": "4be911f347cf2fbcb939c481775d5f4706b9a18ffc19b7c1a7e4463cad303feb",
       "docRelative": "eng_manager/_index.mdx"
     }
   }
