@@ -52,6 +52,10 @@
       "hash": "ace9ca327dee723a2ae54ab7b322345a6f31002fff4711192e335dbd24898f0e",
       "docRelative": "eng_manager/tlm.mdx"
     },
+    "behavorial/eng_manager/tlm_engineering_manager_interview_playbook.mdx": {
+      "hash": "df9bdac1e415a9cd29bdf4af61661217881f0cc2fdfe18f22da68b21eefcd3a1",
+      "docRelative": "eng_manager/tlm_engineering_manager_interview_playbook.mdx"
+    },
     "behavorial/model_foundry_agent_qna_system_design.mdx": {
       "hash": "09e748c2580e2ea998ef6e1ddd3befc8135ca8cdf06fd9277f0f386dee675021",
       "docRelative": "model_foundry_agent_qna_system_design.mdx"
@@ -93,7 +97,7 @@
       "docRelative": "tradeoff-behavioral.mdx"
     },
     "__nav__:eng_manager": {
-      "hash": "c7eddbc32fff24aa9a563d6ab3403b2cf00f38d6730343d8b88e3b7e87bdb74e",
+      "hash": "8e3461b362b2da6844a6344cf2539c167ab1b52cf25b8854ca26d669b613df56",
       "docRelative": "eng_manager/_index.mdx"
     }
   }
