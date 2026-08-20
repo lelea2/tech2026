@@ -20,29 +20,37 @@
       "hash": "f6b035879a018b6461a23582d4333d20854ad324aa0df54c8b99dbf24511c701",
       "docRelative": "db-selection.mdx"
     },
-    "behavorial/em-difficult-stakeholder-framework.mdx": {
-      "hash": "9f5b537d8bfe6754f30e5a74b2997262c8674eccc46480b061f04c210d0bb90a",
-      "docRelative": "em-difficult-stakeholder-framework.mdx"
+    "behavorial/eng_manager/em-difficult-stakeholder-framework.mdx": {
+      "hash": "08217eae408973bd470c370d73d792841fb5763e06b1477b6239a2ddb238a117",
+      "docRelative": "eng_manager/em-difficult-stakeholder-framework.mdx"
     },
-    "behavorial/em-product-design-vision-platform-interview.mdx": {
-      "hash": "6dc1f38b39d7bb45176c8e9e7dd47bea7be2e4eec2ea221c402b61b1db517a09",
-      "docRelative": "em-product-design-vision-platform-interview.mdx"
+    "behavorial/eng_manager/em-product-design-vision-platform-interview.mdx": {
+      "hash": "8115beadfc055c89fbc8de861157ca426543ff8b6a6a42f0cb645ff68d57b52b",
+      "docRelative": "eng_manager/em-product-design-vision-platform-interview.mdx"
     },
-    "behavorial/em_behavior_execution_prep.mdx": {
-      "hash": "e18d175db82e1e5e1b30b0fbada45175e5a00f249c3d30f40047a281a7f2f905",
-      "docRelative": "em_behavior_execution_prep.mdx"
+    "behavorial/eng_manager/em_behavior_execution_prep.mdx": {
+      "hash": "afb79bab58ef15bcb2f07a61194f153d597bc65fb6a6c076c8e2a038fc66cc9b",
+      "docRelative": "eng_manager/em_behavior_execution_prep.mdx"
     },
-    "behavorial/engineering-manager-behavioral-interview.mdx": {
-      "hash": "b7ed56fadb08ab07ccc948ec2540fce6607eb0cc770e9f9194ed001c2234d3ec",
-      "docRelative": "engineering-manager-behavioral-interview.mdx"
+    "behavorial/eng_manager/engineering-manager-behavioral-interview.mdx": {
+      "hash": "d82148890878208d98b209c9943c0a99d57628ce130802494eaa9d5cf263f25f",
+      "docRelative": "eng_manager/engineering-manager-behavioral-interview.mdx"
     },
-    "behavorial/engx-frontend-platform-leadership-story.mdx": {
-      "hash": "166aee71482915039c9d509c5ef94a4e711d4c313d7300895897e8f4990ef810",
-      "docRelative": "engx-frontend-platform-leadership-story.mdx"
+    "behavorial/eng_manager/engineering_manager_conflict_prioritization_alignment.mdx": {
+      "hash": "7073edae44b1b9e13109339d4a5490c8fb1815e196b968424734f9a80c975bf8",
+      "docRelative": "eng_manager/engineering_manager_conflict_prioritization_alignment.mdx"
     },
-    "behavorial/feature-drift-staff-interview-story.mdx": {
-      "hash": "bfb6db97950977351545c7601cb50753f118363c4b092833ac30248a0eef0a3f",
-      "docRelative": "feature-drift-staff-interview-story.mdx"
+    "behavorial/eng_manager/engx-frontend-platform-leadership-story.mdx": {
+      "hash": "0405da452b69c1670e7c7bc9ac21175ead5cb1a73af458775ebfa84f853a7e33",
+      "docRelative": "eng_manager/engx-frontend-platform-leadership-story.mdx"
+    },
+    "behavorial/eng_manager/feature-drift-staff-interview-story.mdx": {
+      "hash": "49766acdae4dd55cb20ca4ae7658575f768c9a2c55ae36dbca709fbd0f8d8916",
+      "docRelative": "eng_manager/feature-drift-staff-interview-story.mdx"
+    },
+    "behavorial/eng_manager/tlm.mdx": {
+      "hash": "ace9ca327dee723a2ae54ab7b322345a6f31002fff4711192e335dbd24898f0e",
+      "docRelative": "eng_manager/tlm.mdx"
     },
     "behavorial/model_foundry_agent_qna_system_design.mdx": {
       "hash": "09e748c2580e2ea998ef6e1ddd3befc8135ca8cdf06fd9277f0f386dee675021",
@@ -80,13 +88,13 @@
       "hash": "7b5aa30ebd7422aa3b2e9af01d6c8038a0ce6e15d2aee0470426e87297977c77",
       "docRelative": "strength-vs-weakness.mdx"
     },
-    "behavorial/tlm.mdx": {
-      "hash": "1ed4f506a5259a08b96430f3aa86a4468a060d84b2bf455ae9d66c4511ab96b0",
-      "docRelative": "tlm.mdx"
-    },
     "behavorial/tradeoff-behavioral.mdx": {
       "hash": "b3de7641108f76b6fd9323ad043aa30cf09a715e134bc02b6427876e98534cb2",
       "docRelative": "tradeoff-behavioral.mdx"
+    },
+    "__nav__:eng_manager": {
+      "hash": "c7eddbc32fff24aa9a563d6ab3403b2cf00f38d6730343d8b88e3b7e87bdb74e",
+      "docRelative": "eng_manager/_index.mdx"
     }
   }
 }
