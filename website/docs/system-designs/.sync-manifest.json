@@ -133,7 +133,7 @@
       "docRelative": "i18n.png"
     },
     "system-designs/job-scheduler.png": {
-      "hash": "9233017b5ea20cb07ce064d5ceaf500bdb96584b01c6baef2001207f326d8ed4",
+      "hash": "7e493eb3cb85c51dbaadac46d8e9ee6a7514a11b915e54ea2f7a1e7babb1faf0",
       "docRelative": "job-scheduler.png"
     },
     "system-designs/key-technologies/promixity-search.png": {
@@ -147,6 +147,10 @@
     "system-designs/local-delivery-service.png": {
       "hash": "f85ed6bcdb19726538ef851adf88b43862c750273ce6af5b731a1f054e8b52dd",
       "docRelative": "local-delivery-service.png"
+    },
+    "system-designs/logging-service.png": {
+      "hash": "ef8601655ef3805337d06ab0fc5595a4bf64280e4d13656e71ecd9e5580aec69",
+      "docRelative": "logging-service.png"
     },
     "system-designs/metrics-monitoring.png": {
       "hash": "4d752a8fea5a603af68529b6b4fd2b035fad70a4d7f660d24ab75f5c63082bf7",
@@ -257,7 +261,7 @@
       "docRelative": "quota-management.png"
     },
     "system-designs/rate-limit.png": {
-      "hash": "344c574653d3742936ed85d4cde3b8d08bd54c7a11d8efa8c1143c51c0e3b95b",
+      "hash": "84e903f77a0af861cc69eac503c0e7676b0db836ba658a5b183d774bf9bcaf1f",
       "docRelative": "rate-limit.png"
     },
     "system-designs/recommendation.png": {
@@ -409,7 +413,7 @@
       "docRelative": "i18n-design.mdx"
     },
     "system-designs/job-scheduler.mdx": {
-      "hash": "71653f45f7d31516ced7e2c0b02ae8e8527a85e515ccc5b6776f2b7de9d4f006",
+      "hash": "87234c7a382fac472290a68d4b16e6a3f09a26a75d6a876253dbf043d8630276",
       "docRelative": "job-scheduler.mdx"
     },
     "system-designs/key-technologies/database.mdx": {
@@ -435,6 +439,10 @@
     "system-designs/local-delivery-service.mdx": {
       "hash": "2d69028d9146a1335f2c49a5d31268e134e84551d6ab2b56d43042a9438e097e",
       "docRelative": "local-delivery-service.mdx"
+    },
+    "system-designs/logging-service.mdx": {
+      "hash": "c9afc572cd69ff14907c96c2c93aa5d408c3123c3c2fdefc39175baa7e28e40e",
+      "docRelative": "logging-service.mdx"
     },
     "system-designs/metrics-monitoring.mdx": {
       "hash": "9b3c3a231c5712318baab3222e2b83f8db562d64f6b83a060c42106b4e28da7a",
@@ -557,7 +565,7 @@
       "docRelative": "quota-management.mdx"
     },
     "system-designs/rate-limit.mdx": {
-      "hash": "821c24111a7b71c3d0140c8d1ff40c459e76ff91d68ec0173065a0e5cf29fa4a",
+      "hash": "ce147668b63e97fe9973bb08d80cdca41e9efa18b2412c2129c8b45fe2927cba",
       "docRelative": "rate-limit.mdx"
     },
     "system-designs/recommendation.mdx": {
