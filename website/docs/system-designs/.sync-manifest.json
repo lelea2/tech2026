@@ -365,7 +365,7 @@
       "docRelative": "automated-jira-to-pr.mdx"
     },
     "system-designs/bitly.mdx": {
-      "hash": "9da02c2aa2b6a8ea01789bacec67a98c36161f503dc8d23ec31ba364803aeae9",
+      "hash": "60a0df4bfb93a014689a6f1417635e7555b6b56be5e6fd32fd4df3b0c5f9f080",
       "docRelative": "bitly.mdx"
     },
     "system-designs/chat-gpt.mdx": {
@@ -389,7 +389,7 @@
       "docRelative": "distributed-cache.mdx"
     },
     "system-designs/dropbox.mdx": {
-      "hash": "6e1b484c886dfc374da0d06e159d8f105691ec0d14f01ea764dd225f234bc17e",
+      "hash": "154edbe84aa150c6e6bdd79dcd3493c48328c95342be201d8efac689c9b54c82",
       "docRelative": "dropbox.mdx"
     },
     "system-designs/feature-flag-system.mdx": {
@@ -433,7 +433,7 @@
       "docRelative": "key-technologies/zookeeper.mdx"
     },
     "system-designs/leetcode.mdx": {
-      "hash": "b4c83758cacd20067bb1b35cc5403e0d620a610194bb68f693bf195cab5d0893",
+      "hash": "d8c76d2553902a365793b525f4cc7174f0a35146898ffeca0e83a7f00437906b",
       "docRelative": "leetcode.mdx"
     },
     "system-designs/local-delivery-service.mdx": {
@@ -441,7 +441,7 @@
       "docRelative": "local-delivery-service.mdx"
     },
     "system-designs/metrics-monitoring.mdx": {
-      "hash": "dc00f4a891daf3b106aa0dacdee206d256acb926e4fb8ed2ba5962f2d79e06ce",
+      "hash": "9b3c3a231c5712318baab3222e2b83f8db562d64f6b83a060c42106b4e28da7a",
       "docRelative": "metrics-monitoring.mdx"
     },
     "system-designs/miscellaneous/agoda-scaling.mdx": {
@@ -497,7 +497,7 @@
       "docRelative": "news-aggregator.mdx"
     },
     "system-designs/notifications.mdx": {
-      "hash": "245317961c69deb30423f01a15e6b7c582178d369eef7fb84b49ba2c700a8b8e",
+      "hash": "1ae6884537acb456fe2fa5cca901eb080b1abb14a806864175d0f3d5be8e6b2b",
       "docRelative": "notifications.mdx"
     },
     "system-designs/online-auction.mdx": {
@@ -581,7 +581,7 @@
       "docRelative": "teleoperations.mdx"
     },
     "system-designs/ticketmaster.mdx": {
-      "hash": "d662f2fd0247f984733ef8cac66bf2bf9ed0f58b37bf4e83c4a610a33ff145b2",
+      "hash": "2ca676a6722e96fbf3df0a1a98d0612ba04df7d905786eb6f8db9e2f13e8fbcd",
       "docRelative": "ticketmaster.mdx"
     },
     "system-designs/token-api-scale.mdx": {
@@ -597,7 +597,7 @@
       "docRelative": "uber.mdx"
     },
     "system-designs/web-crawler.mdx": {
-      "hash": "d0a52b1a218472326456aac68a6b2183eef09a7d41bca84b69d52f6e13e08d51",
+      "hash": "cdd53c3601dc9052986be44ddd217d3c78ab0aafb47ecc6e93b85dfe68df14b4",
       "docRelative": "web-crawler.mdx"
     },
     "system-designs/webhook-callback-system.mdx": {
@@ -605,11 +605,11 @@
       "docRelative": "webhook-callback-system.mdx"
     },
     "system-designs/whatsapp-chat-app.mdx": {
-      "hash": "a06baa8a5b2af60249c290b4dd0059a729e5c715d8ad5b1594a595f9a4ec858c",
+      "hash": "7566c8b5a63b6e320a71a01b378b236bbe25df610e883385f5a0a0cb2aaf20f2",
       "docRelative": "whatsapp-chat-app.mdx"
     },
     "system-designs/yelp.mdx": {
-      "hash": "79221ade813c027f69c039f6e7106fb4db6fd4266b39bbfdb5582478162743f2",
+      "hash": "c699a1d2d7c2cac6eee6ce4b89a9af45aa92555de8dfaded6dc6272066543420",
       "docRelative": "yelp.mdx"
     },
     "__nav__:agentic-system-design": {
