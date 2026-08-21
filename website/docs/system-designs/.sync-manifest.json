@@ -385,7 +385,7 @@
       "docRelative": "dau_mau_metrics_system_design.mdx"
     },
     "system-designs/distributed-cache.mdx": {
-      "hash": "e05a5745dfd5c5ef0d97cb7c5e4d7048f9d4e88805000efded876454409b2887",
+      "hash": "8032b23edfabb0cd1c13f9cf28744fd26730d0ee6e4e5c027f3cebbe86424c50",
       "docRelative": "distributed-cache.mdx"
     },
     "system-designs/dropbox.mdx": {
@@ -401,7 +401,7 @@
       "docRelative": "figma.mdx"
     },
     "system-designs/geolocation-service.mdx": {
-      "hash": "3cd8650a85d60c9683cb0b8ccb60f5cf81974a698227f1311ae74becd1bab365",
+      "hash": "75ae25a3bdeb29dc5bef3b9a0c32aab1eda5233558d3e8a517fe8dde6cf0f19e",
       "docRelative": "geolocation-service.mdx"
     },
     "system-designs/github-actions-system-design.mdx": {
@@ -601,7 +601,7 @@
       "docRelative": "uber.mdx"
     },
     "system-designs/web-crawler.mdx": {
-      "hash": "cdd53c3601dc9052986be44ddd217d3c78ab0aafb47ecc6e93b85dfe68df14b4",
+      "hash": "3e4bc560f2be2427255396a96846b9b84d2fc928a6866ddb61119aaa944c2305",
       "docRelative": "web-crawler.mdx"
     },
     "system-designs/webhook-callback-system.mdx": {
