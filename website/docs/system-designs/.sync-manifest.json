@@ -257,7 +257,7 @@
       "docRelative": "price-tracking-service.png"
     },
     "system-designs/quota-management.png": {
-      "hash": "999cbd028d72b1110be38f987139e6f98f1881fbe44a43df3050bac255ce1ee8",
+      "hash": "99cb3f057e103c164a0741cfe950739a6fa0419da55e984fd06513d05e1bc011",
       "docRelative": "quota-management.png"
     },
     "system-designs/rate-limit.png": {
@@ -561,7 +561,7 @@
       "docRelative": "price-tracking-service.mdx"
     },
     "system-designs/quota-management.mdx": {
-      "hash": "cc4c624e493e50233dce1eddb35aec06afc94acf14a588a3631d6ffb85510d26",
+      "hash": "8746aedaefb2f988eea9720cc99d80ab0a5bcc8ff75f296d14d86c0e97f128b8",
       "docRelative": "quota-management.mdx"
     },
     "system-designs/rate-limit.mdx": {
