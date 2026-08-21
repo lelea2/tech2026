@@ -9,6 +9,10 @@ tags:
   - reliability
 ---
 
+> **Editable diagram:** [Open in Excalidraw](https://excalidraw.com/#json=p80YixKO2CGbpJMLo4XN9,6tTPByEOEoUE9Ai237pWxA)
+
+![Rate limiter component architecture and request flow](./rate-limit.png)
+
 I would design this as a distributed token-bucket rate limiter integrated into the API gateway.
 Each request is identified by API key, org, project, endpoint, and model.
 The gateway asks a rate limiter service whether the request can proceed. For the first version,
@@ -21,8 +25,6 @@ At larger scale, I would move from a centralized Redis model to regional quota l
 where each region receives a portion of global quota and enforces locally,
 while usage events are streamed for reconciliation, billing, and abuse detection.
 This gives low latency, high availability, and bounded quota error across regions.
-
-![Rate limiter component architecture and request flow](./rate-limiter.png)
 
 # Rate Limiter System Design
 

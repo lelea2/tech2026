@@ -260,10 +260,6 @@
       "hash": "344c574653d3742936ed85d4cde3b8d08bd54c7a11d8efa8c1143c51c0e3b95b",
       "docRelative": "rate-limit.png"
     },
-    "system-designs/rate-limiter.png": {
-      "hash": "cbc9857f856770f79e74b98e7b38ddc52eada83f69b2b8cc91f44340fd050530",
-      "docRelative": "rate-limiter.png"
-    },
     "system-designs/recommendation.png": {
       "hash": "0649efa10e6a12f0c5972837e3a0f713aa222d0864bb953df771fbf0f785ec0d",
       "docRelative": "recommendation.png"
@@ -321,7 +317,7 @@
       "docRelative": "yelp.png"
     },
     "system-designs/ad-click-aggregator.mdx": {
-      "hash": "9d48daa0af663cec231cac224f8b8a613b443a53b5bf6dc14853752dc1fc38b1",
+      "hash": "fc3a62df8558b648e6cf899feedfe505edac7fbc4cc2fa955f4e0a8b80a25395",
       "docRelative": "ad-click-aggregator.mdx"
     },
     "system-designs/agentic-system-design/agentic-mcp-copilot-system-design.mdx": {
@@ -385,11 +381,11 @@
       "docRelative": "dau_mau_metrics_system_design.mdx"
     },
     "system-designs/distributed-cache.mdx": {
-      "hash": "a9ea2491822d8fc9852394ac6ebd9faad555456bf03657bf98591df53e172879",
+      "hash": "e05a5745dfd5c5ef0d97cb7c5e4d7048f9d4e88805000efded876454409b2887",
       "docRelative": "distributed-cache.mdx"
     },
     "system-designs/dropbox.mdx": {
-      "hash": "154edbe84aa150c6e6bdd79dcd3493c48328c95342be201d8efac689c9b54c82",
+      "hash": "fc0b3a51e5b22885ffc7722d688133c5e15b04c2d676253af7c714c0526f0135",
       "docRelative": "dropbox.mdx"
     },
     "system-designs/feature-flag-system.mdx": {
@@ -561,7 +557,7 @@
       "docRelative": "quota-management.mdx"
     },
     "system-designs/rate-limit.mdx": {
-      "hash": "a62a344d5c71f09dade78a20324ea1052d2ae53ae9670a39c5b9fe124a1c1355",
+      "hash": "821c24111a7b71c3d0140c8d1ff40c459e76ff91d68ec0173065a0e5cf29fa4a",
       "docRelative": "rate-limit.mdx"
     },
     "system-designs/recommendation.mdx": {
@@ -573,7 +569,7 @@
       "docRelative": "ride_hailing.mdx"
     },
     "system-designs/robinhood.mdx": {
-      "hash": "2aca2034a667fb647f65ff1afb9a0822ceed128a66c0a0141706e55c875411bc",
+      "hash": "c81034ad0af272313db2994a2dfdfcd8b926569ca8d6d6cf38a873ac1a462617",
       "docRelative": "robinhood.mdx"
     },
     "system-designs/teleoperations.mdx": {
@@ -593,7 +589,7 @@
       "docRelative": "topk.mdx"
     },
     "system-designs/uber.mdx": {
-      "hash": "f06103d7cefd942912141bbcda5c46bb76a7a45ebf4642cbf2432331f8d47c46",
+      "hash": "c107a6f3465d51950f3a18e81059ff287d3781754184ad9136f87532664f027e",
       "docRelative": "uber.mdx"
     },
     "system-designs/web-crawler.mdx": {
