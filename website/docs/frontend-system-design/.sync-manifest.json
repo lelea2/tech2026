@@ -24,6 +24,10 @@
       "hash": "21d565565a3c30b078cd2d0b22555c66e9842210892518390d4ce38e4d1f638b",
       "docRelative": "chatgpt.png"
     },
+    "frontend-system-design/client-cache.png": {
+      "hash": "45d19f4036f95f0588febd7f276c11f2b758ff2008b14bf1cf3b2293826e42ca",
+      "docRelative": "client-cache.png"
+    },
     "frontend-system-design/core/llm-text-vs-image.png": {
       "hash": "a45ac5dd698b6331070e912abc2ce8cdadadc2e3047a7de897766d6a4a4ab593",
       "docRelative": "core/llm-text-vs-image.png"
@@ -115,6 +119,10 @@
     "frontend-system-design/claude-ai-spreadsheet-agent-interview-guide.mdx": {
       "hash": "1cfafe5dda3ea44b53f27b187487900d4bf83e6ae6a0e34d6a8615b6a31e1f5f",
       "docRelative": "claude-ai-spreadsheet-agent-interview-guide.mdx"
+    },
+    "frontend-system-design/client-cache.mdx": {
+      "hash": "482aa8be4a5950312b2a21c4e1ba2a8886093c2c6e4863093c23dd6be3eba588",
+      "docRelative": "client-cache.mdx"
     },
     "frontend-system-design/core/XSS-vs-CORS.mdx": {
       "hash": "b8aea79be67efbc913a32ec8149ecd01d264f2878bf3118ef6a36192abf111b8",
