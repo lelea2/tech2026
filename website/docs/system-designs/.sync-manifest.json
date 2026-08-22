@@ -369,7 +369,7 @@
       "docRelative": "bitly.mdx"
     },
     "system-designs/chat-gpt.mdx": {
-      "hash": "0ea5fb71f01ff516475386f64a40d892730ea2eddccd82e43831a75c53433567",
+      "hash": "be45b743ad997b314304cd825cc6f36d453632b862553288724bd3bad17076b7",
       "docRelative": "chat-gpt.mdx"
     },
     "system-designs/cicd-workflow-design.mdx": {
@@ -437,7 +437,7 @@
       "docRelative": "leetcode.mdx"
     },
     "system-designs/local-delivery-service.mdx": {
-      "hash": "2d69028d9146a1335f2c49a5d31268e134e84551d6ab2b56d43042a9438e097e",
+      "hash": "e3fcefb29fb88ea94d3c438f93458efa0ee1e08daf55c2a264110cdb1fec68c1",
       "docRelative": "local-delivery-service.mdx"
     },
     "system-designs/logging-service.mdx": {
@@ -493,11 +493,11 @@
       "docRelative": "nearby_vehicle_search.mdx"
     },
     "system-designs/netflix.mdx": {
-      "hash": "7eabbff232b7b245cf291045dc51c68a8fcae919f2cd2a46ba40205d37ed6462",
+      "hash": "4838f41a6f9cc750789ab72a400bd8496cc42763be059cd23ffa33a89efa6f1e",
       "docRelative": "netflix.mdx"
     },
     "system-designs/news-aggregator.mdx": {
-      "hash": "515e3f1dc9be787119e71ad9d198b22745b761b7d265a5aa7aac9d2903d4a8de",
+      "hash": "369de1b808ca3027dcfe1c64899aa011e6a0737bbcc2a62c06a44881f444a3b6",
       "docRelative": "news-aggregator.mdx"
     },
     "system-designs/notifications.mdx": {
@@ -505,15 +505,15 @@
       "docRelative": "notifications.mdx"
     },
     "system-designs/online-auction.mdx": {
-      "hash": "a16210c4d6e1758aee2fd32a98a7d5fd2c65bc01f43ea842f03daf8cf4e84475",
+      "hash": "2dddd5b20937a1c88538724f24f782830a5ac9bbb2d90d47cd0776b4baf63e0d",
       "docRelative": "online-auction.mdx"
     },
     "system-designs/online-chess.mdx": {
-      "hash": "6d82f693b871c729ca38679aa0720990ec2f47a9b47d3da9fb3b45944632053c",
+      "hash": "144ab14edcc92a07b22245d6ddef7cf0e32631ff0020c8f0959a88e8ab61c2dd",
       "docRelative": "online-chess.mdx"
     },
     "system-designs/pastebin.mdx": {
-      "hash": "77146e6c92d60339945bce8bc3cd4f3403a1fb5a4d43e5b599d083816831e0cf",
+      "hash": "07247c467acce138c771c690d0db6ca97cb1d0307558d9998f11aaf38d358fc1",
       "docRelative": "pastebin.mdx"
     },
     "system-designs/patterns/OLAPvsOTLP.mdx": {
@@ -553,11 +553,11 @@
       "docRelative": "patterns/scale-db-read-write.mdx"
     },
     "system-designs/payment-system.mdx": {
-      "hash": "110bae956514dbedc40993f228ca9b88b68e8721920111e02d64f1625eedad61",
+      "hash": "24550f9199f14bcd3a00dcd57388c8a663b852ce0ad83f7bbbd43e9df0353416",
       "docRelative": "payment-system.mdx"
     },
     "system-designs/price-tracking-service.mdx": {
-      "hash": "17ce07043eca67547c0438d269b814db50105537db835d9759d61ff031c0d0ef",
+      "hash": "6b61211a4c4668d2dc4cadf6513c644026e9ee69b7cc05417f60fabd9cc684b6",
       "docRelative": "price-tracking-service.mdx"
     },
     "system-designs/quota-management.mdx": {
@@ -569,7 +569,7 @@
       "docRelative": "rate-limit.mdx"
     },
     "system-designs/recommendation.mdx": {
-      "hash": "adf9bbcffcf5c8ed735966663b5b1c5223d5a98d9c79d7dac71fd1342fbae098",
+      "hash": "eda6932078dc85058390a079a3c4465dfefbbc448656bf126fdc610cb394b2dd",
       "docRelative": "recommendation.mdx"
     },
     "system-designs/ride_hailing.mdx": {
@@ -605,7 +605,7 @@
       "docRelative": "web-crawler.mdx"
     },
     "system-designs/webhook-callback-system.mdx": {
-      "hash": "76dfef4375329840aca526de4cd327734e71af25922eaaab0ac0a956cf0779bc",
+      "hash": "1d9b04bba0a42e46208797d69e3ed612b10e62626e7cf087194c40367a85f184",
       "docRelative": "webhook-callback-system.mdx"
     },
     "system-designs/whatsapp-chat-app.mdx": {
