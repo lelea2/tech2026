@@ -197,7 +197,7 @@
       "docRelative": "nearby-vehicle-search.svg"
     },
     "system-designs/netflix.png": {
-      "hash": "66118e22ec250382cb26428c4f1f3ed668cf3969e64ee0c805b22e9bad48367e",
+      "hash": "76a659a3f7907f92692cd586496e6cec26914d3a6c9cd3c72717de06586f33c9",
       "docRelative": "netflix.png"
     },
     "system-designs/news-aggregator.png": {
@@ -493,7 +493,7 @@
       "docRelative": "nearby_vehicle_search.mdx"
     },
     "system-designs/netflix.mdx": {
-      "hash": "4838f41a6f9cc750789ab72a400bd8496cc42763be059cd23ffa33a89efa6f1e",
+      "hash": "d092cf236527d092d16271a88dbe64d689fc1395006ba9b3f61988e1bf4f7a1c",
       "docRelative": "netflix.mdx"
     },
     "system-designs/news-aggregator.mdx": {

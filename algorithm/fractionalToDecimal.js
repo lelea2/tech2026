@@ -1,0 +1,61 @@
+/**
+ * @param {number} numerator
+ * @param {number} denominator
+ * @return {string}
+ */
+function fractionToDecimal(numerator, denominator) {
+  if (numerator === 0) return "0";
+
+  let result = "";
+
+  // 1. Handle sign
+  if ((numerator < 0) !== (denominator < 0)) {
+    result += "-";
+  }
+
+  // JS numbers are safe here because inputs are 32-bit integers.
+  let n = Math.abs(numerator);
+  let d = Math.abs(denominator);
+
+  // 2. Integer part
+  result += Math.floor(n / d);
+
+  let remainder = n % d;
+
+  // No fractional part
+  if (remainder === 0) {
+    return result;
+  }
+
+  result += ".";
+
+  // remainder -> position in result where digits produced
+  // from this remainder begin.
+  const seen = new Map();
+
+  // 3. Simulate long division
+  while (remainder !== 0) {
+    if (seen.has(remainder)) {
+      const repeatStart = seen.get(remainder);
+
+      result =
+        result.slice(0, repeatStart) +
+        "(" +
+        result.slice(repeatStart) +
+        ")";
+
+      return result;
+    }
+
+    seen.set(remainder, result.length);
+
+    remainder *= 10;
+
+    const digit = Math.floor(remainder / d);
+    result += digit;
+
+    remainder %= d;
+  }
+
+  return result;
+}

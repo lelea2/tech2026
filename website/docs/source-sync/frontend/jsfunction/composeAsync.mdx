@@ -1,0 +1,104 @@
+---
+title: composeAsync
+---
+
+# composeAsync
+
+~~~javascript
+/**
+ * Interview Question:
+ * Implement composeAsync(...fns), an async version of compose(). Functions
+ * are combined right-to-left (RTL), same as compose(), but each function's
+ * result is awaited before being passed into the next one — so fns may be
+ * sync, return a value, or return a Promise, and it all just works.
+ *
+ * composeAsync(f, g, h)(x) => f(await g(await h(x)))
+ *
+ * Answer:
+ * Walk `fns` from the last index to the first (right to left), awaiting
+ * each call before feeding its resolved value into the previous function.
+ * A plain sequential loop with `await` is simpler and easier to reason
+ * about here than reduceRight + Promise chaining.
+ *
+ * Complexity:
+ * O(n) awaited steps executed strictly one after another (sequential,
+ * not parallel) — total latency is the SUM of each step's latency, not
+ * the max. Use Promise.all-based fan-out instead if steps are independent
+ * and should run concurrently.
+ *
+ * @param {...Function} fns
+ * @returns {(initialValue: unknown) => Promise<unknown>}
+ */
+function composeAsync(...fns) {
+  return async function (initialValue) {
+    let result = initialValue;
+
+    for (let i = fns.length - 1; i >= 0; i--) {
+      result = await fns[i](result);
+    }
+
+    return result;
+  };
+}
+
+// Version accepted multiple variables
+function composeAsync(...fns) {
+  return async function (...args) {
+    if (fns.length === 0) {
+      return args[0];
+    }
+
+    let index = fns.length - 1;
+
+    let result = await fns[index](...args);
+
+    for (index--; index >= 0; index--) {
+      result = await fns[index](result);
+    }
+
+    return result;
+  };
+}
+
+
+// function composeAsync(...fns) {
+//   return (initialValue) =>
+//     fns.reduceRight(
+//       (promise, fn) => promise.then(fn),
+//       Promise.resolve(initialValue)
+//     );
+// }
+
+/**
+Example — right-to-left execution order:
+
+const step = (label, delayMs) => async (value) => {
+  await new Promise((resolve) => setTimeout(resolve, delayMs));
+  console.log(`${label}: ${value} -> ${value + 1}`);
+  return value + 1;
+};
+
+const pipeline = composeAsync(
+  step('third', 10),  // declared 1st, runs LAST  (fns[0])
+  step('second', 10), // declared 2nd, runs SECOND
+  step('first', 10),  // declared 3rd, runs FIRST (fns[fns.length - 1])
+);
+
+await pipeline(0);
+// first: 0 -> 1
+// second: 1 -> 2
+// third: 2 -> 3
+// => 3
+
+Interview talking points:
+- "RTL" (right-to-left): the LAST argument runs FIRST, mirroring
+  mathematical composition f(g(h(x))). Contrast with a pipeAsync()
+  that runs left-to-right instead.
+- Sequential, not parallel: each fns[i] is awaited before the next
+  starts, so this is NOT equivalent to Promise.all(fns.map(...)).
+- Mixed sync/async fns both work because `await` on a non-Promise
+  value just resolves immediately.
+- With zero fns, the returned function is effectively async identity:
+  composeAsync()(5) resolves to 5.
+*/
+~~~

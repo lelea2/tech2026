@@ -1,0 +1,78 @@
+---
+title: pipeAsync
+---
+
+# pipeAsync
+
+~~~javascript
+/**
+ * Interview Question:
+ * Implement pipeAsync(...fns), an async version of pipe(). Functions are
+ * combined left-to-right (LTR) — the opposite order from composeAsync() —
+ * and each function's result is awaited before being passed into the next
+ * one, so fns may be sync, return a value, or return a Promise.
+ *
+ * pipeAsync(f, g, h)(x) => h(await g(await f(x)))
+ *
+ * Answer:
+ * Walk `fns` from the first index to the last (left to right), awaiting
+ * each call before feeding its resolved value into the next function.
+ * A plain sequential loop with `await` reads top-to-bottom in the same
+ * order the functions execute, which is the whole appeal of pipe().
+ *
+ * Complexity:
+ * O(n) awaited steps executed strictly one after another (sequential,
+ * not parallel) — total latency is the SUM of each step's latency, not
+ * the max. Use Promise.all-based fan-out instead if steps are independent
+ * and should run concurrently.
+ *
+ * @param {...Function} fns
+ * @returns {(initialValue: unknown) => Promise<unknown>}
+ */
+function pipeAsync(...fns) {
+  return async function (initialValue) {
+    let result = initialValue;
+
+    for (const fn of fns) {
+      result = await fn(result);
+    }
+
+    return result;
+  };
+}
+
+/**
+Example — left-to-right execution order:
+
+const step = (label, delayMs) => async (value) => {
+  await new Promise((resolve) => setTimeout(resolve, delayMs));
+  console.log(`${label}: ${value} -> ${value + 1}`);
+  return value + 1;
+};
+
+const pipeline = pipeAsync(
+  step('first', 10),  // declared 1st, runs FIRST  (fns[0])
+  step('second', 10), // declared 2nd, runs SECOND
+  step('third', 10),  // declared 3rd, runs LAST   (fns[fns.length - 1])
+);
+
+await pipeline(0);
+// first: 0 -> 1
+// second: 1 -> 2
+// third: 2 -> 3
+// => 3
+
+Interview talking points:
+- "LTR" (left-to-right): the FIRST argument runs FIRST, mirroring a
+  Unix-style pipe x |> f |> g |> h. Contrast with composeAsync(), where
+  the LAST argument runs first.
+- Same declaration order as execution order is exactly why pipe() reads
+  more naturally than compose() for describing a sequence of steps.
+- Sequential, not parallel: each fn is awaited before the next starts,
+  so this is NOT equivalent to Promise.all(fns.map(...)).
+- Mixed sync/async fns both work because `await` on a non-Promise
+  value just resolves immediately.
+- With zero fns, the returned function is effectively async identity:
+  pipeAsync()(5) resolves to 5.
+*/
+~~~

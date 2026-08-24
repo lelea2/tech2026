@@ -60,6 +60,10 @@
       "hash": "59235e7e54b2c76a565452b1e762a5ccc3e12231bbf4346b81a06288d23cc520",
       "docRelative": "frontend/interview/Underground.mdx"
     },
+    "frontend/interview/Wikipedia.js": {
+      "hash": "466871030406a86a357b6a18de101b695683dbc51f14553eab28f5b5e541daa9",
+      "docRelative": "frontend/interview/Wikipedia.mdx"
+    },
     "frontend/interview/airtable-ai-fluency-60min.ts": {
       "hash": "acd7004eba8decc5c711c3b95f595f5cfd067b8f85819f61a77dd6d3b0ed4780",
       "docRelative": "frontend/interview/airtable-ai-fluency-60min.mdx"
@@ -423,6 +427,10 @@
     "frontend/jsfunction/compose.js": {
       "hash": "5d0d9627f2870e968fdf5a3ccf077e5d91c20720322e8ced555edf31f55f4bc3",
       "docRelative": "frontend/jsfunction/compose.mdx"
+    },
+    "frontend/jsfunction/composeAsync.js": {
+      "hash": "c687a12906ae0ce62611270b8668c061eda6c3078e6b5ce60b29e496cc8edaa4",
+      "docRelative": "frontend/jsfunction/composeAsync.mdx"
     },
     "frontend/jsfunction/consoleLogHistory.js": {
       "hash": "417b896978e7e8a50f90b7c3cded04bd3d38f90e49e0a198e8bd59e3b7c91c2a",
@@ -839,6 +847,10 @@
     "frontend/jsfunction/object/unsquashObject.js": {
       "hash": "115e1661d31f90113f07dd12d721f8e96c5ebcf957d1e9f6dcd01af4cc16230f",
       "docRelative": "frontend/jsfunction/object/unsquashObject.mdx"
+    },
+    "frontend/jsfunction/pipeAsync.js": {
+      "hash": "905b7f636088aa89e3e87634a375cf5b90bbb6e3c8bcc607d0cef7b205a22e5f",
+      "docRelative": "frontend/jsfunction/pipeAsync.mdx"
     },
     "frontend/jsfunction/prismaORM/miniORM.js": {
       "hash": "87a0468b2a9a5b1037cd55b94a9d1137d74788776a39a5294e652997dd122bab",
@@ -1804,6 +1816,10 @@
       "hash": "bc685c19cb2b9ecfb2c0e498b758690a8bbd1ac902ebb86a193dbc0ba7a0f44f",
       "docRelative": "algorithm/array/duplicateArray.mdx"
     },
+    "algorithm/array/findDiagnalOrder.js": {
+      "hash": "3aac2bdcadc38962983328eef393fca4fc30ee40ddacba0cb20f24b32e8869bd",
+      "docRelative": "algorithm/array/findDiagnalOrder.mdx"
+    },
     "algorithm/array/findMedianSortedArray.js": {
       "hash": "679bcbf16e543cb662d219072256fc86458e0b135e6b435431bf68f47fb6e078",
       "docRelative": "algorithm/array/findMedianSortedArray.mdx"
@@ -1836,6 +1852,10 @@
       "hash": "836137b0c35eef0a193d474574390f8a7ac911e449e2d88f694a161118b26b06",
       "docRelative": "algorithm/array/kRowPascalTriangle.mdx"
     },
+    "algorithm/array/largestNumber.js": {
+      "hash": "c165fa1148a4f779de3418161a7d0281279444ee00c2702500d7853a8e0eb79b",
+      "docRelative": "algorithm/array/largestNumber.mdx"
+    },
     "algorithm/array/lengthOfLongestSubString.js": {
       "hash": "e2c8530fed53e71a13c86d509a5c0c400245ff6593023373ce86be88ad9511a8",
       "docRelative": "algorithm/array/lengthOfLongestSubString.mdx"
@@ -1848,9 +1868,9 @@
       "hash": "fdc737315b57bce9dc5dd8c861117c181c29d5c98f0c7f09d2396a58e2142f83",
       "docRelative": "algorithm/array/maxProductSubArray.mdx"
     },
-    "algorithm/array/maxProfit.js": {
-      "hash": "5bee2a253625e73209d5e6f8a61016977eb3fa3ac4d8183684c58d820ecc2d5e",
-      "docRelative": "algorithm/array/maxProfit.mdx"
+    "algorithm/array/maxStockProfit.js": {
+      "hash": "5b02527522e5ed4c54f989a4614c281c36c450c0ff5c7767c076f8be2877f8be",
+      "docRelative": "algorithm/array/maxStockProfit.mdx"
     },
     "algorithm/array/maxSumSubArray.py": {
       "hash": "55e6487d0eb23db41d50a1fcbfcc9cc9940ce52e3788ff6895d923faf7975a95",
@@ -1864,6 +1884,10 @@
       "hash": "537c1c55b200a162ce649ef16730242bf6a6a6082b341192fbf666a35f88f44b",
       "docRelative": "algorithm/array/mergeSortedArray.mdx"
     },
+    "algorithm/array/minPathSum.js": {
+      "hash": "ba417061ff28723dae52f2050afdeae4e74b69c15dd664cc49575352ba2e2573",
+      "docRelative": "algorithm/array/minPathSum.mdx"
+    },
     "algorithm/array/overlapInterval.js": {
       "hash": "3180d31d9579f45a7a71d8a30efecf156da6dbf60c6c8e98c6e9e4976c374452",
       "docRelative": "algorithm/array/overlapInterval.mdx"
@@ -1875,6 +1899,10 @@
     "algorithm/array/stringAnagram.js": {
       "hash": "ab077d06cd071e85d9a711a88cf3817c5bbdab62c1b321d5896433d72aa6bec9",
       "docRelative": "algorithm/array/stringAnagram.mdx"
+    },
+    "algorithm/array/twoCitySchedulingCost.js": {
+      "hash": "b7392185edce5da53169b957bdeb4eb9dd58711e91dd547ba9638618a10e6376",
+      "docRelative": "algorithm/array/twoCitySchedulingCost.mdx"
     },
     "algorithm/array/twoSum.js": {
       "hash": "d889993cf0437ecd27d9c0902b386cf589e306e48511890c5b758164320c9df4",
@@ -1936,6 +1964,10 @@
       "hash": "599797a7cd4282da4f3834fc26dcc1177fc393734d59608b933b31b471c9a170",
       "docRelative": "algorithm/dfs/maximizeAmountAfterTwoDays.mdx"
     },
+    "algorithm/fractionalToDecimal.js": {
+      "hash": "9b76fe66b8d6b800cbcc4a09fe830b1e05ee66469edb9036833fa7102c0844e4",
+      "docRelative": "algorithm/fractionalToDecimal.mdx"
+    },
     "algorithm/graph/aliendOrder.js": {
       "hash": "e21cb72c5cd4922e6400530fac743e324f01fceab1993b5cf0c8d03876b3bf06",
       "docRelative": "algorithm/graph/aliendOrder.mdx"
@@ -1979,6 +2011,10 @@
     "algorithm/linkedlist/LinkedList.js": {
       "hash": "fdafe483495a45be8b0d59b7e2fbd73fb95003506d6c312bbcd3c04c0a829605",
       "docRelative": "algorithm/linkedlist/LinkedList.mdx"
+    },
+    "algorithm/linkedlist/copyRandomList.js": {
+      "hash": "38a7c97ba72e5b56377fd26d5f006bb838660db73f027bccb4fc64568f0f1010",
+      "docRelative": "algorithm/linkedlist/copyRandomList.mdx"
     },
     "algorithm/linkedlist/isCircularLinkedList.py": {
       "hash": "6310e628414b72e7a5cda3acce14ed9c4ddefaaf1c03137715d6a3ef03574e50",
@@ -2225,11 +2261,11 @@
       "docRelative": "algorithm/two-pointers/twoNumberSum.mdx"
     },
     "__nav__:algorithm": {
-      "hash": "c912eb5082a8ce85350d1b4703ffd74dbe277deb6531ad4e418704dcd34a4522",
+      "hash": "f4bfca20830ff94dd6e64e046cd4da295fadcb71c09569356430ed6e0f4c89fa",
       "docRelative": "algorithm/_index.mdx"
     },
     "__nav__:algorithm/array": {
-      "hash": "aec26b21b40ff60e3e145622f9ba63900f9720ccc58312a40a3836eb0fd90e28",
+      "hash": "6de3b0c56be796548d1ff5de8b60de6ed808a0a0b84029fbf754831021e2373a",
       "docRelative": "algorithm/array/_index.mdx"
     },
     "__nav__:algorithm/bit": {
@@ -2249,7 +2285,7 @@
       "docRelative": "algorithm/heap/_index.mdx"
     },
     "__nav__:algorithm/linkedlist": {
-      "hash": "4c64b4d24398081ecc260ed8f43c53c7222edc455f102a4118dde99dd9c25ebc",
+      "hash": "af79c9b41c52b231a56eba94837d6cce08ba2fb9f2e3a568b52ce5e97d7cdf0f",
       "docRelative": "algorithm/linkedlist/_index.mdx"
     },
     "__nav__:algorithm/lru": {
@@ -2293,11 +2329,11 @@
       "docRelative": "frontend/css/_index.mdx"
     },
     "__nav__:frontend/interview": {
-      "hash": "40c1bbce4a62c586f7182a24d10232f9662276eca84bf43c5258b58c200fb1fd",
+      "hash": "4d8ef5a2e0740c2d91bb5a7128bbd82a12fb6018291bbcb0cbd07527b8fec202",
       "docRelative": "frontend/interview/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {
-      "hash": "7249081d1768c50d9b6ab4213deccd6586d9882c0685ec615888e1cbf8b8cfe5",
+      "hash": "92396dd562a2df0074d8897292ce0b014b81b4ce9b47b9fcdaa7b4509f4a7dcf",
       "docRelative": "frontend/jsfunction/_index.mdx"
     },
     "__nav__:frontend/jsfunction/2d-readingOrder": {

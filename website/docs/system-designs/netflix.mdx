@@ -93,7 +93,7 @@ Never route video bytes through your application servers. The app server issues 
    - Returns { videoId, status: 'processing' }
 ```
 
-**Resumability:** Client stores `{uploadId, completedParts[]}` in localStorage. On retry, fetches already-uploaded parts from server (store ETags in DB per part), skips completed parts, re-uploads only failed ones.
+**Resumability:** Client stores `\{uploadId, completedParts[]\}` in localStorage. On retry, fetches already-uploaded parts from server (store ETags in DB per part), skips completed parts, re-uploads only failed ones.
 
 **Chunk size:** 10–50MB per part. Client measures bandwidth after chunk 1, adjusts dynamically.
 
@@ -171,13 +171,13 @@ DASH (MPEG-DASH) — Android/Smart TV:
 
 ### Raw Video Storage
 
-- S3 bucket: `videos-raw/{userId}/{videoId}/original.mp4`
+- S3 bucket: `videos-raw/\{userId\}/\{videoId\}/original.mp4`
 - Lifecycle: delete raw after 30 days (or keep for re-transcoding if codec evolves)
 - Access: write-once from worker, never served to end users
 
 ### Processed Video Storage (CDN Origin)
 
-- S3 bucket: `videos-cdn/{videoId}/{resolution}/`
+- S3 bucket: `videos-cdn/\{videoId\}/\{resolution\}/`
 - All segments + manifests stored here
 - CloudFront points to this as origin
 - S3 is never hit directly by clients — all traffic goes through CDN
@@ -333,7 +333,7 @@ Materialized view in DB: videos.views (updated every 1min)
 Redis cache: hot video view counts (updated from Flink output)
 ```
 
-**Deduplication:** a single user refreshing counts once per 24hr window using a Redis `SET` with TTL: `SADD video:{id}:viewers:{date} {userId}` → cardinality = unique viewers.
+**Deduplication:** a single user refreshing counts once per 24hr window using a Redis `SET` with TTL: `SADD video:\{id\}:viewers:\{date\} \{userId\}` → cardinality = unique viewers.
 
 ---
 
@@ -367,7 +367,7 @@ Redis cache: hot video view counts (updated from Flink output)
 ## Staff Interview Follow-ups
 
 **"How do you handle a 10GB upload from a mobile client on a flaky connection?"**
-Multipart upload with resumability. Client computes chunk SHA-256 before upload, stores `{uploadId, completedParts}` in IndexedDB. On reconnect, client calls `/upload/status` to retrieve already-uploaded parts, skips them, resumes from first failed part. Exponential backoff on 5xx. VisibilityTimeout on SQS extended by heartbeat while transcoding.
+Multipart upload with resumability. Client computes chunk SHA-256 before upload, stores `\{uploadId, completedParts\}` in IndexedDB. On reconnect, client calls `/upload/status` to retrieve already-uploaded parts, skips them, resumes from first failed part. Exponential backoff on 5xx. VisibilityTimeout on SQS extended by heartbeat while transcoding.
 
 **"How does ABR work when a user's bandwidth drops suddenly mid-video?"**
 The player's buffer is the buffer. A 30s buffer means a sudden bandwidth drop doesn't cause immediate rebuffering — the player has 30s of runway. During that window, ABR switches to lower bitrate for future segments. The player continuously measures download time of each segment (not just raw bandwidth) and feeds that into the ABR algorithm. Emergency fallback: drop to minimum bitrate if buffer &lt; 3s.

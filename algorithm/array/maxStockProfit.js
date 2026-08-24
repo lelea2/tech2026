@@ -20,3 +20,6 @@ export default function optimalStockTrading(prices) {
 
 // Time complexity: O(n) - single pass through the array
 // Space complexity: O(1) - constant space for minPrice and maxProfit
+// Instead of brute force, 
+// we can keep track of the minimum price seen so far and calculate the profit if we sell at the current price. 
+// This way, we only need to traverse the array once, making it efficient.

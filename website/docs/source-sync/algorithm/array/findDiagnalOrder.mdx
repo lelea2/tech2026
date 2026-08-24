@@ -1,0 +1,67 @@
+---
+title: findDiagnalOrder
+---
+
+# findDiagnalOrder
+
+~~~javascript
+/**
+ * @param {number[][]} mat
+ * @return {number[]}
+ */
+function findDiagonalOrder(mat) {
+  const m = mat.length;
+  const n = mat[0].length;
+
+  const result = [];
+  let row = 0;
+  let col = 0;
+  let goingUp = true;
+
+  for (let i = 0; i < m * n; i++) {
+    result.push(mat[row][col]);
+
+    if (goingUp) {
+      // Moving up-right
+      if (col === n - 1) {
+        // Hit right boundary -> move down
+        row++;
+        goingUp = false;
+      } else if (row === 0) {
+        // Hit top boundary -> move right
+        col++;
+        goingUp = false;
+      } else {
+        row--;
+        col++;
+      }
+    } else {
+      // Moving down-left
+      if (row === m - 1) {
+        // Hit bottom boundary -> move right
+        col++;
+        goingUp = true;
+      } else if (col === 0) {
+        // Hit left boundary -> move down
+        row++;
+        goingUp = true;
+      } else {
+        row++;
+        col--;
+      }
+    }
+  }
+
+  return result;
+}
+// Time complexity: O(m * n) - we visit each element once
+// Space complexity: O(1) - we only use a few variables, not counting the output array
+
+// Example usage:
+const mat1 = [
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9],
+];
+console.log(findDiagonalOrder(mat1)); // Output: [1,2,4,7,5,3,6,8,9]
+~~~

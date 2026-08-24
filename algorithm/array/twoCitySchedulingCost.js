@@ -1,0 +1,34 @@
+/**
+ * @param {number[][]} costs
+ * @return {number}
+ */
+function twoCitySchedCost(costs) {
+  costs.sort((x, y) => {
+    return (x[0] - x[1]) - (y[0] - y[1]);
+  });
+
+  const n = costs.length / 2;
+  let total = 0;
+
+  for (let i = 0; i < costs.length; i++) {
+    if (i < n) {
+      total += costs[i][0]; // city A
+    } else {
+      total += costs[i][1]; // city B
+    }
+  }
+
+  return total;
+}
+
+// Time complexity: O(n log n) - sorting the costs array
+// Space complexity: O(1) - constant space for total and n
+
+// Example usage: Greedy approach to minimize the total cost of sending n people to two cities
+const costs1 = [
+  [10, 20],
+  [30, 200],
+  [400, 50],
+  [30, 20],
+];
+console.log(twoCitySchedCost(costs1)); // Output: 110

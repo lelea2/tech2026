@@ -1,0 +1,32 @@
+/**
+ * @param {number[][]} grid
+ * @return {number}
+ */
+function minPathSum(grid) {
+  const m = grid.length;
+  const n = grid[0].length;
+
+  // dp[col] = minimum path sum to current cell
+  const dp = new Array(n).fill(Infinity);
+
+  dp[0] = 0;
+
+  for (let row = 0; row < m; row++) {
+    for (let col = 0; col < n; col++) {
+      const fromTop = dp[col];
+      const fromLeft = col > 0 ? dp[col - 1] : Infinity;
+
+      dp[col] = grid[row][col] + Math.min(fromTop, fromLeft);
+    }
+  }
+
+  return dp[n - 1];
+}
+
+// Example usage:
+const grid1 = [
+  [1, 3, 1],
+  [1, 5, 1],
+  [4, 2, 1],
+];
+console.log(minPathSum(grid1)); // Output: 7
