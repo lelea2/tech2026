@@ -1,0 +1,60 @@
+---
+title: longestPalindrome
+---
+
+# longestPalindrome
+
+~~~javascript
+function longestPalindrome(s) {
+  if (!s || s.length < 2) return s;
+
+  let start = 0;
+  let maxLen = 1;
+
+  function expand(left, right) {
+    while (
+      left >= 0 &&
+      right < s.length &&
+      s[left] === s[right]
+    ) {
+      left--;
+      right++;
+    }
+
+    return [left + 1, right - 1];
+  }
+
+  for (let i = 0; i < s.length; i++) {
+    // Odd-length palindrome: "aba"
+    const [left1, right1] = expand(i, i);
+
+    if (right1 - left1 + 1 > maxLen) {
+      start = left1;
+      maxLen = right1 - left1 + 1;
+    }
+
+    // Even-length palindrome: "abba"
+    const [left2, right2] = expand(i, i + 1);
+
+    if (right2 - left2 + 1 > maxLen) {
+      start = left2;
+      maxLen = right2 - left2 + 1;
+    }
+  }
+
+  return s.slice(start, start + maxLen);
+}
+
+// Time complexity: O(n^2) - for each character, we may expand to the entire string in the worst case
+// Space complexity: O(1) - constant space used for variables
+
+// Explains:
+// The function longestPalindrome finds the longest palindromic substring in a given string s.
+// It uses a two-pointer technique to expand around each character (for odd-length palindromes) and each pair of characters (for even-length palindromes).
+// The expand function checks how far we can expand while the characters on both sides are equal, indicating a palindrome.
+// The main loop iterates through each character, considering it as the center of a potential palindrome, and updates the start and maxLen accordingly.
+
+// example usage:
+const input = "babad";
+console.log(longestPalindrome(input)); // Output: "bab" or "aba"
+~~~

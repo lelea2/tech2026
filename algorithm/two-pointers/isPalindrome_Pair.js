@@ -69,4 +69,6 @@ const isPal = (word, i=0, j=word.length-1) => {
 };
 
 
+// Example usage:
 console.log(palindromePairs(["abcd","dcba","lls","s","sssll"]));
+// Output: [[0,1],[1,0],[3,2],[2,4]]

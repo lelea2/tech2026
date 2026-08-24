@@ -2229,12 +2229,16 @@
       "docRelative": "algorithm/two-pointers/isPalindrome.mdx"
     },
     "algorithm/two-pointers/isPalindrome_Pair.py": {
-      "hash": "dbc429691c4ea3bf9e60aa82d1a33fa0ce741cbc17f7c742fdb2f8f15492cda4",
+      "hash": "152ac9348ea6488136cabf59dece9d6f4ef3aa6eb01e268ab7bfaf0dd6093161",
       "docRelative": "algorithm/two-pointers/isPalindrome_Pair.mdx"
     },
     "algorithm/two-pointers/isPalindrome_Pair.js": {
-      "hash": "dbc429691c4ea3bf9e60aa82d1a33fa0ce741cbc17f7c742fdb2f8f15492cda4",
+      "hash": "152ac9348ea6488136cabf59dece9d6f4ef3aa6eb01e268ab7bfaf0dd6093161",
       "docRelative": "algorithm/two-pointers/isPalindrome_Pair.mdx"
+    },
+    "algorithm/two-pointers/longestPalindrome.js": {
+      "hash": "1b6c88311fdf7fdaa45b563a22d5448e34462b9cb050d06b19c1920804eabc1c",
+      "docRelative": "algorithm/two-pointers/longestPalindrome.mdx"
     },
     "algorithm/two-pointers/minimumMoveToMakePalindrome.js": {
       "hash": "10f8eefdb66f9c37ee39bbce594cc2db0874191d8954e981127a44a075c662f3",
@@ -2309,7 +2313,7 @@
       "docRelative": "algorithm/trie/_index.mdx"
     },
     "__nav__:algorithm/two-pointers": {
-      "hash": "7a2d3f8821c0d6ad60842fb01923bc3aecb57d75e700a6274e8a45703c235611",
+      "hash": "721c147a6f96dcb13489c9d9d8b927629d4c4c4a1dc4cb2f7480bcad45fe3abf",
       "docRelative": "algorithm/two-pointers/_index.mdx"
     },
     "__nav__:backend": {
