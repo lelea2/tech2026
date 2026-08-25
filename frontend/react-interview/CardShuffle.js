@@ -1,0 +1,81 @@
+import React, {use, useEffect, useState} from 'react'
+import './App.css'
+
+
+const NUMBERS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+const SUITS = ["♠", "♣", "♥", "♦"];
+
+const CARDS_TO_DRAW = 5;
+
+function cardShuffle() {
+  const deck = [];
+  for (const suit of SUITS) {
+    for (const number of NUMBERS) {
+      deck.push(`${number}${suit}`);
+    }
+  }
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  return deck;
+}
+
+function App() {
+  const [cards, setCards] = useState([]);
+  const [index, setIndex] = useState(0);
+  const [deck, setDeck] = useState(cardShuffle());
+
+  // console.log(deck);
+ 
+  const handleDrawCard = () => {
+    // cardShuffle();
+    // console.log(deck);
+    // setCards(deck.slice(index, index + CARDS_TO_DRAW));
+    const newIndex = index + CARDS_TO_DRAW;
+    console.log('>>>> new index: ', newIndex);
+    if (newIndex >= deck.length - CARDS_TO_DRAW) {
+      // reshuffle
+      console.log('>>>>> reset');
+      setDeck(cardShuffle());
+      setIndex(0);
+    } else {
+      setIndex(newIndex);
+    }
+  };
+
+  
+  const handleUndo = () => {
+    console.log('>>>>> index', index);
+    if (index <= 0) {
+      return;
+    } else {
+      const newIndex = index - CARDS_TO_DRAW;
+      setIndex(newIndex);
+      // setCards(deck.slice(newIndex, newIndex + CARDS_TO_DRAW));
+    }
+    // console.log('>>> undo Index', index);
+  };
+
+  function getCardColor(card) {
+    if (card.includes('♥') || card.includes('♦')) {
+      return 'red';
+    }
+    return 'black';
+  }
+
+
+  return (
+    <div>
+     <button onClick={handleDrawCard}>Deal a hand</button>
+     <button disabled={index === 0} onClick={handleUndo}>Handle undo</button>
+     <div className="cardBoard">
+      {deck.slice(index, index + CARDS_TO_DRAW).map((item) => (
+        <div className={`card ${getCardColor(item)}`} key={item}>{item}</div>
+      ))}
+     </div>
+    </div>
+  )
+}
+
+export default App

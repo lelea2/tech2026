@@ -1228,6 +1228,10 @@
       "hash": "cb4167df076985aa2720bbf843cfb96e9d7bcf1585adcf9ae1ee686f590a0ed6",
       "docRelative": "frontend/react-interview/CalendarAvailabilityPicker/CalendarAvailabilityPicker.jsx.mdx"
     },
+    "frontend/react-interview/CardShuffle.js": {
+      "hash": "bdb6b5a1e1ccb7ff2b0d97d7eb41a7356a6f84d20ec35a71637f218ea76e23ef",
+      "docRelative": "frontend/react-interview/CardShuffle.mdx"
+    },
     "frontend/react-interview/DateRangePicker/DateRangePicker.css": {
       "hash": "12bdb2db061295f09d2f560fd0ba1736c8f9e9dad95397d5753813dbbe44d796",
       "docRelative": "frontend/react-interview/DateRangePicker/DateRangePicker.css.mdx"
@@ -2469,7 +2473,7 @@
       "docRelative": "frontend/react-component-interview/hooks/_index.mdx"
     },
     "__nav__:frontend/react-interview": {
-      "hash": "67f52687fe3c673eabf2d35190446f8b4bbf7f08c16490e55bbec96823c222d7",
+      "hash": "6d25b5b51ee15804f4e45fec93485120fd59d67bb68205856b4f55773b40ef49",
       "docRelative": "frontend/react-interview/_index.mdx"
     },
     "__nav__:frontend/react-interview/Accordion": {
