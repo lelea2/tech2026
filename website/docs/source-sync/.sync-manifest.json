@@ -1896,6 +1896,10 @@
       "hash": "3180d31d9579f45a7a71d8a30efecf156da6dbf60c6c8e98c6e9e4976c374452",
       "docRelative": "algorithm/array/overlapInterval.mdx"
     },
+    "algorithm/array/protonNeutronAlpha.js": {
+      "hash": "8c8d320d66b347ae9f6d7e67992914e7da74727abd1a1424a6b9dedbfbc7d432",
+      "docRelative": "algorithm/array/protonNeutronAlpha.mdx"
+    },
     "algorithm/array/searchRotate.js": {
       "hash": "e1ef10de97eff713935b69046050d9d7a706d38f3080bce671eae4cd32e7edbe",
       "docRelative": "algorithm/array/searchRotate.mdx"
@@ -1903,6 +1907,10 @@
     "algorithm/array/stringAnagram.js": {
       "hash": "ab077d06cd071e85d9a711a88cf3817c5bbdab62c1b321d5896433d72aa6bec9",
       "docRelative": "algorithm/array/stringAnagram.mdx"
+    },
+    "algorithm/array/topCompanyProfit.js": {
+      "hash": "8ffc3b03633fe6763193aad45bd7bf1b66e8babb469340a70d4154fc1a5e1a10",
+      "docRelative": "algorithm/array/topCompanyProfit.mdx"
     },
     "algorithm/array/twoCitySchedulingCost.js": {
       "hash": "b7392185edce5da53169b957bdeb4eb9dd58711e91dd547ba9638618a10e6376",
@@ -1987,6 +1995,10 @@
     "algorithm/heap/MinHeap.js": {
       "hash": "c94dce102cfd868472c8f4cfc832f1623a72371fef6bbdb4fc2c170030504a83",
       "docRelative": "algorithm/heap/MinHeap.mdx"
+    },
+    "algorithm/heap/TaskScheduler.js": {
+      "hash": "f516cacc215c178aa4c00a605d6bc2a12b9520b455ec5ffb7c043544b41e24e4",
+      "docRelative": "algorithm/heap/TaskScheduler.mdx"
     },
     "algorithm/heap/heapSort.js": {
       "hash": "e30c65c586041d95697594b55b7be8b66802558b5be826295a8993cdb4185514",
@@ -2076,6 +2088,14 @@
       "hash": "2360af786da5f0253281096a843edb8de5009892165f339e06784b6f3ca54836",
       "docRelative": "algorithm/stack/Stack.mdx"
     },
+    "algorithm/stack/bacteriaEating.js": {
+      "hash": "be578334c63157d62d227e3a36755246eeddd28c7b5d420f126a02c0b4c93fa3",
+      "docRelative": "algorithm/stack/bacteriaEating.mdx"
+    },
+    "algorithm/stack/bateriaEatingSizeIncrease.js": {
+      "hash": "52bcc9be0928f8d45baa87a0364c1b0dbc329e02019495816c8bde6be097c4d6",
+      "docRelative": "algorithm/stack/bateriaEatingSizeIncrease.mdx"
+    },
     "algorithm/stack/isBalanceBracket.py": {
       "hash": "534a99755859d20db8c3271cf0d1b069408de8d64123186325accbc59419480e",
       "docRelative": "algorithm/stack/isBalanceBracket.mdx"
@@ -2091,6 +2111,10 @@
     "algorithm/stack/longestParenthesis.js": {
       "hash": "703c845bd791ec9b42aaef6de16deae79c46e03f70285422763d329f8029d420",
       "docRelative": "algorithm/stack/longestParenthesis.mdx"
+    },
+    "algorithm/stack/removeInvalidParenthesis.js": {
+      "hash": "ba6cd49990c58814175b6915570049accb998222fa4d3697d9b33db22e979f8e",
+      "docRelative": "algorithm/stack/removeInvalidParenthesis.mdx"
     },
     "algorithm/tree/BinaryTree.js": {
       "hash": "40d5127a13aa754b0f5a904f73bd240376b72661a37606b5ec65091ba3fcff3f",
@@ -2273,7 +2297,7 @@
       "docRelative": "algorithm/_index.mdx"
     },
     "__nav__:algorithm/array": {
-      "hash": "6de3b0c56be796548d1ff5de8b60de6ed808a0a0b84029fbf754831021e2373a",
+      "hash": "5da89fe4b608e221c24e1b8145d2a8c5ea5fd26790d8f190aacf002a84e0b481",
       "docRelative": "algorithm/array/_index.mdx"
     },
     "__nav__:algorithm/bit": {
@@ -2289,7 +2313,7 @@
       "docRelative": "algorithm/graph/_index.mdx"
     },
     "__nav__:algorithm/heap": {
-      "hash": "871705f16c797f6cf02552d808ef0dc7e49c03692b8ab13a145d53fd51ec0902",
+      "hash": "8b09ff93f0ea8c77a8da792cc6403058b2555a4ad3a19978320e093b11fba494",
       "docRelative": "algorithm/heap/_index.mdx"
     },
     "__nav__:algorithm/linkedlist": {
@@ -2305,7 +2329,7 @@
       "docRelative": "algorithm/recursive/_index.mdx"
     },
     "__nav__:algorithm/stack": {
-      "hash": "e062408cc2a3c827348fabafb42b0bae34a676c3f61b9b02b75174e8dc86831d",
+      "hash": "e80a27932e641352cc8cbfcdb8b2f3a3cdf91f18921c2d61e6c03424b9d5b5ab",
       "docRelative": "algorithm/stack/_index.mdx"
     },
     "__nav__:algorithm/tree": {

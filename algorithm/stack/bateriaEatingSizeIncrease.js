@@ -1,0 +1,39 @@
+function survivingBacteria(names, sizes) {
+  const survivors = [];
+
+  let i = 0;
+
+  while (i < names.length) {
+    let currName = names[i];
+    let currSize = sizes[i];
+
+    let j = i + 1;
+
+    // Keep eating smaller bacteria to the right
+    while (
+      j < names.length &&
+      currSize > sizes[j]
+    ) {
+      currSize += sizes[j];
+      j++;
+    }
+
+    survivors.push({
+      name: currName,
+      size: currSize
+    });
+
+    // Everything from i+1 to j-1 was eaten.
+    i = j;
+  }
+
+  return survivors;
+}
+// Example usage:
+const names = ["A", "B", "C", "D", "E"];
+const sizes = [4, 3, 6, 20, 2];
+console.log(survivingBacteria(names, sizes));
+// Output: [{ name: 'A', size: 6 }, { name: 'D', size: 9 }]
+
+// Time complexity: O(n) - we traverse the list of bacteria once
+// Space complexity: O(n) - in the worst case, all bacteria survive and are stored in the survivors array

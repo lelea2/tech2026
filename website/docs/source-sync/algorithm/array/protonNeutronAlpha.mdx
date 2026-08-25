@@ -1,0 +1,66 @@
+---
+title: protonNeutronAlpha
+---
+
+# protonNeutronAlpha
+
+~~~javascript
+function protonNeutronAlpha(start, target) {
+  const [sx, sy] = start;
+  const [tx, ty] = target;
+
+  const dx = tx - sx;
+  const dy = ty - sy;
+
+  // Smallest number of ALPHA moves required
+  const alpha = Math.max(
+    0,
+    Math.ceil(-dx / 2),
+    Math.ceil(-dy / 2)
+  );
+
+  const proton = dx + 2 * alpha;
+  const neutron = dy + 2 * alpha;
+
+  return {
+    proton,
+    neutron,
+    alpha
+  };
+}
+
+// Example usage:
+const start = [0, 0];
+const target = [3, 4];
+const result = protonNeutronAlpha(start, target);
+console.log(result); // Output: { proton: 3, neutron: 4, alpha: 0 }
+
+// Why we compute alpha this way:
+//
+// Model each move as a vector added to the current position:
+//   PROTON move  -> (+1,  0)
+//   NEUTRON move -> ( 0, +1)
+//   ALPHA move   -> (-2, -2)   (like alpha decay: removes 2 "protons" and 2 "neutrons" at once)
+//
+// To go from start to target we need, for some non-negative integers
+// proton, neutron, alpha:
+//   proton  * 1 + alpha * (-2) = dx   =>  proton  = dx + 2*alpha
+//   neutron * 1 + alpha * (-2) = dy   =>  neutron = dy + 2*alpha
+//
+// proton and neutron represent *counts* of moves, so they can never be
+// negative. That gives two lower bounds on alpha:
+//   dx + 2*alpha >= 0  =>  alpha >= ceil(-dx / 2)
+//   dy + 2*alpha >= 0  =>  alpha >= ceil(-dy / 2)
+// and alpha itself can't be negative, so alpha >= 0 too.
+//
+// We want the SMALLEST alpha that still satisfies all three bounds at once
+// (using extra alpha moves you don't need only wastes moves, since each
+// alpha move covers -2 in both dimensions simultaneously and is only
+// "free" when both dx and dy are already negative enough to need it).
+// The smallest value that clears every lower bound simultaneously is just
+// the max of the three bounds - hence:
+//   alpha = Math.max(0, Math.ceil(-dx / 2), Math.ceil(-dy / 2))
+//
+// Once alpha is pinned to its minimum valid value, proton and neutron
+// fall out directly from the two equations above.
+~~~

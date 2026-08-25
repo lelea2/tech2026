@@ -1,0 +1,75 @@
+function removeInvalidParentheses(s) {
+  const isValid = (str) => {
+    let balance = 0;
+
+    for (const ch of str) {
+      if (ch === "(") {
+        balance++;
+      } else if (ch === ")") {
+        balance--;
+
+        if (balance < 0) {
+          return false;
+        }
+      }
+    }
+
+    return balance === 0;
+  };
+
+  const result = [];
+  const visited = new Set([s]);
+  let queue = [s];
+
+  while (queue.length > 0) {
+    const next = [];
+    let found = false;
+
+    for (const str of queue) {
+      if (isValid(str)) {
+        result.push(str);
+        found = true;
+      }
+    }
+
+    // Important: once this level has valid strings,
+    // do not remove any more parentheses.
+    if (found) {
+      return result;
+    }
+
+    for (const str of queue) {
+      for (let i = 0; i < str.length; i++) {
+        // Only remove parentheses
+        if (str[i] !== "(" && str[i] !== ")") {
+          continue;
+        }
+
+        // Avoid duplicate removals such as removing
+        // either '(' from "(("
+        if (i > 0 && str[i] === str[i - 1]) {
+          continue;
+        }
+
+        const candidate =
+          str.slice(0, i) + str.slice(i + 1);
+
+        if (!visited.has(candidate)) {
+          visited.add(candidate);
+          next.push(candidate);
+        }
+      }
+    }
+
+    queue = next;
+  }
+
+  return [""];
+}
+
+// Time complexity: O(2^n) - in the worst case, we may need to explore all combinations of parentheses removal
+// Space complexity: O(n) - for the queue and visited set
+
+// Example usage:
+const input = "()())()";
+console.log(removeInvalidParentheses(input)); // Output: ["()()()", "(())()"]
