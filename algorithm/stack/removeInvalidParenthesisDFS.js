@@ -1,0 +1,112 @@
+function removeInvalidParentheses(s) {
+  let removeLeft = 0;
+  let removeRight = 0;
+
+  // Step 1: determine minimum removals required.
+  for (const ch of s) {
+    if (ch === "(") {
+      removeLeft++;
+    } else if (ch === ")") {
+      if (removeLeft > 0) {
+        removeLeft--;
+      } else {
+        removeRight++;
+      }
+    }
+  }
+
+  const result = [];
+
+  const dfs = (
+    index,
+    path,
+    balance,
+    leftRemaining,
+    rightRemaining
+  ) => {
+    // Invalid prefix: more ')' than '('.
+    if (balance < 0) {
+      return;
+    }
+
+    // Impossible to remove enough characters anymore.
+    const charsLeft = s.length - index;
+    if (leftRemaining + rightRemaining > charsLeft) {
+      return;
+    }
+
+    if (index === s.length) {
+      if (
+        balance === 0 &&
+        leftRemaining === 0 &&
+        rightRemaining === 0
+      ) {
+        result.push(path);
+      }
+
+      return;
+    }
+
+    const ch = s[index];
+
+    if (ch === "(") {
+      // Option 1: remove '('
+      if (leftRemaining > 0) {
+        dfs(
+          index + 1,
+          path,
+          balance,
+          leftRemaining - 1,
+          rightRemaining
+        );
+      }
+
+      // Option 2: keep '('
+      dfs(
+        index + 1,
+        path + ch,
+        balance + 1,
+        leftRemaining,
+        rightRemaining
+      );
+    } else if (ch === ")") {
+      // Option 1: remove ')'
+      if (rightRemaining > 0) {
+        dfs(
+          index + 1,
+          path,
+          balance,
+          leftRemaining,
+          rightRemaining - 1
+        );
+      }
+
+      // Option 2: keep ')'
+      if (balance > 0) {
+        dfs(
+          index + 1,
+          path + ch,
+          balance - 1,
+          leftRemaining,
+          rightRemaining
+        );
+      }
+    } else {
+      // Normal character must stay.
+      dfs(
+        index + 1,
+        path + ch,
+        balance,
+        leftRemaining,
+        rightRemaining
+      );
+    }
+  };
+
+  dfs(0, "", 0, removeLeft, removeRight);
+
+  return [...new Set(result)];
+}
+
+// Time complexity: O(2^n) - in the worst case, we may need to explore all combinations of parentheses removal  
+// Space complexity: O(n) - for the recursion stack and result set  

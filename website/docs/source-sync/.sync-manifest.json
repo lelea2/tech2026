@@ -396,6 +396,10 @@
       "hash": "26de7ca37ea8925d474db1ab13a3e4f3f8db3bc173252da704abf8ba90c13f36",
       "docRelative": "frontend/jsfunction/array.prototype/Array.prototype.square.mdx"
     },
+    "frontend/jsfunction/array.prototype/String.prototype.include.js": {
+      "hash": "bd02fd2cb6e3033ce41ed764a41036eeec575af7a7836aa62ef3f1315556f13f",
+      "docRelative": "frontend/jsfunction/array.prototype/String.prototype.include.mdx"
+    },
     "frontend/jsfunction/calendarDaysNeed.js": {
       "hash": "6e3991af3bcca3e3f2f82e40c58ef309a4e21774412fb570def739bb20c47d83",
       "docRelative": "frontend/jsfunction/calendarDaysNeed.mdx"
@@ -2116,6 +2120,10 @@
       "hash": "ba6cd49990c58814175b6915570049accb998222fa4d3697d9b33db22e979f8e",
       "docRelative": "algorithm/stack/removeInvalidParenthesis.mdx"
     },
+    "algorithm/stack/removeInvalidParenthesisDFS.js": {
+      "hash": "c75e4c0b8e46483ff303642beb9597366a05dbff641bd9e3c2575f67c96dfef5",
+      "docRelative": "algorithm/stack/removeInvalidParenthesisDFS.mdx"
+    },
     "algorithm/tree/BinaryTree.js": {
       "hash": "40d5127a13aa754b0f5a904f73bd240376b72661a37606b5ec65091ba3fcff3f",
       "docRelative": "algorithm/tree/BinaryTree.mdx"
@@ -2329,7 +2337,7 @@
       "docRelative": "algorithm/recursive/_index.mdx"
     },
     "__nav__:algorithm/stack": {
-      "hash": "e80a27932e641352cc8cbfcdb8b2f3a3cdf91f18921c2d61e6c03424b9d5b5ab",
+      "hash": "4dfece1463329752342df4e1b01ef6e3b63c0602ccbd4264be38200544cb71c5",
       "docRelative": "algorithm/stack/_index.mdx"
     },
     "__nav__:algorithm/tree": {
@@ -2393,7 +2401,7 @@
       "docRelative": "frontend/jsfunction/array/_index.mdx"
     },
     "__nav__:frontend/jsfunction/array.prototype": {
-      "hash": "fa566fd9f88c77693ea21ca2eeb3d3daeb070072870e10cdb0e2fb33d841b558",
+      "hash": "658cd0d37af2c79652e0a57ea5be44aa1ebdaa96badccab57a66db855f4cff85",
       "docRelative": "frontend/jsfunction/array.prototype/_index.mdx"
     },
     "__nav__:frontend/jsfunction/closure": {
