@@ -66,4 +66,14 @@ function fractionToDecimal(numerator, denominator) {
 
   return result;
 }
+
+// Time complexity: O(n) - where n is the number of digits in the fractional part
+// Space complexity: O(n) - for the result string and the seen map
+
+// Example usage:
+console.log(fractionToDecimal(1, 2)); // Output: "0.5"
+console.log(fractionToDecimal(2, 1)); // Output: "2"
+console.log(fractionToDecimal(2, 3)); // Output: "0.(6)"
+console.log(fractionToDecimal(4, 333)); // Output: "0.(012)"
+console.log(fractionToDecimal(1, 5)); // Output: "0.2"
 ~~~

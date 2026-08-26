@@ -1916,6 +1916,10 @@
       "hash": "e1ef10de97eff713935b69046050d9d7a706d38f3080bce671eae4cd32e7edbe",
       "docRelative": "algorithm/array/searchRotate.mdx"
     },
+    "algorithm/array/slidingWindowMaximum.js": {
+      "hash": "dc4585daf0753a8616b51623e729f9c88ff45ac06b66eb1dbff876aded93e519",
+      "docRelative": "algorithm/array/slidingWindowMaximum.mdx"
+    },
     "algorithm/array/stringAnagram.js": {
       "hash": "ab077d06cd071e85d9a711a88cf3817c5bbdab62c1b321d5896433d72aa6bec9",
       "docRelative": "algorithm/array/stringAnagram.mdx"
@@ -1989,7 +1993,7 @@
       "docRelative": "algorithm/dfs/maximizeAmountAfterTwoDays.mdx"
     },
     "algorithm/fractionalToDecimal.js": {
-      "hash": "9b76fe66b8d6b800cbcc4a09fe830b1e05ee66469edb9036833fa7102c0844e4",
+      "hash": "8d7d372b1780ab6ec5ecef3ee4979df8127bd6f13f81ec3aeff334540fa4e679",
       "docRelative": "algorithm/fractionalToDecimal.mdx"
     },
     "algorithm/graph/aliendOrder.js": {
@@ -2023,6 +2027,10 @@
     "algorithm/heap/minSum.js": {
       "hash": "6f53fb118ebee3e478534c66e1dfd6501a96f043a32572c00e07cc6d461596a0",
       "docRelative": "algorithm/heap/minSum.mdx"
+    },
+    "algorithm/heap/shortestPath.js": {
+      "hash": "d15eb206af9efb3f243e3b93c50f49881cc372dab555dfaeda7232fdf503586a",
+      "docRelative": "algorithm/heap/shortestPath.mdx"
     },
     "algorithm/heap/shortestPathDistance.js": {
       "hash": "e5a9ce07cad3e794f45ce6bd1706c6af3c5c391506f069a0375b00a8d57db620",
@@ -2313,7 +2321,7 @@
       "docRelative": "algorithm/_index.mdx"
     },
     "__nav__:algorithm/array": {
-      "hash": "f9211a568ed8fc5c356c2049ff73910ce1f37e41bb254ca3bec45bbf4156f9fc",
+      "hash": "6fd7c99e62da6ef3d3d38dc6b0d278ee7bf52b8f78bae810a32c52a8610a81fd",
       "docRelative": "algorithm/array/_index.mdx"
     },
     "__nav__:algorithm/bit": {
@@ -2329,7 +2337,7 @@
       "docRelative": "algorithm/graph/_index.mdx"
     },
     "__nav__:algorithm/heap": {
-      "hash": "8b09ff93f0ea8c77a8da792cc6403058b2555a4ad3a19978320e093b11fba494",
+      "hash": "921f5e5502091c318bb1a07ea480884ba4e01ab57eb857b2e6979f08b930279e",
       "docRelative": "algorithm/heap/_index.mdx"
     },
     "__nav__:algorithm/linkedlist": {

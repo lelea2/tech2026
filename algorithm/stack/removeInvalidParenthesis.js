@@ -1,7 +1,6 @@
 function removeInvalidParentheses(s) {
   const isValid = (str) => {
     let balance = 0;
-
     for (const ch of str) {
       if (ch === "(") {
         balance++;
@@ -13,18 +12,15 @@ function removeInvalidParentheses(s) {
         }
       }
     }
-
     return balance === 0;
   };
 
   const result = [];
   const visited = new Set([s]);
   let queue = [s];
-
   while (queue.length > 0) {
     const next = [];
     let found = false;
-
     for (const str of queue) {
       if (isValid(str)) {
         result.push(str);
@@ -37,30 +33,25 @@ function removeInvalidParentheses(s) {
     if (found) {
       return result;
     }
-
     for (const str of queue) {
       for (let i = 0; i < str.length; i++) {
         // Only remove parentheses
         if (str[i] !== "(" && str[i] !== ")") {
           continue;
         }
-
         // Avoid duplicate removals such as removing
         // either '(' from "(("
         if (i > 0 && str[i] === str[i - 1]) {
           continue;
         }
-
         const candidate =
           str.slice(0, i) + str.slice(i + 1);
-
         if (!visited.has(candidate)) {
           visited.add(candidate);
           next.push(candidate);
         }
       }
     }
-
     queue = next;
   }
 
