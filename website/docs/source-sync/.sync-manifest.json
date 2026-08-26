@@ -1824,6 +1824,10 @@
       "hash": "bc685c19cb2b9ecfb2c0e498b758690a8bbd1ac902ebb86a193dbc0ba7a0f44f",
       "docRelative": "algorithm/array/duplicateArray.mdx"
     },
+    "algorithm/array/findCombination.js": {
+      "hash": "f67697523c3c4da6b2e9b3b31bbcfcbd66706e9cf18dd012e34567791091b2ff",
+      "docRelative": "algorithm/array/findCombination.mdx"
+    },
     "algorithm/array/findDiagnalOrder.js": {
       "hash": "3aac2bdcadc38962983328eef393fca4fc30ee40ddacba0cb20f24b32e8869bd",
       "docRelative": "algorithm/array/findDiagnalOrder.mdx"
@@ -1895,6 +1899,10 @@
     "algorithm/array/minPathSum.js": {
       "hash": "ba417061ff28723dae52f2050afdeae4e74b69c15dd664cc49575352ba2e2573",
       "docRelative": "algorithm/array/minPathSum.mdx"
+    },
+    "algorithm/array/nicknameGroup.js": {
+      "hash": "49d5cc9ff2fd18bd11fcf96247662057bfa5fb21c1bea05dfa978ae0449a22ed",
+      "docRelative": "algorithm/array/nicknameGroup.mdx"
     },
     "algorithm/array/overlapInterval.js": {
       "hash": "3180d31d9579f45a7a71d8a30efecf156da6dbf60c6c8e98c6e9e4976c374452",
@@ -2113,7 +2121,7 @@
       "docRelative": "algorithm/stack/isValidParenthesis.mdx"
     },
     "algorithm/stack/longestParenthesis.js": {
-      "hash": "703c845bd791ec9b42aaef6de16deae79c46e03f70285422763d329f8029d420",
+      "hash": "51d746191e7ef570c2b11eb437df25cb460d2cd3b744c594a8adcd87e9a257e1",
       "docRelative": "algorithm/stack/longestParenthesis.mdx"
     },
     "algorithm/stack/removeInvalidParenthesis.js": {
@@ -2305,7 +2313,7 @@
       "docRelative": "algorithm/_index.mdx"
     },
     "__nav__:algorithm/array": {
-      "hash": "5da89fe4b608e221c24e1b8145d2a8c5ea5fd26790d8f190aacf002a84e0b481",
+      "hash": "f9211a568ed8fc5c356c2049ff73910ce1f37e41bb254ca3bec45bbf4156f9fc",
       "docRelative": "algorithm/array/_index.mdx"
     },
     "__nav__:algorithm/bit": {

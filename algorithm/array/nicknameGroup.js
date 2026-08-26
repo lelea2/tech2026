@@ -1,0 +1,76 @@
+function arrangeGroups(people, k) {
+  const byNickname = new Map();
+
+  for (const person of people) {
+    if (!byNickname.has(person.nickname)) {
+      byNickname.set(person.nickname, []);
+    }
+
+    byNickname.get(person.nickname).push(person);
+  }
+
+  let maxFrequency = 0;
+
+  for (const members of byNickname.values()) {
+    maxFrequency = Math.max(maxFrequency, members.length);
+  }
+
+  const groupCount = Math.max(
+    Math.ceil(people.length / k),
+    maxFrequency
+  );
+
+  const groups = Array.from(
+    { length: groupCount },
+    () => []
+  );
+
+  // Process difficult nicknames first
+  const nicknameGroups = [...byNickname.values()]
+    .sort((a, b) => b.length - a.length);
+
+  for (const members of nicknameGroups) {
+    // choose different groups for members with same nickname
+    const availableGroups = groups
+      .map((group, index) => ({
+        index,
+        size: group.length,
+      }))
+      .filter(({ size }) => size < k)
+      .sort((a, b) => a.size - b.size);
+
+    if (availableGroups.length < members.length) {
+      return null;
+    }
+
+    for (let i = 0; i < members.length; i++) {
+      groups[availableGroups[i].index].push(members[i]);
+    }
+  }
+
+  return groups;
+}
+
+// Example usage:
+const people = [
+  { name: "Alice", nickname: "Ally" },
+  { name: "Bob", nickname: "Bobby" },
+  { name: "Charlie", nickname: "Ally" },
+  { name: "David", nickname: "Dave" },
+  { name: "Eve", nickname: "Eve" },
+];
+
+const k = 2;
+const result = arrangeGroups(people, k);
+console.log(result);
+
+// Time complexity: O(n log n) - sorting the nicknames and processing them
+// Space complexity: O(n) - storing the groups and the map of nicknames
+
+// Explanation:
+// 1. We first group people by their nicknames using a Map.
+// 2. We determine the maximum frequency of any nickname to ensure we have enough groups to accommodate them.
+// 3. We calculate the required number of groups based on the total number of people and the maximum frequency.
+// 4. We create empty groups and sort the nickname groups by size in descending order to process the most difficult nicknames first.
+// 5. For each nickname group, we find available groups that can accommodate them and assign members to those groups.
+// 6. If at any point we cannot find enough available groups for a nickname group, we return null indicating it's not possible to arrange them according to the rules.  
