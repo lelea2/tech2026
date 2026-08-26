@@ -2125,7 +2125,7 @@
       "docRelative": "algorithm/stack/longestParenthesis.mdx"
     },
     "algorithm/stack/removeInvalidParenthesis.js": {
-      "hash": "ba6cd49990c58814175b6915570049accb998222fa4d3697d9b33db22e979f8e",
+      "hash": "aa14be93733b76e5d4e64859d89334121daf3c3a25af5ca58e411756a5e52dec",
       "docRelative": "algorithm/stack/removeInvalidParenthesis.mdx"
     },
     "algorithm/stack/removeInvalidParenthesisDFS.js": {
