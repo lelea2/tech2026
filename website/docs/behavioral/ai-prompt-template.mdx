@@ -1,0 +1,871 @@
+---
+title: 'AI Prompt template'
+---
+
+## Core Prompt Structure
+
+Use this structure whenever you ask AI for help:
+
+```text
+CONTEXT
+Here is my understanding of the problem:
+<restate the important requirement in my own words>
+
+MY CURRENT THINKING
+I think the approach should be:
+<algorithm / data structure / architecture>
+
+because:
+<reasoning>
+
+CONSTRAINTS
+- <important constraint>
+- <complexity target>
+- <existing API/code constraint>
+
+WHAT I WANT FROM YOU
+Help me with only:
+<specific small task>
+
+Do not solve the entire problem.
+
+CHECK
+Please point out:
+1. Anything incorrect in my reasoning
+2. Edge cases I may be missing
+3. Whether this preserves my target complexity
+```
+
+The important signal is:
+
+> **I provide the direction; AI challenges, validates, or assists with one bounded piece.**
+
+---
+
+# Scenario 1 — Use AI to Validate Your Plan
+
+First explain your reasoning aloud:
+
+> “I think this is a sliding-window problem. I want to maintain the maximum efficiently rather than scan every window. A monotonic deque should give O(n). Before implementing it, I'm going to ask AI to challenge that approach.”
+
+Then prompt:
+
+```text
+I'm solving a problem where a window of size k moves across an array
+and I need the maximum for each window.
+
+My plan:
+- Iterate once through the array.
+- Keep indices in a decreasing monotonic deque.
+- Remove indices that leave the window.
+- Remove smaller values from the back.
+- The front represents the current maximum.
+
+I'm targeting O(n) time and O(k) auxiliary space.
+
+Don't implement the solution.
+
+Challenge my plan:
+1. Is the invariant correct?
+2. What edge cases should I consider?
+3. Is there any hidden case where the complexity becomes worse than O(n)?
+```
+
+### Strong signal
+
+You already selected the algorithm.
+
+AI is acting as a **reviewer**, not the problem solver.
+
+---
+
+# Scenario 2 — Ask AI to Help With One Implementation Step
+
+You have already designed the solution.
+
+```text
+I've decided to use BFS because every transition has equal cost.
+
+My BFS state and visited-state logic are already implemented.
+
+I only need help writing the neighbor-generation function.
+
+Requirements:
+- State is [row, col].
+- Movement is up/down/left/right.
+- Ignore cells outside the grid.
+- Ignore obstacles.
+- Do not modify the BFS logic.
+
+Please implement only:
+
+getNeighbors(row, col, grid)
+```
+
+This is much stronger than:
+
+```text
+Solve this shortest-path problem.
+```
+
+---
+
+# Scenario 3 — Ask AI for Scaffolding
+
+Useful for frontend/API interviews.
+
+Say:
+
+> “I know how I want the state flow to work. I'll use AI to generate some mechanical scaffolding so I can focus on the important logic.”
+
+Prompt:
+
+```text
+I'm building a React search component.
+
+I have already decided the state model:
+
+query
+results
+loading
+error
+
+Flow:
+input
+  -> debounce 300ms
+  -> fetchResults(query)
+  -> update results
+
+Please create only the basic React component scaffold:
+- input
+- loading state
+- error state
+- results list
+
+Do not implement debounce or fetch logic yet.
+I want to implement those parts myself.
+```
+
+This demonstrates you understand the architecture while using AI for repetitive work.
+
+---
+
+# Scenario 4 — Ask AI to Implement From Your Pseudocode
+
+Instead of giving the requirement, convert your reasoning into pseudocode first.
+
+```text
+I've reduced the problem to this algorithm:
+
+initialize minPrice = infinity
+initialize maxProfit = 0
+
+for each price:
+    update minPrice
+    calculate profit if sold today
+    update maxProfit
+
+return maxProfit
+
+I believe this is O(n) time and O(1) space.
+
+Translate exactly this algorithm into JavaScript.
+
+Keep it interview-friendly:
+- no libraries
+- no abstractions
+- clear variable names
+- no extra optimization
+```
+
+This signals:
+
+**The algorithm came from you. AI translated it into code.**
+
+---
+
+# Scenario 5 — Debug by Forming a Hypothesis First
+
+Do NOT say:
+
+```text
+My code doesn't work. Fix it.
+```
+
+Instead reason first.
+
+Say aloud:
+
+> “The output becomes wrong after the left side of the window moves. My hypothesis is that stale indices aren't being removed correctly. I'm going to have AI inspect specifically that invariant.”
+
+Prompt:
+
+```text
+I have a bug in my monotonic deque implementation.
+
+Observed behavior:
+Expected:
+[3,3,5,5,6,7]
+
+Actual:
+[3,3,5,5,7,7]
+
+My hypothesis:
+The deque keeps an index after it has already left the current window.
+
+The invariant should be:
+
+deque.front > i - k
+
+Please inspect only the window-eviction logic below.
+
+Tell me:
+1. Whether my hypothesis is correct
+2. Which invariant is violated
+3. The smallest correction
+
+Do not rewrite the entire solution.
+
+<relevant 5-10 lines of code>
+```
+
+That is an excellent interview signal because you show:
+
+**Observation → hypothesis → investigation → correction.**
+
+---
+
+# Scenario 6 — Debug After Isolating the Failure
+
+```text
+I've narrowed the bug down to this function.
+
+Expected:
+isValid("(())") -> true
+
+Actual:
+isValid("(())") -> false
+
+I traced the balance values:
+
+(
+balance = 1
+
+(
+balance = 2
+
+)
+balance = 1
+
+)
+balance = 0
+
+So the balance calculation appears correct.
+
+My current hypothesis is that the return condition or an early-return
+condition is wrong.
+
+Please inspect only this function and tell me which condition violates
+the intended invariant.
+
+Do not rewrite unrelated code.
+```
+
+Strong signal:
+
+You used tracing yourself before involving AI.
+
+---
+
+# Scenario 7 — Runtime Error
+
+Weak:
+
+```text
+TypeError: x is undefined
+
+Fix it.
+```
+
+Strong:
+
+```text
+I'm getting:
+
+TypeError: Cannot read properties of undefined
+
+It occurs when processing the final element.
+
+I traced these values:
+
+i = nums.length - 1
+right = i + 1
+nums[right] = undefined
+
+My hypothesis is that I have an off-by-one boundary bug rather than
+a data issue.
+
+Please check my boundary conditions and tell me the minimum fix.
+
+Do not redesign the algorithm.
+```
+
+---
+
+# Scenario 8 — AI Generated Something You Don't Like
+
+Rejecting AI output can actually be a strong signal.
+
+Say:
+
+> “This works, but AI introduced abstractions that aren't justified for this interview. I'm going to constrain it to the simpler design I intended.”
+
+Prompt:
+
+```text
+This implementation is functionally correct, but it introduced:
+- three helper classes
+- a generic strategy abstraction
+- unnecessary configuration
+
+For this interview I want the simplest implementation that preserves:
+
+O(n) time
+O(k) space
+one main function
+at most one helper
+
+Refactor the code without changing the algorithm.
+```
+
+You're demonstrating engineering judgment rather than blindly accepting generation.
+
+---
+
+# Scenario 9 — Ask AI to Review Your Code
+
+Once your implementation works:
+
+```text
+Here is my implementation.
+
+My intended invariants are:
+
+1. deque contains only indices inside the active window
+2. values represented by deque are monotonically decreasing
+3. deque.front is therefore the maximum
+4. each index is inserted once and removed at most once
+
+Review the implementation against those invariants.
+
+Don't rewrite it.
+
+Return only:
+- correctness issues
+- complexity issues
+- edge cases I missed
+```
+
+This is much stronger than:
+
+```text
+Is this code good?
+```
+
+---
+
+# Scenario 10 — Generate Tests After You Identify Categories
+
+Don't ask:
+
+```text
+Give me test cases.
+```
+
+First determine the categories yourself.
+
+```text
+I want to test my solution systematically.
+
+I've identified these test categories:
+
+1. empty input
+2. one element
+3. k = 1
+4. k = array length
+5. increasing values
+6. decreasing values
+7. duplicates
+8. negative values
+
+Generate one minimal test for each category.
+
+Also tell me if there is an important behavioral category
+I haven't considered.
+
+Do not change my implementation.
+```
+
+You are defining the test strategy. AI fills in examples.
+
+---
+
+# Scenario 11 — Complexity Validation
+
+Say first:
+
+> “My reasoning is that each element enters and leaves the deque at most once, so although there are nested while loops, total work is O(n). I'll ask AI to challenge that amortized analysis.”
+
+Prompt:
+
+```text
+I believe this implementation is O(n), not O(n²).
+
+My reasoning:
+
+- every index is pushed once
+- an index can be popped from the back at most once
+- an index can be removed from the front at most once
+
+Therefore total deque operations are O(n).
+
+Please challenge this complexity argument.
+
+Do not analyze the problem from scratch.
+Tell me whether this amortized argument is valid and why.
+```
+
+---
+
+# Scenario 12 — Compare Two Approaches
+
+```text
+I've identified two possible solutions.
+
+Approach A:
+max heap
+O(n log k)
+
+Approach B:
+monotonic deque
+O(n)
+
+I'm leaning toward B because we only need the maximum and the window
+moves sequentially.
+
+Compare these specifically on:
+
+- implementation complexity
+- runtime
+- memory
+- ease of explaining in an interview
+
+Do not propose a third solution unless one of these is fundamentally
+incorrect.
+```
+
+You still own the decision.
+
+---
+
+# Scenario 13 — Refactoring
+
+```text
+The implementation is correct and tests pass.
+
+Before changing anything, my concerns are:
+
+- duplicated boundary checks
+- variable names aren't very descriptive
+- one function is doing parsing and computation
+
+Refactor only for readability.
+
+Constraints:
+- preserve algorithm
+- preserve asymptotic complexity
+- no new classes
+- no external libraries
+- keep it easy to explain during an interview
+
+Explain each meaningful change.
+```
+
+---
+
+# Scenario 14 — Frontend Bug
+
+```text
+I have a React component where an API request fires on every keystroke.
+
+Desired behavior:
+request only after the user stops typing for 300ms.
+
+My hypothesis:
+I'm creating a new timer without cancelling the previous timer.
+
+I expect the lifecycle to be:
+
+input changes
+ -> clear previous timeout
+ -> create new timeout
+ -> 300ms
+ -> fetch
+ -> cleanup on another change/unmount
+
+Please verify that reasoning first.
+
+Then show only the debounce-related useEffect implementation.
+```
+
+---
+
+# Scenario 15 — Async / Race Condition
+
+```text
+I think I have a race condition rather than a rendering bug.
+
+Sequence:
+
+request("a") starts
+request("ab") starts
+request("ab") completes
+request("a") completes later
+UI incorrectly displays results for "a"
+
+My proposed fixes are:
+
+A. AbortController
+B. request sequence/version ID
+
+For this browser-only implementation I'm leaning toward AbortController.
+
+Validate that diagnosis and show the smallest change needed.
+Do not rewrite the component.
+```
+
+This is particularly strong because you have already reconstructed the event ordering.
+
+---
+
+# Scenario 16 — Production / Failure-Mode Review
+
+After getting the basic solution working:
+
+```text
+The happy path is working.
+
+Before I consider this finished, I want to reason about failure modes.
+
+I currently see:
+
+- malformed input
+- empty input
+- duplicate values
+- very large input
+- API timeout
+- stale responses
+
+Act as a reviewer.
+
+Identify the three most important failure modes I'm still missing,
+prioritized by likelihood and impact.
+
+Don't redesign the application.
+```
+
+---
+
+# Scenario 17 — When You're Stuck
+
+Being stuck is fine. Avoid outsourcing the entire problem.
+
+Say:
+
+> “I have a brute-force solution but haven't found the optimization yet. I'm going to ask for a hint rather than the answer.”
+
+Prompt:
+
+```text
+I have an O(n²) solution:
+
+For every element:
+    scan all elements after it
+    compute the best candidate
+
+I suspect there is an O(n) solution because information from previous
+iterations can probably be maintained incrementally.
+
+Do not give me the solution.
+
+Give me one conceptual hint about what information I should preserve
+while scanning left to right.
+```
+
+If still stuck:
+
+```text
+One more hint, focused only on the data structure or state
+I should maintain.
+
+Still don't give me code.
+```
+
+This is an excellent use of AI during an interview.
+
+---
+
+# Scenario 18 — AI Gives a Wrong Answer
+
+Say aloud:
+
+> “I don't think that suggestion preserves the invariant. Let me verify it rather than accepting it.”
+
+Prompt:
+
+```text
+I don't think your previous suggestion is correct.
+
+You suggested removing X before Y.
+
+But my invariant is:
+
+<state invariant>
+
+Consider this counterexample:
+
+<input>
+
+I believe your approach produces:
+
+<incorrect result>
+
+Re-evaluate only that assumption.
+
+If my counterexample is valid, propose the minimum correction.
+```
+
+Being willing to challenge AI is a very strong signal.
+
+---
+
+# Scenario 19 — Ask AI to Explain an Unfamiliar API, Not the Problem
+
+```text
+I know the algorithm I want to implement, but I'm forgetting the exact
+JavaScript syntax for AbortController.
+
+Show me only:
+
+1. how to create a controller
+2. how to pass signal to fetch
+3. how to abort it
+4. how to detect AbortError
+
+No application implementation.
+```
+
+Great use of AI as documentation.
+
+---
+
+# Scenario 20 — Final Interview Review
+
+```text
+My implementation now passes the tests.
+
+My reasoning is:
+
+Algorithm:
+<short explanation>
+
+Time:
+O(...)
+
+Space:
+O(...)
+
+Important invariant:
+<invariant>
+
+Edge cases tested:
+<cases>
+
+Before I call this done, review it as an interviewer.
+
+Do not rewrite the code.
+
+Tell me only:
+
+1. correctness concern
+2. missing edge case
+3. questionable complexity claim
+4. one production concern
+5. one question an interviewer is likely to ask next
+```
+
+---
+
+# The Best Generic Prompt to Memorize
+
+You don't need to memorize twenty prompts.
+
+Memorize this:
+
+```text
+Here's my current reasoning:
+
+<what I believe>
+
+I'm choosing:
+
+<approach>
+
+because:
+
+<reason>
+
+The invariant / assumption I'm relying on is:
+
+<invariant>
+
+I'm currently uncertain about:
+
+<specific uncertainty>
+
+Help me only with:
+
+<small scoped request>
+
+Don't solve or rewrite the whole problem.
+
+Challenge my reasoning if it's incorrect.
+```
+
+---
+
+# Debugging Prompt to Memorize
+
+```text
+Observed:
+<what happened>
+
+Expected:
+<what should happen>
+
+I traced it to:
+<small area>
+
+My hypothesis:
+<why I think it's happening>
+
+The invariant I expect:
+<invariant>
+
+Help me validate or reject that hypothesis.
+
+If it's correct, show the minimum fix.
+Don't rewrite the entire solution.
+```
+
+---
+
+# Testing Prompt to Memorize
+
+```text
+The implementation works for the happy path.
+
+I've identified these edge-case categories:
+
+<your categories>
+
+Generate minimal tests for those categories and tell me what important
+category I'm missing.
+
+Do not modify the implementation.
+```
+
+---
+
+# Optimization Prompt to Memorize
+
+```text
+My current solution is:
+
+<approach>
+
+Complexity:
+<time / space>
+
+I think the bottleneck is:
+
+<specific operation>
+
+My hypothesis is that I can improve it by maintaining:
+
+<state / data structure>
+
+Don't give me the optimized code yet.
+
+Validate my reasoning and give me one hint if I'm heading in the
+wrong direction.
+```
+
+---
+
+# What the Interviewer Should Hear From You
+
+Your narration should sound roughly like this:
+
+> “Let me first make sure I understand the problem.”
+
+> “The straightforward solution would be O(n²), but I think we can avoid recomputing this state.”
+
+> “I'm considering a monotonic deque because I need efficient removal from both ends while maintaining the maximum.”
+
+> “Before coding, I'll use AI to challenge that invariant rather than having it solve the problem.”
+
+Then:
+
+> “That matches my reasoning. I'll implement it.”
+
+Later:
+
+> “This test fails. Before asking AI, I'm going to trace the state.”
+
+Then:
+
+> “The stale index stays in the deque. I think my eviction boundary is off by one. I'll have AI validate only that hypothesis.”
+
+Finally:
+
+> “The fix makes sense. Let me explain why it preserves the invariant.”
+
+That sequence demonstrates exactly what an AI-enabled interviewer is looking for:
+
+**You reason → AI assists → you evaluate → you own the result.**
+
+# Weak vs Strong AI Usage
+
+| Weak Signal | Strong Signal |
+|---|---|
+| “Solve this.” | “Challenge my proposed O(n) approach.” |
+| Paste entire requirement | Restate the problem yourself |
+| “Fix my code.” | “I suspect this invariant is violated.” |
+| Paste error only | Observed → expected → hypothesis |
+| Accept generated code | Read, question, simplify it |
+| “Give me test cases.” | Define test categories first |
+| “Optimize this.” | Identify the bottleneck first |
+| Ask for whole component | Ask for one bounded implementation step |
+| Silently use AI | Narrate why you're using it |
+| Assume AI is correct | Verify with invariant/counterexample |
+| Ask AI for complexity | State your complexity analysis and challenge it |
+| Ask for solution when stuck | Ask for progressively stronger hints |
+
+# Golden Rule
+
+Before every AI prompt, you should be able to finish this sentence:
+
+> **“I believe ________, and I'm using AI specifically to help me verify/implement/debug ________.”**
+
+If you cannot fill in the first blank yourself, you are probably delegating too much of the interview problem to AI.

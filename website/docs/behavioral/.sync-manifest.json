@@ -12,6 +12,10 @@
       "hash": "a2c4de61974f1181c7ab5f30fd1567389b16a85269e8bbd8c37bd1f37baa97c8",
       "docRelative": "ai-enabled-playbook.mdx"
     },
+    "behavorial/ai-prompt-template.mdx": {
+      "hash": "12826a937182a77e986033b91858f246cb6502a69fec8eca1a9f95ff2a52a5ed",
+      "docRelative": "ai-prompt-template.mdx"
+    },
     "behavorial/ai_coding_experience_interview_script.mdx": {
       "hash": "9c90b8779c52f1328d379dd95ccf4b7918d6d909efa4f29b55b56135820753b9",
       "docRelative": "ai_coding_experience_interview_script.mdx"
