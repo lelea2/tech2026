@@ -7,6 +7,8 @@ tags:
   - probability
   - fermi-estimation
 sidebar_label: Quant Math & Physics
+toc_min_heading_level: 2
+toc_max_heading_level: 2
 ---
 
 # Quantitative Reasoning Interview Prep
@@ -26,13 +28,13 @@ For almost every problem:
 
 ---
 
-# 1. Regular Hexagon: Find Side Length From Area
+## 1. Regular Hexagon: Find Side Length From Area
 
-## Prompt
+### Prompt
 
 Given the area `A` of a regular hexagon, find side length `s`.
 
-## Key idea
+### Key idea
 
 A regular hexagon contains **6 equilateral triangles**.
 
@@ -56,7 +58,7 @@ s² = 2A / (3 * sqrt(3))
 s = sqrt(2A / (3 * sqrt(3)))
 ```
 
-## JavaScript
+### JavaScript
 
 ```js
 function hexagonSideFromArea(area) {
@@ -64,7 +66,7 @@ function hexagonSideFromArea(area) {
 }
 ```
 
-## Example
+### Example
 
 ```js
 const area = 54 * Math.sqrt(3);
@@ -73,13 +75,13 @@ console.log(hexagonSideFromArea(area));
 // 6
 ```
 
-## Answer
+### Answer
 
 ```text
 s = sqrt(2A / (3√3))
 ```
 
-## Sanity check
+### Sanity check
 
 ```text
 Area ∝ side²
@@ -91,15 +93,15 @@ side ∝ sqrt(area)
 
 That matches the formula.
 
-## What to say aloud
+### What to say aloud
 
 > A regular hexagon is six equilateral triangles. I write the triangle-area formula, multiply by six, and solve for the side length.
 
 ---
 
-# 2. Why Is Summer Hotter Than Winter?
+## 2. Why Is Summer Hotter Than Winter?
 
-## Short answer
+### Short answer
 
 ```text
 Earth's axial tilt ≈ 23.5°
@@ -114,7 +116,7 @@ Two effects matter:
 2. Summer days are longer.
 ```
 
-## Incidence angle
+### Incidence angle
 
 Suppose `θ` is the angle between sunlight and the vertical surface normal.
 
@@ -157,7 +159,7 @@ cos(60°) = 0.5
 
 The same incoming sunlight is spread across approximately **twice the ground area**.
 
-## Why summer gets even hotter
+### Why summer gets even hotter
 
 Approximate daily solar energy:
 
@@ -175,7 +177,7 @@ more daylight hours
 
 The effects compound.
 
-## Important interview trap
+### Important interview trap
 
 Earth is actually closest to the Sun around **early January**.
 
@@ -191,15 +193,15 @@ would experience summer together.
 
 They do not.
 
-## What to say aloud
+### What to say aloud
 
 > Seasons come from Earth's axial tilt. In summer, sunlight arrives closer to perpendicular, so more energy reaches each square meter, and the days are longer. The opposite hemisphere experiences winter at the same time, which is strong evidence that Earth-Sun distance isn't the main cause.
 
 ---
 
-# 3. Two Spheres With the Same Density
+## 3. Two Spheres With the Same Density
 
-## Prompt
+### Prompt
 
 Two spheres are made from the same material.
 
@@ -213,7 +215,7 @@ The smaller sphere weighs:
 
 Find the larger sphere's weight.
 
-## Key idea
+### Key idea
 
 Diameter scale:
 
@@ -241,7 +243,7 @@ largeMass = 8 × 3.375
           = 27 lb
 ```
 
-## JavaScript
+### JavaScript
 
 ```js
 const smallMass = 8;
@@ -253,21 +255,21 @@ console.log(largeMass);
 // 27
 ```
 
-## Answer
+### Answer
 
 ```text
 27 lb
 ```
 
-## What to say aloud
+### What to say aloud
 
 > Same material means same density, so mass scales with volume. Sphere volume scales with diameter cubed. A 1.5× diameter therefore means 1.5³ = 3.375× the mass, giving 27 pounds.
 
 ---
 
-# 4. How Much 1080p30 Video Fits on 1 TB?
+## 4. How Much 1080p30 Video Fits on 1 TB?
 
-## Prompt
+### Prompt
 
 A 1 TB drive stores:
 
@@ -278,7 +280,7 @@ A 1 TB drive stores:
 
 How many minutes fit?
 
-## First thing to say
+### First thing to say
 
 The problem is **underspecified**.
 
@@ -302,7 +304,7 @@ Ask:
 
 > Should I assume raw RGB video or a compressed bitrate?
 
-## Case A: Raw RGB
+### Case A: Raw RGB
 
 Assume:
 
@@ -314,7 +316,7 @@ bytesPerPixel = 3
 storage = 1 TB = 10¹² bytes
 ```
 
-## JavaScript
+### JavaScript
 
 ```js
 const width = 1920;
@@ -349,13 +351,13 @@ bytes/sec ≈ 186.6 MB/s
 duration ≈ 89.3 minutes
 ```
 
-## Answer for raw RGB
+### Answer for raw RGB
 
 ```text
 ≈ 90 minutes
 ```
 
-## Case B: Compressed Video
+### Case B: Compressed Video
 
 General formula:
 
@@ -389,7 +391,7 @@ videoMinutes(1, 20);
 // ≈ 6667 minutes
 ```
 
-## Interview lesson
+### Interview lesson
 
 The most important observation is:
 
@@ -405,9 +407,9 @@ resolution × FPS
 
 ---
 
-# 5. Drop a Dense Stone From a Boat Into Water
+## 5. Drop a Dense Stone From a Boat Into Water
 
-## Prompt
+### Prompt
 
 A dense stone is initially sitting inside a floating boat.
 
@@ -423,13 +425,13 @@ fall
 stay the same
 ```
 
-## Answer
+### Answer
 
 ```text
 FALL
 ```
 
-## Before
+### Before
 
 While inside the boat, the stone causes the boat to displace water equal to the stone's **weight**.
 
@@ -438,7 +440,7 @@ displacedVolumeBefore =
   stoneMass / waterDensity
 ```
 
-## After
+### After
 
 When the stone sinks, it displaces only its physical volume.
 
@@ -475,7 +477,7 @@ Therefore:
 water level falls
 ```
 
-## JavaScript representation
+### JavaScript representation
 
 ```js
 const mass = 10;
@@ -490,15 +492,15 @@ console.log(after < before);
 // true
 ```
 
-## What to say aloud
+### What to say aloud
 
 > In the boat, the stone causes displacement based on its weight. Once submerged, it displaces only its own volume. Since the stone is denser than water, its volume is smaller than the volume of water having the same weight, so the water level falls.
 
 ---
 
-# 6. $1000 at 100% Interest for 20 Years
+## 6. $1000 at 100% Interest for 20 Years
 
-## Clarification
+### Clarification
 
 Ask whether interest is:
 
@@ -512,7 +514,7 @@ compounded
 
 Usually assume annual compounding.
 
-## Formula
+### Formula
 
 ```text
 futureValue =
@@ -546,7 +548,7 @@ Therefore:
 $1,048,576,000
 ```
 
-## JavaScript
+### JavaScript
 
 ```js
 const principal = 1000;
@@ -559,13 +561,13 @@ console.log(amount);
 // 1048576000
 ```
 
-## Answer
+### Answer
 
 ```text
 ≈ $1.05 billion
 ```
 
-## Interview concept
+### Interview concept
 
 This tests **exponential growth**.
 
@@ -577,9 +579,9 @@ money doubles every year
 
 ---
 
-# 7. Randomly Choose a d6 or d8
+## 7. Randomly Choose a d6 or d8
 
-## Setup
+### Setup
 
 Choose randomly between:
 
@@ -595,7 +597,7 @@ P(D6) = 1/2
 P(D8) = 1/2
 ```
 
-## Part A: Probability of Rolling a 3
+### Part A: Probability of Rolling a 3
 
 ```text
 P(3 | D6) = 1/6
@@ -626,13 +628,13 @@ Substitute:
 = 7/48
 ```
 
-## Answer
+### Answer
 
 ```text
 7/48
 ```
 
-## Part B: Given a 3, Probability It Was the d6
+### Part B: Given a 3, Probability It Was the d6
 
 Bayes:
 
@@ -661,7 +663,7 @@ Substitute:
 4/7
 ```
 
-## Answer
+### Answer
 
 ```text
 P(D6 | 3) = 4/7
@@ -669,7 +671,7 @@ P(D6 | 3) = 4/7
 P(D8 | 3) = 3/7
 ```
 
-## Part C: Expected Value of the Next Roll
+### Part C: Expected Value of the Next Roll
 
 Expected d6:
 
@@ -716,9 +718,9 @@ Approximate:
 
 ---
 
-# 8. Probability the 13th Is a Friday
+## 8. Probability the 13th Is a Friday
 
-## Simple interview assumption
+### Simple interview assumption
 
 If weekdays are uniformly distributed:
 
@@ -732,7 +734,7 @@ Approximate:
 14.29%
 ```
 
-## Exact Gregorian Calendar
+### Exact Gregorian Calendar
 
 The Gregorian calendar repeats every:
 
@@ -761,15 +763,15 @@ Therefore:
 ≈ 14.333%
 ```
 
-## Strong interview answer
+### Strong interview answer
 
 > Assuming weekday alignment is uniform, the answer is 1/7. If you're asking for the exact Gregorian-calendar frequency, it's 43/300, or about 14.33%.
 
 ---
 
-# 9. 3D Tic-Tac-Toe Winning Lines
+## 9. 3D Tic-Tac-Toe Winning Lines
 
-## Important clarification
+### Important clarification
 
 For:
 
@@ -797,9 +799,9 @@ with four cells required:
 
 If the expected answer is `49`, assume a **3×3×3 board**.
 
-## Count 3×3×3 Winning Lines
+### Count 3×3×3 Winning Lines
 
-### Axis-parallel
+#### Axis-parallel
 
 Three directions:
 
@@ -821,7 +823,7 @@ So:
 3 × 9 = 27
 ```
 
-### Face diagonals
+#### Face diagonals
 
 ```text
 6 faces
@@ -837,7 +839,7 @@ Running total:
 27 + 12 = 39
 ```
 
-### Middle-plane diagonals
+#### Middle-plane diagonals
 
 Three central planes:
 
@@ -865,7 +867,7 @@ Running total:
 45
 ```
 
-### Space diagonals
+#### Space diagonals
 
 A cube has:
 
@@ -883,7 +885,7 @@ Total:
 = 49
 ```
 
-## Answer
+### Answer
 
 ```text
 49
@@ -891,7 +893,7 @@ Total:
 
 ---
 
-# 10. Distance From a Point to a Plane
+## 10. Distance From a Point to a Plane
 
 Plane:
 
@@ -913,7 +915,7 @@ d = -----------------------------
           sqrt(A² + B² + C²)
 ```
 
-## JavaScript
+### JavaScript
 
 ```js
 function pointToPlaneDistance(point, plane) {
@@ -928,7 +930,7 @@ function pointToPlaneDistance(point, plane) {
 }
 ```
 
-## Intuition
+### Intuition
 
 ```text
 (A, B, C)
@@ -940,7 +942,7 @@ The formula measures how far the point extends along that perpendicular directio
 
 ---
 
-# 11. Estimate Earth-Moon Distance
+## 11. Estimate Earth-Moon Distance
 
 Useful rough value:
 
@@ -954,7 +956,7 @@ Interview estimate:
 ≈ 4 × 10⁵ km
 ```
 
-## Fermi approach
+### Fermi approach
 
 Earth radius:
 
@@ -976,7 +978,7 @@ Therefore:
 384,000 km
 ```
 
-## JavaScript
+### JavaScript
 
 ```js
 const earthRadius = 6400;
@@ -987,7 +989,7 @@ console.log(earthRadius * earthRadiiToMoon);
 // 384000
 ```
 
-## Light-time sanity check
+### Light-time sanity check
 
 Speed of light:
 
@@ -1004,7 +1006,7 @@ Therefore:
 
 ---
 
-# 12. Expected Number of Times `max` Changes
+## 12. Expected Number of Times `max` Changes
 
 Consider:
 
@@ -1022,7 +1024,7 @@ Suppose `values` is a random permutation of `n` distinct values.
 
 How many times does `max` update on average?
 
-## Key observation
+### Key observation
 
 At position `i`, the current element becomes the new maximum if it is the largest among the first `i` elements.
 
@@ -1057,7 +1059,7 @@ Approximation:
 Hn ≈ ln(n) + 0.577
 ```
 
-## JavaScript
+### JavaScript
 
 ```js
 function expectedMaxUpdates(n) {
@@ -1085,7 +1087,7 @@ Math.log(1_000_000) + 0.57721;
 // ≈ 14.39
 ```
 
-## Answer
+### Answer
 
 ```text
 E = Hn ≈ ln(n) + γ
@@ -1102,9 +1104,9 @@ but max changes only
 
 ---
 
-# 13. Buffon's Needle
+## 13. Buffon's Needle
 
-## Setup
+### Setup
 
 Parallel lines are separated by:
 
@@ -1143,7 +1145,7 @@ P = 2/π
   ≈ 0.637
 ```
 
-## JavaScript
+### JavaScript
 
 ```js
 function buffonProbability(length, spacing) {
@@ -1154,7 +1156,7 @@ buffonProbability(1, 1);
 // ≈ 0.63662
 ```
 
-## Important correction
+### Important correction
 
 For the standard Buffon's Needle problem:
 
@@ -1170,7 +1172,7 @@ not:
 1/π
 ```
 
-## Short intuition
+### Short intuition
 
 For an angle `θ`, crossing occurs when the center is close enough to a line:
 
@@ -1188,9 +1190,9 @@ Average this over all orientations and positions, giving:
 
 ---
 
-# 14. Match a Small 2D Point Set Inside a Larger Set
+## 14. Match a Small 2D Point Set Inside a Larger Set
 
-## Problem
+### Problem
 
 Given:
 
@@ -1212,7 +1214,7 @@ No scaling.
 
 Find the best alignment.
 
-## Case A: Correspondence Is Known
+### Case A: Correspondence Is Known
 
 Suppose:
 
@@ -1257,7 +1259,7 @@ SVD
 Kabsch algorithm
 ```
 
-## Case B: Correspondence Is Unknown
+### Case B: Correspondence Is Unknown
 
 This is harder.
 
@@ -1270,7 +1272,7 @@ angles
 
 Use those properties to generate candidate matches.
 
-## Strong architecture
+### Strong architecture
 
 ```text
 Small Template
@@ -1302,7 +1304,7 @@ RANSAC best candidate
 Optional ICP refinement
 ```
 
-## RANSAC
+### RANSAC
 
 Useful with noise and outliers.
 
@@ -1315,7 +1317,7 @@ Useful with noise and outliers.
 6. Keep best transform.
 ```
 
-### Pros
+#### Pros
 
 ```text
 robust to outliers
@@ -1323,14 +1325,14 @@ easy to parallelize
 easy interview explanation
 ```
 
-### Cons
+#### Cons
 
 ```text
 probabilistic
 may require many iterations
 ```
 
-## ICP
+### ICP
 
 Iterative Closest Point:
 
@@ -1344,20 +1346,20 @@ solve rigid transform
 repeat
 ```
 
-### Pros
+#### Pros
 
 ```text
 excellent local refinement
 ```
 
-### Cons
+#### Cons
 
 ```text
 can converge to local optimum
 needs decent initialization
 ```
 
-## Interview recommendation
+### Interview recommendation
 
 ```text
 Invariant matching
@@ -1368,9 +1370,9 @@ Invariant matching
 
 ---
 
-# 15. Seattle Rain + Three Friends
+## 15. Seattle Rain + Three Friends
 
-## Setup
+### Setup
 
 Probability of rain:
 
@@ -1402,7 +1404,7 @@ Find:
 P(rain | all 3 say rain)
 ```
 
-## If it actually rains
+### If it actually rains
 
 Each tells the truth with probability:
 
@@ -1418,7 +1420,7 @@ All three say rain:
 8/27
 ```
 
-## If it does not rain
+### If it does not rain
 
 Each must lie:
 
@@ -1434,7 +1436,7 @@ All three say rain:
 1/27
 ```
 
-## Bayes calculation
+### Bayes calculation
 
 Compare weighted likelihoods.
 
@@ -1468,13 +1470,13 @@ P(R | YYY)
 = 8/11
 ```
 
-## Answer
+### Answer
 
 ```text
 8/11 ≈ 72.7%
 ```
 
-## JavaScript
+### JavaScript
 
 ```js
 const rain = 0.25 * (2 / 3) ** 3;
@@ -1489,9 +1491,9 @@ console.log(posterior);
 
 ---
 
-# 16. Packing Equal Circles on an Infinite Plane
+## 16. Packing Equal Circles on an Infinite Plane
 
-## Clarify the problem
+### Clarify the problem
 
 If circles may overlap and the question is simply:
 
@@ -1513,7 +1515,7 @@ But if the intended question is:
 
 then this is the **hexagonal circle-packing problem**.
 
-## Result
+### Result
 
 Maximum density:
 
@@ -1539,7 +1541,7 @@ or:
 90.69%
 ```
 
-## JavaScript
+### JavaScript
 
 ```js
 const density = Math.PI / (2 * Math.sqrt(3));
@@ -1548,7 +1550,7 @@ console.log(density);
 // 0.906899...
 ```
 
-## Intuition
+### Intuition
 
 Optimal centers form a triangular / hexagonal lattice:
 
@@ -1564,7 +1566,7 @@ This packs circles more densely than a square grid.
 
 ---
 
-# 17. 4×4 Grid of Points: How Many Squares?
+## 17. 4×4 Grid of Points: How Many Squares?
 
 Assume:
 
@@ -1582,21 +1584,21 @@ axis-aligned
 rotated squares
 ```
 
-## Axis-Aligned Squares
+### Axis-Aligned Squares
 
-### 1×1
+#### 1×1
 
 ```text
 3 × 3 = 9
 ```
 
-### 2×2
+#### 2×2
 
 ```text
 2 × 2 = 4
 ```
 
-### 3×3
+#### 3×3
 
 ```text
 1 × 1 = 1
@@ -1609,7 +1611,7 @@ Total:
 = 14
 ```
 
-## Rotated Squares
+### Rotated Squares
 
 There are:
 
@@ -1626,13 +1628,13 @@ Therefore:
 = 22
 ```
 
-## Answer
+### Answer
 
 ```text
 22 squares
 ```
 
-## Probability Four Random Points Form a Square
+### Probability Four Random Points Form a Square
 
 Number of ways to choose 4 points from 16:
 
@@ -1685,19 +1687,19 @@ Approximate:
 
 ---
 
-# 18. Find the Pattern in Number of Edges
+## 18. Find the Pattern in Number of Edges
 
 The referenced image is missing, so the exact sequence cannot be solved.
 
 But this is the framework to use.
 
-## Step 1: Write the sequence
+### Step 1: Write the sequence
 
 ```text
 E1, E2, E3, E4, ...
 ```
 
-## Step 2: First differences
+### Step 2: First differences
 
 ```text
 ΔE1 = E2 - E1
@@ -1713,7 +1715,7 @@ linear sequence
 En = an + b
 ```
 
-## Step 3: Second differences
+### Step 3: Second differences
 
 If first differences are not constant:
 
@@ -1729,7 +1731,7 @@ quadratic
 En = an² + bn + c
 ```
 
-## Step 4: Prefer structural counting
+### Step 4: Prefer structural counting
 
 Instead of guessing a numeric pattern:
 
@@ -1766,7 +1768,7 @@ En
 3n + 1
 ```
 
-## JavaScript
+### JavaScript
 
 ```js
 function edgesForSquaresInRow(n) {
@@ -1776,7 +1778,7 @@ function edgesForSquaresInRow(n) {
 
 ---
 
-# Fast Review Sheet
+## Fast Review Sheet
 
 ```text
 ┌─────────────────────────────┬─────────────────────────────────────────┐
@@ -1807,7 +1809,7 @@ function edgesForSquaresInRow(n) {
 
 ---
 
-# Interview Strategy
+## Interview Strategy
 
 For a quantitative problem, say your reasoning in this order:
 
@@ -1827,29 +1829,29 @@ Check magnitude
 Explain intuition
 ```
 
-# Strong Clarification Examples
+## Strong Clarification Examples
 
-## Video storage
+### Video storage
 
 > Resolution and frame rate don't determine compressed storage by themselves. Should I assume raw RGB or a specific bitrate?
 
-## Circle problem
+### Circle problem
 
 > Do you mean covering, where circles may overlap, or packing equal non-overlapping circles?
 
-## Tic-tac-toe
+### Tic-tac-toe
 
 > I'll assume this is a 3×3×3 board where three aligned cells win, since that corresponds to 49 winning lines.
 
-## Interest
+### Interest
 
 > Should I assume the 100% interest compounds annually?
 
 ---
 
-# High-Value Concepts
+## High-Value Concepts
 
-## 1. Scaling Laws
+### 1. Scaling Laws
 
 ```text
 Length:
@@ -1889,7 +1891,7 @@ Instead:
 // 3.375
 ```
 
-## 2. Bayes' Theorem
+### 2. Bayes' Theorem
 
 Conceptually:
 
@@ -1923,7 +1925,7 @@ Normalize
 Posterior
 ```
 
-## 3. Expected Value
+### 3. Expected Value
 
 For discrete values:
 
@@ -1941,7 +1943,7 @@ function expectedValue(outcomes) {
 }
 ```
 
-## 4. Linearity of Expectation
+### 4. Linearity of Expectation
 
 Extremely useful:
 
@@ -1970,7 +1972,7 @@ P(update at 2)
 P(update at n)
 ```
 
-## 5. Harmonic Numbers
+### 5. Harmonic Numbers
 
 ```text
 Hn
@@ -1999,27 +2001,27 @@ Math.log(1_000_000_000) + 0.577;
 
 Huge input sizes can therefore still produce surprisingly small harmonic expectations.
 
-## 6. Geometry Formulas Worth Knowing
+### 6. Geometry Formulas Worth Knowing
 
-### Equilateral triangle
+#### Equilateral triangle
 
 ```text
 A = √3 / 4 × s²
 ```
 
-### Regular hexagon
+#### Regular hexagon
 
 ```text
 A = 3√3 / 2 × s²
 ```
 
-### Sphere
+#### Sphere
 
 ```text
 V = 4/3 × πr³
 ```
 
-### Point-to-plane
+#### Point-to-plane
 
 ```text
         |Ax0 + By0 + Cz0 + D|
@@ -2027,7 +2029,7 @@ d = -----------------------------
           √(A² + B² + C²)
 ```
 
-## 7. Circle Packing
+### 7. Circle Packing
 
 Maximum equal-circle packing density:
 
@@ -2051,7 +2053,7 @@ not:
 square grid
 ```
 
-## 8. Buffon's Needle
+### 8. Buffon's Needle
 
 For:
 
@@ -2077,9 +2079,9 @@ P = 2/π
 
 ---
 
-# Common Interview Traps
+## Common Interview Traps
 
-## Trap 1: Linear vs Cubic Scaling
+### Trap 1: Linear vs Cubic Scaling
 
 Wrong:
 
@@ -2099,7 +2101,7 @@ mass ×1.5³
 mass ×3.375
 ```
 
-## Trap 2: Calculating Before Clarifying
+### Trap 2: Calculating Before Clarifying
 
 Bad:
 
@@ -2116,7 +2118,7 @@ Better:
 
 Interviewers often intentionally leave information out.
 
-## Trap 3: Weight vs Volume Displacement
+### Trap 3: Weight vs Volume Displacement
 
 Stone inside boat:
 
@@ -2132,7 +2134,7 @@ displacement based on physical volume
 
 That distinction determines the answer.
 
-## Trap 4: Forgetting Bayesian Updating
+### Trap 4: Forgetting Bayesian Updating
 
 Before observing a `3`:
 
@@ -2150,7 +2152,7 @@ P(D8 | 3) = 3/7
 
 The probabilities changed because a `3` is more likely on the smaller die.
 
-## Trap 5: Trusting the Supplied Answer
+### Trap 5: Trusting the Supplied Answer
 
 If an interview prompt says:
 
@@ -2170,7 +2172,7 @@ State your assumptions and derive the result.
 
 ---
 
-# 60-Second Mental Math Sheet
+## 60-Second Mental Math Sheet
 
 ```text
 √3 ≈ 1.732
@@ -2219,7 +2221,7 @@ Earth → Moon light time
 
 ---
 
-# Final Interview Cheat Pattern
+## Final Interview Cheat Pattern
 
 When you see a math or physics question, think:
 
