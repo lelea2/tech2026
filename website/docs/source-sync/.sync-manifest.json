@@ -20,6 +20,10 @@
       "hash": "ae60d7953a5283afa27cb684b895a390fc70172fbd29abe80af2dfb796777109",
       "docRelative": "frontend/interview/ConnectionPool.mdx"
     },
+    "frontend/interview/DataGrid.js": {
+      "hash": "4cfb8759ab3032818afd564838189e41f99b88389bea261f966f0fc558bd1c85",
+      "docRelative": "frontend/interview/DataGrid.mdx"
+    },
     "frontend/interview/EmployeeTrainingDay.java": {
       "hash": "d78d6ae13265aa1da798fab7c5d41818e42e5a5e81d1eaf9b8406cba61f56a5f",
       "docRelative": "frontend/interview/EmployeeTrainingDay.java.mdx"
@@ -139,6 +143,10 @@
     "frontend/interview/inferColumnTypes.js": {
       "hash": "9dd22ca848e218c09b3f6d90f8caf68ce6f929f8cf7df48ff506ae8f229ef414",
       "docRelative": "frontend/interview/inferColumnTypes.mdx"
+    },
+    "frontend/interview/isValidJSCode.js": {
+      "hash": "5bbd11de78c3ddb928ce36a66d277e102bea9dbf05b586c2a5ed38c342a68574",
+      "docRelative": "frontend/interview/isValidJSCode.mdx"
     },
     "frontend/interview/isValidJSSyntax.js": {
       "hash": "90c213fab827959d1f55990febfcc197ad9477cdd1b0a0fcb90062d259ec7106",
@@ -2385,7 +2393,7 @@
       "docRelative": "frontend/css/_index.mdx"
     },
     "__nav__:frontend/interview": {
-      "hash": "4d8ef5a2e0740c2d91bb5a7128bbd82a12fb6018291bbcb0cbd07527b8fec202",
+      "hash": "1e6a44d495582f5048fdc22ede033ecfe31a1fe3b1549be29c28c6d9d51802a9",
       "docRelative": "frontend/interview/_index.mdx"
     },
     "__nav__:frontend/jsfunction": {

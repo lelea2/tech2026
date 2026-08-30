@@ -1,0 +1,191 @@
+---
+title: DataGrid
+---
+
+# DataGrid
+
+~~~javascript
+class DataGrid {
+  constructor(container, columns, data) {
+    this.container = container;
+    this.columns = columns;
+    this.originalData = data;
+
+    this.state = {
+      search: "",
+      sortKey: null,
+      sortDirection: "asc",
+    };
+
+    this.render();
+  }
+
+  getVisibleData() {
+    let rows = [...this.originalData];
+
+    // 1. Filter
+    if (this.state.search) {
+      const query = this.state.search.toLowerCase();
+
+      rows = rows.filter((row) =>
+        this.columns.some((column) =>
+          String(row[column.key])
+            .toLowerCase()
+            .includes(query)
+        )
+      );
+    }
+
+    // 2. Sort
+    if (this.state.sortKey) {
+      const { sortKey, sortDirection } = this.state;
+
+      rows.sort((a, b) => {
+        const aValue = a[sortKey];
+        const bValue = b[sortKey];
+
+        if (aValue === bValue) return 0;
+
+        const result = aValue < bValue ? -1 : 1;
+
+        return sortDirection === "asc"
+          ? result
+          : -result;
+      });
+    }
+
+    return rows;
+  }
+
+  handleSort(key) {
+    if (this.state.sortKey === key) {
+      this.state.sortDirection =
+        this.state.sortDirection === "asc"
+          ? "desc"
+          : "asc";
+    } else {
+      this.state.sortKey = key;
+      this.state.sortDirection = "asc";
+    }
+
+    this.render();
+  }
+
+  setSearch(search) {
+    this.state.search = search;
+    this.render();
+  }
+
+  render() {
+    const rows = this.getVisibleData();
+
+    this.container.innerHTML = "";
+
+    const table = document.createElement("table");
+
+    // Header
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+
+    for (const column of this.columns) {
+      const th = document.createElement("th");
+
+      th.textContent = column.label;
+
+      if (column.sortable !== false) {
+        th.style.cursor = "pointer";
+
+        th.addEventListener("click", () => {
+          this.handleSort(column.key);
+        });
+      }
+
+      if (this.state.sortKey === column.key) {
+        th.textContent +=
+          this.state.sortDirection === "asc"
+            ? " ↑"
+            : " ↓";
+      }
+
+      headerRow.appendChild(th);
+    }
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Body
+    const tbody = document.createElement("tbody");
+
+    for (const row of rows) {
+      const tr = document.createElement("tr");
+
+      for (const column of this.columns) {
+        const td = document.createElement("td");
+
+        td.textContent = row[column.key];
+
+        tr.appendChild(td);
+      }
+
+      tbody.appendChild(tr);
+    }
+
+    table.appendChild(tbody);
+
+    this.container.appendChild(table);
+  }
+}
+
+const columns = [
+  {
+    key: "name",
+    label: "Name",
+  },
+  {
+    key: "vehicle",
+    label: "Vehicle",
+  },
+  {
+    key: "speed",
+    label: "Speed",
+  },
+];
+
+const data = [
+  {
+    id: 1,
+    name: "Vehicle A",
+    vehicle: "Robotaxi",
+    speed: 42,
+  },
+  {
+    id: 2,
+    name: "Vehicle B",
+    vehicle: "Test Vehicle",
+    speed: 35,
+  },
+  {
+    id: 3,
+    name: "Vehicle C",
+    vehicle: "Robotaxi",
+    speed: 50,
+  },
+];
+
+const grid = new DataGrid(
+  document.getElementById("grid"),
+  columns,
+  data
+);
+
+document
+  .getElementById("search")
+  .addEventListener("input", (event) => {
+    grid.setSearch(event.target.value);
+  });
+
+
+// HTML structure for the DataGrid and search input
+// <input type="text" id="search" placeholder="Search..." />
+// <div id="grid"></div>
+~~~
