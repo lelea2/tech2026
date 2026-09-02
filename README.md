@@ -29,6 +29,7 @@ Use this skill when `frontend`, `backend`, or `algorithm` changes and you want d
 - `website/docs/frontend-system-design`
 - `website/docs/system-designs`
 - `website/docs/behavioral`
+- `website/docs/ai-coding`
 - `website/docs/low-level-design`
 - `website/docs/source-sync` (optional catch-all)
 
@@ -45,6 +46,7 @@ From repository root:
    - `npm run sync:frontend-system-design`
    - `npm run sync:source-docs -- --docs-subdir system-designs --format "system-designs=."`
    - `npm run sync:source-docs -- --docs-subdir behavioral --format "behavorial=."`
+   - `npm run sync:source-docs -- --docs-subdir ai-coding --format "ai-coding=."` (or `npm run sync:ai-coding`)
    - `npm run sync:source-docs -- --docs-subdir low-level-design --format "low-level-design=."`
 3. `npm run build`
 

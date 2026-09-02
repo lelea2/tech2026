@@ -9,6 +9,7 @@
     "sync:source-docs": "node ./scripts/sync-source-docs.mjs",
     "sync:system-designs": "node ./scripts/sync-source-docs.mjs --docs-subdir system-designs --format \"system-designs=.\"",
     "sync:frontend-system-design": "node ./scripts/sync-frontend-system-design.mjs",
+    "sync:ai-coding": "node ./scripts/sync-ai-coding.mjs",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",

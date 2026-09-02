@@ -1,0 +1,240 @@
+import json
+import re
+import hashlib
+from typing import Any, Dict, List
+
+
+def evaluate_condition(user: Dict[str, Any], condition: Dict[str, Any]) -> bool:
+    """
+    Evaluate one condition against one user.
+
+    Supported operators:
+      - eq
+      - in
+      - regex
+      - ~=
+
+    Missing/None values fail closed rather than throwing.
+    """
+    attribute = condition.get("attribute")
+    operator = condition.get("operator")
+    expected = condition.get("value")
+
+    actual = user.get(attribute)
+
+    # Treat missing values safely.
+    if actual is None:
+        return False
+
+    if operator == "eq":
+        return actual == expected
+
+    if operator == "in":
+        if not isinstance(expected, (list, tuple, set)):
+            return False
+        return actual in expected
+
+    if operator == "regex":
+        try:
+            # re.match is anchored at the beginning of the string.
+            return re.match(str(expected), str(actual)) is not None
+        except re.error:
+            return False
+
+    if operator == "~=":
+        return approximate_match(actual, expected)
+
+    # Unknown operators fail closed.
+    return False
+
+
+def approximate_match(actual: Any, expected: Any) -> bool:
+    """
+    Example interpretation of ~=.
+
+    Adjust this if the provided fixtures demonstrate different semantics.
+
+    Here:
+      - strings: case-insensitive substring match
+      - numbers: numeric equality within a tiny tolerance
+    """
+    if isinstance(actual, (int, float)) and isinstance(expected, (int, float)):
+        return abs(actual - expected) < 1e-9
+
+    return str(expected).lower() in str(actual).lower()
+
+
+def rule_conditions_match(
+    user: Dict[str, Any],
+    rule: Dict[str, Any]
+) -> bool:
+    """
+    All conditions inside a rule use logical AND.
+    """
+    conditions = rule.get("conditions", [])
+
+    return all(
+        evaluate_condition(user, condition)
+        for condition in conditions
+    )
+
+
+def stable_bucket(flag_key: str, user_id: Any) -> int:
+    """
+    Deterministically map a user + flag to bucket [0, 99].
+
+    Keeping flag_key in the hash prevents every flag from assigning
+    the same users to its rollout cohort.
+
+    IMPORTANT:
+    Replace this hashing scheme if expected_decisions.json demonstrates
+    another percentage-rollout algorithm.
+    """
+    value = f"{flag_key}:{user_id}".encode("utf-8")
+
+    digest = hashlib.sha256(value).hexdigest()
+
+    return int(digest[:8], 16) % 100
+
+
+def passes_percentage_rollout(
+    user: Dict[str, Any],
+    flag: Dict[str, Any],
+    rule: Dict[str, Any]
+) -> bool:
+    """
+    Apply percentage rollout if the rule contains a `percentage` field.
+
+    Percentage:
+      0   -> nobody
+      30  -> buckets 0..29
+      100 -> everybody
+    """
+    percentage = rule.get("percentage")
+
+    # No percentage means this rule applies normally.
+    if percentage is None:
+        return True
+
+    try:
+        percentage = float(percentage)
+    except (TypeError, ValueError):
+        return False
+
+    if percentage <= 0:
+        return False
+
+    if percentage >= 100:
+        return True
+
+    user_id = user.get("user_id")
+
+    if user_id is None:
+        return False
+
+    bucket = stable_bucket(
+        flag_key=flag.get("key", ""),
+        user_id=user_id,
+    )
+
+    return bucket < percentage
+
+
+def rule_matches(
+    user: Dict[str, Any],
+    flag: Dict[str, Any],
+    rule: Dict[str, Any]
+) -> bool:
+    """
+    A rule matches when:
+      1. every condition matches
+      2. its percentage rollout includes the user
+    """
+    if not rule_conditions_match(user, rule):
+        return False
+
+    if not passes_percentage_rollout(user, flag, rule):
+        return False
+
+    return True
+
+
+def evaluate_flag(
+    user: Dict[str, Any],
+    flag: Dict[str, Any]
+) -> bool:
+    """
+    Evaluate one feature flag for one user.
+
+    Semantics:
+      1. Disabled flag -> default immediately
+      2. All matching rules are considered
+      3. If no rules match -> default
+      4. If multiple rules match -> true wins
+    """
+    default = bool(flag.get("default", False))
+
+    # Disabled flags ignore all rules.
+    if not flag.get("enabled", False):
+        return default
+
+    matched_values = []
+
+    for rule in flag.get("rules", []):
+        if rule_matches(user, flag, rule):
+            matched_values.append(bool(rule.get("value", False)))
+
+    if not matched_values:
+        return default
+
+    # Conflict resolution:
+    # if any matching rule evaluates to true, final result is true.
+    return any(matched_values)
+
+
+def evaluate_all_flags(
+    user: Dict[str, Any],
+    flags: List[Dict[str, Any]]
+) -> Dict[str, bool]:
+    """
+    Evaluate every flag for one user.
+    """
+    return {
+        flag["key"]: evaluate_flag(user, flag)
+        for flag in flags
+    }
+
+
+def evaluate_all_users(
+    users: List[Dict[str, Any]],
+    flags: List[Dict[str, Any]]
+) -> Dict[str, Dict[str, bool]]:
+    """
+    Evaluate all flags for all users.
+    """
+    results = {}
+
+    for user in users:
+        user_id = str(user["user_id"])
+
+        results[user_id] = evaluate_all_flags(
+            user=user,
+            flags=flags,
+        )
+
+    return results
+
+### Example usage:
+if __name__ == "__main__":
+    # Load users and flags from JSON files
+    with open("users.json", "r") as f:
+        users = json.load(f)
+
+    with open("flags.json", "r") as f:
+        flags = json.load(f)
+
+    # Evaluate all flags for all users
+    results = evaluate_all_users(users, flags)
+
+    # Print the results
+    print(json.dumps(results, indent=2))

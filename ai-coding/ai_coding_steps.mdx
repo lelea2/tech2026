@@ -1,0 +1,158 @@
+---
+title: 'AI Template strategy'
+---
+
+```
+00–05  Understand + milestones
+05–10  Inspect fixtures / resolve semantics
+10–18  evaluate_condition
+18–24  rule_matches
+24–32  evaluate_flag
+32–38  evaluate_all + oracle harness
+38–45  diagnose mismatches
+45–50  regression tests
+50–55  cleanup/code review
+55–60  explain + complexity/tradeoffs
+```
+
+### Prompt1: Analyze, don't solve -- Understand semantics
+
+```
+Context:
+I'm implementing a feature flag evaluation engine.
+
+Inputs:
+- flags.json: flag definitions
+- users.json: users
+- expected_decisions.json: oracle for 200 users × 7 flags
+
+Known semantics so far:
+- disabled flag => return default immediately
+- conditions inside one rule are AND
+- multiple matched rules appear to use true-wins
+- no matched rule => default
+- operators include eq, in, regex, ~=
+- some rules have percentage rollout
+
+Do NOT implement yet.
+
+Help me create a concise table of:
+1. confirmed semantics
+2. ambiguous semantics I should infer from expected_decisions.json
+3. edge cases that could cause false conclusions
+4. the smallest experiments I should run against the input files to resolve each ambiguity
+
+Especially focus on:
+- multiple matching rules
+- percentage rollout
+- regex semantics
+- ~= semantics
+- missing/empty attributes
+```
+
+### Milestones i'm consider for my steps:
+
+| Milestone | Goal                             | Validation                   |
+| --------- | -------------------------------- | ---------------------------- |
+| M1        | Load and inspect data            | Counts/schema sanity         |
+| M2        | Implement basic operators        | Table-driven unit tests      |
+| M3        | Implement single-rule matching   | Hand-picked users            |
+| M4        | Implement single-flag evaluation | Known expected decisions     |
+| M5        | Resolve conflict semantics       | Compare multi-match users    |
+| M6        | Implement percentage rollout     | Derive from oracle           |
+| M7        | Evaluate all flags               | Compare 200 × 7              |
+| M8        | Investigate mismatches           | Cluster mismatches by cause  |
+| M9        | Handle dirty data                | Explicit policy/tests        |
+| M10       | Refactor and document            | Full regression remains 100% |
+
+### Prompt2 -- implement for condition evaluator only
+
+’m deliberately isolating condition semantics because if this primitive is wrong, every higher-level mismatch becomes noisy.
+
+```
+I want to implement only the condition evaluation layer now.
+
+Target interface:
+
+evaluateCondition(user, condition) -> boolean
+
+Operators currently known:
+- eq
+- in
+- regex
+- ~=
+
+Constraints:
+- don't implement flag/rule aggregation yet
+- handle missing attributes safely
+- avoid throwing on malformed/empty user fields
+- regex should behave like an anchored match, not arbitrary substring search
+
+Please:
+1. propose precise semantics for each operator
+2. point out anything still ambiguous
+3. give pseudocode first
+4. suggest table-driven tests
+5. do NOT build the entire feature flag engine
+```
+
+### Prompt3 -- Using AI for review, not code dumping
+
+```
+Review this condition evaluator as if you were doing a code review.
+
+Look specifically for:
+- coercion bugs
+- undefined/null/empty-string behavior
+- regex anchoring mistakes
+- membership bugs
+- assumptions about ~= semantics
+
+Do not rewrite it yet.
+
+Return:
+1. correctness risks
+2. examples that would break it
+3. tests I should add
+```
+
+### Prompt4 -- Build rule evaluation separately -- claude making design decision instead of just coding
+
+```
+Next milestone: evaluate a single rule.
+
+Assumption:
+ruleMatches(user, rule) is true only when every condition returns true.
+
+I already have evaluateCondition().
+
+Please help me validate the following design rather than replacing it:
+
+function ruleMatches(user, rule) {
+  return rule.conditions.every(condition =>
+    evaluateCondition(user, condition)
+  );
+}
+
+Questions:
+1. Are there meaningful edge cases around empty condition lists?
+2. Should malformed conditions fail closed or throw?
+3. What tests distinguish AND behavior from accidental OR behavior?
+4. Should percentage rollout belong here or at flag evaluation level?
+```
+
+Ask Claude one subtle question
+
+```
+For an empty conditions array, Python all([]) returns True.
+
+Based on feature-flag semantics and the fixtures, should an empty-condition rule represent an unconditional rule or invalid rule?
+
+Use fixture evidence if available. Do not guess.
+```
+
+### Prompt5: infer conflict behavior, evidence-driven investigation
+
+```
+
+```

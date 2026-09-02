@@ -1,0 +1,55 @@
+---
+title: 'AI Template strategy'
+---
+
+### Prompt1: Analyze, don't solve -- Understand semantics
+
+```
+Context:
+I'm implementing a feature flag evaluation engine.
+
+Inputs:
+- flags.json: flag definitions
+- users.json: users
+- expected_decisions.json: oracle for 200 users × 7 flags
+
+Known semantics so far:
+- disabled flag => return default immediately
+- conditions inside one rule are AND
+- multiple matched rules appear to use true-wins
+- no matched rule => default
+- operators include eq, in, regex, ~=
+- some rules have percentage rollout
+
+Do NOT implement yet.
+
+Help me create a concise table of:
+1. confirmed semantics
+2. ambiguous semantics I should infer from expected_decisions.json
+3. edge cases that could cause false conclusions
+4. the smallest experiments I should run against the input files to resolve each ambiguity
+
+Especially focus on:
+- multiple matching rules
+- percentage rollout
+- regex semantics
+- ~= semantics
+- missing/empty attributes
+```
+
+### Milestones i'm consider for my steps:
+
+| Milestone | Goal                             | Validation                  |
+| --------- | --------------------------------- | ---------------------------- |
+| M1        | Load and inspect data             | Counts/schema sanity         |
+| M2        | Implement basic operators         | Table-driven unit tests      |
+| M3        | Implement single-rule matching    | Hand-picked users            |
+| M4        | Implement single-flag evaluation  | Known expected decisions     |
+| M5        | Resolve conflict semantics        | Compare multi-match users    |
+| M6        | Implement percentage rollout      | Derive from oracle           |
+| M7        | Evaluate all flags                | Compare 200 × 7              |
+| M8        | Investigate mismatches            | Cluster mismatches by cause  |
+| M9        | Handle dirty data                 | Explicit policy/tests        |
+| M10       | Refactor and document             | Full regression remains 100% |
+
+### Prompt2

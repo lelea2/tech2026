@@ -1,0 +1,24 @@
+{
+  "files": {
+    "ai-coding/ai-enabled-playbook.mdx": {
+      "hash": "33827bfab24402c11c6f6405e0d5560377e10a02bc1c3dbd6bb3574723587fe0",
+      "docRelative": "ai-enabled-playbook.mdx"
+    },
+    "ai-coding/ai-prompt-template.mdx": {
+      "hash": "9b18b08477776d7e0afff5a2abdb171fd7a332b9d91e8dc8b2a59dbe11c808ff",
+      "docRelative": "ai-prompt-template.mdx"
+    },
+    "ai-coding/ai_coding_experience_interview_script.mdx": {
+      "hash": "6a227f7460f941e275cd993709dfa9e5b03d76d8d1bddaa72390c9a57c174354",
+      "docRelative": "ai_coding_experience_interview_script.mdx"
+    },
+    "ai-coding/ai_coding_steps.mdx": {
+      "hash": "e15010c6decc5786dab7631db1461e90f88a5d6408279df7095b68d5fcabe957",
+      "docRelative": "ai_coding_steps.mdx"
+    },
+    "ai-coding/ai_observability_study.mdx": {
+      "hash": "6c201a00138db0c4d2d74afe19819c28fdcf845be9bb43a9567376ccac12d8ed",
+      "docRelative": "ai_observability_study.mdx"
+    }
+  }
+}
